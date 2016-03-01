@@ -5,3 +5,10 @@ pronlex is a sketch of/place holder for a pronunciation lexicon database behind 
 Clone pronlex under src/github.com/stts-se/ in your GOPATH root.
 
 Create a pronlex.db and place it in the lexserver directory.
+
+```
+github.com/stts-se/pronlex/lexserver$ createEmptyDB pronlex.db
+github.com/stts-se/pronlex/lexserver$ addNSTLexToDB sv.se.nst pronlex.db [PATH TO NST LEX]/swe030224NST.pron_utf8.txt 
+github.com/stts-se/pronlex/lexserver$ CompileDaemon -command lexserver
+```
+(Or just `lexserver`)
