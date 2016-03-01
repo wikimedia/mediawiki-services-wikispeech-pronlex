@@ -1,3 +1,4 @@
+// lookup is a command line look up script for a Sqlite3 lexicon db created using createEmptyDB
 package main
 
 import (
@@ -36,17 +37,13 @@ func main() {
 		Words:      os.Args[2:],
 		PageLength: 100}
 
-	//log.Printf("VOFF: %v", q)
-
 	res := dbapi.GetEntries(db, q)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//for _, e := range res {
 	res0, err := json.MarshalIndent(res, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s\n", res0)
-	//}
 }
