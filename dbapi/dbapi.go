@@ -134,56 +134,56 @@ func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
 	return l
 }
 
-func insertEntry(db *sql.DB, l Lexicon, e Entry) int64 {
+// func insertEntry(db *sql.DB, l Lexicon, e Entry) int64 {
 
-	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
-	var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
+// 	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
+// 	var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
-	// Transaction -->
-	tx, err := db.Begin()
+// 	// Transaction -->
+// 	tx, err := db.Begin()
 
-	stmt1, err := tx.Prepare(entrySTMT)
-	if err != nil {
-		log.Fatal(err)
-	}
-	stmt2, err := tx.Prepare(transAfterEntrySTMT)
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	stmt1, err := tx.Prepare(entrySTMT)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	stmt2, err := tx.Prepare(transAfterEntrySTMT)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	res, err := tx.Stmt(stmt1).Exec(
-		l.Id,
-		e.Strn,
-		e.Language,
-		e.PartOfSpeech,
-		e.WordParts)
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	res, err := tx.Stmt(stmt1).Exec(
+// 		l.Id,
+// 		strings.ToLower(e.Strn),
+// 		e.Language,
+// 		e.PartOfSpeech,
+// 		e.WordParts)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	id, err := res.LastInsertId()
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	// res.Close()
+// 	// res.Close()
 
-	for _, t := range e.Transcriptions {
-		_, err := tx.Stmt(stmt2).Exec(id, t.Strn, t.Language)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+// 	for _, t := range e.Transcriptions {
+// 		_, err := tx.Stmt(stmt2).Exec(id, t.Strn, t.Language)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 	}
 
-	tx.Commit()
-	// <- transaction
+// 	tx.Commit()
+// 	// <- transaction
 
-	return id
-}
+// 	return id
+// }
 
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
@@ -211,7 +211,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 	for _, e := range es {
 		res, err := tx.Stmt(stmt1).Exec(
 			l.Id,
-			e.Strn,
+			strings.ToLower(e.Strn),
 			e.Language,
 			e.PartOfSpeech,
 			e.WordParts)

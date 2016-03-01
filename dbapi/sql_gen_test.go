@@ -15,6 +15,28 @@ func TestSql_RemoveEmptyStrings(t *testing.T) {
 	}
 }
 
+func TestSql_ToLower(t *testing.T) {
+	ss := []string{"AaaA", "aB", "cCC"}
+	ss = ToLower(ss)
+	x := 3
+	if len(ss) != x {
+		t.Errorf(fs, x, len(ss))
+	}
+
+	if ss[0] != "aaaa" {
+		t.Errorf(fs, "aaaa", ss[0])
+	}
+	if ss[1] != "ab" {
+		t.Errorf(fs, "ab", ss[1])
+	}
+
+	if ss[2] != "ccc" {
+		t.Errorf(fs, "ccc", ss[2])
+	}
+
+}
+
+
 func TestSql_words(t *testing.T) {
 	w, wv := words(Query{})
 	if "" != w {

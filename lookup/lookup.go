@@ -34,7 +34,7 @@ func main() {
 	ls := []dbapi.Lexicon{l}
 
 	q := dbapi.Query{Lexicons: ls,
-		Words:      os.Args[2:],
+		Words:      dbapi.ToLower(os.Args[2:]),
 		PageLength: 100}
 
 	res := dbapi.GetEntries(db, q)

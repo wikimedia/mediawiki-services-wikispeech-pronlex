@@ -105,7 +105,7 @@ func words(q Query) (string, []interface{}) {
 	} //else {
 	if len(q.Words) > 0 {
 		res += "entry.strn in " + nQs(len(q.Words))
-		resv = append(resv, convS(q.Words)...)
+		resv = append(resv, convS(ToLower(q.Words))...)
 	}
 	if trm(q.WordLike) != "" {
 		res += "entry.strn like ? "
@@ -185,6 +185,14 @@ func filter(ss []string, f func(string) bool) []string {
 
 func RemoveEmptyStrings(ss []string) []string {
 	return filter(ss, func(s string) bool { return strings.TrimSpace(s) != "" })
+}
+
+func ToLower(ss []string) []string {
+	res := make([]string, len(ss))
+	for i, v := range ss {
+		res[i] = strings.ToLower(v)
+	}
+	return res
 }
 
 

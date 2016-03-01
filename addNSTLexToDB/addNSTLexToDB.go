@@ -55,7 +55,7 @@ func nstLine2Entry(l string) dbapi.Entry {
 	fs := strings.Split(l, ";")
 
 	res := dbapi.Entry{
-		Strn:           fs[orth],
+		Strn:           strings.ToLower(fs[orth]),
 		Language:       fs[wordLang],
 		PartOfSpeech:   fs[pos] + " " + fs[morph],
 		WordParts:      fs[decomp],
