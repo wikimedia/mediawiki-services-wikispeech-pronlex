@@ -4,6 +4,7 @@ pronlex is a sketch of/place holder for a pronunciation lexicon database behind 
 
 Clone pronlex under src/github.com/stts-se/ in your GOPATH root.
 
+```
 cd pronlex/createEmptyDB/
 go get
 go install
@@ -12,7 +13,7 @@ go install
 cd ../lexserver
 go install
 Make sure GOPATH/bin is in $PATH
-
+```
 
 Create a pronlex.db and place it in the lexserver directory.
 
