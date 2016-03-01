@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+<title>Lexserver</title>
+</head>
+<body>
+
+<h1>Create db and start server</h1>
+
+<pre>
+github.com/stts-se/pronlex/lexserver$ createEmptyDB pronlex.db
+github.com/stts-se/pronlex/lexserver$ addNSTLexToDB sv.se.nst pronlex.db [PATH TO NST LEX]/swe030224NST.pron_utf8.txt 
+github.com/stts-se/pronlex/lexserver$ CompileDaemon -command lexserver
+</pre>
+
+<h1>Lexserver</h1>
+
+
+<h2>List lexicons:</h2>
+
+<a href='http://localhost:8787/listlexicons'>http://localhost:8787/listlexicons</a>
+
+<h2>List lexicons, pretty print:</h2>
+
+<a href='http://localhost:8787/listlexicons?pp=yes'>http://localhost:8787/listlexicons?pp=yes</a>
+<p>
+(Value of 'pp' parameter does not matter, as long there is one.)
+
+<h2>Lexicon look up:</h2>
+
+<a href="http://localhost:8787/lexlookup">http://localhost:8787/lexlookup</a>
+
+</body>
+</html>
+

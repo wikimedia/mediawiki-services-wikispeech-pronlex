@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Create lexicon</title>
+  </head>
+  <body>
+    <h1>** Admin create lexicon **</h1>
+    
+    <table id="lexnames">
+      <thead>
+	<tr>
+	  <td>db id</td>
+	  <td>name</td>
+	  <td>symbol set name</td>
+	  <td>entries</td>
+	  <td>delete</td>
+	</tr>
+      </thead>
+      <tbody data-bind="foreach: DMCRLX.lexicons">
+	<tr>
+	  <td data-bind="text: $data.id"</td>
+	  <td data-bind="text: $data.name"></td>
+	  <td data-bind="text: $data.symbolSetName"></td>
+	  <td>?</td>
+	  <td>?</td>
+	</tr>
+      </tbody>
+    </table>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
+<!-- There is something fishy with this src path: -->
+<script type="text/javascript" src="../../static/admin/create_lex.js"></script>
+</body>
+</html>

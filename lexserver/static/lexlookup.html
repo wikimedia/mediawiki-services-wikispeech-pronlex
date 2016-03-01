@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>lexlookup</title>
+  </head>
+  <body>
+    <h1>Lexserver</h1>
+    
+    <h2>Look up words:</h2>
+    
+    <code>words=hund,häst</code>
+    <p>
+
+    <a href='http://localhost:8787/lexlookup?lexicons=sv.se.nst&words=hund,häst'>http://localhost:8787/lexlookup?lexicons=sv.se.nst&words=hund,häst</a>
+    
+    <h2>Look up words, pretty print:</h2>
+
+    <code>words=hund,häst&pp=yes</code>
+    <p>
+
+    
+    <a href='http://localhost:8787/lexlookup?lexicons=sv.se.ns&words=hund,häst&pp=yes'>http://localhost:8787/lexlookup?lexicons=sv.se.ns&words=hund,häst&pp=yes</a>
+    <p>
+      (Value of 'pp' parameter does not matter, as long there is one.)
+      
+      
+      <h2>transcriptionlike</h2>
+      Look up word <code>dom</code> where transcription includes string <code>o:</code>
+    <p>
+      <a href='http://localhost:8787/lexlookup?lexicons=sv.se.ns&words=dom&transcriptionlike=%25o:%25&pp=yes'>http://localhost:8787/lexlookup?lexicons=sv.se.ns&words=dom&transcriptionlike=%25o:%25&pp=yes</a>
+    <p>
+      (For this to work properly, the Sqlite db must be instructed that <code>PRAGMA case_sensitive_like=ON</code>)
+
+      <h2>Look up lemmas</h2>
+
+      <a href="http://localhost:8787/lexlookup?lemmas=springa&pp=y">http://localhost:8787/lexlookup?lemmas=spring&pp=y</a>
+
+      <p>
+
+  </body>
+</html>
