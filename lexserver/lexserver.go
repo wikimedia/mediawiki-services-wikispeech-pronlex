@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"morf.se/wsgo/pronlex/dbapi"
+	"github.com/stts-se/pronlex/dbapi"
 	"net/http"
 	"net/url"
 	"os"
