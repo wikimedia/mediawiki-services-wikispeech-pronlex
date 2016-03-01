@@ -6,6 +6,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os"
+	"github.com/stts-se/pronlex/dbapi"
 )
 
 // createEmptyDB creates an empty Sqlite3 relational database according to a schema defining a lexicon database
@@ -31,95 +32,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec(schema)
+	_, err = db.Exec(dbapi.Schema)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 }
 
-var schema = `
-CREATE TABLE Lexicon (
-    name varchar(128) not null,
-    symbolSetName varchar(128) not null,
-    id integer not null primary key autoincrement
-  );
-CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);
-CREATE TABLE Symbolset (
-    description varchar(128),
-    subcat varchar(128) not null,
-    symbol varchar(128) not null,
-    id integer not null primary key autoincrement,
-    category varchar(128) not null,
-    lexiconId integer not null,
-    ipa varchar(128)
-  );
-CREATE INDEX idx37380686 on Symbolset (symbol);
-CREATE TABLE Lemma (
-    reading varchar(128) not null,
-    id integer not null primary key autoincrement,
-    paradigm varchar(128),
-    strn varchar(128) not null
-  );
-CREATE INDEX idx21d604f4 on Lemma (reading);
-CREATE INDEX idx273f055f on Lemma (paradigm);
-CREATE INDEX idx149303e1 on Lemma (strn);
-CREATE TABLE SurfaceForm (
-    id integer not null primary key autoincrement,
-    strn varchar(128) not null
-  );
-CREATE UNIQUE INDEX idx35390652 on SurfaceForm (strn);
-CREATE TABLE Entry (
-    wordParts varchar(128),
-    label varchar(128),
-    id integer not null primary key autoincrement,
-    language varchar(128) not null,
-    strn varchar(128) not null,
-    lexiconId integer not null,
-    partOfSpeech varchar(128)
-  ,
-foreign key (lexiconId) references Lexicon(id));
-CREATE INDEX idx28d70584 on Entry (language);
-CREATE INDEX idx15890407 on Entry (strn);
-CREATE TABLE EntryStatus (
-    name varchar(128) not null,
-    source varchar(128) not null,
-    entryId integer not null,
-    timestamp timestamp not null,
-    id integer not null primary key autoincrement
-  ,
-foreign key (entryId) references Entry(id) on delete cascade);
-CREATE TABLE Transcription (
-    entryId integer not null,
-    preference int,
-    label varchar(128),
-    -- symbolSetCode varchar(128) not null,
-    id integer not null primary key autoincrement,
-    language varchar(128) not null,
-    strn varchar(128) not null
-  ,
-foreign key (entryId) references Entry(id) on delete cascade);
-CREATE TABLE TranscriptionStatus (
-    name varchar(128) not null,
-    source varchar(128) not null,
-    timestamp timestamp not null,
-    transcriptionId integer not null,
-    id integer not null primary key autoincrement
-  ,
-foreign key (transcriptionId) references Transcription(id) on delete cascade);
-CREATE TABLE Lemma2Entry (
-    entryId bigint not null,
-    lemmaId bigint not null,
-unique(lemmaId,entryId),
-foreign key (entryId) references Entry(id), -- NL20160226
-foreign key (lemmaId) references Lemma(id)); -- NL20160226
-CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
-CREATE TABLE SurfaceForm2Entry (
-    entryId bigint not null,
-    surfaceFormId bigint not null
-  ,
-unique(surfaceFormId,entryId));
-CREATE UNIQUE INDEX idx8bc90a52 on Symbolset (lexiconId,symbol);
-CREATE INDEX idx4a250778 on Entry (strn,language);
-CREATE UNIQUE INDEX idx407206e8 on Lemma (strn,reading);
-`
