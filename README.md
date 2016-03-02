@@ -12,6 +12,7 @@ cd ../addNSTLexToDB
 go install
 cd ../lexserver
 go install
+
 Make sure GOPATH/bin is in $PATH
 ```
 
