@@ -138,11 +138,7 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := queryFromParams(r)
-	tx, err := db.Begin()
-	ff("lexLookUpHandler: %v", err) // TODO
-	defer tx.Commit()
-	res := dbapi.GetEntries(tx, q)
-	tx.Commit()
+	res := dbapi.GetEntries(db, q)
 
 	jsn, err := marshal(res, r)
 	ff("lexserver: Failed to marshal json: %v", err)

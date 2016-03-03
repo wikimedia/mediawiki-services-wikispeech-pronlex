@@ -37,17 +37,8 @@ func main() {
 		Words:      dbapi.ToLower(os.Args[2:]),
 		PageLength: 100}
 
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		log.Fatal(err)
-	}
+	res := dbapi.GetEntries(db, q)
 
-	res := dbapi.GetEntries(tx, q)
-	tx.Commit()
-	if err != nil {
-		log.Fatal(err)
-	}
 	res0, err := json.MarshalIndent(res, "", "  ")
 	if err != nil {
 		log.Fatal(err)

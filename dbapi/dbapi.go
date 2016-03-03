@@ -5,6 +5,7 @@ package dbapi
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"sort"
@@ -212,7 +213,9 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
 	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
 	_, err := db.Exec(sql, l.Id, e.Id)
-	ff("Wha? %v", err)
+	if err != nil {
+		err = fmt.Errorf("failed to associate lemma "+l.Strn+" and entry "+e.Strn+":%v", err)
+	}
 	return err
 }
 
@@ -227,7 +230,7 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	case err == sql.ErrNoRows:
 		return InsertLemma(tx, Lemma{Id: id, Strn: strn, Reading: reading, Paradigm: paradigm})
 	case err != nil:
-		ff("SetOrGetLemma failed: %v", err)
+		return res, fmt.Errorf("SetOrGetLemma failed querying db : %v", err)
 	}
 
 	res.Id = id
@@ -238,25 +241,22 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	return res, err
 }
 
-func getLemmaFromEntryId(tx *sql.Tx, id int64) Lemma {
+func getLemmaFromEntryId(db *sql.DB, id int64) Lemma {
 	res := Lemma{}
-	sql := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
+	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
 		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
 	var lId int64
 	var strn, reading, paradigm string
-	err := tx.QueryRow(sql, id).Scan(&lId, &strn, &reading, &paradigm)
-	// TODO: why doesn't this work? Must be some silly mistake
-	// "./dbapi.go:281: sql.ErrNoRows undefined (type string has no field or method ErrNoRows)"
-	// switch {
-	// case err == sql.ErrNoRows:
-	// 	// No row:
-	// 	// Silently return empty Lemma below
-	// case err != nil:
-	// 	ff("getLemmaFromENtryId: %v", err)
-	// }
-	_ = err
+	err := db.QueryRow(sqlS, id).Scan(&lId, &strn, &reading, &paradigm)
+	switch {
+	case err == sql.ErrNoRows:
+		// TODO No row:
+		// Silently return empty Lemma below
+	case err != nil:
+		ff("getLemmaFromENtryId: %v", err)
+	}
 
-	// TODO Now silently returns empty lemma if nothing returned from tx. Ok?
+	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
 	// Return err when there is an err
 	res.Id = lId
 	res.Strn = strn
@@ -269,22 +269,25 @@ func getLemmaFromEntryId(tx *sql.Tx, id int64) Lemma {
 func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
 	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
-	ff("InsertLemma tx.Exec: %v", err)
+	if err != nil {
+		err = fmt.Errorf("failed insert lemma "+l.Strn+": %v", err)
+	}
 	id, err := res.LastInsertId()
-	ff("InsertLemma LastInsertId: %v", err)
+	if err != nil {
+		err = fmt.Errorf("failed last LastInsertId after insert lemma "+l.Strn+": %v", err)
+	}
 	l.Id = id
 	return l, err
 }
 
-// TODO Maybe this should take an sql.DB instead? Unsure about locking of sql.Tx
-func EntriesFromIds(tx *sql.Tx, entryIds []int64) map[string][]Entry {
+func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if len(entryIds) == 0 {
 		return res
 	}
 
 	qString, values := entriesFromIdsSelect(entryIds)
-	rows, err := tx.Query(qString, values...)
+	rows, err := db.Query(qString, values...)
 	if err != nil {
 		log.Fatalf("EntriesFromIds: %s", err)
 	}
@@ -323,7 +326,7 @@ func EntriesFromIds(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 				Language:     entryLanguage,
 				PartOfSpeech: entryPartofSpeech,
 				WordParts:    entryWordParts,
-				Lemma:        getLemmaFromEntryId(tx, entryId),
+				Lemma:        getLemmaFromEntryId(db, entryId),
 			}
 
 			entries[entryId] = e
@@ -364,8 +367,7 @@ func EntriesFromIds(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	return res
 }
 
-// TODO Maybe this should take an sql.DB instead. Unsure about sql.Tx and locking.
-func GetEntries(tx *sql.Tx, q Query) map[string][]Entry {
+func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if q.Empty() { // TODO report to client?
 		log.Printf("dbapi.GetEntries: Query empty of search constraints: %v", q)
@@ -374,7 +376,7 @@ func GetEntries(tx *sql.Tx, q Query) map[string][]Entry {
 
 	qString, vs := idiotSql(q)
 
-	rows, err := tx.Query(qString, vs...)
+	rows, err := db.Query(qString, vs...)
 	if err != nil {
 		log.Fatalf("dbapi.GetEntries:\t%s", err)
 	}
@@ -389,7 +391,7 @@ func GetEntries(tx *sql.Tx, q Query) map[string][]Entry {
 		ids = append(ids, id)
 	}
 
-	res = EntriesFromIds(tx, ids)
+	res = EntriesFromIds(db, ids)
 	return res
 }
 
