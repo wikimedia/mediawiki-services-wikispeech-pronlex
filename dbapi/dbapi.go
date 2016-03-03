@@ -276,17 +276,6 @@ func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	return l, err
 }
 
-// func InsertLemma(db *sql.DB, l Lemma) (Lemma, error) {
-// 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
-// 	res, err := db.Exec(sql, l.Strn, l.Reading, l.Paradigm)
-// 	ff("InsertLemma db.Exec: %v", err)
-// 	id, err := res.LastInsertId()
-// 	ff("InsertLemma LastInsertId: %v", err)
-// 	l.Id = id
-// 	return l, err
-// }
-
-// TODO Map gör så att ordnigen blir galen
 // TODO Maybe this should take an sql.DB instead? Unsure about locking of sql.Tx
 func EntriesFromIds(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	res := make(map[string][]Entry)
