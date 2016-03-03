@@ -7,7 +7,7 @@ You need [Sqlite3](https://www.sqlite.org/)
 
 
 
-Clone pronlex under src/github.com/stts-se/ in your GOPATH root.
+Clone pronlex under src/github.com/stts-se/ in your [GOPATH](https://golang.org/doc/code.html#GOPATH) root.
 
 ```
 cd pronlex/createEmptyDB/
