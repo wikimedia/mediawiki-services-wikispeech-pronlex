@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"github.com/stts-se/pronlex/dbapi"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -61,18 +61,18 @@ func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 
 // TODO Gör konstanter som kan användas istället för strängar
 var knownParams = map[string]int{
-	"lexicons":         1,
-	"words":            1,
-	"lemmas":           1,
-	"wordlike":         1,
-	"transcriptionlike" : 1,
-	"partofspeechlike": 1,
-	"lemmalike":        1,
-	"readinglike":      1,
-	"paradigmlike":     1,
-	"page":             1,
-	"pagelike":         1,
-	"pp":               1,
+	"lexicons":          1,
+	"words":             1,
+	"lemmas":            1,
+	"wordlike":          1,
+	"transcriptionlike": 1,
+	"partofspeechlike":  1,
+	"lemmalike":         1,
+	"readinglike":       1,
+	"paradigmlike":      1,
+	"page":              1,
+	"pagelike":          1,
+	"pp":                1,
 }
 
 func queryFromParams(r *http.Request) dbapi.Query {
@@ -103,17 +103,17 @@ func queryFromParams(r *http.Request) dbapi.Query {
 	dbLexs := dbapi.GetLexicons(db, lexs)
 
 	q := dbapi.Query{
-		Lexicons:         dbLexs,
-		Words:            words,
-		WordLike:         wordLike,
-		TranscriptionLike : transcriptionLike,
-		PartOfSpeechLike: partOfSpeechLike,
-		Lemmas:           lemmas,
-		LemmaLike:        lemmaLike,
-		ReadingLike:      readingLike,
-		ParadigmLike:     paradigmLike,
-		Page:             page,
-		PageLength:       pageLength}
+		Lexicons:          dbLexs,
+		Words:             words,
+		WordLike:          wordLike,
+		TranscriptionLike: transcriptionLike,
+		PartOfSpeechLike:  partOfSpeechLike,
+		Lemmas:            lemmas,
+		LemmaLike:         lemmaLike,
+		ReadingLike:       readingLike,
+		ParadigmLike:      paradigmLike,
+		Page:              page,
+		PageLength:        pageLength}
 
 	return q
 }
@@ -137,9 +137,12 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
 	q := queryFromParams(r)
-	res := dbapi.GetEntries(db, q)
+	tx, err := db.Begin()
+	ff("lexLookUpHandler: %v", err) // TODO
+	defer tx.Commit()
+	res := dbapi.GetEntries(tx, q)
+	tx.Commit()
 
 	jsn, err := marshal(res, r)
 	ff("lexserver: Failed to marshal json: %v", err)
@@ -151,7 +154,6 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/create_lex.html")
 }
-
 
 var db *sql.DB
 
@@ -174,7 +176,6 @@ func main() {
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
-	
 	// static
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/favicon.ico", faviconHandler)
@@ -186,8 +187,7 @@ func main() {
 
 	// admin page
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
-	
-	
+
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 

@@ -5,13 +5,13 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"github.com/stts-se/pronlex/dbapi"
+	"log"
 	"os"
 )
 
 // TODO replace calls to ff() with proper error handling
-// ff is a place holder to easily find places lacking sane error handling 
+// ff is a place holder to easily find places lacking sane error handling
 func ff(f string, err error) {
 	if err != nil {
 		log.Fatalf(f, err)
@@ -37,7 +37,14 @@ func main() {
 		Words:      dbapi.ToLower(os.Args[2:]),
 		PageLength: 100}
 
-	res := dbapi.GetEntries(db, q)
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res := dbapi.GetEntries(tx, q)
+	tx.Commit()
 	if err != nil {
 		log.Fatal(err)
 	}

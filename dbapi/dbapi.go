@@ -11,10 +11,6 @@ import (
 	"strings"
 )
 
-func f0(i int) {
-	// hello?
-}
-
 // TODO
 // f is a place holder to be replaced by proper error handling
 func f(err error) {
@@ -91,6 +87,7 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 
 }
 
+// TODO change input arg to sql.Tx ?
 func InsertLexicon(db *sql.DB, l Lexicon) Lexicon {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -143,6 +140,7 @@ func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
 	return l
 }
 
+// TODO change input arg to sql.Tx ?
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
 	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
@@ -200,7 +198,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 		if "" != e.Lemma.Strn && "" != e.Lemma.Reading {
 			lemma, err := SetOrGetLemmaTx(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
 			ff("Failed to insert lemma: %v", err)
-			err = AssociateLemma2EntryTx(tx, lemma, e)
+			err = AssociateLemma2Entry(tx, lemma, e)
 			ff("Failed lemma to entry assoc: %v", err)
 		}
 	}
@@ -211,30 +209,23 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 	return ids
 }
 
-func AssociateLemma2EntryTx(db *sql.Tx, l Lemma, e Entry) error {
+func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
 	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
 	_, err := db.Exec(sql, l.Id, e.Id)
 	ff("Wha? %v", err)
 	return err
 }
 
-func AssociateLemma2Entry(db *sql.DB, l Lemma, e Entry) error {
-	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
-	_, err := db.Exec(sql, l.Id, e.Id)
-	ff("?? %v", err)
-	return err
-}
-
-func SetOrGetLemmaTx(db *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
+func SetOrGetLemmaTx(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
 	res := Lemma{}
 
 	var id int64
 	var strn0, reading0, paradigm0 string
 	sqlS := "select id, strn, reading, paradigm from lemma where strn = ? and reading = ?"
-	err := db.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
+	err := tx.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
 	switch {
 	case err == sql.ErrNoRows:
-		return InsertLemmaTx(db, Lemma{Id: id, Strn: strn, Reading: reading, Paradigm: paradigm})
+		return InsertLemma(tx, Lemma{Id: id, Strn: strn, Reading: reading, Paradigm: paradigm})
 	case err != nil:
 		ff("SetOrGetLemma failed: %v", err)
 	}
@@ -247,16 +238,16 @@ func SetOrGetLemmaTx(db *sql.Tx, strn string, reading string, paradigm string) (
 	return res, err
 }
 
-func SetOrGetLemma(db *sql.DB, strn string, reading string, paradigm string) (Lemma, error) {
+func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
 	res := Lemma{}
 
 	var id int64
 	var strn0, reading0, paradigm0 string
 	sqlS := "select id, strn, reading, paradigm from lemma where strn = ? and reading = ?"
-	err := db.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
+	err := tx.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
 	switch {
 	case err == sql.ErrNoRows:
-		return InsertLemma(db, Lemma{Id: id, Strn: strn, Reading: reading, Paradigm: paradigm})
+		return InsertLemma(tx, Lemma{Id: id, Strn: strn, Reading: reading, Paradigm: paradigm})
 	case err != nil:
 		ff("SetOrGetLemma failed: %v", err)
 	}
@@ -269,13 +260,13 @@ func SetOrGetLemma(db *sql.DB, strn string, reading string, paradigm string) (Le
 	return res, err
 }
 
-func getLemmaFromEntryId(db *sql.DB, id int64) Lemma {
+func getLemmaFromEntryId(tx *sql.Tx, id int64) Lemma {
 	res := Lemma{}
 	sql := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
 		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
 	var lId int64
 	var strn, reading, paradigm string
-	err := db.QueryRow(sql, id).Scan(&lId, &strn, &reading, &paradigm)
+	err := tx.QueryRow(sql, id).Scan(&lId, &strn, &reading, &paradigm)
 	// TODO: why doesn't this work? Must be some silly mistake
 	// "./dbapi.go:281: sql.ErrNoRows undefined (type string has no field or method ErrNoRows)"
 	// switch {
@@ -287,7 +278,7 @@ func getLemmaFromEntryId(db *sql.DB, id int64) Lemma {
 	// }
 	_ = err
 
-	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
+	// TODO Now silently returns empty lemma if nothing returned from tx. Ok?
 	// Return err when there is an err
 	res.Id = lId
 	res.Strn = strn
@@ -297,35 +288,36 @@ func getLemmaFromEntryId(db *sql.DB, id int64) Lemma {
 	return res
 }
 
-func InsertLemmaTx(db *sql.Tx, l Lemma) (Lemma, error) {
+func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
-	res, err := db.Exec(sql, l.Strn, l.Reading, l.Paradigm)
-	ff("InsertLemma db.Exec: %v", err)
+	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
+	ff("InsertLemma tx.Exec: %v", err)
 	id, err := res.LastInsertId()
 	ff("InsertLemma LastInsertId: %v", err)
 	l.Id = id
 	return l, err
 }
 
-func InsertLemma(db *sql.DB, l Lemma) (Lemma, error) {
-	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
-	res, err := db.Exec(sql, l.Strn, l.Reading, l.Paradigm)
-	ff("InsertLemma db.Exec: %v", err)
-	id, err := res.LastInsertId()
-	ff("InsertLemma LastInsertId: %v", err)
-	l.Id = id
-	return l, err
-}
+// func InsertLemma(db *sql.DB, l Lemma) (Lemma, error) {
+// 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
+// 	res, err := db.Exec(sql, l.Strn, l.Reading, l.Paradigm)
+// 	ff("InsertLemma db.Exec: %v", err)
+// 	id, err := res.LastInsertId()
+// 	ff("InsertLemma LastInsertId: %v", err)
+// 	l.Id = id
+// 	return l, err
+// }
 
 // TODO Map gör så att ordnigen blir galen
-func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
+
+func EntriesFromIds(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if len(entryIds) == 0 {
 		return res
 	}
 
 	qString, values := entriesFromIdsSelect(entryIds)
-	rows, err := db.Query(qString, values...)
+	rows, err := tx.Query(qString, values...)
 	if err != nil {
 		log.Fatalf("EntriesFromIds: %s", err)
 	}
@@ -364,7 +356,7 @@ func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 				Language:     entryLanguage,
 				PartOfSpeech: entryPartofSpeech,
 				WordParts:    entryWordParts,
-				Lemma:        getLemmaFromEntryId(db, entryId),
+				Lemma:        getLemmaFromEntryId(tx, entryId),
 			}
 
 			entries[entryId] = e
@@ -405,7 +397,7 @@ func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 	return res
 }
 
-func GetEntries(db *sql.DB, q Query) map[string][]Entry {
+func GetEntries(tx *sql.Tx, q Query) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if q.Empty() { // TODO report to client?
 		log.Printf("dbapi.GetEntries: Query empty of search constraints: %v", q)
@@ -414,7 +406,7 @@ func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 
 	qString, vs := idiotSql(q)
 
-	rows, err := db.Query(qString, vs...)
+	rows, err := tx.Query(qString, vs...)
 	if err != nil {
 		log.Fatalf("dbapi.GetEntries:\t%s", err)
 	}
@@ -429,8 +421,12 @@ func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 		ids = append(ids, id)
 	}
 
-	res = EntriesFromIds(db, ids)
+	res = EntriesFromIds(tx, ids)
 	return res
+}
+
+func UpdateEntry(tx *sql.Tx, e Entry) error {
+	return nil
 }
 
 func Nothing() {}

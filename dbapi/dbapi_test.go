@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-
 func Test_InsertEntries(t *testing.T) {
 
 	err := os.Remove("./testlex.db")
@@ -24,7 +23,6 @@ func Test_InsertEntries(t *testing.T) {
 	ff("Failed to exec PRAGMA call %v", err)
 
 	defer db.Close()
-
 
 	_, err = db.Exec(Schema) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
@@ -55,10 +53,12 @@ func Test_InsertEntries(t *testing.T) {
 	// Check that there are things in db:
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
-
 	var entries map[string][]Entry
-	entries = GetEntries(db, q)
-
+	tx, err := db.Begin()
+	ff("MUCK! %v", err)
+	defer tx.Commit()
+	entries = GetEntries(tx, q)
+	tx.Commit()
 
 	if len(entries) != 1 {
 		t.Errorf(fs, 1, len(entries))
@@ -72,22 +72,38 @@ func Test_InsertEntries(t *testing.T) {
 	}
 
 	le := Lemma{Strn: "apa", Reading: "67t", Paradigm: "7(c)"}
-	le2, err := InsertLemma(db, le)
+	tx0, err := db.Begin()
+	defer tx0.Commit()
+	f(err)
+	le2, err := InsertLemma(tx0, le)
+	tx0.Commit()
 	if le2.Id < 1 {
 		t.Errorf(fs, "more than zero", le2.Id)
 	}
 
-	le3, err := SetOrGetLemma(db, "apa", "67t", "7(c)")
+	tx00, err := db.Begin()
+	f(err)
+	defer tx00.Commit()
+
+	le3, err := SetOrGetLemma(tx00, "apa", "67t", "7(c)")
 	if le3.Id < 1 {
 		t.Errorf(fs, "more than zero", le3.Id)
 	}
+	tx00.Commit()
 
-	err = AssociateLemma2Entry(db, le3, entries["apa"][0])
+	tx01, err := db.Begin()
+	f(err)
+	defer tx01.Commit()
+	err = AssociateLemma2Entry(tx01, le3, entries["apa"][0])
 	if err != nil {
 		t.Error(fs, nil, err)
 	}
+	tx01.Commit()
 
-	ess := GetEntries(db, q)
+	tx2, err := db.Begin()
+	defer tx2.Commit()
+	ess := GetEntries(tx2, q)
+	tx2.Commit()
 	if len(ess) != 1 {
 		t.Error("ERRRRRRROR")
 	}
