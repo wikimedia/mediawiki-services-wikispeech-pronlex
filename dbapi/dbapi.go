@@ -273,11 +273,15 @@ func getLemmaFromEntryId(db *sql.DB, id int64) Lemma {
 	var strn, reading, paradigm string
 	err := db.QueryRow(sql, id).Scan(&lId, &strn, &reading, &paradigm)
 
-	// TODO How to handle err from QueryRow?
-	_ = err
+	// TODO:
+	// if err == sql.ErrNoRows {
+	// 	// Handle no rows
+	// } else if err != nil {
+	// 	// Handle actual error
+	// }
 
 	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
-
+	// Return err when there is an err
 	res.Id = lId
 	res.Strn = strn
 	res.Reading = reading
