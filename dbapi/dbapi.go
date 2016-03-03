@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+func f0(i int) {
+	// hello?
+}
+
 // TODO
 // f is a place holder to be replaced by proper error handling
 func f(err error) {
@@ -272,13 +276,16 @@ func getLemmaFromEntryId(db *sql.DB, id int64) Lemma {
 	var lId int64
 	var strn, reading, paradigm string
 	err := db.QueryRow(sql, id).Scan(&lId, &strn, &reading, &paradigm)
-
-	// TODO:
-	// if err == sql.ErrNoRows {
-	// 	// Handle no rows
-	// } else if err != nil {
-	// 	// Handle actual error
+	// TODO: why doesn't this work? Must be some silly mistake
+	// "./dbapi.go:281: sql.ErrNoRows undefined (type string has no field or method ErrNoRows)"
+	// switch {
+	// case err == sql.ErrNoRows:
+	// 	// No row:
+	// 	// Silently return empty Lemma below
+	// case err != nil:
+	// 	ff("getLemmaFromENtryId: %v", err)
 	// }
+	_ = err
 
 	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
 	// Return err when there is an err
