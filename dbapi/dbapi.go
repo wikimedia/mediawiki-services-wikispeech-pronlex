@@ -196,7 +196,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
 		//log.Printf("%v", e)
 		if "" != e.Lemma.Strn && "" != e.Lemma.Reading {
-			lemma, err := SetOrGetLemmaTx(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
+			lemma, err := SetOrGetLemma(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
 			ff("Failed to insert lemma: %v", err)
 			err = AssociateLemma2Entry(tx, lemma, e)
 			ff("Failed lemma to entry assoc: %v", err)
@@ -214,28 +214,6 @@ func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
 	_, err := db.Exec(sql, l.Id, e.Id)
 	ff("Wha? %v", err)
 	return err
-}
-
-func SetOrGetLemmaTx(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
-	res := Lemma{}
-
-	var id int64
-	var strn0, reading0, paradigm0 string
-	sqlS := "select id, strn, reading, paradigm from lemma where strn = ? and reading = ?"
-	err := tx.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
-	switch {
-	case err == sql.ErrNoRows:
-		return InsertLemma(tx, Lemma{Id: id, Strn: strn, Reading: reading, Paradigm: paradigm})
-	case err != nil:
-		ff("SetOrGetLemma failed: %v", err)
-	}
-
-	res.Id = id
-	res.Strn = strn0
-	res.Reading = reading0
-	res.Paradigm = paradigm0
-
-	return res, err
 }
 
 func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
@@ -309,7 +287,7 @@ func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 // }
 
 // TODO Map gör så att ordnigen blir galen
-
+// TODO Maybe this should take an sql.DB instead? Unsure about locking of sql.Tx
 func EntriesFromIds(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if len(entryIds) == 0 {
@@ -397,6 +375,7 @@ func EntriesFromIds(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	return res
 }
 
+// TODO Maybe this should take an sql.DB instead. Unsure about sql.Tx and locking.
 func GetEntries(tx *sql.Tx, q Query) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if q.Empty() { // TODO report to client?
