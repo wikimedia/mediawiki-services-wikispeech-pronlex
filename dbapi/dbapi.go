@@ -4,19 +4,21 @@ package dbapi
 
 import (
 	"database/sql"
-	"strings"
 	"errors"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"sort"
+	"strings"
 )
-// TODO 
+
+// TODO
 // f is a place holder to be replaced by proper error handling
 func f(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
 }
+
 // TODO
 // ff is a place holder to be replaced by proper error handling
 func ff(f string, err error) {
@@ -30,6 +32,7 @@ func ListLexicons(db *sql.DB) []Lexicon {
 	sql := "select id, name, symbolsetname from lexicon"
 	rows, err := db.Query(sql)
 	ff("Query failed %v", err)
+	defer rows.Close()
 
 	for rows.Next() {
 		var id int64
@@ -55,16 +58,15 @@ func GetLexicons(db *sql.DB, names []string) []Lexicon {
 
 	rows, err := db.Query("select id, name, symbolsetname from lexicon where name in "+nQs(len(names)), convS(names)...)
 	ff("Failed DB query for lexicon names:\t%v", err)
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&id, &lname, &symbolsetname)
 		ff("Scanning rows went wrong: %v", err)
 		res = append(res, Lexicon{Id: id, Name: lname, SymbolSetName: symbolsetname})
 	}
 
-
 	return res
 }
-
 
 func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 	var id int64
@@ -99,6 +101,8 @@ func InsertLexicon(db *sql.DB, l Lexicon) Lexicon {
 		log.Fatal(err)
 	}
 
+	tx.Commit()
+
 	return Lexicon{Id: id, Name: l.Name, SymbolSetName: l.SymbolSetName}
 }
 
@@ -109,6 +113,7 @@ func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer tx.Commit()
 
 	rows, err := tx.Query(s, l.Name)
 	defer rows.Close()
@@ -129,61 +134,10 @@ func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
 		datum = append(datum, Lexicon{Id: id, Name: l.Name, SymbolSetName: symbolsetname})
 	}
 
-	defer tx.Commit()
+	tx.Commit()
 
 	return l
 }
-
-// func insertEntry(db *sql.DB, l Lexicon, e Entry) int64 {
-
-// 	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
-// 	var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
-
-// 	// Transaction -->
-// 	tx, err := db.Begin()
-
-// 	stmt1, err := tx.Prepare(entrySTMT)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	stmt2, err := tx.Prepare(transAfterEntrySTMT)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	res, err := tx.Stmt(stmt1).Exec(
-// 		l.Id,
-// 		strings.ToLower(e.Strn),
-// 		e.Language,
-// 		e.PartOfSpeech,
-// 		e.WordParts)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	id, err := res.LastInsertId()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	// res.Close()
-
-// 	for _, t := range e.Transcriptions {
-// 		_, err := tx.Stmt(stmt2).Exec(id, t.Strn, t.Language)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-// 	}
-
-// 	tx.Commit()
-// 	// <- transaction
-
-// 	return id
-// }
 
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
@@ -194,6 +148,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
 	// Transaction -->
 	tx, err := db.Begin()
+	defer tx.Commit()
 
 	stmt1, err := tx.Prepare(entrySTMT)
 	if err != nil {
@@ -363,6 +318,7 @@ func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 	if err != nil {
 		log.Fatalf("EntriesFromIds: %s", err)
 	}
+	defer rows.Close()
 
 	// entries map Entries so far. One entry may have several transcriptions, resulting in multiple rows for a single entry
 	entries := make(map[int64]Entry)
@@ -451,6 +407,7 @@ func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 	if err != nil {
 		log.Fatalf("dbapi.GetEntries:\t%s", err)
 	}
+	defer rows.Close()
 
 	ids := make([]int64, 0)
 	for rows.Next() {
