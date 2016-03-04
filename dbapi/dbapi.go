@@ -145,6 +145,7 @@ func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
 	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
+	// TODO move to function
 	var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
 	ids := make([]int64, 0)
@@ -424,9 +425,48 @@ func UpdateEntry(db *sql.DB, e Entry) (updated bool, err error) { // TODO return
 	return UpdateEntryTx(tx, e)
 }
 
+func getTIds(ts []Transcription) []int64 {
+	res := make([]int64, 0)
+	for _, t := range ts {
+		res = append(res, t.Id)
+	}
+	return res
+}
 func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+	if e.Id != dbE.Id {
+		return false, fmt.Errorf("update and db entry id differ")
+	}
+	// TODO move to function
+	var transSTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
-	return updated, fmt.Errorf("I'm a place holder ")
+	// the easy way would be to simply nuke any transcriptions for
+	// the entry and substitute for the new ones, but we only want
+	// to save new transcriptions if there are changes
+
+	// If the number of transcriptions has changed, remove the old
+	// and inser the new ones
+	if len(e.Transcriptions) != len(dbE.Transcriptions) {
+		transIds := getTIds(dbE.Transcriptions)
+		_, err := tx.Exec("delete from transcription where transcription.id in "+nQs(len(transIds)), convI(transIds)...)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("failed transcription delete : %v", err)
+		}
+		for _, t := range e.Transcriptions {
+			_, err := tx.Exec(transSTMT, e.Id, t.Strn, t.Language)
+			if err != nil {
+				tx.Rollback()
+				return false, fmt.Errorf("failed transcription update : %v", err)
+			}
+		}
+		// different numbers of transcription, new ones inserted
+		return true, nil
+	}
+	// TODO
+	// same number of transcriptions, check if they differ
+
+	// Nothing happened
+	return false, err
 }
 
 func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
@@ -444,7 +484,7 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 
 	updated, err = updateTranscriptions(tx, e, dbEntries[0])
 
-	return updated, nil
+	return updated, err
 }
 
 func Nothing() {}
