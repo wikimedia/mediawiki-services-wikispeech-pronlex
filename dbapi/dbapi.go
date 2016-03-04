@@ -241,13 +241,13 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	return res, err
 }
 
-func getLemmaFromEntryId(db *sql.DB, id int64) Lemma {
+func getLemmaFromEntryIdTx(tx *sql.Tx, id int64) Lemma {
 	res := Lemma{}
 	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
 		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
 	var lId int64
 	var strn, reading, paradigm string
-	err := db.QueryRow(sqlS, id).Scan(&lId, &strn, &reading, &paradigm)
+	err := tx.QueryRow(sqlS, id).Scan(&lId, &strn, &reading, &paradigm)
 	switch {
 	case err == sql.ErrNoRows:
 		// TODO No row:
@@ -280,14 +280,23 @@ func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	return l, err
 }
 
-func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
+func entryMapToEntrySlice(em map[string][]Entry) []Entry {
+	res := make([]Entry, 0)
+	for _, v := range em {
+		res = append(res, v...)
+	}
+	return res
+}
+
+// TODO this should return []Entry rather than map[string][]Entry?
+func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry { // TODO return error
 	res := make(map[string][]Entry)
 	if len(entryIds) == 0 {
 		return res
 	}
 
 	qString, values := entriesFromIdsSelect(entryIds)
-	rows, err := db.Query(qString, values...)
+	rows, err := tx.Query(qString, values...)
 	if err != nil {
 		log.Fatalf("EntriesFromIds: %s", err)
 	}
@@ -326,7 +335,7 @@ func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 				Language:     entryLanguage,
 				PartOfSpeech: entryPartofSpeech,
 				WordParts:    entryWordParts,
-				Lemma:        getLemmaFromEntryId(db, entryId),
+				Lemma:        getLemmaFromEntryIdTx(tx, entryId),
 			}
 
 			entries[entryId] = e
@@ -367,6 +376,15 @@ func EntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 	return res
 }
 
+// TODO this should return []Entry rather than map[string][]Entry?
+func GetEntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry { // TODO return error
+	tx, err := db.Begin()
+	f(err)
+	defer tx.Commit()
+	return GetEntriesFromIdsTx(tx, entryIds)
+}
+
+// TODO should be a wrapper to GetEntriesTx
 func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if q.Empty() { // TODO report to client?
@@ -391,12 +409,42 @@ func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 		ids = append(ids, id)
 	}
 
-	res = EntriesFromIds(db, ids)
+	// TODO return map shuold be built here rather than by GetEntriesFromIds?
+	res = GetEntriesFromIds(db, ids)
 	return res
 }
 
-func UpdateEntry(tx *sql.Tx, e Entry) error {
-	return nil
+// UpdateEntry wraps call to UpdateEntryTx with a transaction
+func UpdateEntry(db *sql.DB, e Entry) (updated bool, err error) { // TODO return the updated entry?
+	tx, err := db.Begin()
+	if err != nil {
+		return updated, fmt.Errorf("failed updating entry : %v", err)
+	}
+	defer tx.Commit()
+	return UpdateEntryTx(tx, e)
+}
+
+func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+
+	return updated, fmt.Errorf("I'm a place holder ")
+}
+
+func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
+	// updated == false
+	dbEntryMap := GetEntriesFromIdsTx(tx, []int64{(e.Id)})
+	dbEntries := entryMapToEntrySlice(dbEntryMap)
+	if len(dbEntries) == 0 {
+
+		return updated, fmt.Errorf("no entry with id '%d'", e.Id)
+	}
+	if len(dbEntries) > 1 {
+
+		return updated, fmt.Errorf("very bad error, more than one entry with id '%d'", e.Id)
+	}
+
+	updated, err = updateTranscriptions(tx, e, dbEntries[0])
+
+	return updated, nil
 }
 
 func Nothing() {}

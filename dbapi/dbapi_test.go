@@ -112,4 +112,25 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "67t", lm.Reading)
 	}
 
+	ees := GetEntriesFromIds(db, []int64{ess["apa"][0].Id})
+	if len(ees) != 1 {
+		t.Errorf(fs, 1, len(ees))
+	}
+
+	// Change transcriptions and update db
+	ees0 := ees["apa"][0]
+	t10 := Transcription{Strn: "A: p A:", Language: "Apo"}
+	t20 := Transcription{Strn: "a p a", Language: "Sweinsprach"}
+	t30 := Transcription{Strn: "a pp a", Language: "Mysko"}
+
+	ees0.Transcriptions = []Transcription{t10, t20, t30}
+
+	updated, err := UpdateEntry(db, ees0)
+
+	if !updated {
+		t.Errorf(fs, true, updated)
+	}
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 }
