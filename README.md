@@ -33,4 +33,4 @@ github.com/stts-se/pronlex/lexserver$ CompileDaemon -command lexserver
 (Or just `lexserver`)
 
 ---
-[Compile daemon](https://github.com/githubnemo/CompileDaemon)  is a nifty utility
+[Compile Daemon](https://github.com/githubnemo/CompileDaemon)  is a nifty utility
