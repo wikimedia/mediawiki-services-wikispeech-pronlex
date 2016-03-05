@@ -460,6 +460,21 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 	return true
 }
 
+func updateLanguage(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
+	if e.Id != dbE.Id {
+		return false, fmt.Errorf("new and old entries have different ids")
+	}
+	if e.Language == dbE.Language {
+		return false, nil
+	}
+	_, err := tx.Exec("update entry set language = ? where entry.id = ?", e.Language, e.Id)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("failed language update : %v", err)
+	}
+	return true, nil
+}
+
 func updateWordParts(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 	if e.Id != dbE.Id {
 		return false, fmt.Errorf("new and old entries have different ids")
@@ -559,8 +574,12 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 	if err != nil {
 		return updated3, err
 	}
+	updated4, err := updateLanguage(tx, e, dbEntries[0])
+	if err != nil {
+		return updated4, err
+	}
 
-	return updated1 || updated2 || updated3, err
+	return updated1 || updated2 || updated3 || updated4, err
 }
 
 func Nothing() {}
