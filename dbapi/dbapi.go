@@ -432,21 +432,37 @@ func getTIds(ts []Transcription) []int64 {
 	}
 	return res
 }
+
+func equal(ts1 []Transcription, ts2 []Transcription) bool {
+	if len(ts1) != len(ts2) {
+		return false
+	}
+	for i, _ := range ts1 {
+		if ts1[i] != ts2[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// TODO move to function
+var transSTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
+
 func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 	if e.Id != dbE.Id {
 		return false, fmt.Errorf("update and db entry id differ")
 	}
-	// TODO move to function
-	var transSTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
 	// the easy way would be to simply nuke any transcriptions for
 	// the entry and substitute for the new ones, but we only want
 	// to save new transcriptions if there are changes
 
-	// If the number of transcriptions has changed, remove the old
+	// If the new and old transcriptions differ, remove the old
 	// and inser the new ones
-	if len(e.Transcriptions) != len(dbE.Transcriptions) {
+	if !equal(e.Transcriptions, dbE.Transcriptions) {
 		transIds := getTIds(dbE.Transcriptions)
+		// TODO move to a function
 		_, err := tx.Exec("delete from transcription where transcription.id in "+nQs(len(transIds)), convI(transIds)...)
 		if err != nil {
 			tx.Rollback()
@@ -462,9 +478,6 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 		// different numbers of transcription, new ones inserted
 		return true, nil
 	}
-	// TODO
-	// same number of transcriptions, check if they differ
-
 	// Nothing happened
 	return false, err
 }
