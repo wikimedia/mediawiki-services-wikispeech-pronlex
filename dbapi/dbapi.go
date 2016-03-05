@@ -460,6 +460,21 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 	return true
 }
 
+func updateWordParts(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
+	if e.Id != dbE.Id {
+		return false, fmt.Errorf("new and old entries have different ids")
+	}
+	if e.WordParts == dbE.WordParts {
+		return false, nil
+	}
+	_, err := tx.Exec("update entry set wordparts = ? where entry.id = ?", e.WordParts, e.Id)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("failed worparts update : %v", err)
+	}
+	return true, nil
+}
+
 func updateLemma(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 	if e.Lemma == dbE.Lemma {
 		return false, nil
@@ -540,7 +555,12 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 		return updated2, err
 	}
 
-	return updated1 || updated2, err
+	updated3, err := updateWordParts(tx, e, dbEntries[0])
+	if err != nil {
+		return updated3, err
+	}
+
+	return updated1 || updated2 || updated3, err
 }
 
 func Nothing() {}

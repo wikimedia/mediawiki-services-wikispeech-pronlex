@@ -140,6 +140,7 @@ func Test_InsertEntries(t *testing.T) {
 	}
 
 	eApa.Lemma.Strn = "tjubba"
+	eApa.WordParts = "fin+krog"
 	updated, err = UpdateEntry(db, eApa)
 	if err != nil {
 		t.Errorf(fs, "nil", err)
@@ -152,5 +153,7 @@ func Test_InsertEntries(t *testing.T) {
 	if eApax.Lemma.Strn != "tjubba" {
 		t.Errorf(fs, "tjubba", eApax.Lemma.Strn)
 	}
-
+	if eApax.WordParts != "fin+krog" {
+		t.Errorf(fs, "fin+krog", eApax.WordParts)
+	}
 }
