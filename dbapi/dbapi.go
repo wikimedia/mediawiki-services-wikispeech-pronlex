@@ -475,7 +475,7 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 				return false, fmt.Errorf("failed transcription update : %v", err)
 			}
 		}
-		// different numbers of transcription, new ones inserted
+		// different sets of transcription, new ones inserted
 		return true, nil
 	}
 	// Nothing happened
