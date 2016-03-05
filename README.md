@@ -30,7 +30,7 @@ github.com/stts-se/pronlex/lexserver$ createEmptyDB pronlex.db
 github.com/stts-se/pronlex/lexserver$ addNSTLexToDB sv.se.nst pronlex.db [PATH TO NST LEX]/swe030224NST.pron_utf8.txt 
 github.com/stts-se/pronlex/lexserver$ CompileDaemon -command lexserver
 ```
-(Or just `lexserver`)
+(Or just `lexserver` if you don't use `CompileDaemon`)
 
 ---
-[Compile Daemon](https://github.com/githubnemo/CompileDaemon)  is a nifty utility
+[Compile Daemon](https://github.com/githubnemo/CompileDaemon)
