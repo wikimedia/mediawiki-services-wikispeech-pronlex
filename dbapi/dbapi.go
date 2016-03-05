@@ -377,6 +377,20 @@ func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry { // T
 	return res
 }
 
+// TODO error handling!!!
+func GetEntryFromId(db *sql.DB, id int64) Entry {
+	res := GetEntriesFromIds(db, []int64{id})
+	// if len(res) != 1 {
+	// 	return nil
+	// }
+	//return
+	for _, v := range res {
+		return v[0]
+	}
+
+	return Entry{}
+}
+
 // TODO this should return []Entry rather than map[string][]Entry?
 func GetEntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry { // TODO return error
 	tx, err := db.Begin()
@@ -446,6 +460,28 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 	return true
 }
 
+func updateLemma(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+	if e.Lemma == dbE.Lemma {
+		return false, nil
+	}
+	// If e.Lemma uninitialized, and different from dbE, then wipe
+	// old lemma from db
+	if e.Lemma.Id == 0 && e.Lemma.Strn == "" {
+		_, err = tx.Exec("delete from lemma where lemma.id = ?", dbE.Lemma.Id)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("failed to delete old lemma : %v", err)
+		}
+	}
+	// Only one alternative left, to update old lemma with new values
+	_, err = tx.Exec("update lemma set strn = ?, reading = ?, paradigm = ? where lemma.id = ?", e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm, dbE.Lemma.Id)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("failed to update lemma : %v", err)
+	}
+	return true, nil
+}
+
 // TODO move to function
 var transSTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
@@ -495,9 +531,16 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 		return updated, fmt.Errorf("very bad error, more than one entry with id '%d'", e.Id)
 	}
 
-	updated, err = updateTranscriptions(tx, e, dbEntries[0])
+	updated1, err := updateTranscriptions(tx, e, dbEntries[0])
+	if err != nil {
+		return updated1, err
+	}
+	updated2, err := updateLemma(tx, e, dbEntries[0])
+	if err != nil {
+		return updated2, err
+	}
 
-	return updated, err
+	return updated1 || updated2, err
 }
 
 func Nothing() {}

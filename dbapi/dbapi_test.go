@@ -133,4 +133,24 @@ func Test_InsertEntries(t *testing.T) {
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
+
+	eApa := GetEntryFromId(db, ees0.Id)
+	if len(eApa.Transcriptions) != 3 {
+		t.Errorf(fs, 3, len(eApa.Transcriptions))
+	}
+
+	eApa.Lemma.Strn = "tjubba"
+	updated, err = UpdateEntry(db, eApa)
+	if err != nil {
+		t.Errorf(fs, "nil", err)
+	}
+	if !updated {
+		t.Errorf(fs, true, updated)
+	}
+
+	eApax := GetEntryFromId(db, ees0.Id)
+	if eApax.Lemma.Strn != "tjubba" {
+		t.Errorf(fs, "tjubba", eApax.Lemma.Strn)
+	}
+
 }
