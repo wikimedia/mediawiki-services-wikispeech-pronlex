@@ -123,6 +123,7 @@ func main() {
 	}
 
 	fh, err := os.Open(inFile)
+	defer fh.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -139,7 +140,10 @@ func main() {
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {
-			dbapi.InsertEntries(db, lex, eBuf)
+			_, err = dbapi.InsertEntries(db, lex, eBuf)
+			if err != nil {
+				log.Fatal(err)
+			}
 			eBuf = make([]dbapi.Entry, 0)
 			fmt.Printf("\rLines read: %d               \r", n)
 		}

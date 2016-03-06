@@ -118,12 +118,11 @@ func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	return Lexicon{Id: id, Name: l.Name, SymbolSetName: l.SymbolSetName}, err
 }
 
-// TODO return error
 // TODO change input arg to sql.Tx
-func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
+func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 
-	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
 	// TODO move to function
+	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
 	var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
 	ids := make([]int64, 0)
@@ -131,18 +130,17 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 	// Transaction -->
 	tx, err := db.Begin()
 	defer tx.Commit()
+	if err != nil {
+		return ids, fmt.Errorf("begin transaction faild : %v", err)
+	}
 
 	stmt1, err := tx.Prepare(entrySTMT)
 	if err != nil {
-		log.Fatal(err)
+		return ids, fmt.Errorf("failed prepare : %v", err)
 	}
 	stmt2, err := tx.Prepare(transAfterEntrySTMT)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err != nil {
-		log.Fatal(err)
+		return ids, fmt.Errorf("failed prepare : %v", err)
 	}
 
 	for _, e := range es {
@@ -153,12 +151,14 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 			e.PartOfSpeech,
 			e.WordParts)
 		if err != nil {
-			log.Fatal(err) // TODO rollback
+			tx.Rollback()
+			return ids, fmt.Errorf("failed exec : %v", err)
 		}
 
 		id, err := res.LastInsertId()
 		if err != nil {
-			log.Fatal(err) // TODO rollback
+			tx.Rollback()
+			return ids, fmt.Errorf("failed last insert id : %v", err)
 		}
 		// We want the Entry to have the right id for inserting lemma assocs below
 		e.Id = id
@@ -170,23 +170,30 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 		for _, t := range e.Transcriptions {
 			_, err := tx.Stmt(stmt2).Exec(id, t.Strn, t.Language)
 			if err != nil {
-				log.Fatal(err) // TODO rollback
+				tx.Rollback()
+				return ids, fmt.Errorf("failed exec : %v", err)
 			}
 		}
 
 		//log.Printf("%v", e)
 		if "" != e.Lemma.Strn && "" != e.Lemma.Reading {
 			lemma, err := SetOrGetLemma(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
-			ff("Failed to insert lemma: %v", err)
+			if err != nil {
+				tx.Rollback()
+				return ids, fmt.Errorf("failed set or get lemma : %v", err)
+			}
 			err = AssociateLemma2Entry(tx, lemma, e)
-			ff("Failed lemma to entry assoc: %v", err)
+			if err != nil {
+				tx.Rollback()
+				return ids, fmt.Errorf("Failed lemma to entry assoc: %v", err)
+			}
 		}
 	}
 
 	tx.Commit()
 	// <- transaction
 
-	return ids
+	return ids, err
 }
 
 func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
