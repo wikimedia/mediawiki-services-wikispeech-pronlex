@@ -48,8 +48,8 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 		l := Lexicon{Id: id, Name: name, SymbolSetName: symbolSetName}
 		res = append(res, l)
 	}
-
-	return res, nil
+	err = rows.Err()
+	return res, err
 }
 
 func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
@@ -74,6 +74,7 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 		}
 		res = append(res, Lexicon{Id: id, Name: lname, SymbolSetName: symbolsetname})
 	}
+	err = rows.Err()
 	rows.Close()
 
 	return res, err
@@ -333,7 +334,9 @@ func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 		}
 
 	} // rows.Next()
-
+	// TODO error
+	// err = rows.Err()
+	//
 	// map entry ids to transcriptions
 	eId2ts := make(map[int64][]Transcription)
 	for _, t := range transes {
@@ -405,6 +408,7 @@ func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 		}
 		ids = append(ids, id)
 	}
+	// TODO err = rows.Err()
 
 	// TODO return map shuold be built here rather than by GetEntriesFromIds?
 	res = GetEntriesFromIds(db, ids)
