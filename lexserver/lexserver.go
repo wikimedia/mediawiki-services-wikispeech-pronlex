@@ -75,6 +75,7 @@ var knownParams = map[string]int{
 	"pp":                1,
 }
 
+// TODO return error
 func queryFromParams(r *http.Request) dbapi.Query {
 
 	lexs := dbapi.RemoveEmptyStrings(
@@ -100,8 +101,11 @@ func queryFromParams(r *http.Request) dbapi.Query {
 		pageLength = 25
 	}
 
-	dbLexs := dbapi.GetLexicons(db, lexs)
-
+	dbLexs, err := dbapi.GetLexicons(db, lexs)
+	// TODO return error
+	if err != nil {
+		log.Printf("GetLexicons failed : %v", err)
+	}
 	q := dbapi.Query{
 		Lexicons:          dbLexs,
 		Words:             words,

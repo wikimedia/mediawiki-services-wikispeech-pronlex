@@ -52,11 +52,10 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	return res, nil
 }
 
-// TODO return error
-func GetLexicons(db *sql.DB, names []string) []Lexicon {
+func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	res := make([]Lexicon, 0)
 	if 0 == len(names) {
-		return res
+		return res, nil
 	}
 
 	var id int64
@@ -64,15 +63,20 @@ func GetLexicons(db *sql.DB, names []string) []Lexicon {
 	var symbolsetname string
 
 	rows, err := db.Query("select id, name, symbolsetname from lexicon where name in "+nQs(len(names)), convS(names)...)
-	ff("Failed DB query for lexicon names:\t%v", err)
 	defer rows.Close()
+	if err != nil {
+		return res, fmt.Errorf("failed db select on lexicon table : %v", err)
+	}
 	for rows.Next() {
 		err := rows.Scan(&id, &lname, &symbolsetname)
-		ff("Scanning rows went wrong: %v", err)
+		if err != nil {
+			return res, fmt.Errorf("failed rows scan : %v", err)
+		}
 		res = append(res, Lexicon{Id: id, Name: lname, SymbolSetName: symbolsetname})
 	}
+	rows.Close()
 
-	return res
+	return res, err
 }
 
 func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
@@ -114,7 +118,7 @@ func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 }
 
 // TODO return error
-// TODO change input arg to sql.Tx ?
+// TODO change input arg to sql.Tx
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
 	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
