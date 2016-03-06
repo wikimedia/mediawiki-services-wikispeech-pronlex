@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"database/sql"
 	"fmt"
-	"log"
 	"github.com/stts-se/pronlex/dbapi"
+	"log"
 	"os"
 	"strings"
 )
@@ -89,17 +89,16 @@ func main() {
 	if len(os.Args) != 4 {
 		log.Fatal("Expected <DB LEXICON NAME> <DB FILE> <NST INPUT FILE>", "\n\tSample invocation: ", sampleInvocation)
 	}
-	
+
 	lexName := os.Args[1]
-	dbFile := os.Args[2] 
+	dbFile := os.Args[2]
 	inFile := os.Args[3]
-	
-	
+
 	_, err := os.Stat(dbFile)
-	if err != nil { 
+	if err != nil {
 		log.Fatalf("Cannot find db file. %v", err)
 	}
-		
+
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -108,9 +107,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	defer db.Close()
-	
+
 	_, err = dbapi.GetLexicon(db, lexName)
 	if err == nil {
 		log.Fatalf("Nothing will be added. Lexicon already exists in database: %s", lexName)
@@ -118,9 +117,10 @@ func main() {
 
 	// TODO hard coded symbol set name
 	lex := dbapi.Lexicon{Name: lexName, SymbolSetName: "nst-sv-SAMPA"}
-	lex = dbapi.InsertLexicon(db, lex)
-
-	
+	lex, err = dbapi.InsertLexicon(db, lex)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fh, err := os.Open(inFile)
 	if err != nil {

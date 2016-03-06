@@ -32,7 +32,10 @@ func Test_InsertEntries(t *testing.T) {
 
 	l := Lexicon{Name: "test", SymbolSetName: "ZZ"}
 
-	l = InsertLexicon(db, l)
+	l, err = InsertLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 
 	lxs, err := ListLexicons(db)
 	if err != nil {

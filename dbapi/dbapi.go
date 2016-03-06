@@ -81,72 +81,36 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 	var symbolsetname string
 
 	if "" == strings.TrimSpace(name) {
-		return Lexicon{}, errors.New("FAN!")
+		return Lexicon{}, errors.New("lexicon name must not be the empty string")
 	}
 
 	err := db.QueryRow("select id, name, symbolsetname from lexicon where name = ?", strings.ToLower(name)).Scan(&id, &lname, &symbolsetname)
 	if err != nil {
 		//log.Fatalf("DISASTER: %s", err)
-		return Lexicon{}, errors.New("ZATAN")
+		return Lexicon{}, fmt.Errorf("db query failed : %v", err)
 	}
 
 	return Lexicon{Id: id, Name: lname, SymbolSetName: symbolsetname}, nil
-
 }
 
-// TODO return error
 // TODO change input arg to sql.Tx ?
-func InsertLexicon(db *sql.DB, l Lexicon) Lexicon {
+func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 
 	res, err := tx.Exec("insert into lexicon (name, symbolsetname) values (?, ?)", strings.ToLower(l.Name), l.SymbolSetName)
 	if err != nil {
-		log.Fatal("FAILED TO INSERT Lexicon (name + symbolset name): ", err)
+		return l, fmt.Errorf("failed to insert lexicon + symbolset name : %v", err)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal(err)
+		return l, fmt.Errorf("failed to get last insert id : %v", err)
 	}
 
 	tx.Commit()
 
-	return Lexicon{Id: id, Name: l.Name, SymbolSetName: l.SymbolSetName}
-}
-
-// TODO return error
-func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
-	s := "select id, symbolsetname from lexicon where name = ?"
-
-	tx, err := db.Begin()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer tx.Commit()
-
-	rows, err := tx.Query(s, l.Name)
-	defer rows.Close()
-	if err != nil {
-		log.Fatal("HEJ: ", err)
-	}
-
-	datum := make([]Lexicon, 0)
-	for rows.Next() {
-		var id int64
-		var symbolsetname string
-		if err := rows.Scan(&id); err != nil {
-			log.Fatal(err)
-		}
-		if err := rows.Scan(&symbolsetname); err != nil {
-			log.Fatal(err)
-		}
-		datum = append(datum, Lexicon{Id: id, Name: l.Name, SymbolSetName: symbolsetname})
-	}
-
-	tx.Commit()
-
-	return l
+	return Lexicon{Id: id, Name: l.Name, SymbolSetName: l.SymbolSetName}, err
 }
 
 // TODO return error
@@ -184,12 +148,12 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 			e.PartOfSpeech,
 			e.WordParts)
 		if err != nil {
-			log.Fatal(err) // TODO rollback?
+			log.Fatal(err) // TODO rollback
 		}
 
 		id, err := res.LastInsertId()
 		if err != nil {
-			log.Fatal(err) // TODO rollback?
+			log.Fatal(err) // TODO rollback
 		}
 		// We want the Entry to have the right id for inserting lemma assocs below
 		e.Id = id
@@ -201,7 +165,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 		for _, t := range e.Transcriptions {
 			_, err := tx.Stmt(stmt2).Exec(id, t.Strn, t.Language)
 			if err != nil {
-				log.Fatal(err) // TODO rollback?
+				log.Fatal(err) // TODO rollback
 			}
 		}
 
