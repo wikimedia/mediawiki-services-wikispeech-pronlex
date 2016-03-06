@@ -34,7 +34,10 @@ func Test_InsertEntries(t *testing.T) {
 
 	l = InsertLexicon(db, l)
 
-	lxs := ListLexicons(db)
+	lxs, err := ListLexicons(db)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(lxs) != 1 {
 		t.Errorf(fs, 1, len(lxs))
 	}

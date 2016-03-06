@@ -28,25 +28,31 @@ func ff(f string, err error) {
 	}
 }
 
-func ListLexicons(db *sql.DB) []Lexicon {
+func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	res := make([]Lexicon, 0)
 	sql := "select id, name, symbolsetname from lexicon"
 	rows, err := db.Query(sql)
-	ff("Query failed %v", err)
 	defer rows.Close()
+	if err != nil {
+		return res, fmt.Errorf("db query failed : %v", err)
+	}
 
 	for rows.Next() {
 		var id int64
 		var name string
 		var symbolSetName string
-		rows.Scan(&id, &name, &symbolSetName)
+		err = rows.Scan(&id, &name, &symbolSetName)
+		if err != nil {
+			return res, fmt.Errorf("scanning row failed : %v", err)
+		}
 		l := Lexicon{Id: id, Name: name, SymbolSetName: symbolSetName}
 		res = append(res, l)
 	}
 
-	return res
+	return res, nil
 }
 
+// TODO return error
 func GetLexicons(db *sql.DB, names []string) []Lexicon {
 	res := make([]Lexicon, 0)
 	if 0 == len(names) {
@@ -88,6 +94,7 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 
 }
 
+// TODO return error
 // TODO change input arg to sql.Tx ?
 func InsertLexicon(db *sql.DB, l Lexicon) Lexicon {
 	tx, err := db.Begin()
@@ -108,6 +115,7 @@ func InsertLexicon(db *sql.DB, l Lexicon) Lexicon {
 	return Lexicon{Id: id, Name: l.Name, SymbolSetName: l.SymbolSetName}
 }
 
+// TODO return error
 func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
 	s := "select id, symbolsetname from lexicon where name = ?"
 
@@ -141,6 +149,7 @@ func InsertOrGetLexicon(db *sql.DB, l Lexicon) Lexicon {
 	return l
 }
 
+// TODO return error
 // TODO change input arg to sql.Tx ?
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) []int64 {
 
@@ -242,6 +251,7 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	return res, err
 }
 
+// TODO return error
 func getLemmaFromEntryIdTx(tx *sql.Tx, id int64) Lemma {
 	res := Lemma{}
 	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
@@ -289,8 +299,9 @@ func entryMapToEntrySlice(em map[string][]Entry) []Entry {
 	return res
 }
 
+// TODO return error
 // TODO this should return []Entry rather than map[string][]Entry?
-func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry { // TODO return error
+func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if len(entryIds) == 0 {
 		return res
@@ -377,6 +388,7 @@ func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry { // T
 	return res
 }
 
+// TODO return error
 // TODO error handling!!!
 func GetEntryFromId(db *sql.DB, id int64) Entry {
 	res := GetEntriesFromIds(db, []int64{id})
@@ -391,14 +403,16 @@ func GetEntryFromId(db *sql.DB, id int64) Entry {
 	return Entry{}
 }
 
+// TODO return error
 // TODO this should return []Entry rather than map[string][]Entry?
-func GetEntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry { // TODO return error
+func GetEntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 	tx, err := db.Begin()
 	f(err)
 	defer tx.Commit()
 	return GetEntriesFromIdsTx(tx, entryIds)
 }
 
+// TODO return error
 // TODO should be a wrapper to GetEntriesTx
 func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 	res := make(map[string][]Entry)

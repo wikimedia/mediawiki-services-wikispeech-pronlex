@@ -49,7 +49,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 
-	lexs := dbapi.ListLexicons(db)
+	lexs, err := dbapi.ListLexicons(db) // TODO error handling
 	jsn, err := marshal(lexs, r)
 	ff("Failed json marshalling %v", err) // TODO Skicka tillbaka felet till r?
 
