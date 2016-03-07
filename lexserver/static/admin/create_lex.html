@@ -7,16 +7,18 @@
     <h1>** Admin lexicon **</h1>
 
 
-Select lexicon
+    Select lexicon
     <select data-bind="options: DMCRLX.lexicons, optionsText: 'name', value: DMCRLX.selectedLexicon"></select>
-
-
+    
+    
     <table id="lexnames">
       <thead>
 	<tr>
 	  <td>Id</td>
 	  <td>Name</td>
 	  <td>Symbol set name</td>
+	  <td></td> <!-- save btn -->
+	  <td></td> <!-- delete btn -->
 	</tr>
       </thead>
       <tbody data-bind="if: DMCRLX.selectedLexicon"> 
@@ -24,9 +26,16 @@ Select lexicon
 	  <td data-bind="text: DMCRLX.selectedLexicon().id"></td>
 	  <td><input data-bind="textInput: DMCRLX.selectedLexicon().name"></input></td>
 	  <td><input data-bind="textInput: DMCRLX.selectedLexicon().symbolSetName"></input></td>
+	  <!-- TODO only visible after editing lexicon (name) -->
+	  <td><button data-bind="click: DMCRLX.updateLexiconName">Update</button><td>
+	  <!-- <td><button data-bind="click: DMCRLX.updateLexiconName">Delete</button><td> -->
+	  <td><button>Delete</button><td>
 	</tr>
       </tbody>
     </table>
+    <p>
+      <button data-bind="click: DMCRLX.addLexicon">Add lexicon</button>
+    </p>
 
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
