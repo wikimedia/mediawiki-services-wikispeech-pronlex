@@ -1,28 +1,29 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Create lexicon</title>
+    <title>Admin lexicon</title>
   </head>
   <body>
-    <h1>** Admin create lexicon **</h1>
-    
+    <h1>** Admin lexicon **</h1>
+
+
+Select lexicon
+    <select data-bind="options: DMCRLX.lexicons, optionsText: 'name', value: DMCRLX.selectedLexicon"></select>
+
+
     <table id="lexnames">
       <thead>
 	<tr>
-	  <td>db id</td>
-	  <td>name</td>
-	  <td>symbol set name</td>
-	  <td>entries</td>
-	  <td>delete</td>
+	  <td>Id</td>
+	  <td>Name</td>
+	  <td>Symbol set name</td>
 	</tr>
       </thead>
-      <tbody data-bind="foreach: DMCRLX.lexicons">
+      <tbody data-bind="if: DMCRLX.selectedLexicon"> 
 	<tr>
-	  <td data-bind="text: $data.id"</td>
-	  <td data-bind="text: $data.name"></td>
-	  <td data-bind="text: $data.symbolSetName"></td>
-	  <td>?</td>
-	  <td>?</td>
+	  <td data-bind="text: DMCRLX.selectedLexicon().id"></td>
+	  <td><input data-bind="textInput: DMCRLX.selectedLexicon().name"></input></td>
+	  <td><input data-bind="textInput: DMCRLX.selectedLexicon().symbolSetName"></input></td>
 	</tr>
       </tbody>
     </table>
