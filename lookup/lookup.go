@@ -25,9 +25,7 @@ func main() {
 	}
 
 	db, err := sql.Open("sqlite3", os.Args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
+	ff("failed to open db : %v", err)
 
 	l, err := dbapi.GetLexicon(db, "sv.se.nst")
 	ff("Failed to get lexicon from db: %v", err)
@@ -38,13 +36,10 @@ func main() {
 		PageLength: 100}
 
 	res, err := dbapi.GetEntries(db, q)
-	if err != nil {
-		log.Fatal(err)
-	}
+	ff("get entries failed : %v", err)
 
 	res0, err := json.MarshalIndent(res, "", "  ")
-	if err != nil {
-		log.Fatal(err)
-	}
+	ff("json conversion failed : %v", err)
+
 	fmt.Printf("%s\n", res0)
 }
