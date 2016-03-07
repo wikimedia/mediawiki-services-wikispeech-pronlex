@@ -158,6 +158,10 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))                               // TODO should not be called if error occurs?
 }
 
+// func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
+
+// }
+
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/create_lex.html")
 }
@@ -191,6 +195,7 @@ func main() {
 	// function calls
 	http.HandleFunc("/listlexicons", listLexsHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
+	//http.HandleFunc("/updateentry", updateEntryHandler)
 
 	// admin page
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
