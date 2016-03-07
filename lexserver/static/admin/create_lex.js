@@ -6,10 +6,9 @@ DMCRLX.CreateLexModel = function() {
     var self = this;
     
     DMCRLX.lexicons = ko.observableArray();
+    DMCRLX.selectedLexicon = ko.observable();
     
     DMCRLX.loadLexiconNames = function () {
-
-	console.log("DGDGDGD");
 
 	$.getJSON(DMCRLX.baseURL +"listlexicons")
 	    .done(function (data) {
@@ -20,6 +19,21 @@ DMCRLX.CreateLexModel = function() {
 	    });
     };
     
+    DMCRLX.updateLexiconName = function () {
+	console.log("EN SNÄLL APA ÄTER SPENAT: "+ JSON.stringify(DMCRLX.selectedLexicon()));
+    }
+
+    
+    DMCRLX.addLexicon = function () {
+	var newLex = {'id': 0, 'name': " ", 'symbolSetName': " "};
+	//var newLex2 = {'id': 0, 'name': " ", 'symbolSetName': " "};
+	console.log(JSON.stringify(newLex));
+	DMCRLX.lexicons.push(newLex);
+	DMCRLX.selectedLexicon(newLex);
+    }
+    
+
+
     // On pageload:
     DMCRLX.loadLexiconNames();
 };
