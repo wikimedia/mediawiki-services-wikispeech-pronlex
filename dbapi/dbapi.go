@@ -392,26 +392,28 @@ func GetEntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
 
 // TODO return error
 // TODO should be a wrapper to GetEntriesTx
-func GetEntries(db *sql.DB, q Query) map[string][]Entry {
+func GetEntries(db *sql.DB, q Query) (map[string][]Entry, error) {
 	res := make(map[string][]Entry)
 	if q.Empty() { // TODO report to client?
 		log.Printf("dbapi.GetEntries: Query empty of search constraints: %v", q)
-		return res
+		return res, nil // report error, or think the caller knows whiat it's doing?
 	}
 
 	qString, vs := idiotSql(q)
 
 	rows, err := db.Query(qString, vs...)
-	if err != nil {
-		log.Fatalf("dbapi.GetEntries:\t%s", err)
-	}
 	defer rows.Close()
+	if err != nil {
+		log.Printf("dbapi.GetEntries:\t%s", err)
+		return res, fmt.Errorf("db query failed : %v", err)
+	}
 
 	ids := make([]int64, 0)
 	for rows.Next() {
 		var id int64
 		if err := rows.Scan(&id); err != nil {
-			log.Fatalf("GetEntries(2):\t%s", err)
+			log.Printf("GetEntries(2):\t%s", err)
+			return res, fmt.Errorf("rows scan failed : %v", err)
 		}
 		ids = append(ids, id)
 	}
@@ -419,7 +421,7 @@ func GetEntries(db *sql.DB, q Query) map[string][]Entry {
 
 	// TODO return map shuold be built here rather than by GetEntriesFromIds?
 	res = GetEntriesFromIds(db, ids)
-	return res
+	return res, err
 }
 
 // UpdateEntry wraps call to UpdateEntryTx with a transaction

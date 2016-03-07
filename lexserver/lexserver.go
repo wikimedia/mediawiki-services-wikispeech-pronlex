@@ -142,13 +142,20 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := queryFromParams(r)
-	res := dbapi.GetEntries(db, q)
+	res, err := dbapi.GetEntries(db, q)
+	if err != nil {
+		log.Printf("lexserver: Failed to get entries: %v", err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+	}
 
 	jsn, err := marshal(res, r)
-	ff("lexserver: Failed to marshal json: %v", err)
+	if err != nil {
+		log.Printf("lexserver: Failed to marshal json: %v", err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+	}
 
 	w.Header().Set("Content-Type", "application/javascript") // TODO Behövs denna?
-	fmt.Fprint(w, string(jsn))
+	fmt.Fprint(w, string(jsn))                               // TODO should not be called if error occurs?
 }
 
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
@@ -191,6 +198,6 @@ func main() {
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
-	log.Print("Lexicon server is going up on port ", port)
+	log.Print("Lexicon server listening on port ", port)
 	log.Fatal(http.ListenAndServe(port, nil))
 }

@@ -60,8 +60,10 @@ func Test_InsertEntries(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	var entries map[string][]Entry
-	entries = GetEntries(db, q)
-
+	entries, err = GetEntries(db, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(entries) != 1 {
 		t.Errorf(fs, 1, len(entries))
 	}
@@ -102,7 +104,10 @@ func Test_InsertEntries(t *testing.T) {
 	}
 	tx01.Commit()
 
-	ess := GetEntries(db, q)
+	ess, err := GetEntries(db, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(ess) != 1 {
 		t.Error("ERRRRRRROR")
 	}

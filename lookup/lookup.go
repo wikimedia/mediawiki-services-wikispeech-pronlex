@@ -37,7 +37,10 @@ func main() {
 		Words:      dbapi.ToLower(os.Args[2:]),
 		PageLength: 100}
 
-	res := dbapi.GetEntries(db, q)
+	res, err := dbapi.GetEntries(db, q)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	res0, err := json.MarshalIndent(res, "", "  ")
 	if err != nil {
