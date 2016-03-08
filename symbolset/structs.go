@@ -34,7 +34,7 @@ type SymbolSet struct {
 	//phonemeRe *regexp.Regexp
 }
 
-// NewSymbolSet: public constructor for SymbolSet with build-in error checks
+// NewSymbolSet: public constructor for SymbolSet with built-in error checks
 func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	res := SymbolSet{name, symbols}
 	if len(res.PhonemeDelimiters()) < 1 {
