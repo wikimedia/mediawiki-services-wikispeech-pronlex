@@ -98,24 +98,84 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 	return Lexicon{Id: id, Name: lname, SymbolSetName: symbolsetname}, nil
 }
 
+func LexiconFromId(tx *sql.Tx, id int64) (Lexicon, error) {
+	res := Lexicon{}
+	var dbId int64
+	var name, symbolSetName string
+	err := tx.QueryRow("select id, name, symbolsetname from lexicon where id = ?", id).Scan(&dbId, &name, &symbolSetName)
+	if err == sql.ErrNoRows {
+		return res, fmt.Errorf("no lexicon with id %d : %v", id, err)
+	}
+	if err != nil {
+		return res, fmt.Errorf("query failed %v", err)
+	}
+
+	res.Id = dbId
+	res.Name = name
+	res.SymbolSetName = symbolSetName
+
+	return res, err
+}
+
+func InsertOrUpdateLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		return Lexicon{}, fmt.Errorf("failed begin transaction %v", err)
+	}
+	return InsertOrUpdateLexiconTx(tx, l)
+}
+func InsertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
+
+	res := Lexicon{}
+
+	if l.Id == 0 {
+		return InsertLexiconTx(tx, l)
+	}
+
+	if l.Id > 0 {
+		res, err := LexiconFromId(tx, l.Id)
+		if err != nil {
+			return res, fmt.Errorf("faild get lexicon : %v", err)
+		}
+		if l != res {
+			_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", l.Name, l.SymbolSetName, res.Id)
+			if err != nil {
+				tx.Rollback()
+				return res, fmt.Errorf("failed to update lex : %v", err)
+			}
+		}
+	}
+	return res, nil
+}
+
 // TODO change input arg to sql.Tx ?
 func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
+	res, err := InsertLexiconTx(tx, l)
+	tx.Commit()
+
+	return res, err
+}
+
+func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	res, err := tx.Exec("insert into lexicon (name, symbolsetname) values (?, ?)", strings.ToLower(l.Name), l.SymbolSetName)
 	if err != nil {
-		return l, fmt.Errorf("failed to insert lexicon + symbolset name : %v", err)
+		tx.Rollback()
+		return l, fmt.Errorf("failed to insert lexicon name + symbolset name : %v", err)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
+		tx.Rollback()
 		return l, fmt.Errorf("failed to get last insert id : %v", err)
 	}
 
-	tx.Commit()
+	//tx.Commit()
 
-	return Lexicon{Id: id, Name: l.Name, SymbolSetName: l.SymbolSetName}, err
+	return Lexicon{Id: id, Name: strings.ToLower(l.Name), SymbolSetName: l.SymbolSetName}, err
 }
 
 // TODO change input arg to sql.Tx

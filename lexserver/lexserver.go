@@ -51,9 +51,35 @@ func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 
 	lexs, err := dbapi.ListLexicons(db) // TODO error handling
 	jsn, err := marshal(lexs, r)
-	ff("Failed json marshalling %v", err) // TODO Skicka tillbaka felet till r?
-
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/javascript") // TODO Behövs denna?
+	fmt.Fprint(w, string(jsn))
+}
+
+func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
+	// if no id or not an int, simply set id to 0:
+	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+	name := strings.TrimSpace(r.FormValue("name"))
+	symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
+	if name == "" || symbolSetName == "" {
+		http.Error(w, fmt.Sprintf("missing parameter value, expecting value for 'name' and 'symbolsetname'"), http.StatusExpectationFailed)
+		return
+	}
+
+	res, err := dbapi.InsertOrUpdateLexicon(db, dbapi.Lexicon{Id: id, Name: name, SymbolSetName: symbolSetName})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed database call : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	jsn, err := marshal(res, r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+		return
+	}
+
 	fmt.Fprint(w, string(jsn))
 }
 
@@ -194,6 +220,7 @@ func main() {
 
 	// function calls
 	http.HandleFunc("/listlexicons", listLexsHandler)
+	http.HandleFunc("/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
 	//http.HandleFunc("/updateentry", updateEntryHandler)
 
