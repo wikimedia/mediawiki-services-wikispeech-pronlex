@@ -7,11 +7,16 @@ import (
 var fsExp = "Expected: '%v' got: '%v'"
 var fsDidntExp = "Didn't expect: '%v'"
 
-func Test_TODO_IMPLEMENT_TESTS_HERE(t *testing.T) {
-	expect := "a"
-	result := expect
-	if result != expect {
+func testEq(t *testing.T, expect []Symbol, result []Symbol) {
+	if len(expect) != len(result) {
 		t.Errorf(fsExp, expect, result)
+		return
 	}
-
+	for i, ex := range expect {
+		re := result[i]
+		if ex != re {
+			t.Errorf(fsExp, expect, result)
+			return
+		}
+	}
 }
