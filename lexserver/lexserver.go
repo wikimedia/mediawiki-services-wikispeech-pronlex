@@ -83,6 +83,20 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 }
 
+func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+	//name := strings.TrimSpace(r.FormValue("name"))
+	//symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
+
+	err := dbapi.DeleteLexicon(db, id) //dbapi.Lexicon{Id: id, Name: name, SymbolSetName: symbolSetName})
+	if err != nil {
+
+		http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+}
+
 // TODO report unused URL parameters
 
 // TODO Gör konstanter som kan användas istället för strängar
@@ -220,12 +234,13 @@ func main() {
 
 	// function calls
 	http.HandleFunc("/listlexicons", listLexsHandler)
-	http.HandleFunc("/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
 	//http.HandleFunc("/updateentry", updateEntryHandler)
 
 	// admin page
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
+	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
+	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))

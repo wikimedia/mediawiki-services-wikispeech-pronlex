@@ -29,7 +29,7 @@ DMCRLX.CreateLexModel = function() {
 	var params = {'id' : DMCRLX.selectedLexicon().id, 'name' : DMCRLX.selectedLexicon().name, 'symbolsetname' : DMCRLX.selectedLexicon().symbolSetName}
 	
 	
-	$.get(DMCRLX.baseURL + "insertorupdatelexicon", params)
+	$.get(DMCRLX.baseURL + "admin/insertorupdatelexicon", params)
 	    .done(function(data){
 		DMCRLX.loadLexiconNames();
 		DMCRLX.selectedLexicon(data);
@@ -39,8 +39,21 @@ DMCRLX.CreateLexModel = function() {
 	    });
 	
     }
+
+    DMCRLX.deleteLexicon = function () {
+	var params = {'id' : DMCRLX.selectedLexicon().id} // , 'name' : DMCRLX.selectedLexicon().name, 'symbolsetname' : DMCRLX.selectedLexicon().symbolSetName}
+	$.get(DMCRLX.baseURL + "admin/deletelexicon", params)
+	    .done(function(data){
+		// dumdelidum
+		DMCRLX.loadLexiconNames();
+	    })
+	    .fail(function (xhr, textStatus, errorThrown) {
+		alert(xhr.responseText);	    
+	    });
+    }
     
-    
+
+
     
     DMCRLX.addLexicon = function () {
 	

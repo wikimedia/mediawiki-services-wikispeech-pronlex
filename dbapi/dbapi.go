@@ -9,6 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -117,6 +118,36 @@ func LexiconFromId(tx *sql.Tx, id int64) (Lexicon, error) {
 	return res, err
 }
 
+func DeleteLexicon(db *sql.DB, id int64) error {
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		return err
+	}
+	return DeleteLexiconTx(tx, id)
+}
+
+func DeleteLexiconTx(tx *sql.Tx, id int64) error {
+	var n int
+	err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
+	// must always return a row, no need to check for empty row
+	if err != nil {
+		return err
+	}
+
+	if n > 0 {
+		return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: " + strconv.Itoa(n) + ")")
+	}
+
+	_, err = tx.Exec("delete from lexicon where id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete lexicon : %v", err)
+	}
+
+	return nil
+}
+
 func InsertOrUpdateLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -139,7 +170,7 @@ func InsertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 			return res, fmt.Errorf("faild get lexicon : %v", err)
 		}
 		if l != res {
-			_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", l.Name, l.SymbolSetName, res.Id)
+			_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", strings.ToLower(l.Name), l.SymbolSetName, res.Id)
 			if err != nil {
 				tx.Rollback()
 				return res, fmt.Errorf("failed to update lex : %v", err)
