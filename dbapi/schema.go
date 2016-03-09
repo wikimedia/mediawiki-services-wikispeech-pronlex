@@ -75,6 +75,8 @@ CREATE TABLE Lemma2Entry (
 unique(lemmaId,entryId),
 foreign key (entryId) references Entry(id), -- NL20160226
 foreign key (lemmaId) references Lemma(id)); -- NL20160226
+CREATE INDEX l2eind on Lemma2Entry (lemmaId); -- NL20160309 (meaningless line?)
+CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId); -- NL20160309
 CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 CREATE TABLE SurfaceForm2Entry (
     entryId bigint not null,
