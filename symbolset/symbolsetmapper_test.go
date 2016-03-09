@@ -4,6 +4,8 @@ import (
 	"testing"
 )
 
+var fsExpTrans = "Expected: /%v/ got: /%v/"
+
 func Test_NewSymbolSetMapper_WithCorrectInput1(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
@@ -97,7 +99,7 @@ func Test_mapTranscription_WithAmbiguousSymbols(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -122,7 +124,7 @@ func Test_mapTranscription_WithNonEmptyDelimiters(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -148,7 +150,7 @@ func Test_mapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -174,7 +176,7 @@ func Test_mapTranscription_EmptyDelimiterInInput2(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -200,7 +202,7 @@ func Test_mapTranscription_EmptyDelimiterInOutput(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -224,7 +226,7 @@ func Test_mapTranscription_Sampa2Ipa_Simple(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -250,7 +252,7 @@ func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_1(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -279,7 +281,7 @@ func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_2(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -353,7 +355,7 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_1(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -381,7 +383,7 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_2(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -410,7 +412,7 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_3(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -440,7 +442,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
@@ -472,6 +474,40 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
-		t.Errorf(fsExp, expect, result)
+		t.Errorf(fsExpTrans, expect, result)
 	}
+}
+
+func testMapTranscription(t *testing.T, ssm SymbolSetMapper, input string, expect string) {
+	result, err := ssm.mapTranscription(input)
+	if err != nil {
+		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
+	if result != expect {
+		t.Errorf(fsExpTrans, expect, result)
+	}
+}
+
+func Test_LoadSymbolSetMapper_NST2WS(t *testing.T) {
+	fromName := "NST-XSAMPA"
+	toName := "WS-SAMPA"
+	fName := "static/sv_maptable.csv"
+	ssm, err := LoadSymbolSetMapper(fName, fromName, toName)
+	if err != nil {
+		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
+	testMapTranscription(t, ssm, "\"bOt`", "\" b O rt")
+	testMapTranscription(t, ssm, "\"ku0r-d", "\" k u0 r d")
+}
+
+func Test_LoadSymbolSetMapper_NST2IPA(t *testing.T) {
+	fromName := "NST-XSAMPA"
+	toName := "IPA"
+	fName := "static/sv_maptable.csv"
+	ssm, err := LoadSymbolSetMapper(fName, fromName, toName)
+	if err != nil {
+		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
+	testMapTranscription(t, ssm, "\"bOt`", "\u02C8bɔʈ")
+	testMapTranscription(t, ssm, "\"ku0r-ds", "\u02C8kɵrds")
 }

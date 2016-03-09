@@ -180,42 +180,44 @@ func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSe
 		}
 		n++
 		l := s.Text()
-		fs := strings.Split(l, "\t")
-		if n == 1 { // header
-			descIndex = indexOf(fs, "DESC/EXAMPLE")
-			fromIndex = indexOf(fs, fromName)
-			toIndex = indexOf(fs, toName)
-			typeIndex = indexOf(fs, "TYPE")
+		if len(strings.TrimSpace(l)) > 0 && !strings.HasPrefix(strings.TrimSpace(l), "#") {
+			fs := strings.Split(l, "\t")
+			if n == 1 { // header
+				descIndex = indexOf(fs, "DESC/EXAMPLE")
+				fromIndex = indexOf(fs, fromName)
+				toIndex = indexOf(fs, toName)
+				typeIndex = indexOf(fs, "TYPE")
 
-		} else {
-			from := fs[fromIndex]
-			to := fs[toIndex]
-			desc := fs[descIndex]
-			typeS := fs[typeIndex]
-			var symType SymbolType
-			switch typeS {
-			case "syllabic":
-				symType = Syllabic
-			case "non syllabic":
-				symType = NonSyllabic
-			case "stress":
-				symType = Stress
-			case "phoneme delimiter":
-				symType = PhonemeDelimiter
-			case "explicit phoneme delimiter":
-				symType = ExplicitPhonemeDelimiter
-			case "syllable delimiter":
-				symType = SyllableDelimiter
-			case "morpheme delimiter":
-				symType = MorphemeDelimiter
-			case "word delimiter":
-				symType = WordDelimiter
-			default:
-				return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
+			} else {
+				from := fs[fromIndex]
+				to := fs[toIndex]
+				desc := fs[descIndex]
+				typeS := fs[typeIndex]
+				var symType SymbolType
+				switch typeS {
+				case "syllabic":
+					symType = Syllabic
+				case "non syllabic":
+					symType = NonSyllabic
+				case "stress":
+					symType = Stress
+				case "phoneme delimiter":
+					symType = PhonemeDelimiter
+				case "explicit phoneme delimiter":
+					symType = ExplicitPhonemeDelimiter
+				case "syllable delimiter":
+					symType = SyllableDelimiter
+				case "morpheme delimiter":
+					symType = MorphemeDelimiter
+				case "word delimiter":
+					symType = WordDelimiter
+				default:
+					return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
+				}
+				symFrom := Symbol{String: from, Type: symType, Desc: desc}
+				symTo := Symbol{String: to, Type: symType, Desc: desc}
+				maptable = append(maptable, SymbolPair{symFrom, symTo})
 			}
-			symFrom := Symbol{String: from, Type: symType, Desc: desc}
-			symTo := Symbol{String: to, Type: symType, Desc: desc}
-			maptable = append(maptable, SymbolPair{symFrom, symTo})
 		}
 	}
 	ssm, err := NewSymbolSetMapper(fromName, toName, maptable)

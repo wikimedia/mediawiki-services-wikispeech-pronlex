@@ -91,7 +91,9 @@ func (ssm SymbolSetMapper) mapTranscription(input string) (string, error) {
 		if to.Type == UndefinedSymbol {
 			return res, fmt.Errorf("couldn't map symbol /%s/", fromS)
 		}
-		mapped = append(mapped, to.String)
+		if len(to.String) > 0 {
+			mapped = append(mapped, to.String)
+		}
 	}
 	mapped, err = ssm.to.FilterAmbiguous(mapped)
 	if err != nil {
@@ -166,7 +168,7 @@ func (ss SymbolSet) FilterAmbiguous(trans []string) ([]string, error) {
 		test := phn0 + phnDel + phn1
 		if contains(potentiallyAmbs, test) {
 			if !ss.hasExplicitPhonemeDelimiter {
-				return res, fmt.Errorf("explicit phoneme delimiter was undefined when needed for [%s] vs [%s] + [%s]", (phn0 + phn1), phn0, phn1)
+				return res, fmt.Errorf("explicit phoneme delimiter in %s was undefined when needed for [%s] vs [%s] + [%s]", ss.Name, (phn0 + phn1), phn0, phn1)
 			} else {
 				res = append(res, phn0+explicitPhnDel.String)
 			}
@@ -206,7 +208,7 @@ func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 
 			default:
 				if match[0] != 0 {
-					return nil, fmt.Errorf("couldn't parse transcription /%s/, it may contains undefined symbols!", input)
+					return nil, fmt.Errorf("couldn't parse transcription /%s/, it may contain undefined symbols!", input)
 				}
 				acc = append(acc, rest[match[0]:match[1]])
 				rest = rest[match[1]:]
