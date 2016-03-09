@@ -1,6 +1,6 @@
 var DMCRLX = {};
 
-DMCRLX.baseURL = "http://localhost:8787/"
+DMCRLX.baseURL = "http://localhost:8787/" // location.origin
 //DMCRLX.baseURL = "./"
 DMCRLX.CreateLexModel = function() {
     var self = this;
