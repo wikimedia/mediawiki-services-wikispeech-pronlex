@@ -34,7 +34,7 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 
 	// specific symbol initialization
 	if len(phonemeDelimiters) < 1 {
-		return nilRes, fmt.Errorf("No phoneme delimiters defined in symbol set %s", name)
+		return nilRes, fmt.Errorf("no phoneme delimiters defined in symbol set %s", name)
 	}
 	phonemeDelimiter := phonemeDelimiters[0]
 
@@ -78,25 +78,26 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	// end: split re
 
 	res := SymbolSet{
-		Name:                      name,
-		Symbols:                   symbols,
-		Phonemes:                  phonemes,
-		PhoneticSymbols:           phoneticSymbols,
-		StressSymbols:             stressSymbols,
-		Syllabic:                  syllabic,
-		NonSyllabic:               nonSyllabic,
-		PhonemeDelimiters:         phonemeDelimiters,
-		ExplicitPhonemeDelimiters: explicitPhonemeDelimiters,
+		Name:    name,
+		Symbols: symbols,
 
-		PhonemeDelimiter:            phonemeDelimiter,
-		ExplicitPhonemeDelimiter:    explicitPhonemeDelimiter,
-		HasExplicitPhonemeDelimiter: len(explicitPhonemeDelimiter.String) > 0,
+		phonemes:                  phonemes,
+		phoneticSymbols:           phoneticSymbols,
+		stressSymbols:             stressSymbols,
+		syllabic:                  syllabic,
+		nonSyllabic:               nonSyllabic,
+		phonemeDelimiters:         phonemeDelimiters,
+		explicitPhonemeDelimiters: explicitPhonemeDelimiters,
 
-		PhonemeRe:          phonemeRe,
-		SyllabicRe:         syllabicRe,
-		NonSyllabicRe:      nonSyllabicRe,
-		PhonemeDelimiterRe: phonemeDelimiterRe,
-		SplitRe:            splitRe,
+		phonemeDelimiter:            phonemeDelimiter,
+		explicitPhonemeDelimiter:    explicitPhonemeDelimiter,
+		hasExplicitPhonemeDelimiter: len(explicitPhonemeDelimiter.String) > 0,
+
+		phonemeRe:          phonemeRe,
+		syllabicRe:         syllabicRe,
+		nonSyllabicRe:      nonSyllabicRe,
+		phonemeDelimiterRe: phonemeDelimiterRe,
+		splitRe:            splitRe,
 	}
 	return res, nil
 
@@ -129,7 +130,7 @@ func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair)
 		return nilRes, err
 	}
 	if from.Name == to.Name {
-		return nilRes, fmt.Errorf("Both phoneme sets cannot have the same name: %s", from.Name)
+		return nilRes, fmt.Errorf("both phoneme sets cannot have the same name: %s", from.Name)
 	}
 	err = from.PreCheckAmbiguous()
 	if err != nil {
@@ -140,7 +141,7 @@ func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair)
 		return nilRes, err
 	}
 
-	repeatedPhonemeDelimiters, err := regexp.Compile(to.PhonemeDelimiterRe.String() + "+")
+	repeatedPhonemeDelimiters, err := regexp.Compile(to.phonemeDelimiterRe.String() + "+")
 	if err != nil {
 		return nilRes, err
 	}
@@ -149,13 +150,13 @@ func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair)
 		FromName:                  fromName,
 		ToName:                    toName,
 		SymbolList:                symbolList,
-		FromIsIPA:                 fromIsIPA,
-		ToIsIPA:                   toIsIPA,
-		From:                      from,
-		To:                        to,
+		fromIsIPA:                 fromIsIPA,
+		toIsIPA:                   toIsIPA,
+		from:                      from,
+		to:                        to,
 		ipa:                       ipa,
-		SymbolMap:                 symbolMap,
-		RepeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
+		symbolMap:                 symbolMap,
+		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}
 	return ssm, nil
 
@@ -210,7 +211,7 @@ func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSe
 			case "word delimiter":
 				symType = WordDelimiter
 			default:
-				return nilRes, fmt.Errorf("Unknown symbol type on line:\t" + l)
+				return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
 			}
 			symFrom := Symbol{String: from, Type: symType, Desc: desc}
 			symTo := Symbol{String: to, Type: symType, Desc: desc}

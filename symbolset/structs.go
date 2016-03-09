@@ -8,32 +8,34 @@ import (
 
 // structs in package symbolset
 
-// SymbolSet: package private struct
+// SymbolSet: struct for package private usage
+// To create a new SymbolSet, use NewSymbolSet
 type SymbolSet struct {
 	Name    string
 	Symbols []Symbol
 
 	// derived values computed upon initialization
-	Phonemes                  []Symbol
-	PhoneticSymbols           []Symbol
-	StressSymbols             []Symbol
-	Syllabic                  []Symbol
-	NonSyllabic               []Symbol
-	PhonemeDelimiters         []Symbol
-	ExplicitPhonemeDelimiters []Symbol
+	phonemes                  []Symbol
+	phoneticSymbols           []Symbol
+	stressSymbols             []Symbol
+	syllabic                  []Symbol
+	nonSyllabic               []Symbol
+	phonemeDelimiters         []Symbol
+	explicitPhonemeDelimiters []Symbol
 
-	PhonemeDelimiter            Symbol
-	ExplicitPhonemeDelimiter    Symbol
-	HasExplicitPhonemeDelimiter bool
+	phonemeDelimiter            Symbol
+	explicitPhonemeDelimiter    Symbol
+	hasExplicitPhonemeDelimiter bool
 
-	PhonemeRe          *regexp.Regexp
-	SyllabicRe         *regexp.Regexp
-	NonSyllabicRe      *regexp.Regexp
-	PhonemeDelimiterRe *regexp.Regexp
-	SplitRe            *regexp.Regexp
+	phonemeRe          *regexp.Regexp
+	syllabicRe         *regexp.Regexp
+	nonSyllabicRe      *regexp.Regexp
+	phonemeDelimiterRe *regexp.Regexp
+	splitRe            *regexp.Regexp
 }
 
-// start: SymbolSetMapper
+// SymbolSetMapper: struct for package private usage
+// To create a new SymbolSet, use NewSymbolSet
 type SymbolSetMapper struct {
 	FromName   string
 	ToName     string
@@ -42,18 +44,18 @@ type SymbolSetMapper struct {
 	ipa IPA
 
 	// derived values computed upon initialization
-	FromIsIPA bool
-	ToIsIPA   bool
+	fromIsIPA bool
+	toIsIPA   bool
 
-	From      SymbolSet
-	To        SymbolSet
-	SymbolMap map[Symbol]Symbol
+	from      SymbolSet
+	to        SymbolSet
+	symbolMap map[Symbol]Symbol
 
-	RepeatedPhonemeDelimiters *regexp.Regexp
+	repeatedPhonemeDelimiters *regexp.Regexp
 }
 
 func (ssm SymbolSetMapper) preFilter(trans string, ss SymbolSet) (string, error) {
-	switch ssm.FromIsIPA {
+	switch ssm.fromIsIPA {
 	case true:
 		return ssm.ipa.filterBeforeMappingFromIpa(trans, ss)
 	default:
@@ -62,7 +64,7 @@ func (ssm SymbolSetMapper) preFilter(trans string, ss SymbolSet) (string, error)
 }
 
 func (ssm SymbolSetMapper) postFilter(trans string, ss SymbolSet) (string, error) {
-	switch ssm.ToIsIPA {
+	switch ssm.toIsIPA {
 	case true:
 		return ssm.ipa.filterAfterMappingToIpa(trans, ss)
 	default:
@@ -71,38 +73,36 @@ func (ssm SymbolSetMapper) postFilter(trans string, ss SymbolSet) (string, error
 }
 
 func (ssm SymbolSetMapper) mapTranscription(input string) (string, error) {
-	res, err := ssm.preFilter(input, ssm.From)
+	res, err := ssm.preFilter(input, ssm.from)
 	if err != nil {
 		return res, err
 	}
-	splitted, err := ssm.From.SplitTranscription(res)
+	splitted, err := ssm.from.SplitTranscription(res)
 	if err != nil {
 		return res, err
 	}
 	mapped := make([]string, 0)
 	for _, fromS := range splitted {
-		from, err := ssm.From.Get(fromS)
+		from, err := ssm.from.Get(fromS)
 		if err != nil {
 			return res, fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
 		}
-		to := ssm.SymbolMap[from]
+		to := ssm.symbolMap[from]
 		if to.Type == UndefinedSymbol {
 			return res, fmt.Errorf("couldn't map symbol /%s/", fromS)
 		}
 		mapped = append(mapped, to.String)
 	}
-	mapped, err = ssm.To.FilterAmbiguous(mapped)
+	mapped, err = ssm.to.FilterAmbiguous(mapped)
 	if err != nil {
 		return res, err
 	}
-	res = strings.Join(mapped, ssm.To.PhonemeDelimiter.String)
+	res = strings.Join(mapped, ssm.to.phonemeDelimiter.String)
 
 	// remove repeated phoneme delimiters
-	res = ssm.RepeatedPhonemeDelimiters.ReplaceAllString(res, ssm.To.PhonemeDelimiter.String)
-	return ssm.postFilter(res, ssm.To)
+	res = ssm.repeatedPhonemeDelimiters.ReplaceAllString(res, ssm.to.phonemeDelimiter.String)
+	return ssm.postFilter(res, ssm.to)
 }
-
-// end: SymbolSetMapper
 
 type SymbolPair struct {
 	Sym1 Symbol
@@ -153,31 +153,33 @@ func (ss SymbolSet) Get(symbol string) (Symbol, error) {
 			return s, nil
 		}
 	}
-	return Symbol{}, fmt.Errorf("No symbol /%s/ in symbol set", symbol)
+	return Symbol{}, fmt.Errorf("no symbol /%s/ in symbol set", symbol)
 }
 
 func (ss SymbolSet) FilterAmbiguous(trans []string) ([]string, error) {
-	potentiallyAmbs := ss.PhoneticSymbols
-	phnDel := ss.PhonemeDelimiter.String
-	explicitPhnDel := ss.ExplicitPhonemeDelimiter
+	potentiallyAmbs := ss.phoneticSymbols
+	phnDel := ss.phonemeDelimiter.String
+	explicitPhnDel := ss.explicitPhonemeDelimiter
 	res := make([]string, 0)
 	for i, phn0 := range trans[0 : len(trans)-1] {
 		phn1 := trans[i+1]
 		test := phn0 + phnDel + phn1
 		if contains(potentiallyAmbs, test) {
-			if !ss.HasExplicitPhonemeDelimiter {
-				return res, fmt.Errorf("Explicit phoneme delimiter was undefined when needed for [%s] vs [%s] + [%s]", (phn0 + phn1), phn0, phn1)
+			if !ss.hasExplicitPhonemeDelimiter {
+				return res, fmt.Errorf("explicit phoneme delimiter was undefined when needed for [%s] vs [%s] + [%s]", (phn0 + phn1), phn0, phn1)
 			} else {
 				res = append(res, phn0+explicitPhnDel.String)
 			}
+		} else {
+			res = append(res, phn0)
 		}
 	}
-	res = append(res, trans[len(trans)])
-	return trans, nil
+	res = append(res, trans[len(trans)-1])
+	return res, nil
 }
 
 func (ss SymbolSet) PreCheckAmbiguous() error {
-	allSymbols := ss.Phonemes
+	allSymbols := ss.phonemes
 	res := make([]string, 0)
 	for _, a := range allSymbols {
 		for _, b := range allSymbols {
@@ -192,17 +194,20 @@ func (ss SymbolSet) PreCheckAmbiguous() error {
 }
 
 func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
-	delim := ss.PhonemeDelimiterRe
+	delim := ss.phonemeDelimiterRe
 	if delim.FindStringIndex("") != nil {
 		rest := input
 		acc := make([]string, 0)
 		for len(rest) > 0 {
-			match := ss.SplitRe.FindStringIndex(rest)
+			match := ss.splitRe.FindStringIndex(rest)
 			switch match {
 			case nil:
-				return nil, fmt.Errorf("Transcription not splittable (invalid symbols?)! input=/%s/, acc=/%s/, rest=/%s/", input, strings.Join(acc, ss.PhonemeDelimiter.String), rest)
+				return nil, fmt.Errorf("transcription not splittable (invalid symbols?)! input=/%s/, acc=/%s/, rest=/%s/", input, strings.Join(acc, ss.phonemeDelimiter.String), rest)
 
 			default:
+				if match[0] != 0 {
+					return nil, fmt.Errorf("couldn't parse transcription /%s/, it may contains undefined symbols!", input)
+				}
 				acc = append(acc, rest[match[0]:match[1]])
 				rest = rest[match[1]:]
 			}
@@ -212,8 +217,6 @@ func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 		return delim.Split(input, -1), nil
 	}
 }
-
-// end: symbol set
 
 // start: IPA
 // SYMBOLS: http://www.phon.ucl.ac.uk/home/wells/ipa-unicode.htm#numbers
@@ -229,9 +232,9 @@ func (ipa IPA) IsIPA(symbolSetName string) bool {
 
 func (ipa IPA) checkFilterRequirements(ss SymbolSet) error {
 	if !ss.Contains(ipa.accentI) {
-		return fmt.Errorf("No IPA stress symbol in stress symbol list? IPA stress =/%v/, stress symbols=%v", ipa.accentI, ss.StressSymbols)
+		return fmt.Errorf("no IPA stress symbol in stress symbol list? IPA stress =/%v/, stress symbols=%v", ipa.accentI, ss.stressSymbols)
 	} else if !ss.Contains(ipa.accentI + ipa.accentII) {
-		return fmt.Errorf("No IPA tone II symbol in stress symbol list? IPA stress =/%s/, stress symbols=%v", ipa.accentI, ss.StressSymbols)
+		return fmt.Errorf("no IPA tone II symbol in stress symbol list? IPA stress =/%s/, stress symbols=%v", ipa.accentI, ss.stressSymbols)
 	} else {
 		return nil
 	}
@@ -243,7 +246,7 @@ func (ipa IPA) filterBeforeMappingFromIpa(trans string, ss SymbolSet) (string, e
 	if err != nil {
 		return "", err
 	}
-	s := ipa.accentI + "(" + ss.PhonemeRe.String() + "+)" + ipa.accentII
+	s := ipa.accentI + "(" + ss.phonemeRe.String() + "+)" + ipa.accentII
 	repl, err := regexp.Compile(s)
 	if err != nil {
 		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
@@ -260,8 +263,8 @@ func (ipa IPA) filterAfterMappingToIpa(trans string, ss SymbolSet) (string, erro
 		if err != nil {
 			return "", err
 		}
-		repl, err := regexp.Compile(ipa.accentI + ipa.accentII + "(" + ss.NonSyllabicRe.String() + "*)(" + ss.SyllabicRe.String() + ")")
-		res := repl.ReplaceAllString(trans, ipa.accentI+ipa.accentII+"$1")
+		repl, err := regexp.Compile(ipa.accentI + ipa.accentII + "(" + ss.nonSyllabicRe.String() + "*)(" + ss.syllabicRe.String() + ")")
+		res := repl.ReplaceAllString(trans, ipa.accentI+"$1$2"+ipa.accentII)
 		return res, nil
 	} else {
 		return trans, nil
