@@ -1,7 +1,7 @@
 var DMCRLX = {};
 
 DMCRLX.baseURL = "http://localhost:8787/"
-
+//DMCRLX.baseURL = "./"
 DMCRLX.CreateLexModel = function() {
     var self = this;
     

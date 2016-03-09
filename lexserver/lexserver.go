@@ -202,6 +202,10 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 
 // }
 
+func adminHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/admin/index.html")
+}
+
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/create_lex.html")
 }
@@ -238,6 +242,7 @@ func main() {
 	//http.HandleFunc("/updateentry", updateEntryHandler)
 
 	// admin page
+	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
