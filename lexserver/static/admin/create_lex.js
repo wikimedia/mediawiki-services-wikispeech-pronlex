@@ -1,7 +1,7 @@
 var DMCRLX = {};
 
-DMCRLX.baseURL = "http://localhost:8787/" // location.origin
-//DMCRLX.baseURL = "./"
+DMCRLX.baseURL = window.location.origin
+
 DMCRLX.CreateLexModel = function() {
     var self = this;
     
@@ -10,7 +10,7 @@ DMCRLX.CreateLexModel = function() {
     
     DMCRLX.loadLexiconNames = function () {
 	
-	$.getJSON(DMCRLX.baseURL +"listlexicons")
+	$.getJSON(DMCRLX.baseURL +"/listlexicons")
 	    .done(function (data) {
 		DMCRLX.lexicons(data);
 	    })
@@ -29,7 +29,7 @@ DMCRLX.CreateLexModel = function() {
 	var params = {'id' : DMCRLX.selectedLexicon().id, 'name' : DMCRLX.selectedLexicon().name, 'symbolsetname' : DMCRLX.selectedLexicon().symbolSetName}
 	
 	
-	$.get(DMCRLX.baseURL + "admin/insertorupdatelexicon", params)
+	$.get(DMCRLX.baseURL + "/admin/insertorupdatelexicon", params)
 	    .done(function(data){
 		DMCRLX.loadLexiconNames();
 		DMCRLX.selectedLexicon(data);
@@ -42,7 +42,7 @@ DMCRLX.CreateLexModel = function() {
 
     DMCRLX.deleteLexicon = function () {
 	var params = {'id' : DMCRLX.selectedLexicon().id} // , 'name' : DMCRLX.selectedLexicon().name, 'symbolsetname' : DMCRLX.selectedLexicon().symbolSetName}
-	$.get(DMCRLX.baseURL + "admin/deletelexicon", params)
+	$.get(DMCRLX.baseURL + "/admin/deletelexicon", params)
 	    .done(function(data){
 		// dumdelidum
 		DMCRLX.loadLexiconNames();
@@ -77,6 +77,7 @@ DMCRLX.CreateLexModel = function() {
     
     // On pageload:
     DMCRLX.loadLexiconNames();
+    //console.log("!!!!!!!!"+ )
 };
 
 ko.applyBindings(new DMCRLX.CreateLexModel());
