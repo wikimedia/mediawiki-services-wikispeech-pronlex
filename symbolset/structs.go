@@ -31,7 +31,7 @@ type SymbolSet struct {
 	syllabicRe         *regexp.Regexp
 	nonSyllabicRe      *regexp.Regexp
 	phonemeDelimiterRe *regexp.Regexp
-	splitRe            *regexp.Regexp
+	symbolRe           *regexp.Regexp
 }
 
 // SymbolSetMapper struct for package private usage.
@@ -207,7 +207,7 @@ func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 		rest := input
 		acc := make([]string, 0)
 		for len(rest) > 0 {
-			match := ss.splitRe.FindStringIndex(rest)
+			match := ss.symbolRe.FindStringIndex(rest)
 			switch match {
 			case nil:
 				return nil, fmt.Errorf("transcription not splittable (invalid symbols?)! input=/%s/, acc=/%s/, rest=/%s/", input, strings.Join(acc, ss.phonemeDelimiter.String), rest)

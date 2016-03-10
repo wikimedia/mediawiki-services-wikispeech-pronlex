@@ -62,7 +62,7 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 		return nilRes, err
 	}
 
-	splitRe, err := buildRegexpWithGroup(symbols, true, false)
+	symbolRe, err := buildRegexpWithGroup(symbols, true, false)
 	if err != nil {
 		return nilRes, err
 	}
@@ -87,7 +87,7 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 		syllabicRe:         syllabicRe,
 		nonSyllabicRe:      nonSyllabicRe,
 		phonemeDelimiterRe: phonemeDelimiterRe,
-		splitRe:            splitRe,
+		symbolRe:           symbolRe,
 	}
 	return res, nil
 
