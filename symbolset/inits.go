@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-// Initialization functions for structs in package symbolset
+// inits.go Initialization functions for structs in package symbolset
 
+// NewIpa is a public contructor for IPA with fixed-value fields
 func NewIPA() IPA {
 	return IPA{
 		ipa:      "ipa",

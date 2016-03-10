@@ -1,3 +1,4 @@
+// symbolset is a package for defining symbol sets and mapping between different sets, such as IPA to SAMPA, and so on
 package symbolset
 
 import (
@@ -8,7 +9,7 @@ import (
 
 // structs in package symbolset
 
-// SymbolSet struct for package private usage.
+// SymbolSet is a struct for package private usage.
 // To create a new SymbolSet, use NewSymbolSet
 type SymbolSet struct {
 	Name    string
@@ -34,7 +35,7 @@ type SymbolSet struct {
 	symbolRe           *regexp.Regexp
 }
 
-// SymbolSetMapper struct for package private usage.
+// SymbolSetMapper is a struct for package private usage.
 // To create a new SymbolSet, use NewSymbolSet.
 type SymbolSetMapper struct {
 	FromName   string
@@ -111,7 +112,7 @@ type SymbolPair struct {
 	Sym2 Symbol
 }
 
-// SymbolSlice for sorting symbol slices according to symbol length
+// SymbolSlice is used for sorting slices of symbols according to symbol length. Symbols with equal length will be sorted alphabetically.
 type SymbolSlice []Symbol
 
 func (a SymbolSlice) Len() int      { return len(a) }
@@ -124,6 +125,7 @@ func (a SymbolSlice) Less(i, j int) bool {
 	}
 }
 
+// SymbolType is used to categorize transcription symbols.
 type SymbolType int
 
 const (
@@ -147,12 +149,7 @@ type Symbol struct {
 }
 
 func (ss SymbolSet) Contains(symbol string) bool {
-	for _, s := range ss.Symbols {
-		if s.String == symbol {
-			return true
-		}
-	}
-	return false
+	return contains(ss.Symbols, symbol)
 }
 
 func (ss SymbolSet) Get(symbol string) (Symbol, error) {
