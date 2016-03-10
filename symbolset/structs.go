@@ -1,4 +1,4 @@
-// Package symbolset is a package for defining symbol sets and mapping between different sets, such as IPA to SAMPA, and so on
+// Package symbolset is a package for defining symbol sets and mapping between different sets, such as IPA to SAMPA, and so on.
 package symbolset
 
 import (
@@ -36,7 +36,7 @@ type SymbolSet struct {
 }
 
 // Mapper is a struct for package private usage.
-// To create a new SymbolSet, use NewSymbolSet.
+// To create a new Mapper, use NewMapper.
 type Mapper struct {
 	FromName string
 	ToName   string
