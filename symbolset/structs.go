@@ -1,4 +1,4 @@
-// Package symbolset is a package for defining symbol sets and mapping between different sets, such as IPA to SAMPA, and so on.
+// Package symbolset is used to define symbol sets and mapping between different sets, such as IPA to SAMPA, and so on.
 package symbolset
 
 import (
@@ -107,7 +107,7 @@ func (m Mapper) mapTranscription(input string) (string, error) {
 	return m.postFilter(res, m.to)
 }
 
-// SymbolPair is a tuple inside the symbol set mapper
+// SymbolPair is a tuple inside the Mapper
 type SymbolPair struct {
 	Sym1 Symbol
 	Sym2 Symbol
