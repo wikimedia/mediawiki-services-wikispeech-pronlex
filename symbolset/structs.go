@@ -107,7 +107,7 @@ func (m Mapper) mapTranscription(input string) (string, error) {
 	return m.postFilter(res, m.to)
 }
 
-// SymbolPair is a tuple inside the Mapper
+// SymbolPair is a tuple inside the Mapper used to store the symbol mappings in a list in preserved order
 type SymbolPair struct {
 	Sym1 Symbol
 	Sym2 Symbol
