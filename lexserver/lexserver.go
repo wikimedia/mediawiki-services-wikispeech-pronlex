@@ -210,6 +210,10 @@ func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/create_lex.html")
 }
 
+func adminEditSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
+}
+
 var db *sql.DB
 
 func main() {
@@ -244,6 +248,7 @@ func main() {
 	// admin page
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
+	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 
