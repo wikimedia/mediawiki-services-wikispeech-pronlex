@@ -6,7 +6,7 @@ import (
 
 var fsExpTrans = "Expected: /%v/ got: /%v/"
 
-func Test_NewSymbolSetMapper_WithCorrectInput1(t *testing.T) {
+func Test_NewMapper_WithCorrectInput1(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -14,13 +14,13 @@ func Test_NewSymbolSetMapper_WithCorrectInput1(t *testing.T) {
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
-	_, err := NewSymbolSetMapper(fromName, toName, symbols)
+	_, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("NewSymbolSetMapper() didn't expect error here : %v", err)
+		t.Errorf("NewMapper() didn't expect error here : %v", err)
 	}
 }
 
-func Test_NewSymbolSetMapper_FailIfInputLacksPhonemeDelimiter(t *testing.T) {
+func Test_NewMapper_FailIfInputLacksPhonemeDelimiter(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -28,13 +28,13 @@ func Test_NewSymbolSetMapper_FailIfInputLacksPhonemeDelimiter(t *testing.T) {
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", NonSyllabic, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
-	_, err := NewSymbolSetMapper(fromName, toName, symbols)
+	_, err := NewMapper(fromName, toName, symbols)
 	if err == nil {
-		t.Errorf("NewSymbolSetMapper() expected error here")
+		t.Errorf("NewMapper() expected error here")
 	}
 }
 
-func Test_NewSymbolSetMapper_FailIfOutputLacksPhonemeDelimiter(t *testing.T) {
+func Test_NewMapper_FailIfOutputLacksPhonemeDelimiter(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -42,13 +42,13 @@ func Test_NewSymbolSetMapper_FailIfOutputLacksPhonemeDelimiter(t *testing.T) {
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", NonSyllabic, ""}},
 	}
-	_, err := NewSymbolSetMapper(fromName, toName, symbols)
+	_, err := NewMapper(fromName, toName, symbols)
 	if err == nil {
-		t.Errorf("NewSymbolSetMapper() expected error here")
+		t.Errorf("NewMapper() expected error here")
 	}
 }
 
-func Test_NewSymbolSetMapper_FailIfBothSymbolSetsHaveTheSameName(t *testing.T) {
+func Test_NewMapper_FailIfBothSymbolSetsHaveTheSameName(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssLC"
 	symbols := []SymbolPair{
@@ -56,13 +56,13 @@ func Test_NewSymbolSetMapper_FailIfBothSymbolSetsHaveTheSameName(t *testing.T) {
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
-	_, err := NewSymbolSetMapper(fromName, toName, symbols)
+	_, err := NewMapper(fromName, toName, symbols)
 	if err == nil {
-		t.Errorf("NewSymbolSetMapper() expected error here")
+		t.Errorf("NewMapper() expected error here")
 	}
 }
 
-func Test_NewSymbolSetMapper_FailWithAmbiguousPhonemesAndNoExplicitDelimiter(t *testing.T) {
+func Test_NewMapper_FailWithAmbiguousPhonemesAndNoExplicitDelimiter(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -72,9 +72,9 @@ func Test_NewSymbolSetMapper_FailWithAmbiguousPhonemesAndNoExplicitDelimiter(t *
 		SymbolPair{Symbol{"rt", NonSyllabic, ""}, Symbol{"RT", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{"", PhonemeDelimiter, ""}},
 	}
-	_, err := NewSymbolSetMapper(fromName, toName, symbols)
+	_, err := NewMapper(fromName, toName, symbols)
 	if err == nil {
-		t.Errorf("NewSymbolSetMapper() expected error here")
+		t.Errorf("NewMapper() expected error here")
 	}
 }
 
@@ -88,7 +88,7 @@ func Test_mapTranscription_WithAmbiguousSymbols(t *testing.T) {
 		SymbolPair{Symbol{"rt", NonSyllabic, ""}, Symbol{"RT", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -113,7 +113,7 @@ func Test_mapTranscription_WithNonEmptyDelimiters(t *testing.T) {
 		SymbolPair{Symbol{"t_s", NonSyllabic, ""}, Symbol{"T_S", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -139,7 +139,7 @@ func Test_mapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 		SymbolPair{Symbol{"", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 		SymbolPair{Symbol{"-", ExplicitPhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -165,7 +165,7 @@ func Test_mapTranscription_EmptyDelimiterInInput2(t *testing.T) {
 		SymbolPair{Symbol{"", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 		SymbolPair{Symbol{"-", ExplicitPhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -191,7 +191,7 @@ func Test_mapTranscription_EmptyDelimiterInOutput(t *testing.T) {
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{"", PhonemeDelimiter, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{"-", ExplicitPhonemeDelimiter, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -215,7 +215,7 @@ func Test_mapTranscription_Sampa2Ipa_Simple(t *testing.T) {
 		SymbolPair{Symbol{"", PhonemeDelimiter, ""}, Symbol{"", PhonemeDelimiter, ""}},
 		SymbolPair{Symbol{"$", SyllableDelimiter, ""}, Symbol{".", SyllableDelimiter, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -241,7 +241,7 @@ func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_1(t *testing.T) {
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\u02C8", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\u02C8\u0300", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -270,7 +270,7 @@ func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_2(t *testing.T) {
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\u02C8", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\u02C8\u0300", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -297,14 +297,14 @@ func Test_mapTranscription_FailWithUnknownSymbols_EmptyDelim(t *testing.T) {
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\"\"", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\"baŋ.ka"
 	result, err := ssm.mapTranscription(input)
 	if err == nil {
-		t.Errorf("NewSymbolSetMapper() expected error here, but got %s", result)
+		t.Errorf("NewMapper() expected error here, but got %s", result)
 	}
 }
 
@@ -320,14 +320,14 @@ func Test_mapTranscription_FailWithUnknownSymbols_NonEmptyDelim(t *testing.T) {
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\"\"", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\" b a ŋ . k a"
 	result, err := ssm.mapTranscription(input)
 	if err == nil {
-		t.Errorf("NewSymbolSetMapper() expected error here, but got %s", result)
+		t.Errorf("NewMapper() expected error here, but got %s", result)
 	}
 }
 
@@ -344,7 +344,7 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_1(t *testing.T) {
 		SymbolPair{Symbol{"\u02C8", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\u02C8\u0300", Stress, ""}, Symbol{"\"\"", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -372,7 +372,7 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_2(t *testing.T) {
 		SymbolPair{Symbol{"\u02C8", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\u02C8\u0300", Stress, ""}, Symbol{"\"\"", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -401,7 +401,7 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_3(t *testing.T) {
 		SymbolPair{Symbol{"\u02C8", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\u02C8\u0300", Stress, ""}, Symbol{"\"\"", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -431,7 +431,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\"\"", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -463,7 +463,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\"\"", Stress, ""}},
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, symbols)
+	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -478,7 +478,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	}
 }
 
-func testMapTranscription(t *testing.T, ssm SymbolSetMapper, input string, expect string) {
+func testMapTranscription(t *testing.T, ssm Mapper, input string, expect string) {
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
@@ -488,11 +488,11 @@ func testMapTranscription(t *testing.T, ssm SymbolSetMapper, input string, expec
 	}
 }
 
-func Test_LoadSymbolSetMapper_NST2WS(t *testing.T) {
+func Test_LoadMapper_NST2WS(t *testing.T) {
 	fromName := "NST-XSAMPA"
 	toName := "WS-SAMPA"
 	fName := "static/sv_maptable.csv"
-	ssm, err := LoadSymbolSetMapper(fName, fromName, toName)
+	ssm, err := LoadMapper(fName, fromName, toName)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
@@ -500,11 +500,11 @@ func Test_LoadSymbolSetMapper_NST2WS(t *testing.T) {
 	testMapTranscription(t, ssm, "\"ku0r-d", "\" k u0 r d")
 }
 
-func Test_LoadSymbolSetMapper_NST2IPA(t *testing.T) {
+func Test_LoadMapper_NST2IPA(t *testing.T) {
 	fromName := "NST-XSAMPA"
 	toName := "IPA"
 	fName := "static/sv_maptable.csv"
-	ssm, err := LoadSymbolSetMapper(fName, fromName, toName)
+	ssm, err := LoadMapper(fName, fromName, toName)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func filterSymbolsByType(symbols []Symbol, types []SymbolType) []Symbol {
-	res := make([]Symbol, 0)
+	var res = make([]Symbol, 0)
 	for _, s := range symbols {
 		if containsType(types, s.Type) {
 			res = append(res, s)
@@ -24,8 +24,8 @@ func buildRegexp(symbols []Symbol) (*regexp.Regexp, error) {
 func buildRegexpWithGroup(symbols []Symbol, removeEmpty bool, anonGroup bool) (*regexp.Regexp, error) {
 	sorted := make([]Symbol, len(symbols))
 	copy(sorted, symbols)
-	sort.Sort(SymbolSlice(sorted))
-	acc := make([]string, 0)
+	sort.Sort(symbolSlice(sorted))
+	var acc = make([]string, 0)
 	for _, s := range sorted {
 		if removeEmpty {
 			if len(s.String) > 0 {
@@ -44,9 +44,8 @@ func buildRegexpWithGroup(symbols []Symbol, removeEmpty bool, anonGroup bool) (*
 	if err != nil {
 		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
 		return nil, err
-	} else {
-		return re, nil
 	}
+	return re, nil
 }
 
 func containsType(types []SymbolType, t SymbolType) bool {

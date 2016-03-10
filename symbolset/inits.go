@@ -10,9 +10,9 @@ import (
 
 // inits.go Initialization functions for structs in package symbolset
 
-// NewIpa is a public contructor for IPA with fixed-value fields
-func NewIPA() IPA {
-	return IPA{
+// NewIPA is a package private contructor for the ipa struct with fixed-value fields
+func newIPA() ipa {
+	return ipa{
 		ipa:      "ipa",
 		accentI:  "\u02C8",
 		accentII: "\u0300",
@@ -94,18 +94,18 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 
 }
 
-// NewSymbolSetMapper is a public constructor for SymbolSetMapper with built-in error checks
-func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair) (SymbolSetMapper, error) {
-	var nilRes SymbolSetMapper
+// NewMapper is a public constructor for Mapper with built-in error checks
+func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper, error) {
+	var nilRes Mapper
 
-	ipa := NewIPA()
+	ipa := newIPA()
 
-	toIsIPA := ipa.IsIPA(toName)
-	fromIsIPA := ipa.IsIPA(fromName)
+	toIsIPA := ipa.isIPA(toName)
+	fromIsIPA := ipa.isIPA(fromName)
 
-	fromSymbols := make([]Symbol, 0)
-	toSymbols := make([]Symbol, 0)
-	symbolMap := make(map[Symbol]Symbol)
+	var fromSymbols = make([]Symbol, 0)
+	var toSymbols = make([]Symbol, 0)
+	var symbolMap = make(map[Symbol]Symbol)
 
 	for _, pair := range symbolList {
 		symbolMap[pair.Sym1] = pair.Sym2
@@ -124,11 +124,11 @@ func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair)
 	if from.Name == to.Name {
 		return nilRes, fmt.Errorf("both phoneme sets cannot have the same name: %s", from.Name)
 	}
-	err = from.PreCheckAmbiguous()
+	err = from.preCheckAmbiguous()
 	if err != nil {
 		return nilRes, err
 	}
-	err = to.PreCheckAmbiguous()
+	err = to.preCheckAmbiguous()
 	if err != nil {
 		return nilRes, err
 	}
@@ -138,10 +138,10 @@ func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair)
 		return nilRes, err
 	}
 
-	ssm := SymbolSetMapper{
+	m := Mapper{
 		FromName:                  fromName,
 		ToName:                    toName,
-		SymbolList:                symbolList,
+		Symbols:                   symbolList,
 		fromIsIPA:                 fromIsIPA,
 		toIsIPA:                   toIsIPA,
 		from:                      from,
@@ -150,13 +150,13 @@ func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair)
 		symbolMap:                 symbolMap,
 		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}
-	return ssm, nil
+	return m, nil
 
 }
 
-// LoadSymbolSetMapper loads a SymbolSetMapper from file
-func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSetMapper, error) {
-	var nilRes SymbolSetMapper
+// LoadMapper loads a Mapper from file
+func LoadMapper(fName string, fromName string, toName string) (Mapper, error) {
+	var nilRes Mapper
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
@@ -166,7 +166,7 @@ func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSe
 	s := bufio.NewScanner(fh)
 	n := 0
 	var descIndex, fromIndex, toIndex, typeIndex int
-	maptable := make([]SymbolPair, 0)
+	var maptable = make([]SymbolPair, 0)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			return nilRes, err
@@ -202,6 +202,8 @@ func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSe
 					symType = SyllableDelimiter
 				case "morpheme delimiter":
 					symType = MorphemeDelimiter
+				case "compound delimiter":
+					symType = CompoundDelimiter
 				case "word delimiter":
 					symType = WordDelimiter
 				default:
@@ -213,12 +215,11 @@ func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSe
 			}
 		}
 	}
-	ssm, err := NewSymbolSetMapper(fromName, toName, maptable)
+	m, err := NewMapper(fromName, toName, maptable)
 	if err != nil {
 		return nilRes, err
-	} else {
-		return ssm, nil
 	}
+	return m, nil
 }
 
 // end: initialization
