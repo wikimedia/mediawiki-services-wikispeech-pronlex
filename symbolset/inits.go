@@ -222,7 +222,7 @@ func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSe
 	}
 	ssm, err := NewSymbolSetMapper(fromName, toName, maptable)
 	if err != nil {
-		return ssm, err
+		return nilRes, err
 	} else {
 		return ssm, nil
 	}

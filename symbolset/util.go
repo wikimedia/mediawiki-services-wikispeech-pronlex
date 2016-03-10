@@ -27,8 +27,10 @@ func buildRegexp(symbols []Symbol) (*regexp.Regexp, error) {
 	re, err := regexp.Compile(s)
 	if err != nil {
 		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
+		return nil, err
+	} else {
+		return re, nil
 	}
-	return re, err
 }
 
 func containsType(types []SymbolType, t SymbolType) bool {
