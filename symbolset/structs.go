@@ -8,7 +8,7 @@ import (
 
 // structs in package symbolset
 
-// SymbolSet: struct for package private usage
+// SymbolSet struct for package private usage.
 // To create a new SymbolSet, use NewSymbolSet
 type SymbolSet struct {
 	Name    string
@@ -34,8 +34,8 @@ type SymbolSet struct {
 	splitRe            *regexp.Regexp
 }
 
-// SymbolSetMapper: struct for package private usage
-// To create a new SymbolSet, use NewSymbolSet
+// SymbolSetMapper struct for package private usage.
+// To create a new SymbolSet, use NewSymbolSet.
 type SymbolSetMapper struct {
 	FromName   string
 	ToName     string
@@ -111,7 +111,7 @@ type SymbolPair struct {
 	Sym2 Symbol
 }
 
-// Sort according to symbol length
+// SymbolSlice for sorting symbol slices according to symbol length
 type SymbolSlice []Symbol
 
 func (a SymbolSlice) Len() int      { return len(a) }
@@ -226,8 +226,9 @@ func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 	}
 }
 
-// start: IPA
-// SYMBOLS: http://www.phon.ucl.ac.uk/home/wells/ipa-unicode.htm#numbers
+// IPA utilility functions with struct for package private usage.
+// To create a new SymbolSet, use NewSymbolSet.
+// Symbols and codes: http://www.phon.ucl.ac.uk/home/wells/ipa-unicode.htm#numbers
 type IPA struct {
 	ipa      string
 	accentI  string
@@ -278,5 +279,3 @@ func (ipa IPA) filterAfterMappingToIpa(trans string, ss SymbolSet) (string, erro
 		return trans, nil
 	}
 }
-
-// end: IPA

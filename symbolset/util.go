@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-// start: general util functions
-
 func filterSymbolsByType(symbols []Symbol, types []SymbolType) []Symbol {
 	res := make([]Symbol, 0)
 	for _, s := range symbols {
@@ -77,5 +75,3 @@ func indexOf(elements []string, element string) int {
 	}
 	return -1
 }
-
-// end: general util general util functions

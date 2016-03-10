@@ -18,7 +18,7 @@ func NewIPA() IPA {
 	}
 }
 
-// newSymbolSet: public constructor for SymbolSet with built-in error checks
+// NewSymbolSet is a public constructor for SymbolSet with built-in error checks
 func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	var nilRes SymbolSet
 
@@ -93,6 +93,7 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 
 }
 
+// NewSymbolSetMapper is a public constructor for SymbolSetMapper with built-in error checks
 func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair) (SymbolSetMapper, error) {
 	var nilRes SymbolSetMapper
 
@@ -152,6 +153,7 @@ func NewSymbolSetMapper(fromName string, toName string, symbolList []SymbolPair)
 
 }
 
+// LoadSymbolSetMapper loads a SymbolSetMapper from file
 func LoadSymbolSetMapper(fName string, fromName string, toName string) (SymbolSetMapper, error) {
 	var nilRes SymbolSetMapper
 	fh, err := os.Open(fName)
