@@ -114,9 +114,15 @@ type SymbolPair struct {
 // Sort according to symbol length
 type SymbolSlice []Symbol
 
-func (a SymbolSlice) Len() int           { return len(a) }
-func (a SymbolSlice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a SymbolSlice) Less(i, j int) bool { return len(a[i].String) > len(a[j].String) }
+func (a SymbolSlice) Len() int      { return len(a) }
+func (a SymbolSlice) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a SymbolSlice) Less(i, j int) bool {
+	if len(a[i].String) != len(a[j].String) {
+		return len(a[i].String) > len(a[j].String)
+	} else {
+		return a[i].String < a[j].String
+	}
+}
 
 type SymbolType int
 

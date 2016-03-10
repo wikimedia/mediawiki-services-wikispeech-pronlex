@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"sort"
 	"strings"
 )
 
@@ -63,19 +62,10 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 		return nilRes, err
 	}
 
-	// start: split re
-	sort.Sort(SymbolSlice(symbols))
-	acc := make([]string, 0)
-	for _, s := range symbols {
-		if len(s.String) > 0 {
-			acc = append(acc, regexp.QuoteMeta(s.String))
-		}
-	}
-	splitRe, err := regexp.Compile("(" + strings.Join(acc, "|") + ")")
+	splitRe, err := buildRegexpWithGroup(symbols, true, false)
 	if err != nil {
 		return nilRes, err
 	}
-	// end: split re
 
 	res := SymbolSet{
 		Name:    name,

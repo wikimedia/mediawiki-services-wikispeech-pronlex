@@ -4,23 +4,6 @@ import (
 	"testing"
 )
 
-var fsExp = "Expected: '%v' got: '%v'"
-var fsDidntExp = "Didn't expect: '%v'"
-
-func testEqStrings(t *testing.T, expect []string, result []string) {
-	if len(expect) != len(result) {
-		t.Errorf(fsExp, expect, result)
-		return
-	}
-	for i, ex := range expect {
-		re := result[i]
-		if ex != re {
-			t.Errorf(fsExp, expect, result)
-			return
-		}
-	}
-}
-
 func Test_NewSymbolSet_WithoutPhonemeDelimiter(t *testing.T) {
 	name := "ss"
 	symbols := []Symbol{

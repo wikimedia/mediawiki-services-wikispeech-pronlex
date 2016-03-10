@@ -3,6 +3,7 @@ package symbolset
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -19,11 +20,28 @@ func filterSymbolsByType(symbols []Symbol, types []SymbolType) []Symbol {
 }
 
 func buildRegexp(symbols []Symbol) (*regexp.Regexp, error) {
-	res := make([]string, 0)
-	for _, s := range symbols {
-		res = append(res, regexp.QuoteMeta(s.String))
+	return buildRegexpWithGroup(symbols, false, true)
+}
+
+func buildRegexpWithGroup(symbols []Symbol, removeEmpty bool, anonGroup bool) (*regexp.Regexp, error) {
+	sorted := make([]Symbol, len(symbols))
+	copy(sorted, symbols)
+	sort.Sort(SymbolSlice(sorted))
+	acc := make([]string, 0)
+	for _, s := range sorted {
+		if removeEmpty {
+			if len(s.String) > 0 {
+				acc = append(acc, regexp.QuoteMeta(s.String))
+			}
+		} else {
+			acc = append(acc, regexp.QuoteMeta(s.String))
+		}
 	}
-	s := "(?:" + strings.Join(res, "|") + ")"
+	prefix := "(?:"
+	if !anonGroup {
+		prefix = "("
+	}
+	s := prefix + strings.Join(acc, "|") + ")"
 	re, err := regexp.Compile(s)
 	if err != nil {
 		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
