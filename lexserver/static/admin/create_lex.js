@@ -124,22 +124,23 @@ DMCRLX.CreateLexModel = function() {
 	DMCRLX.symbolSet.push(new DMCRLX.Symbol(DMCRLX.selectedLexicon().id, "", "", "", "", ""));
     }
     
-    DMCRLX.loadSymbolSet = ko.computed(
-	function () {
-	    if(DMCRLX.selectedLexicon() !== undefined) {
-		$.getJSON(DMCRLX.baseURL +"/admin/listphonemesymbols", {lexiconId: DMCRLX.selectedLexicon().id}, function (data) {
-		    console.log("FFFFFFFFFFFFFFFFFFFF")
-		    var syms = _.map(data, function (s) {
-			return new DMCRLX.Symbol(s.lexiconId, s.symbol, s.category, s.subcat, s.description, s.ipa);
-		    }); 
-		    DMCRLX.symbolSet(syms);
-		})
-		    .fail(function (xhr, textStatus, errorThrown) {
-			alert(xhr.responseText);
-		    });
-	    }
+    DMCRLX.loadSymbolSet = // ko.computed(
+    function (lexid) {
+	if(DMCRLX.selectedLexicon() !== undefined) {
+	    //$.getJSON(DMCRLX.baseURL +"/admin/listphonemesymbols", {lexiconId: DMCRLX.selectedLexicon().id}, function (data) {
+	    $.getJSON(DMCRLX.baseURL +"/admin/listsymbolset", {lexiconId: lexid}, function (data) {
+		console.log("FFFFFFFFFFFFFFFFFFFF")
+		var syms = _.map(data, function (s) {
+		    return new DMCRLX.Symbol(s.lexiconId, s.symbol, s.category, s.subcat, s.description, s.ipa);
+		}); 
+		DMCRLX.symbolSet(syms);
+	    })
+		.fail(function (xhr, textStatus, errorThrown) {
+		    alert(xhr.responseText);
+		});
 	}
-	, this);
+    };
+	//, this);
     
     DMCRLX.saveSymbolSet = function () {
 	$.post(DMCRLX.baseURL +"/admin/savesymbolset", JSON.stringify(DMCRLX.symbolSet()))

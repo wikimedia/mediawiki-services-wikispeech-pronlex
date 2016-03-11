@@ -210,11 +210,13 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin/create_lex.html")
+	//http.ServeFile(w, r, "./static/admin/create_lex.html")
+	fmt.Fprint(w, "HEJ DU 1")
 }
 
 func adminEditSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
+	//http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
+	fmt.Fprint(w, "HEJ DU 2")
 }
 
 func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
@@ -241,8 +243,9 @@ func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func listPhonemeSymbolsHandler(w http.ResponseWriter, r *http.Request) {
+func listSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("hhhhhhhhhhhhhhhhh")
+	fmt.Fprint(w, "EN APA")
 }
 
 var db *sql.DB
@@ -280,7 +283,7 @@ func main() {
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
 	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
-	http.HandleFunc("/admin/listphonemesymbols", listPhonemeSymbolsHandler)
+	http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
 	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)

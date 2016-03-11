@@ -103,10 +103,10 @@ type Lemma struct {
 }
 
 type Symbol struct {
-	LexiconId   int64  `json:"lexiconId"`
+	LexiconID   int64  `json:"lexiconId"`
 	Symbol      string `json:"symbol"`
 	Category    string `json:"category"`
 	Subcat      string `json:"subcat"`
 	Description string `json:"description"`
-	Ipa         string `json:"ipa"`
+	IPA         string `json:"ipa"`
 }

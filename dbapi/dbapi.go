@@ -682,7 +682,7 @@ func unique(ns []int64) []int64 {
 func uniqIDs(ss []Symbol) []int64 {
 	res := make([]int64, len(ss))
 	for i, s := range ss {
-		res[i] = s.LexiconId
+		res[i] = s.LexiconID
 	}
 	return unique(res)
 }
@@ -717,7 +717,7 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	for _, s := range symbolSet {
 		// TODO prepared statement?
 		_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, subcat, description, ipa) values (?, ?, ?, ?, ?, ?)",
-			s.LexiconId, s.Symbol, s.Category, s.Subcat, s.Description, s.Ipa)
+			s.LexiconID, s.Symbol, s.Category, s.Subcat, s.Description, s.IPA)
 		if err != nil {
 			fmt.Errorf("failed inserting symbol : %v", err)
 			tx.Rollback()
@@ -725,6 +725,43 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	}
 
 	return nil
+}
+
+func SymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		return []Symbol{}, fmt.Errorf("failed to start db transaction : %v", err)
+	}
+	return SymbolSetTx(tx, lexiconID)
+}
+
+func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
+	res := make([]Symbol, 0)
+	rows, err := tx.Query("select lexiconid, symbol, category, subcat, description, ipa from symbolset where lexiconid = ?", lexiconID)
+	if err != nil {
+		return res, fmt.Errorf("failed db query : %v", err)
+	}
+
+	var lexID int64
+	var symbol, category, subcat, description, ipa string
+	for rows.Next() {
+		rows.Scan(&lexID, &symbol, &category, &subcat, &description, &ipa)
+		s := Symbol{
+			LexiconID:   lexID,
+			Symbol:      symbol,
+			Category:    category,
+			Subcat:      subcat,
+			Description: description,
+			IPA:         ipa,
+		}
+		res = append(res, s)
+	}
+	if rows.Err() != nil {
+		return res, fmt.Errorf("error while reading db query result : %v", rows.Err())
+	}
+
+	return res, nil
 }
 
 func Nothing() {}
