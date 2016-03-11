@@ -15,18 +15,18 @@ DMCRLX.CreateLexModel = function() {
 	'Phoneme': ["Syllabic", "NonSyllabic", "Stress"]
 	, 'Delimiter': ["PhonemeDelimiter", "ExplicitPhonemeDelimiter", "SyllableDelimiter", "MorphemeDelimiter", "WordDelimiter"] 
     };
-
+    
     DMCRLX.Symbol = function(lexiconId, symbol, category, subcat, description, ipa) {
 	var self = this;
 	self.lexiconId = lexiconId;
 	self.symbol = symbol;
-	self.category = ko.observable(category);
+	self.category = category; //ko.observable(category);
 	self.subcat = subcat;
 	self.description = description;
-	self.ipa = ko.observable(ipa);
-	self.symSubCats = ko.computed(function() {
-	    return DMCRLX.symbolCategories[self.category()];
-	}, this);
+	self.ipa = ipa;// ko.observable(ipa);
+	//self.symSubCats = ko.computed(function() {
+	//    return DMCRLX.symbolCategories[self.category()];
+	//}, this);
     }
 
     DMCRLX.ipaCharacters = ko.observableArray();
@@ -84,7 +84,7 @@ DMCRLX.CreateLexModel = function() {
 	    });
 	
     }
-
+    
     DMCRLX.deleteLexicon = function () {
 	var params = {'id' : DMCRLX.selectedLexicon().id} // , 'name' : DMCRLX.selectedLexicon().name, 'symbolsetname' : DMCRLX.selectedLexicon().symbolSetName}
 	$.get(DMCRLX.baseURL + "/admin/deletelexicon", params)
@@ -123,35 +123,31 @@ DMCRLX.CreateLexModel = function() {
     DMCRLX.addSymbol = function () {
 	DMCRLX.symbolSet.push(new DMCRLX.Symbol(DMCRLX.selectedLexicon().id, "", "", "", "", ""));
     }
-
+    
     DMCRLX.loadSymbolSet = ko.computed(
 	function () {
 	    if(DMCRLX.selectedLexicon() !== undefined) {
-		//console.log("HÄR KOMMER GREJOR: "+ DMCRLX.selectedLexicon())
 		$.getJSON(DMCRLX.baseURL +"/admin/listphonemesymbols", {lexiconId: DMCRLX.selectedLexicon().id}, function (data) {
+		    console.log("FFFFFFFFFFFFFFFFFFFF")
 		    var syms = _.map(data, function (s) {
 			return new DMCRLX.Symbol(s.lexiconId, s.symbol, s.category, s.subcat, s.description, s.ipa);
 		    }); 
-		    DMCRLX.symbols(syms);
+		    DMCRLX.symbolSet(syms);
 		});
 	    }
 	}
-    , this);
+	, this);
+    
     DMCRLX.saveSymbolSet = function () {
-	var post = _.map(DMCRLX.symbols(), function(s) {
-	    return {'lexiconId': s.lexiconId, 'symbol': s.symbol, 'category': s.category(), 'subcat': s.subcat, 'description': s.description, 'ipa': s.ipa()};
-	});
-	//console.log("SENDING: "+ post);
-	$.post(DMCRLX.baseURL +"/admin/savesymbolset", JSON.stringify(post))
+	$.post(DMCRLX.baseURL +"/admin/savesymbolset", JSON.stringify(DMCRLX.symbolSet()))
 	    .fail(function (xhr, textStatus, errorThrown) {
 		alert(xhr.responseText);
 	    });
     };
-
-
-
+    
 
     // On pageload:
+    
     DMCRLX.loadLexiconNames();
     DMCRLX.loadIPATable();
     //console.log("!!!!!!!!"+ )

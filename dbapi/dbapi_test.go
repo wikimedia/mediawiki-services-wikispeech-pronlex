@@ -172,3 +172,22 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "gummiapa", eApax.Language)
 	}
 }
+
+func Test_unique(t *testing.T) {
+	in := []int64{1, 2, 3}
+
+	res := unique(in)
+	if len(res) != 3 {
+		t.Errorf(fs, 3, len(res))
+	}
+
+	in = []int64{3, 3, 3}
+
+	res = unique(in)
+	if len(res) != 1 {
+		t.Errorf(fs, 1, len(res))
+	}
+	if res[0] != 3 {
+		t.Errorf(fs, 3, res[0])
+	}
+}

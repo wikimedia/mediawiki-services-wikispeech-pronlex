@@ -668,4 +668,63 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 	return updated1 || updated2 || updated3 || updated4, err
 }
 
+func unique(ns []int64) []int64 {
+	tmpMap := make(map[int64]int)
+	res := make([]int64, 0)
+	for _, n := range ns {
+		if _, ok := tmpMap[n]; !ok {
+			res = append(res, n)
+			tmpMap[n]++
+		}
+	}
+	return res
+}
+func uniqIDs(ss []Symbol) []int64 {
+	res := make([]int64, len(ss))
+	for i, s := range ss {
+		res[i] = s.LexiconId
+	}
+	return unique(res)
+}
+
+func SaveSymbolSet(db *sql.DB, symbolSet []Symbol) error {
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed begin db transaction : %v", err)
+	}
+	return SaveSymbolSetTx(tx, symbolSet)
+}
+
+func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
+	if len(symbolSet) == 0 {
+		return nil //li vanilli
+	}
+	unqIDs := uniqIDs(symbolSet)
+	if len(unqIDs) != 1 {
+		return fmt.Errorf("cannot save set of symbols with different lexiconIDs %v : ", unqIDs)
+		tx.Rollback()
+	}
+
+	// Nuke current symbol set for lexicon of ID id:
+	id := unqIDs[0]
+	_, err := tx.Exec("delete from symbolset where lexiconid = ?", id)
+	if err != nil {
+		fmt.Errorf("failed deleting current symbol set : %v", err)
+		tx.Rollback()
+	}
+
+	for _, s := range symbolSet {
+		// TODO prepared statement?
+		_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, subcat, description, ipa) values (?, ?, ?, ?, ?, ?)",
+			s.LexiconId, s.Symbol, s.Category, s.Subcat, s.Description, s.Ipa)
+		if err != nil {
+			fmt.Errorf("failed inserting symbol : %v", err)
+			tx.Rollback()
+		}
+	}
+
+	return nil
+}
+
 func Nothing() {}

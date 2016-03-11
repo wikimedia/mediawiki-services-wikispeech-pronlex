@@ -1,6 +1,5 @@
 package dbapi
 
-
 import (
 	"strings"
 )
@@ -101,4 +100,13 @@ type Lemma struct {
 	Strn     string `json:"strn"`
 	Reading  string `json:"reading"`
 	Paradigm string `json:"paradigm"`
+}
+
+type Symbol struct {
+	LexiconId   int64  `json:"lexiconId"`
+	Symbol      string `json:"symbol"`
+	Category    string `json:"category"`
+	Subcat      string `json:"subcat"`
+	Description string `json:"description"`
+	Ipa         string `json:"ipa"`
 }

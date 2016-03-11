@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stts-se/pronlex/dbapi"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -186,12 +187,14 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("lexserver: Failed to get entries: %v", err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
 
 	jsn, err := marshal(res, r)
 	if err != nil {
 		log.Printf("lexserver: Failed to marshal json: %v", err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/javascript") // TODO Behövs denna?
@@ -212,6 +215,34 @@ func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 
 func adminEditSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
+}
+
+func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("failed reading request body %v : ", err)
+		http.Error(w, fmt.Sprintf("failed json unmashaling : %v", err), http.StatusInternalServerError)
+	}
+
+	var ss []dbapi.Symbol
+	err = json.Unmarshal(body, &ss)
+
+	if err != nil {
+		log.Printf("saveSymbolSetHandler %v\t%v", err, body)
+		http.Error(w, fmt.Sprintf("failed json unmashaling : %v", err), http.StatusBadRequest)
+		return
+	}
+
+	err = dbapi.SaveSymbolSet(db, ss)
+	if err != nil {
+		log.Printf("failed save symbol set %v\t%v", err, ss)
+		http.Error(w, fmt.Sprintf("failed saving symbol set : %v", err), http.StatusInternalServerError)
+		return
+	}
+}
+
+func listPhonemeSymbolsHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("hhhhhhhhhhhhhhhhh")
 }
 
 var db *sql.DB
@@ -245,10 +276,12 @@ func main() {
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
 	//http.HandleFunc("/updateentry", updateEntryHandler)
 
-	// admin page
+	// admin pages/calls
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
 	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
+	http.HandleFunc("/admin/listphonemesymbols", listPhonemeSymbolsHandler)
+	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 

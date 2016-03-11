@@ -22,27 +22,27 @@
 	<td>IPA</td>
       </thead>
       <tbody data-bind="foreach: DMCRLX.symbolSet">
-	<td data-bind="text: $data.lexiconId"></td>
+	<td data-bind="text: lexiconId"></td>
 	<td>
-	  <input data-bind="textValue: $data.symbol"></input>
+	  <input data-bind="textInput: symbol"></input>
 	</td>
 	<td> 
-	  <input data-bind="text: $data.category"></input>
+	  <input data-bind="textInput: category"></input>
 	</td>
 	<td> 
-	  <input data-bind="text: $data.subcat"></input>
+	  <input data-bind="textInput: subcat"></input>
 	</td>
 	<td> 
-	  <input data-bind="text: $data.description"></input>
+	  <input data-bind="textInput: description"></input>
 	</td>
 	<td> 
-	  <input data-bind="text: $data.ipa"></input>
+	  <input data-bind="textInput: ipa"></input>
 	</td>
       </tbody>
     </table>
 
     <button data-bind="click: DMCRLX.addSymbol">Add symbol</button>
-    <button data-bind="click: DMCRLX.saveTable">Save symbol set</button>
+    <button data-bind="click: DMCRLX.saveSymbolSet">Save symbol set</button>
 
 
     
