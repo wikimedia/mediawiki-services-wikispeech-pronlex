@@ -16,13 +16,11 @@ type SymbolSet struct {
 	Symbols []Symbol
 
 	// derived values computed upon initialization
-	phonemes                  []Symbol
-	phoneticSymbols           []Symbol
-	stressSymbols             []Symbol
-	syllabic                  []Symbol
-	nonSyllabic               []Symbol
-	phonemeDelimiters         []Symbol
-	explicitPhonemeDelimiters []Symbol
+	phonemes        []Symbol
+	phoneticSymbols []Symbol
+	stressSymbols   []Symbol
+	syllabic        []Symbol
+	nonSyllabic     []Symbol
 
 	phonemeDelimiter            Symbol
 	explicitPhonemeDelimiter    Symbol

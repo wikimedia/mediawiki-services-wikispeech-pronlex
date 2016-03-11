@@ -72,13 +72,11 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 		Name:    name,
 		Symbols: symbols,
 
-		phonemes:                  phonemes,
-		phoneticSymbols:           phoneticSymbols,
-		stressSymbols:             stressSymbols,
-		syllabic:                  syllabic,
-		nonSyllabic:               nonSyllabic,
-		phonemeDelimiters:         phonemeDelimiters,
-		explicitPhonemeDelimiters: explicitPhonemeDelimiters,
+		phonemes:        phonemes,
+		phoneticSymbols: phoneticSymbols,
+		stressSymbols:   stressSymbols,
+		syllabic:        syllabic,
+		nonSyllabic:     nonSyllabic,
 
 		phonemeDelimiter:            phonemeDelimiter,
 		explicitPhonemeDelimiter:    explicitPhonemeDelimiter,
