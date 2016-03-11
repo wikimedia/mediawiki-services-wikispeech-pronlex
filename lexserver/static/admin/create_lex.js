@@ -133,7 +133,10 @@ DMCRLX.CreateLexModel = function() {
 			return new DMCRLX.Symbol(s.lexiconId, s.symbol, s.category, s.subcat, s.description, s.ipa);
 		    }); 
 		    DMCRLX.symbolSet(syms);
-		});
+		})
+		    .fail(function (xhr, textStatus, errorThrown) {
+			alert(xhr.responseText);
+		    });
 	    }
 	}
 	, this);
@@ -150,6 +153,7 @@ DMCRLX.CreateLexModel = function() {
     
     DMCRLX.loadLexiconNames();
     DMCRLX.loadIPATable();
+    //DMCRLX.loadSymbolSet();
     //console.log("!!!!!!!!"+ )
 };
 
