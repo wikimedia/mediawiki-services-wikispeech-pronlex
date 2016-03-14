@@ -81,7 +81,7 @@ func lexicons(q Query) (string, []interface{}) {
 
 	lIds := make([]interface{}, len(q.Lexicons))
 	for i, l := range q.Lexicons {
-		lIds[i] = l.Id
+		lIds[i] = l.ID
 	}
 
 	resv = append(resv, lIds...)
@@ -154,16 +154,15 @@ func lemmas(q Query) (string, []interface{}) {
 	return res, resv
 }
 
-
 func transcriptions(q Query) (string, []interface{}) {
 	// TODO ?
-	// The link between entry.id and transcription.entryid 
+	// The link between entry.id and transcription.entryid
 	// is already established elsewhere, since every entry is supposed to have at least one transcription.
 	// This assumption may have to change, if we want an entry to be able to have zero transcriptions
 	var res string
 	var resv []interface{}
 	t := trm(q.TranscriptionLike)
-	if "" == t { 
+	if "" == t {
 		return res, resv
 	}
 
@@ -195,7 +194,6 @@ func ToLower(ss []string) []string {
 	return res
 }
 
-
 // idiotSql generates an sql query string and an accompanying list of parameter values from a query struct.
 // idiotSql is brittle, as the name suggests
 func idiotSql(q Query) (string, []interface{}) {
@@ -212,7 +210,7 @@ func idiotSql(q Query) (string, []interface{}) {
 	resv = append(resv, tv...)
 
 	// ... etc...
-	
+
 	// puts together pieces of sql created above with " and " in between
 	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " and "))
 	if "" != qRes {

@@ -53,10 +53,10 @@ func NewQuery() Query {
 	return Query{PageLength: 25}
 }
 
-func (q Query) LexiconIds() []int64 {
+func (q Query) LexiconIDs() []int64 {
 	ids := make([]int64, 0)
 	for _, l := range q.Lexicons {
-		ids = append(ids, l.Id)
+		ids = append(ids, l.ID)
 	}
 	return ids
 }
@@ -65,14 +65,14 @@ func (q Query) LexiconIds() []int64 {
 // TODO kolla efter motsvarighet till Option el dyl. Kolla "New[Struct...]"
 
 type Lexicon struct {
-	Id            int64  `json:"id"`
+	ID            int64  `json:"id"`
 	Name          string `json:"name"`
 	SymbolSetName string `json:"symbolSetName"`
 }
 
 type Transcription struct {
-	Id       int64  `json:"id"`
-	EntryId  int64  `json:"entryId"`
+	ID       int64  `json:"id"`
+	EntryID  int64  `json:"entryId"`
 	Strn     string `json:"strn"`
 	Language string `json:"language"`
 }
@@ -82,11 +82,11 @@ type TranscriptionSlice []Transcription
 
 func (a TranscriptionSlice) Len() int           { return len(a) }
 func (a TranscriptionSlice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a TranscriptionSlice) Less(i, j int) bool { return a[i].Id < a[j].Id }
+func (a TranscriptionSlice) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
 type Entry struct {
-	Id             int64           `json:"id"`
-	LexiconId      int64           `json:"lexiconId"`
+	ID             int64           `json:"id"`
+	LexiconID      int64           `json:"lexiconId"`
 	Strn           string          `json:"strn"`
 	Language       string          `json:"language"`
 	PartOfSpeech   string          `json:"partOfSpeech"`
@@ -96,7 +96,7 @@ type Entry struct {
 }
 
 type Lemma struct {
-	Id       int64  `json:"id"` // Är noll ett pålitligt 'None'-värde? Dvs börjar databaser alltid räkna från 1?
+	ID       int64  `json:"id"` // Är noll ett pålitligt 'None'-värde? Dvs börjar databaser alltid räkna från 1?
 	Strn     string `json:"strn"`
 	Reading  string `json:"reading"`
 	Paradigm string `json:"paradigm"`

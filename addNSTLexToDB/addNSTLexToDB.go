@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	orth           = 0
-	pos            = 1
-	morph          = 2
-	decomp         = 3
-	wordLang       = 6
-	aCrAbbr        = 9
+	orth     = 0
+	pos      = 1
+	morph    = 2
+	decomp   = 3
+	wordLang = 6
+	//aCrAbbr        = 9
 	trans1         = 11
 	translang1     = 14
 	trans2         = 15
@@ -27,7 +27,7 @@ const (
 	translang4     = 26
 	lemma          = 32
 	inflectionRule = 33
-	morphLabel     = 34
+	//morphLabel     = 34
 )
 
 func appendTrans(ts []dbapi.Transcription, t string, l string) []dbapi.Transcription {
