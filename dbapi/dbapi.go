@@ -128,7 +128,7 @@ func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
 }
 
 // DeleteLexicon deletes the lexicon name from the lexicon
-// table. Notice that it does not remove
+// table. Notice that it does not remove the associated entries.
 func DeleteLexicon(db *sql.DB, id int64) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -139,7 +139,7 @@ func DeleteLexicon(db *sql.DB, id int64) error {
 }
 
 // DeleteLexiconTx deletes the lexicon name from the lexicon
-// table. Notice that it does not remove
+// table. Notice that it does not remove the associated entries.
 func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 	var n int
 	err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
