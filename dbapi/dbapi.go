@@ -511,7 +511,7 @@ func GetEntries(db *sql.DB, q Query) (map[string][]Entry, error) {
 		return res, nil // report error, or think the caller knows whiat it's doing?
 	}
 
-	qString, vs := idiotSql(q)
+	qString, vs := idiotSQL(q)
 
 	rows, err := db.Query(qString, vs...)
 	defer rows.Close()

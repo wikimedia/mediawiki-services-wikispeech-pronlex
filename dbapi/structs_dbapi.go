@@ -23,6 +23,7 @@ type Query struct {
 	PageLength        int64     `json:"pageLength"`
 }
 
+// Empty returns true if there are not search criteria values
 func (q Query) Empty() bool {
 	switch {
 	case len(q.Words) > 0:
@@ -48,28 +49,29 @@ func (q Query) Empty() bool {
 	return true
 }
 
-// ??? Klumpigt försök med defaultvärden
+// NewQuery returns a Query instance where PageLength: 25
 func NewQuery() Query {
 	return Query{PageLength: 25}
 }
 
+// LexiconIDs returns a list of db IDs of the Lexicons of the Query
 func (q Query) LexiconIDs() []int64 {
-	ids := make([]int64, 0)
+	var ids []int64
 	for _, l := range q.Lexicons {
 		ids = append(ids, l.ID)
 	}
 	return ids
 }
 
-// TODO Id int64 Är noll ett pålitligt 'None'-värde? Dvs börjar databaser alltid räkna från 1?
-// TODO kolla efter motsvarighet till Option el dyl. Kolla "New[Struct...]"
-
+// Lexicon corresponds to the lexicon db table, to which Entries are
+// associated
 type Lexicon struct {
 	ID            int64  `json:"id"`
 	Name          string `json:"name"`
 	SymbolSetName string `json:"symbolSetName"`
 }
 
+// Transcription corresponds to the transcription db table
 type Transcription struct {
 	ID       int64  `json:"id"`
 	EntryID  int64  `json:"entryId"`
@@ -77,13 +79,17 @@ type Transcription struct {
 	Language string `json:"language"`
 }
 
-// Sort according to ascending id
+// TranscriptionSlice is used for
+// soring according to ascending id
 type TranscriptionSlice []Transcription
 
 func (a TranscriptionSlice) Len() int           { return len(a) }
 func (a TranscriptionSlice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a TranscriptionSlice) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
+// Entry defines a lexical entry. It does not correspond one-to-one to
+// the entry db table, since it contains data also from associated
+// tabled (Lemma, Transcription)
 type Entry struct {
 	ID             int64           `json:"id"`
 	LexiconID      int64           `json:"lexiconId"`
@@ -95,6 +101,7 @@ type Entry struct {
 	Transcriptions []Transcription `json:"transcriptions"`
 }
 
+// Lemma corresponds to a row of the lemma db table
 type Lemma struct {
 	ID       int64  `json:"id"` // Är noll ett pålitligt 'None'-värde? Dvs börjar databaser alltid räkna från 1?
 	Strn     string `json:"strn"`
@@ -102,6 +109,8 @@ type Lemma struct {
 	Paradigm string `json:"paradigm"`
 }
 
+// Symbol corresponds to the symbol db table, and holds a phonetic
+// symbol
 type Symbol struct {
 	LexiconID   int64  `json:"lexiconId"`
 	Symbol      string `json:"symbol"`
