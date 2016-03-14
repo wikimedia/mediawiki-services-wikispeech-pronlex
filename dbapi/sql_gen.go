@@ -50,7 +50,7 @@ func convS(s []string) []interface{} {
 // since the return value of this function is to be used after 'select
 // entry.id from'
 func tables(q Query) string {
-	res := make([]string, 0)
+	var res []string
 	if len(q.Lexicons) > 0 {
 		res = append(res, "lexicon")
 	}
@@ -81,7 +81,7 @@ func lexicons(q Query) (string, []interface{}) {
 
 	lIds := make([]interface{}, len(q.Lexicons))
 	for i, l := range q.Lexicons {
-		lIds[i] = l.Id
+		lIds[i] = l.ID
 	}
 
 	resv = append(resv, lIds...)
@@ -154,16 +154,15 @@ func lemmas(q Query) (string, []interface{}) {
 	return res, resv
 }
 
-
 func transcriptions(q Query) (string, []interface{}) {
 	// TODO ?
-	// The link between entry.id and transcription.entryid 
+	// The link between entry.id and transcription.entryid
 	// is already established elsewhere, since every entry is supposed to have at least one transcription.
 	// This assumption may have to change, if we want an entry to be able to have zero transcriptions
 	var res string
 	var resv []interface{}
 	t := trm(q.TranscriptionLike)
-	if "" == t { 
+	if "" == t {
 		return res, resv
 	}
 
@@ -174,7 +173,7 @@ func transcriptions(q Query) (string, []interface{}) {
 }
 
 func filter(ss []string, f func(string) bool) []string {
-	res := make([]string, 0)
+	var res []string
 	for i, s := range ss {
 		if f(s) {
 			res = append(res, ss[i])
@@ -183,10 +182,12 @@ func filter(ss []string, f func(string) bool) []string {
 	return res
 }
 
+// RemoveEmptyStrings does that
 func RemoveEmptyStrings(ss []string) []string {
 	return filter(ss, func(s string) bool { return strings.TrimSpace(s) != "" })
 }
 
+// ToLower lower-cases its input strings
 func ToLower(ss []string) []string {
 	res := make([]string, len(ss))
 	for i, v := range ss {
@@ -195,12 +196,11 @@ func ToLower(ss []string) []string {
 	return res
 }
 
-
-// idiotSql generates an sql query string and an accompanying list of parameter values from a query struct.
-// idiotSql is brittle, as the name suggests
-func idiotSql(q Query) (string, []interface{}) {
+// idiotSQL generates an sql query string and an accompanying list of parameter values from a query struct.
+// idiotSQL is brittle, as the name suggests
+func idiotSQL(q Query) (string, []interface{}) {
 	res := "select entry.id from " + tables(q) // extracts list of sql tables needed for query
-	resv := make([]interface{}, 0)
+	var resv []interface{}
 
 	l, lv := lexicons(q)
 	resv = append(resv, lv...)
@@ -212,7 +212,7 @@ func idiotSql(q Query) (string, []interface{}) {
 	resv = append(resv, tv...)
 
 	// ... etc...
-	
+
 	// puts together pieces of sql created above with " and " in between
 	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " and "))
 	if "" != qRes {

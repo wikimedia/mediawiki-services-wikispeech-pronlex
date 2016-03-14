@@ -36,7 +36,6 @@ func TestSql_ToLower(t *testing.T) {
 
 }
 
-
 func TestSql_words(t *testing.T) {
 	w, wv := words(Query{})
 	if "" != w {
@@ -75,9 +74,9 @@ func TestSql_nQs(t *testing.T) {
 	}
 }
 
-func TestSql_idiotSql(t *testing.T) {
+func TestSql_idiotSQL(t *testing.T) {
 	q := NewQuery()
-	s, _ := idiotSql(q)
+	s, _ := idiotSQL(q)
 	x := "select entry.id from entry limit 25 offset 0"
 	if s != x {
 		t.Errorf(fs, x, s)
@@ -85,7 +84,7 @@ func TestSql_idiotSql(t *testing.T) {
 
 	q = NewQuery() // Query{Lexicons : []Lexicon{Lexicon{}, Lexicon{}}}
 	q.Lexicons = []Lexicon{Lexicon{}, Lexicon{}}
-	s, _ = idiotSql(q)
+	s, _ = idiotSQL(q)
 	x = "select entry.id from lexicon, entry where lexicon.id in (?,?) limit 25 offset 0"
 	if s != x {
 		t.Errorf(fs, x, s)

@@ -81,8 +81,8 @@ func Test_InsertEntries(t *testing.T) {
 	f(err)
 	le2, err := InsertLemma(tx0, le)
 	tx0.Commit()
-	if le2.Id < 1 {
-		t.Errorf(fs, "more than zero", le2.Id)
+	if le2.ID < 1 {
+		t.Errorf(fs, "more than zero", le2.ID)
 	}
 
 	tx00, err := db.Begin()
@@ -90,8 +90,8 @@ func Test_InsertEntries(t *testing.T) {
 	defer tx00.Commit()
 
 	le3, err := SetOrGetLemma(tx00, "apa", "67t", "7(c)")
-	if le3.Id < 1 {
-		t.Errorf(fs, "more than zero", le3.Id)
+	if le3.ID < 1 {
+		t.Errorf(fs, "more than zero", le3.ID)
 	}
 	tx00.Commit()
 
@@ -112,8 +112,8 @@ func Test_InsertEntries(t *testing.T) {
 		t.Error("ERRRRRRROR")
 	}
 	lm := ess["apa"][0].Lemma
-	if lm.Id < 1 {
-		t.Errorf(fs, "id larger than zero", lm.Id)
+	if lm.ID < 1 {
+		t.Errorf(fs, "id larger than zero", lm.ID)
 	}
 
 	if lm.Strn != "apa" {
@@ -123,7 +123,7 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "67t", lm.Reading)
 	}
 
-	ees := GetEntriesFromIds(db, []int64{ess["apa"][0].Id})
+	ees := GetEntriesFromIDs(db, []int64{ess["apa"][0].ID})
 	if len(ees) != 1 {
 		t.Errorf(fs, 1, len(ees))
 	}
@@ -145,7 +145,7 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, nil, err)
 	}
 
-	eApa := GetEntryFromId(db, ees0.Id)
+	eApa := GetEntryFromID(db, ees0.ID)
 	if len(eApa.Transcriptions) != 3 {
 		t.Errorf(fs, 3, len(eApa.Transcriptions))
 	}
@@ -161,7 +161,7 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, true, updated)
 	}
 
-	eApax := GetEntryFromId(db, ees0.Id)
+	eApax := GetEntryFromID(db, ees0.ID)
 	if eApax.Lemma.Strn != "tjubba" {
 		t.Errorf(fs, "tjubba", eApax.Lemma.Strn)
 	}

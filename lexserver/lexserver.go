@@ -69,7 +69,7 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := dbapi.InsertOrUpdateLexicon(db, dbapi.Lexicon{Id: id, Name: name, SymbolSetName: symbolSetName})
+	res, err := dbapi.InsertOrUpdateLexicon(db, dbapi.Lexicon{ID: id, Name: name, SymbolSetName: symbolSetName})
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed database call : %v", err), http.StatusInternalServerError)
 		return

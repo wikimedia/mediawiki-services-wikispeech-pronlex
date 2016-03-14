@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	// installs sqlite3 driver
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"sort"
@@ -29,8 +30,10 @@ func ff(f string, err error) {
 	}
 }
 
+// ListLexicons returns a list of the lexicons defined in the db
+// (i.e., the rows of the lexicon table)
 func ListLexicons(db *sql.DB) ([]Lexicon, error) {
-	res := make([]Lexicon, 0)
+	var res []Lexicon
 	sql := "select id, name, symbolsetname from lexicon"
 	rows, err := db.Query(sql)
 	defer rows.Close()
@@ -46,7 +49,7 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 		if err != nil {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
-		l := Lexicon{Id: id, Name: name, SymbolSetName: symbolSetName}
+		l := Lexicon{ID: id, Name: name, SymbolSetName: symbolSetName}
 		res = append(res, l)
 	}
 	err = rows.Err()
@@ -54,7 +57,7 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 }
 
 func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
-	res := make([]Lexicon, 0)
+	var res []Lexicon
 	if 0 == len(names) {
 		return res, nil
 	}
@@ -73,7 +76,7 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 		if err != nil {
 			return res, fmt.Errorf("failed rows scan : %v", err)
 		}
-		res = append(res, Lexicon{Id: id, Name: lname, SymbolSetName: symbolsetname})
+		res = append(res, Lexicon{ID: id, Name: lname, SymbolSetName: symbolsetname})
 	}
 	err = rows.Err()
 	rows.Close()
@@ -96,14 +99,16 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 		return Lexicon{}, fmt.Errorf("db query failed : %v", err)
 	}
 
-	return Lexicon{Id: id, Name: lname, SymbolSetName: symbolsetname}, nil
+	return Lexicon{ID: id, Name: lname, SymbolSetName: symbolsetname}, nil
 }
 
-func LexiconFromId(tx *sql.Tx, id int64) (Lexicon, error) {
+// LexiconFromID returns a Lexicon struct corresponding to the db row
+// with that ID
+func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
 	res := Lexicon{}
-	var dbId int64
+	var dbID int64
 	var name, symbolSetName string
-	err := tx.QueryRow("select id, name, symbolsetname from lexicon where id = ?", id).Scan(&dbId, &name, &symbolSetName)
+	err := tx.QueryRow("select id, name, symbolsetname from lexicon where id = ?", id).Scan(&dbID, &name, &symbolSetName)
 	if err == sql.ErrNoRows {
 		return res, fmt.Errorf("no lexicon with id %d : %v", id, err)
 	}
@@ -111,13 +116,15 @@ func LexiconFromId(tx *sql.Tx, id int64) (Lexicon, error) {
 		return res, fmt.Errorf("query failed %v", err)
 	}
 
-	res.Id = dbId
+	res.ID = dbID
 	res.Name = name
 	res.SymbolSetName = symbolSetName
 
 	return res, err
 }
 
+// DeleteLexicon deletes the lexicon name from the lexicon
+// table. Notice that it does not remove
 func DeleteLexicon(db *sql.DB, id int64) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -127,6 +134,8 @@ func DeleteLexicon(db *sql.DB, id int64) error {
 	return DeleteLexiconTx(tx, id)
 }
 
+// DeleteLexiconTx deletes the lexicon name from the lexicon
+// table. Notice that it does not remove
 func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 	var n int
 	err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
@@ -154,23 +163,23 @@ func InsertOrUpdateLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	if err != nil {
 		return Lexicon{}, fmt.Errorf("failed begin transaction %v", err)
 	}
-	return InsertOrUpdateLexiconTx(tx, l)
+	return insertOrUpdateLexiconTx(tx, l)
 }
-func InsertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
+func insertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	res := Lexicon{}
 
-	if l.Id == 0 {
+	if l.ID == 0 {
 		return InsertLexiconTx(tx, l)
 	}
 
-	if l.Id > 0 {
-		res, err := LexiconFromId(tx, l.Id)
+	if l.ID > 0 {
+		res, err := LexiconFromID(tx, l.ID)
 		if err != nil {
 			return res, fmt.Errorf("faild get lexicon : %v", err)
 		}
 		if l != res {
-			_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", strings.ToLower(l.Name), l.SymbolSetName, res.Id)
+			_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", strings.ToLower(l.Name), l.SymbolSetName, res.ID)
 			if err != nil {
 				tx.Rollback()
 				return res, fmt.Errorf("failed to update lex : %v", err)
@@ -180,6 +189,7 @@ func InsertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 	return res, nil
 }
 
+// InsertLexicon saves the name of a new lexicon to the db.
 // TODO change input arg to sql.Tx ?
 func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
@@ -190,6 +200,7 @@ func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	return res, err
 }
 
+// InsertLexiconTx saves the name of a new lexicon to the db.
 func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	res, err := tx.Exec("insert into lexicon (name, symbolsetname) values (?, ?)", strings.ToLower(l.Name), l.SymbolSetName)
@@ -206,9 +217,10 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	//tx.Commit()
 
-	return Lexicon{Id: id, Name: strings.ToLower(l.Name), SymbolSetName: l.SymbolSetName}, err
+	return Lexicon{ID: id, Name: strings.ToLower(l.Name), SymbolSetName: l.SymbolSetName}, err
 }
 
+// InsertEntries saves a list of Entries and associates them to Lexicon
 // TODO change input arg to sql.Tx
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 
@@ -216,8 +228,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
 	var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
-	ids := make([]int64, 0)
-
+	var ids []int64
 	// Transaction -->
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -236,7 +247,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 
 	for _, e := range es {
 		res, err := tx.Stmt(stmt1).Exec(
-			l.Id,
+			l.ID,
 			strings.ToLower(e.Strn),
 			e.Language,
 			e.PartOfSpeech,
@@ -252,7 +263,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 			return ids, fmt.Errorf("failed last insert id : %v", err)
 		}
 		// We want the Entry to have the right id for inserting lemma assocs below
-		e.Id = id
+		e.ID = id
 
 		ids = append(ids, id)
 
@@ -287,15 +298,17 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 	return ids, err
 }
 
+// AssociateLemma2Entry adds a Lemma to an Entry via a linking table
 func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
 	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
-	_, err := db.Exec(sql, l.Id, e.Id)
+	_, err := db.Exec(sql, l.ID, e.ID)
 	if err != nil {
 		err = fmt.Errorf("failed to associate lemma "+l.Strn+" and entry "+e.Strn+":%v", err)
 	}
 	return err
 }
 
+// SetOrGetLemma saves a new Lemma to the db, or returns a matching already existing one
 func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
 	res := Lemma{}
 
@@ -305,12 +318,12 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	err := tx.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
 	switch {
 	case err == sql.ErrNoRows:
-		return InsertLemma(tx, Lemma{Id: id, Strn: strn, Reading: reading, Paradigm: paradigm})
+		return InsertLemma(tx, Lemma{ID: id, Strn: strn, Reading: reading, Paradigm: paradigm})
 	case err != nil:
 		return res, fmt.Errorf("SetOrGetLemma failed querying db : %v", err)
 	}
 
-	res.Id = id
+	res.ID = id
 	res.Strn = strn0
 	res.Reading = reading0
 	res.Paradigm = paradigm0
@@ -319,13 +332,13 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 }
 
 // TODO return error
-func getLemmaFromEntryIdTx(tx *sql.Tx, id int64) Lemma {
+func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) Lemma {
 	res := Lemma{}
 	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
 		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
-	var lId int64
+	var lID int64
 	var strn, reading, paradigm string
-	err := tx.QueryRow(sqlS, id).Scan(&lId, &strn, &reading, &paradigm)
+	err := tx.QueryRow(sqlS, id).Scan(&lID, &strn, &reading, &paradigm)
 	switch {
 	case err == sql.ErrNoRows:
 		// TODO No row:
@@ -336,7 +349,7 @@ func getLemmaFromEntryIdTx(tx *sql.Tx, id int64) Lemma {
 
 	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
 	// Return err when there is an err
-	res.Id = lId
+	res.ID = lID
 	res.Strn = strn
 	res.Reading = reading
 	res.Paradigm = paradigm
@@ -344,6 +357,7 @@ func getLemmaFromEntryIdTx(tx *sql.Tx, id int64) Lemma {
 	return res
 }
 
+// InsertLemma saves a Lemma to the db, but does not associate it with an Entry
 func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
 	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
@@ -354,21 +368,23 @@ func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	if err != nil {
 		err = fmt.Errorf("failed last LastInsertId after insert lemma "+l.Strn+": %v", err)
 	}
-	l.Id = id
+	l.ID = id
 	return l, err
 }
 
 func entryMapToEntrySlice(em map[string][]Entry) []Entry {
-	res := make([]Entry, 0)
+	var res []Entry
 	for _, v := range em {
 		res = append(res, v...)
 	}
 	return res
 }
 
+// GetEntriesFromIDsTx takes a list of Entry db IDs, and return a list
+// of structs of corresponding db entries
 // TODO return error
 // TODO this should return []Entry rather than map[string][]Entry?
-func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
+func GetEntriesFromIDsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	res := make(map[string][]Entry)
 	if len(entryIds) == 0 {
 		return res
@@ -385,19 +401,19 @@ func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	entries := make(map[int64]Entry)
 	transes := make(map[int64]Transcription)
 	for rows.Next() {
-		var entryId, entryLexiconId int64
+		var entryID, entryLexiconID int64
 		var entryStrn, entryLanguage, entryPartofSpeech, entryWordParts string
-		var transcriptionId, transcriptionEntryId int64
+		var transcriptionID, transcriptionEntryID int64
 		var transcriptionStrn, transcriptionLanguage string
 
-		if err := rows.Scan(&entryId,
-			&entryLexiconId,
+		if err := rows.Scan(&entryID,
+			&entryLexiconID,
 			&entryStrn,
 			&entryLanguage,
 			&entryPartofSpeech,
 			&entryWordParts,
-			&transcriptionId,
-			&transcriptionEntryId,
+			&transcriptionID,
+			&transcriptionEntryID,
 			&transcriptionStrn,
 			&transcriptionLanguage); err != nil {
 			log.Fatal(err)
@@ -406,29 +422,29 @@ func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 		// collect Entry and Transcription separately. insert []Transcription into Entry below
 
 		// collect unique Entries
-		if _, ok := entries[entryId]; !ok {
+		if _, ok := entries[entryID]; !ok {
 			e := Entry{
-				Id:           entryId,
-				LexiconId:    entryLexiconId,
+				ID:           entryID,
+				LexiconID:    entryLexiconID,
 				Strn:         entryStrn,
 				Language:     entryLanguage,
 				PartOfSpeech: entryPartofSpeech,
 				WordParts:    entryWordParts,
-				Lemma:        getLemmaFromEntryIdTx(tx, entryId),
+				Lemma:        getLemmaFromEntryIDTx(tx, entryID),
 			}
 
-			entries[entryId] = e
+			entries[entryID] = e
 		}
 
 		// collect unique Transcriptions
-		if _, ok := transes[transcriptionId]; !ok {
+		if _, ok := transes[transcriptionID]; !ok {
 			t := Transcription{
-				Id:       transcriptionId,
-				EntryId:  transcriptionEntryId,
+				ID:       transcriptionID,
+				EntryID:  transcriptionEntryID,
 				Strn:     transcriptionStrn,
 				Language: transcriptionLanguage,
 			}
-			transes[transcriptionId] = t
+			transes[transcriptionID] = t
 		}
 
 	} // rows.Next()
@@ -436,16 +452,16 @@ func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	// err = rows.Err()
 	//
 	// map entry ids to transcriptions
-	eId2ts := make(map[int64][]Transcription)
+	eID2ts := make(map[int64][]Transcription)
 	for _, t := range transes {
-		eId2ts[t.EntryId] = append(eId2ts[t.EntryId], t)
+		eID2ts[t.EntryID] = append(eID2ts[t.EntryID], t)
 	}
 
 	// Put together Entries and Transcriptions and build up return map res
 	for id, e := range entries {
 		var ts []Transcription
 		var ok bool
-		ts, ok = eId2ts[id]
+		ts, ok = eID2ts[id]
 		if !ok {
 			log.Fatal("EntriesFromIds: Entry id unknown")
 		}
@@ -457,10 +473,11 @@ func GetEntriesFromIdsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	return res
 }
 
+// GetEntryFromID returns an Entry struct given a db entry id
 // TODO return error
 // TODO error handling!!!
-func GetEntryFromId(db *sql.DB, id int64) Entry {
-	res := GetEntriesFromIds(db, []int64{id})
+func GetEntryFromID(db *sql.DB, id int64) Entry {
+	res := GetEntriesFromIDs(db, []int64{id})
 	// if len(res) != 1 {
 	// 	return nil
 	// }
@@ -472,17 +489,21 @@ func GetEntryFromId(db *sql.DB, id int64) Entry {
 	return Entry{}
 }
 
+// GetEntriesFromIDs returns map of Entry structs given a db entry id list.
+// The key of the map is the entries orthography.
 // TODO return error
 // TODO this should return []Entry rather than map[string][]Entry?
-func GetEntriesFromIds(db *sql.DB, entryIds []int64) map[string][]Entry {
+func GetEntriesFromIDs(db *sql.DB, entryIds []int64) map[string][]Entry {
 	tx, err := db.Begin()
 	f(err)
 	defer tx.Commit()
-	return GetEntriesFromIdsTx(tx, entryIds)
+	return GetEntriesFromIDsTx(tx, entryIds)
 }
 
-// TODO return error
-// TODO should be a wrapper to GetEntriesTx
+// GetEntries returns a map of Entry structs given a db query in the
+// form of a Query struct.
+//TODO return error TODO should be a wrapper
+// to GetEntriesTx
 func GetEntries(db *sql.DB, q Query) (map[string][]Entry, error) {
 	res := make(map[string][]Entry)
 	if q.Empty() { // TODO report to client?
@@ -490,7 +511,7 @@ func GetEntries(db *sql.DB, q Query) (map[string][]Entry, error) {
 		return res, nil // report error, or think the caller knows whiat it's doing?
 	}
 
-	qString, vs := idiotSql(q)
+	qString, vs := idiotSQL(q)
 
 	rows, err := db.Query(qString, vs...)
 	defer rows.Close()
@@ -499,7 +520,7 @@ func GetEntries(db *sql.DB, q Query) (map[string][]Entry, error) {
 		return res, fmt.Errorf("db query failed : %v", err)
 	}
 
-	ids := make([]int64, 0)
+	var ids []int64
 	for rows.Next() {
 		var id int64
 		if err := rows.Scan(&id); err != nil {
@@ -511,7 +532,7 @@ func GetEntries(db *sql.DB, q Query) (map[string][]Entry, error) {
 	// TODO err = rows.Err()
 
 	// TODO return map shuold be built here rather than by GetEntriesFromIds?
-	res = GetEntriesFromIds(db, ids)
+	res = GetEntriesFromIDs(db, ids)
 	return res, err
 }
 
@@ -525,10 +546,10 @@ func UpdateEntry(db *sql.DB, e Entry) (updated bool, err error) { // TODO return
 	return UpdateEntryTx(tx, e)
 }
 
-func getTIds(ts []Transcription) []int64 {
-	res := make([]int64, 0)
+func getTIDs(ts []Transcription) []int64 {
+	var res []int64
 	for _, t := range ts {
-		res = append(res, t.Id)
+		res = append(res, t.ID)
 	}
 	return res
 }
@@ -537,7 +558,7 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 	if len(ts1) != len(ts2) {
 		return false
 	}
-	for i, _ := range ts1 {
+	for i := range ts1 {
 		if ts1[i] != ts2[i] {
 			return false
 		}
@@ -547,13 +568,13 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 }
 
 func updateLanguage(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
-	if e.Id != dbE.Id {
+	if e.ID != dbE.ID {
 		return false, fmt.Errorf("new and old entries have different ids")
 	}
 	if e.Language == dbE.Language {
 		return false, nil
 	}
-	_, err := tx.Exec("update entry set language = ? where entry.id = ?", e.Language, e.Id)
+	_, err := tx.Exec("update entry set language = ? where entry.id = ?", e.Language, e.ID)
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("failed language update : %v", err)
@@ -562,13 +583,13 @@ func updateLanguage(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 }
 
 func updateWordParts(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
-	if e.Id != dbE.Id {
+	if e.ID != dbE.ID {
 		return false, fmt.Errorf("new and old entries have different ids")
 	}
 	if e.WordParts == dbE.WordParts {
 		return false, nil
 	}
-	_, err := tx.Exec("update entry set wordparts = ? where entry.id = ?", e.WordParts, e.Id)
+	_, err := tx.Exec("update entry set wordparts = ? where entry.id = ?", e.WordParts, e.ID)
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("failed worparts update : %v", err)
@@ -582,15 +603,15 @@ func updateLemma(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 	}
 	// If e.Lemma uninitialized, and different from dbE, then wipe
 	// old lemma from db
-	if e.Lemma.Id == 0 && e.Lemma.Strn == "" {
-		_, err = tx.Exec("delete from lemma where lemma.id = ?", dbE.Lemma.Id)
+	if e.Lemma.ID == 0 && e.Lemma.Strn == "" {
+		_, err = tx.Exec("delete from lemma where lemma.id = ?", dbE.Lemma.ID)
 		if err != nil {
 			tx.Rollback()
 			return false, fmt.Errorf("failed to delete old lemma : %v", err)
 		}
 	}
 	// Only one alternative left, to update old lemma with new values
-	_, err = tx.Exec("update lemma set strn = ?, reading = ?, paradigm = ? where lemma.id = ?", e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm, dbE.Lemma.Id)
+	_, err = tx.Exec("update lemma set strn = ?, reading = ?, paradigm = ? where lemma.id = ?", e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm, dbE.Lemma.ID)
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("failed to update lemma : %v", err)
@@ -602,7 +623,7 @@ func updateLemma(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 var transSTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
 func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
-	if e.Id != dbE.Id {
+	if e.ID != dbE.ID {
 		return false, fmt.Errorf("update and db entry id differ")
 	}
 
@@ -613,15 +634,15 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 	// If the new and old transcriptions differ, remove the old
 	// and inser the new ones
 	if !equal(e.Transcriptions, dbE.Transcriptions) {
-		transIds := getTIds(dbE.Transcriptions)
+		transIDs := getTIDs(dbE.Transcriptions)
 		// TODO move to a function
-		_, err := tx.Exec("delete from transcription where transcription.id in "+nQs(len(transIds)), convI(transIds)...)
+		_, err := tx.Exec("delete from transcription where transcription.id in "+nQs(len(transIDs)), convI(transIDs)...)
 		if err != nil {
 			tx.Rollback()
 			return false, fmt.Errorf("failed transcription delete : %v", err)
 		}
 		for _, t := range e.Transcriptions {
-			_, err := tx.Exec(transSTMT, e.Id, t.Strn, t.Language)
+			_, err := tx.Exec(transSTMT, e.ID, t.Strn, t.Language)
 			if err != nil {
 				tx.Rollback()
 				return false, fmt.Errorf("failed transcription update : %v", err)
@@ -634,17 +655,19 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 	return false, err
 }
 
+// UpdateEntryTx updates the fields of an Entry that do not match the
+// corresponding values in the db
 func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
 	// updated == false
-	dbEntryMap := GetEntriesFromIdsTx(tx, []int64{(e.Id)})
+	dbEntryMap := GetEntriesFromIDsTx(tx, []int64{(e.ID)})
 	dbEntries := entryMapToEntrySlice(dbEntryMap)
 	if len(dbEntries) == 0 {
 
-		return updated, fmt.Errorf("no entry with id '%d'", e.Id)
+		return updated, fmt.Errorf("no entry with id '%d'", e.ID)
 	}
 	if len(dbEntries) > 1 {
 
-		return updated, fmt.Errorf("very bad error, more than one entry with id '%d'", e.Id)
+		return updated, fmt.Errorf("very bad error, more than one entry with id '%d'", e.ID)
 	}
 
 	updated1, err := updateTranscriptions(tx, e, dbEntries[0])
@@ -670,7 +693,7 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 
 func unique(ns []int64) []int64 {
 	tmpMap := make(map[int64]int)
-	res := make([]int64, 0)
+	var res []int64
 	for _, n := range ns {
 		if _, ok := tmpMap[n]; !ok {
 			res = append(res, n)
@@ -687,6 +710,9 @@ func uniqIDs(ss []Symbol) []int64 {
 	return unique(res)
 }
 
+// SaveSymbolSet saves list of symbols that share the same LexiconID
+// to the db. Prior to saving the list, it removes all current Symbols
+// of the same LexiconID
 func SaveSymbolSet(db *sql.DB, symbolSet []Symbol) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -696,6 +722,9 @@ func SaveSymbolSet(db *sql.DB, symbolSet []Symbol) error {
 	return SaveSymbolSetTx(tx, symbolSet)
 }
 
+// SaveSymbolSetTx saves list of symbols that share the same LexiconID
+// to the db. Prior to saving the list, it removes all current Symbols
+// of the same LexiconID
 func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	if len(symbolSet) == 0 {
 		return nil //li vanilli
@@ -727,6 +756,7 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	return nil
 }
 
+// SymbolSet returns the set of Symbols defined for a lexicon with the given db id
 func SymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -736,8 +766,9 @@ func SymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
 	return SymbolSetTx(tx, lexiconID)
 }
 
+// SymbolSetTx returns the set of Symbols defined for a lexicon with the given db id
 func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
-	res := make([]Symbol, 0)
+	var res []Symbol
 	rows, err := tx.Query("select lexiconid, symbol, category, subcat, description, ipa from symbolset where lexiconid = ?", lexiconID)
 	if err != nil {
 		return res, fmt.Errorf("failed db query : %v", err)
@@ -763,5 +794,3 @@ func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
 
 	return res, nil
 }
-
-func Nothing() {}
