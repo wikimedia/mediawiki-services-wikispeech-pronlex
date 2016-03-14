@@ -196,8 +196,8 @@ func ToLower(ss []string) []string {
 	return res
 }
 
-// idiotSql generates an sql query string and an accompanying list of parameter values from a query struct.
-// idiotSql is brittle, as the name suggests
+// idiotSQL generates an sql query string and an accompanying list of parameter values from a query struct.
+// idiotSQL is brittle, as the name suggests
 func idiotSQL(q Query) (string, []interface{}) {
 	res := "select entry.id from " + tables(q) // extracts list of sql tables needed for query
 	var resv []interface{}
