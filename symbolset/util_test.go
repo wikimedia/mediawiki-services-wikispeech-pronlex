@@ -5,7 +5,6 @@ import (
 )
 
 var fsExp = "Expected: '%v' got: '%v'"
-var fsDidntExp = "Didn't expect: '%v'"
 
 func testEqStrings(t *testing.T, expect []string, result []string) {
 	if len(expect) != len(result) {
