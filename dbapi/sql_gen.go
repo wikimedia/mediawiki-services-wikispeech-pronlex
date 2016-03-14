@@ -1,8 +1,3 @@
-/*
-This software is published under the extremely liberal Code Wants To Be Freek (CWTBF) license,
-by stt.se.
-*/
-
 package dbapi
 
 import (

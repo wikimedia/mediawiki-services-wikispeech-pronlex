@@ -1,3 +1,7 @@
+/*
+The dbapi package contains code wrapped around an SQL(ite3) DB.
+
+*/
 package dbapi
 
 //go get github.com/mattn/go-sqlite3
