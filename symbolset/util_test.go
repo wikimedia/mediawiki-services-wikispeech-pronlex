@@ -1,8 +1,6 @@
 package symbolset
 
-import (
-	"testing"
-)
+import "testing"
 
 var fsExp = "Expected: '%v' got: '%v'"
 
