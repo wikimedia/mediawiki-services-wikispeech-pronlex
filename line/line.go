@@ -77,7 +77,12 @@ type Format struct {
 	NFields  int
 }
 
-// valueOf : not used at the moment
+// IndexOf : shorthand to get the index of a particular field
+func (f Format) IndexOf(field Field) int {
+	return f.Fields[field]
+}
+
+// valueOf : shorthand to get the field name for a certain index (not used at the moment)
 func (f Format) valueOf(index int) Field {
 	for field, i := range f.Fields {
 		if i == index {
