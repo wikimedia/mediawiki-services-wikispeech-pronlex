@@ -70,13 +70,14 @@ const (
 	InflectionRule
 )
 
-// Format a lexicon's line format definition
+// Format is used to define a lexicon's line
 type Format struct {
 	FieldSep string
 	Fields   map[Field]int
 	NFields  int
 }
 
+// valueOf : not used at the moment
 func (f Format) valueOf(index int) Field {
 	for field, i := range f.Fields {
 		if i == index {
