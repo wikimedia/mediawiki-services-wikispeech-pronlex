@@ -11,6 +11,8 @@ import (
 // Field is a simple const for line field definition types
 type Field int
 
+//go:generate stringer -type=Field
+
 const (
 	// Orth orthography
 	Orth Field = iota
