@@ -147,10 +147,10 @@ func Test_contains(t *testing.T) {
 
 	s = "t_s"
 	if !contains(symbols, s) {
-		t.Errorf("contains() Expected true for symbol %s in %", s, symbols)
+		t.Errorf("contains() Expected true for symbol %s in %v", s, symbols)
 	}
 	s = "_"
 	if contains(symbols, s) {
-		t.Errorf("contains() Expected false for symbol %s in %", s, symbols)
+		t.Errorf("contains() Expected false for symbol %s in %v", s, symbols)
 	}
 }
