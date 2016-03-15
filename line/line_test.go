@@ -15,11 +15,7 @@ func checkResult(t *testing.T, expect map[Field]string, result map[Field]string)
 		for f, ex := range expect {
 			re := result[f]
 			if re != ex {
-				fn, err := f.Name()
-				if err != nil {
-					t.Errorf("didn't expect error here : %v", err)
-				}
-				t.Errorf(fsExpField, fn, ex, re)
+				t.Errorf(fsExpField, f.Name(), ex, re)
 			}
 		}
 	}
@@ -117,13 +113,10 @@ func Test_String_01(t *testing.T) {
 
 func Test_FieldName(t *testing.T) {
 	var result, expect string
-	var err error
 
-	result, err = Orth.Name()
+	result = Orth.Name()
 	expect = "Orth"
-	if err != nil {
-		t.Errorf("didn't expect error here : %v", err)
-	} else if result != expect {
+	if result != expect {
 		t.Errorf(fsExp, "Orth", result)
 	}
 	fmt.Println(result)
