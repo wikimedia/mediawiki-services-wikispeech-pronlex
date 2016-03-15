@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Bug(hanna) Add field property to indicate whether a field is required or optional (or just use two maps: RequiredFields and OptionalFields).
+// BUG(hanna) Add field property to indicate whether a field is required or optional (or just use two maps: RequiredFields and OptionalFields).
 
 // Field is a simple const for line field definition types
 type Field int
