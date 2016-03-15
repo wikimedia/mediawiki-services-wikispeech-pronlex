@@ -111,7 +111,7 @@ func Test_String_01(t *testing.T) {
 
 }
 
-func Test_FieldName(t *testing.T) {
+func Test_FieldString(t *testing.T) {
 	var result, expect string
 
 	result = Orth.String()
