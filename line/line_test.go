@@ -15,7 +15,7 @@ func checkResult(t *testing.T, expect map[Field]string, result map[Field]string)
 		for f, ex := range expect {
 			re := result[f]
 			if re != ex {
-				t.Errorf(fsExpField, f.Name(), ex, re)
+				t.Errorf(fsExpField, f.String(), ex, re)
 			}
 		}
 	}
@@ -114,7 +114,7 @@ func Test_String_01(t *testing.T) {
 func Test_FieldName(t *testing.T) {
 	var result, expect string
 
-	result = Orth.Name()
+	result = Orth.String()
 	expect = "Orth"
 	if result != expect {
 		t.Errorf(fsExp, "Orth", result)

@@ -71,11 +71,6 @@ const (
 	InflectionRule
 )
 
-// Name returns the name of the field as defined in Field.String
-func (f Field) Name() string {
-	return f.String()
-}
-
 // Format a lexicon's line format definition
 type Format struct {
 	FieldSep string
@@ -128,7 +123,7 @@ func (f Format) String(fields map[Field]string) (string, error) {
 		if ok {
 			res[i] = s
 		} else {
-			return "", fmt.Errorf("undefined field name: %v ", field.Name())
+			return "", fmt.Errorf("undefined field name: %v ", field.String())
 		}
 	}
 	return strings.Join(res, f.FieldSep), nil
