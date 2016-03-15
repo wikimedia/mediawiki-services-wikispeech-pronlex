@@ -6,8 +6,7 @@ import (
 )
 
 // BUG(hanna) Add field property to indicate whether a field is required or optional (or just use two maps: RequiredFields and OptionalFields).
-// BUG(hanna) Unknown content should generate an error? Depends on required/optional property
-// BUG(hanna) (re-)find the utils used for auto-generating const names (cf. Field/FieldName)
+// BUG(hanna) Should unknown content generate an error? Depends on the required/optional property (above).
 
 // Field is a simple const for line field definition types
 type Field int
