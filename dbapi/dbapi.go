@@ -1,7 +1,7 @@
 /*
 The dbapi package contains code wrapped around an SQL(ite3) DB.
-
 */
+
 package dbapi
 
 //go get github.com/mattn/go-sqlite3
@@ -735,16 +735,16 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	}
 	unqIDs := uniqIDs(symbolSet)
 	if len(unqIDs) != 1 {
-		return fmt.Errorf("cannot save set of symbols with different lexiconIDs %v : ", unqIDs)
 		tx.Rollback()
+		return fmt.Errorf("cannot save set of symbols with different lexiconIDs %v : ", unqIDs)
 	}
 
 	// Nuke current symbol set for lexicon of ID id:
 	id := unqIDs[0]
 	_, err := tx.Exec("delete from symbolset where lexiconid = ?", id)
 	if err != nil {
-		fmt.Errorf("failed deleting current symbol set : %v", err)
 		tx.Rollback()
+		return fmt.Errorf("failed deleting current symbol set : %v", err)
 	}
 
 	for _, s := range symbolSet {
@@ -752,8 +752,8 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 		_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, subcat, description, ipa) values (?, ?, ?, ?, ?, ?)",
 			s.LexiconID, s.Symbol, s.Category, s.Subcat, s.Description, s.IPA)
 		if err != nil {
-			fmt.Errorf("failed inserting symbol : %v", err)
 			tx.Rollback()
+			return fmt.Errorf("failed inserting symbol : %v", err)
 		}
 	}
 
