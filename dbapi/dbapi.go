@@ -503,11 +503,14 @@ func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
 		return err
 	}
 
-	//entry.id, entry.lexiconid, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language
+	var entryID, lexiconID int64
+	var entryStrn, entryLanguage, partOfSpeech, wordParts string
+	var transcriptionID, transcriptionEntryID int64
+	var transcriptionStrn, transcriptionLanguage string
+	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
 
 	for rows.Next() {
-		var id int64
-		rows.Scan(&id)
+		rows.Scan(&entryID, &lexiconID, &entryStrn, &entryLanguage, &partOfSpeech, &wordParts, &transcriptionID, &transcriptionEntryID, &transcriptionStrn, &transcriptionLanguage, &lemmaStrn, &lemmaReading, &lemmaParadigm)
 		//ids = append(ids, id)
 	}
 
