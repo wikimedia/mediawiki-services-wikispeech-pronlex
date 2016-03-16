@@ -1,3 +1,4 @@
+// Package line is used to define lexicon line format for parsing input and printing output
 package line
 
 import (
@@ -72,11 +73,44 @@ const (
 	InflectionRule
 )
 
-// Format is used to define a lexicon's line
+// FormatTest defines a test to run upon initialization of Format (using NewFormat)
+type FormatTest struct {
+	Line   string
+	Fields map[Field]string
+}
+
+// Format is used to define a lexicon's line.
+// This a struct for package private usage.
+// To create a new SymbolSet, use NewFormat
 type Format struct {
+	Name     string
 	FieldSep string
 	Fields   map[Field]int
 	NFields  int
+}
+
+// NewFormat is a public constructor for Format with built-in error checks and tests
+func NewFormat(name string, fieldSep string, fields map[Field]int, nFields int, tests []FormatTest) (Format, error) {
+	f := Format{name, fieldSep, fields, nFields}
+	var errs = make([]string, 0)
+	for _, t := range tests {
+		fieldsRes, err := f.Parse(t.Line)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("%v", err))
+		} else if !equals(fieldsRes, t.Fields) {
+			errs = append(errs, fmt.Sprintf("Format.Parse: expected %v, found %v", t.Fields, fieldsRes))
+		}
+		lineRes, err := f.String(t.Fields)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("%v", err))
+		} else if lineRes != t.Line {
+			errs = append(errs, fmt.Sprintf("Format.String: expected %v, found %v", t.Line, lineRes))
+		}
+	}
+	if len(errs) > 0 {
+		return Format{}, fmt.Errorf(strings.Join(errs, " : "))
+	}
+	return f, nil
 }
 
 // IndexOf : shorthand to get the index of a particular field

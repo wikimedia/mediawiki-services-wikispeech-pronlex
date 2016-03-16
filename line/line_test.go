@@ -32,7 +32,7 @@ func Test_Parse_01(t *testing.T) {
 		Translang1: 14,
 		Lemma:      15,
 	}
-	fmt := Format{"\t", fs, 16}
+	fmt := Format{"test", "\t", fs, 16}
 
 	input := "hannas	PM	GEN	hannas	-	-	swe	-	-	-	-	\"\" h a . n a s	-	-	swe	hanna_01"
 
@@ -66,7 +66,7 @@ func Test_Parse_02(t *testing.T) {
 		Translang1: 14,
 		Lemma:      15,
 	}
-	fmt := Format{"\t", fs, 16}
+	fmt := Format{"test", "\t", fs, 16}
 
 	input := "hannas	PM	GEN	hannas	-	-	swe	-	-	-	-	\"\" h a . n a s	-	-	swe	hanna_01	-	-"
 
@@ -88,7 +88,7 @@ func Test_String_01(t *testing.T) {
 		Translang1: 14,
 		Lemma:      15,
 	}
-	fmt := Format{";", fs, 16}
+	fmt := Format{"test", ";", fs, 16}
 
 	expect := "hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01"
 
@@ -109,6 +109,81 @@ func Test_String_01(t *testing.T) {
 		t.Errorf(fsExp, expect, result)
 	}
 
+}
+
+func Test_NewFormat_01(t *testing.T) {
+	var fs = map[Field]int{
+		Orth:       0,
+		Pos:        1,
+		Morph:      2,
+		Decomp:     3,
+		WordLang:   6,
+		Trans1:     11,
+		Translang1: 14,
+		Lemma:      15,
+	}
+	nFields := 16
+	sep := ";"
+	tests := []FormatTest{
+		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
+			map[Field]string{
+				Orth:       "hannas",
+				Pos:        "PM",
+				Morph:      "GEN",
+				Decomp:     "hannas",
+				WordLang:   "eng",
+				Trans1:     "\"\" h a . n a s",
+				Translang1: "swe",
+				Lemma:      "hanna_01"},
+		},
+	}
+	_, err := NewFormat("test", sep, fs, nFields, tests)
+	if err != nil {
+		t.Errorf("didn't expect error here : %v", err)
+	}
+}
+
+func Test_NewFormat_02(t *testing.T) {
+	var fs = map[Field]int{
+		Orth:       0,
+		Pos:        1,
+		Morph:      2,
+		Decomp:     3,
+		WordLang:   6,
+		Trans1:     11,
+		Translang1: 14,
+		Lemma:      15,
+	}
+	nFields := 16
+	sep := ";"
+	tests := []FormatTest{
+		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
+			map[Field]string{
+				Orth:       "hannas",
+				Pos:        "PM",
+				Morph:      "GEN",
+				Decomp:     "hannas",
+				WordLang:   "eng",
+				Trans1:     "\"\" h a . n a s",
+				Translang1: "swe",
+				Lemma:      "hanna_01"},
+		},
+		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
+			map[Field]string{
+				Orth:       "hannas_x",
+				Pos:        "PM",
+				Morph:      "GEN",
+				Decomp:     "hannas",
+				WordLang:   "eng",
+				Trans1:     "\"\" h a . n a s",
+				Translang1: "swe",
+				Lemma:      "hanna_01"},
+		},
+	}
+	_, err := NewFormat("test", sep, fs, nFields, tests)
+	if err == nil {
+		t.Errorf("expected error here")
+	}
 }
 
 func Test_FieldString(t *testing.T) {
