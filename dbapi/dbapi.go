@@ -19,7 +19,7 @@ import (
 )
 
 // TODO
-// f is a place holder to be replaced by proper error handling
+//f is a place holder to be replaced by proper error handling
 func f(err error) {
 	if err != nil {
 		log.Fatal(err)
@@ -491,6 +491,29 @@ func GetEntryFromID(db *sql.DB, id int64) Entry {
 	}
 
 	return Entry{}
+}
+
+// Queries db for all entries with transcriptions and optional lemma forms.
+var hugeSQL = `SELECT entry.id, entry.lexiconid, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+
+func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
+	//var ids []int64
+	rows, err := db.Query(hugeSQL, l.ID)
+	if err != nil {
+		return err
+	}
+
+	//entry.id, entry.lexiconid, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language
+
+	for rows.Next() {
+		var id int64
+		rows.Scan(&id)
+		//ids = append(ids, id)
+	}
+
+	log.Printf("%v\t%v\t%v")
+
+	return nil
 }
 
 // GetEntriesFromIDs returns map of Entry structs given a db entry id list.
