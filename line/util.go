@@ -13,6 +13,7 @@ func equals(expect map[Field]string, result map[Field]string) bool {
 	return true
 }
 
+// Equals compares two line.Format instances
 func Equals(x Format, r Format) bool {
 	if x.Name != r.Name {
 		return false
