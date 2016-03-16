@@ -8,7 +8,7 @@ var lineFmt line.Format
 
 func initLineFmt() (line.Format, error) {
 	var nilFmt line.Format
-	if line.Equals(lineFmt, nilFmt) {
+	if lineFmt.Equals(nilFmt) {
 		tests := []line.FormatTest{
 			// TODO: update to actual format
 			line.FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",

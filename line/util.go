@@ -14,21 +14,21 @@ func equals(expect map[Field]string, result map[Field]string) bool {
 }
 
 // Equals compares two line.Format instances
-func Equals(x Format, r Format) bool {
-	if x.Name != r.Name {
+func (f Format) Equals(other Format) bool {
+	if f.Name != other.Name {
 		return false
 	}
-	if x.FieldSep != r.FieldSep {
+	if f.FieldSep != other.FieldSep {
 		return false
 	}
-	if x.NFields != r.NFields {
+	if f.NFields != other.NFields {
 		return false
 	}
-	if len(x.Fields) != len(r.Fields) {
+	if len(f.Fields) != len(other.Fields) {
 		return false
 	}
-	for f, expS := range x.Fields {
-		resS := r.Fields[f]
+	for f, expS := range f.Fields {
+		resS := other.Fields[f]
 		if resS != expS {
 			return false
 		}
