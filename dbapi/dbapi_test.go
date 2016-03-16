@@ -1,6 +1,7 @@
 package dbapi
 
 import (
+	"bytes"
 	"database/sql"
 	"log"
 	"os"
@@ -171,6 +172,11 @@ func Test_InsertEntries(t *testing.T) {
 	if eApax.Language != "gummiapa" {
 		t.Errorf(fs, "gummiapa", eApax.Language)
 	}
+
+	//var rezz bytes.Buffer
+	//Export(db, l, &rezz)
+	//t.Errorf(">>>>>>>>>%v", &rezz)
+
 }
 
 func Test_unique(t *testing.T) {

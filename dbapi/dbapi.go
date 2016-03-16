@@ -12,6 +12,7 @@ import (
 	"fmt"
 	// installs sqlite3 driver
 	_ "github.com/mattn/go-sqlite3"
+	"io"
 	"log"
 	"sort"
 	"strconv"
@@ -494,28 +495,96 @@ func GetEntryFromID(db *sql.DB, id int64) Entry {
 }
 
 // Queries db for all entries with transcriptions and optional lemma forms.
-var hugeSQL = `SELECT entry.id, entry.lexiconid, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+var hugeSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
 
-func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
+// TODO print n entries at a time, rather than printing each entry?
+// Or can caller use some write buffer?
+//func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
+func Export(db *sql.DB, l Lexicon, out io.Writer) error {
 	//var ids []int64
 	rows, err := db.Query(hugeSQL, l.ID)
 	if err != nil {
 		return err
 	}
 
-	var entryID, lexiconID int64
+	var lexiconID, entryID int64
 	var entryStrn, entryLanguage, partOfSpeech, wordParts string
 	var transcriptionID, transcriptionEntryID int64
 	var transcriptionStrn, transcriptionLanguage string
 	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
 
+	var currE Entry
+	var lastE int64
+	lastE = -1
 	for rows.Next() {
-		rows.Scan(&entryID, &lexiconID, &entryStrn, &entryLanguage, &partOfSpeech, &wordParts, &transcriptionID, &transcriptionEntryID, &transcriptionStrn, &transcriptionLanguage, &lemmaStrn, &lemmaReading, &lemmaParadigm)
-		//ids = append(ids, id)
+		rows.Scan(
+			&lexiconID,
+			&entryID,
+			&entryStrn,
+			&entryLanguage,
+			&partOfSpeech,
+			&wordParts,
+
+			&transcriptionID,
+			&transcriptionEntryID,
+			&transcriptionStrn,
+			&transcriptionLanguage,
+
+			&lemmaStrn,
+			&lemmaReading,
+			&lemmaParadigm,
+		)
+		// new entry starts here.
+		// print last entry.
+		// all rows with same entryID belongs to the same entry.
+		// rows ordered by entryID
+		if lastE != entryID {
+			if lastE != -1 {
+				// TODO call to line formatting of Entry
+				fmt.Fprintf(out, "%v\n", currE)
+			}
+			currE = Entry{
+				LexiconID:    lexiconID,
+				ID:           entryID,
+				Strn:         entryStrn,
+				Language:     entryLanguage,
+				PartOfSpeech: partOfSpeech,
+				WordParts:    wordParts,
+			}
+			if lemmaStrn.Valid {
+				l := Lemma{Strn: lemmaStrn.String}
+				if lemmaReading.Valid {
+					l.Reading = lemmaReading.String
+				}
+				if lemmaParadigm.Valid {
+					l.Paradigm = lemmaParadigm.String
+				}
+				currE.Lemma = l
+			}
+		}
+		// transcriptions ordered by id so they will be added
+		// in correct order
+		currT := Transcription{
+			ID:       transcriptionID,
+			EntryID:  transcriptionEntryID,
+			Strn:     transcriptionStrn,
+			Language: transcriptionLanguage,
+		}
+
+		currE.Transcriptions = append(currE.Transcriptions, currT)
+
+		lastE = entryID
 	}
 
-	log.Printf("%v\t%v\t%v")
+	// TODO call to line formatting of Entry
 
+	// mustn't forget last entry, or lexicon will shrink by one
+	// entry for each export/import...
+	fmt.Fprintf(out, "%v\n", currE)
+
+	if rows.Err() != nil {
+		return rows.Err()
+	}
 	return nil
 }
 
