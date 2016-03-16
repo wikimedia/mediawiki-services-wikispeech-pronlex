@@ -111,7 +111,7 @@ type SymbolPair struct {
 	Sym2 Symbol
 }
 
-// SymbolSlice is used for sorting slices of symbols according to symbol length. Symbols with equal length will be sorted alphabetically.
+// symbolSlice is used for sorting slices of symbols according to symbol length. Symbols with equal length will be sorted alphabetically.
 type symbolSlice []Symbol
 
 func (a symbolSlice) Len() int      { return len(a) }
