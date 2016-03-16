@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"database/sql"
 	"fmt"
-	"github.com/stts-se/pronlex/dbapi"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/stts-se/pronlex/dbapi"
 )
 
 const (

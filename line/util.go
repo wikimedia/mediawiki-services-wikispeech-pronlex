@@ -13,6 +13,28 @@ func equals(expect map[Field]string, result map[Field]string) bool {
 	return true
 }
 
+func Equals(x Format, r Format) bool {
+	if x.Name != r.Name {
+		return false
+	}
+	if x.FieldSep != r.FieldSep {
+		return false
+	}
+	if x.NFields != r.NFields {
+		return false
+	}
+	if len(x.Fields) != len(r.Fields) {
+		return false
+	}
+	for f, expS := range x.Fields {
+		resS := r.Fields[f]
+		if resS != expS {
+			return false
+		}
+	}
+	return true
+}
+
 type stringSlice []string
 
 func (a stringSlice) Len() int      { return len(a) }
