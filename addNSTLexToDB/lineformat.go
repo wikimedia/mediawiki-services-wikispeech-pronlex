@@ -6,7 +6,7 @@ import "github.com/stts-se/pronlex/line"
 
 var lineFmt line.Format
 
-func initLineFmt() line.Format {
+func initLineFmt() (line.Format, error) {
 	var nilFmt line.Format
 	if line.Equals(lineFmt, nilFmt) {
 		tests := []line.FormatTest{
@@ -47,9 +47,9 @@ func initLineFmt() line.Format {
 			tests,
 		)
 		if err != nil {
-			panic(err) // TODO
+			return f, err
 		}
 		lineFmt = f
 	}
-	return lineFmt
+	return lineFmt, nil
 }
