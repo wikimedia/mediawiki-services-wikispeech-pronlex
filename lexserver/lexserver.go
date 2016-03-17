@@ -183,7 +183,7 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := queryFromParams(r)
-	res, err := dbapi.GetEntries(db, q)
+	res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
 	if err != nil {
 		log.Printf("lexserver: Failed to get entries: %v", err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)

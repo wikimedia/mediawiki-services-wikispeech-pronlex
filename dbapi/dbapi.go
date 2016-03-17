@@ -385,6 +385,7 @@ func entryMapToEntrySlice(em map[string][]Entry) []Entry {
 	return res
 }
 
+// TODO probably not needed. See LookUp
 // GetEntriesFromIDsTx takes a list of Entry db IDs, and return a list
 // of structs of corresponding db entries
 // TODO return error
@@ -478,6 +479,7 @@ func GetEntriesFromIDsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
 	return res
 }
 
+// TODO should be changed internally to use LookUp instead. Query and the SQL generation, etc, have to be modified.
 // GetEntryFromID returns an Entry struct given a db entry id
 // TODO return error
 // TODO error handling!!!
@@ -534,6 +536,7 @@ func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
 	}
 	return res, err
 }
+
 func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
 
 	//var eOut EntriesWriter
@@ -631,9 +634,11 @@ func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
 	return nil
 }
 
+// TODO remove
 // TODO make general search
 var hugeSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
 
+// TODO remove: use LookUp/LookUpIntoMap instead
 // TODO print n entries at a time, rather than printing each entry?
 // Or can caller use some write buffer?
 //func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
@@ -730,6 +735,7 @@ func Export(db *sql.DB, l Lexicon, out io.Writer) error {
 	return nil
 }
 
+// TODO remove this: add an IDs field to Query instead, and if needed
 // GetEntriesFromIDs returns map of Entry structs given a db entry id list.
 // The key of the map is the entries orthography.
 // TODO return error
@@ -741,6 +747,7 @@ func GetEntriesFromIDs(db *sql.DB, entryIds []int64) map[string][]Entry {
 	return GetEntriesFromIDsTx(tx, entryIds)
 }
 
+// TODO remove this: use LookUp/LookUpIntoMap instead
 // GetEntries returns a map of Entry structs given a db query in the
 // form of a Query struct.
 //TODO return error TODO should be a wrapper
