@@ -61,7 +61,7 @@ func Test_InsertEntries(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	var entries map[string][]Entry
-	entries, err = GetEntries(db, q)
+	entries, err = LookUpIntoMap(db, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}

@@ -523,12 +523,17 @@ func (w *EntriesSliceWriter) Write(e Entry) error {
 	return nil // fmt.Errorf("not implemented")
 }
 
-// This is a dummy thingumybob to make it possible to pass either a real writer (such as a file) to LookUp or the fake writer EntriesWriter, used as a bucket for collecting entries to return
-
-// func (ew EntriesWriter) Write(p []byte) (int, error) {
-// 	return len(ew.Entries), nil
-// }
-
+func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
+	res := make(map[string][]Entry)
+	var esw EntriesSliceWriter
+	err := LookUp(db, q, &esw)
+	for _, e := range esw.Entries {
+		es := res[e.Strn]
+		es = append(es, e)
+		res[e.Strn] = es
+	}
+	return res, err
+}
 func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
 
 	//var eOut EntriesWriter

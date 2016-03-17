@@ -35,10 +35,12 @@ func main() {
 		Words:      dbapi.ToLower(os.Args[2:]),
 		PageLength: 100}
 
-	res, err := dbapi.GetEntries(db, q)
-	ff("get entries failed : %v", err)
+	//res, err := dbapi.GetEntries(db, q)
+	var res dbapi.EntriesSliceWriter
+	err = dbapi.LookUp(db, q, &res)
+	ff("LookUp failed : %v", err)
 
-	res0, err := json.MarshalIndent(res, "", "  ")
+	res0, err := json.MarshalIndent(res.Entries, "", "  ")
 	ff("json conversion failed : %v", err)
 
 	fmt.Printf("%s\n", res0)
