@@ -313,6 +313,23 @@ func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
 	return err
 }
 
+// TODO do we need both InsertLemma and SetOrGetLemma?
+// InsertLemma saves a Lemma to the db, but does not associate it with an Entry
+func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
+	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
+	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
+	if err != nil {
+		err = fmt.Errorf("failed insert lemma "+l.Strn+": %v", err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		err = fmt.Errorf("failed last LastInsertId after insert lemma "+l.Strn+": %v", err)
+	}
+	l.ID = id
+	return l, err
+}
+
+// TODO do we need both InsertLemma and SetOrGetLemma?
 // SetOrGetLemma saves a new Lemma to the db, or returns a matching already existing one
 func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
 	res := Lemma{}
@@ -360,21 +377,6 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) Lemma {
 	res.Paradigm = paradigm
 
 	return res
-}
-
-// InsertLemma saves a Lemma to the db, but does not associate it with an Entry
-func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
-	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
-	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
-	if err != nil {
-		err = fmt.Errorf("failed insert lemma "+l.Strn+": %v", err)
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		err = fmt.Errorf("failed last LastInsertId after insert lemma "+l.Strn+": %v", err)
-	}
-	l.ID = id
-	return l, err
 }
 
 func entryMapToEntrySlice(em map[string][]Entry) []Entry {
@@ -538,14 +540,21 @@ func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
 }
 
 func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
-
-	//var eOut EntriesWriter
-
-	//_ = entriesWriter
-	//var ids []int64
-	sqlString, values := SelectEntriesSQL(q)
-	rows, err := db.Query(sqlString, values...)
+	tx, err := db.Begin()
+	defer tx.Commit()
 	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to initialize transaction : %v", err)
+	}
+	return LookUpTx(tx, q, out)
+}
+
+func LookUpTx(tx *sql.Tx, q Query, out EntriesWriter) error {
+
+	sqlString, values := SelectEntriesSQL(q)
+	rows, err := tx.Query(sqlString, values...)
+	if err != nil {
+		//tx.Rollback()
 		return err
 	}
 
@@ -629,6 +638,7 @@ func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
 	out.Write(currE)
 
 	if rows.Err() != nil {
+		//tx.Rollback()
 		return rows.Err()
 	}
 	return nil

@@ -10,9 +10,10 @@ import (
 
 // Query represents an sql search query to the lexicon database
 type Query struct {
-	Lexicons          []Lexicon `json:"lexicons"`          // Lexicons to be searched. Empty means 'all' (TODO I think)
-	Words             []string  `json:"words"`             // list of words to get corresponding entries for
-	WordLike          string    `json:"wordLike"`          // a 'like' db search expression matching words
+	Lexicons          []Lexicon `json:"lexicons"` // Lexicons to be searched. Empty means 'all' (TODO I think)
+	Words             []string  `json:"words"`    // list of words to get corresponding entries for
+	WordLike          string    `json:"wordLike"` // a 'like' db search expression matching words
+	EntryIDs          []int64   `json:"entryIds"`
 	TranscriptionLike string    `json:"transcriptionLike"` // a 'like' db search expression matching transcriptions
 	PartOfSpeechLike  string    `json:"partOfSpeechLike"`  // a 'like' db search expression matching part of speech strings
 	Lemmas            []string  `json:"lemmas"`            // list of lemma forms to get corresponding entries for
@@ -29,6 +30,8 @@ func (q Query) Empty() bool {
 	case len(q.Words) > 0:
 		return false
 	case strings.TrimSpace(q.WordLike) != "":
+		return false
+	case len(q.EntryIDs) > 0:
 		return false
 	case strings.TrimSpace(q.TranscriptionLike) != "":
 		return false

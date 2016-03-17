@@ -95,12 +95,16 @@ func words(q Query) (string, []interface{}) {
 
 	// You must study the Query struct to understand this
 
-	if len(q.Words) == 0 && trm(q.WordLike) == "" && trm(q.PartOfSpeechLike) == "" {
+	if len(q.Words) == 0 && trm(q.WordLike) == "" && trm(q.PartOfSpeechLike) == "" && len(q.EntryIDs) == 0 {
 		return res, resv
 	} //else {
 	if len(q.Words) > 0 {
 		res += "entry.strn in " + nQs(len(q.Words))
 		resv = append(resv, convS(ToLower(q.Words))...)
+	}
+	if len(q.EntryIDs) > 0 {
+		res += "entry.id in " + nQs(len(q.EntryIDs))
+		resv = append(resv, convI(q.EntryIDs)...)
 	}
 	if trm(q.WordLike) != "" {
 		res += "entry.strn like ? "
