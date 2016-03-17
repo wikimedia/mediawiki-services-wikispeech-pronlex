@@ -509,6 +509,7 @@ type EntriesFileWriter struct {
 }
 
 func (w EntriesFileWriter) Write(e Entry) error {
+	// TODO call to line formatting of Entry
 	_, err := fmt.Fprintf(w.Writer, "%v\n", e)
 	return err
 }
@@ -575,9 +576,6 @@ func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
 		// rows ordered by entryID
 		if lastE != entryID {
 			if lastE != -1 {
-				// TODO call to line formatting of Entry
-
-				//fmt.Fprintf(out, "%v\n", currE)
 				out.Write(currE)
 			}
 			currE = Entry{
@@ -616,15 +614,11 @@ func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
 		lastE = entryID
 	}
 
-	// TODO call to line formatting of Entry
-
 	// mustn't forget last entry, or lexicon will shrink by one
 	// entry for each export/import...
 	//	fmt.Fprintf(out, "%v\n", currE)
 
 	out.Write(currE)
-
-	//fmt.Fprintf(out, "%v\n", currE)
 
 	if rows.Err() != nil {
 		return rows.Err()
