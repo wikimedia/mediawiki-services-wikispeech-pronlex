@@ -7,6 +7,7 @@ func equals(expect map[Field]string, result map[Field]string) bool {
 	for f, expS := range expect {
 		resS := result[f]
 		if resS != expS {
+			//fmt.Printf("%v: %v vs %v", f, resS, expS)
 			return false
 		}
 	}

@@ -69,17 +69,15 @@ const (
 	// Lemma the lemma form. Ttypically orthographic lemmma + some kind of (disambiguation) identifier, eg., wind_01.
 	Lemma
 
-	// Inflected TODO what's this??
-	Inflected
-
 	// InflectionRule rule reference (id) for generating inflected forms from lemma
 	InflectionRule
 )
 
 // FormatTest defines a test to run upon initialization of Format (using NewFormat)
 type FormatTest struct {
-	Line   string
-	Fields map[Field]string
+	InputLine  string
+	Fields     map[Field]string
+	OutputLine string
 }
 
 // Format is used to define a lexicon's line.
@@ -97,7 +95,7 @@ func NewFormat(name string, fieldSep string, fields map[Field]int, nFields int, 
 	f := Format{name, fieldSep, fields, nFields}
 	var errs = make([]string, 0)
 	for _, t := range tests {
-		fieldsRes, err := f.Parse(t.Line)
+		fieldsRes, err := f.Parse(t.InputLine)
 		if err != nil {
 			errs = append(errs, fmt.Sprintf("%v", err))
 		} else if !equals(fieldsRes, t.Fields) {
@@ -106,8 +104,8 @@ func NewFormat(name string, fieldSep string, fields map[Field]int, nFields int, 
 		lineRes, err := f.String(t.Fields)
 		if err != nil {
 			errs = append(errs, fmt.Sprintf("%v", err))
-		} else if lineRes != t.Line {
-			errs = append(errs, fmt.Sprintf("Format.String: expected %v, found %v", t.Line, lineRes))
+		} else if lineRes != t.OutputLine {
+			errs = append(errs, fmt.Sprintf("Format.String: expected %v, found %v", t.OutputLine, lineRes))
 		}
 	}
 	if len(errs) > 0 {
@@ -133,20 +131,9 @@ func (f Format) Parse(line string) (map[Field]string, error) {
 	return res, nil
 }
 
-func (f Format) rightmostFieldIndex() int {
-	var res = -1
-	for _, i := range f.Fields {
-		if i > res {
-			res = i
-		}
-	}
-	return res
-}
-
 // String is used to generate an output line from a set of fields
 func (f Format) String(fields map[Field]string) (string, error) {
-	max := f.rightmostFieldIndex()
-	var res = make([]string, max+1)
+	var res = make([]string, f.NFields)
 	for field, s := range fields {
 		i, ok := f.Fields[field]
 		if ok {

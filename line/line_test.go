@@ -125,7 +125,7 @@ func Test_NewFormat_01(t *testing.T) {
 	nFields := 16
 	sep := ";"
 	tests := []FormatTest{
-		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
+		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;ANKA;;swe;hanna_01",
 			map[Field]string{
 				Orth:       "hannas",
 				Pos:        "PM",
@@ -134,7 +134,9 @@ func Test_NewFormat_01(t *testing.T) {
 				WordLang:   "eng",
 				Trans1:     "\"\" h a . n a s",
 				Translang1: "swe",
-				Lemma:      "hanna_01"},
+				Lemma:      "hanna_01",
+			},
+			"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
 		},
 	}
 	_, err := NewFormat("test", sep, fs, nFields, tests)
@@ -167,6 +169,7 @@ func Test_NewFormat_02(t *testing.T) {
 				Trans1:     "\"\" h a . n a s",
 				Translang1: "swe",
 				Lemma:      "hanna_01"},
+			"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
 		},
 		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
 			map[Field]string{
@@ -178,6 +181,7 @@ func Test_NewFormat_02(t *testing.T) {
 				Trans1:     "\"\" h a . n a s",
 				Translang1: "swe",
 				Lemma:      "hanna_01"},
+			"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
 		},
 	}
 	_, err := NewFormat("test", sep, fs, nFields, tests)
