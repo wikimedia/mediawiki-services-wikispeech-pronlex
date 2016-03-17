@@ -81,7 +81,7 @@ type FormatTest struct {
 
 // Format is used to define a lexicon's line.
 // This a struct for package private usage.
-// To create a new SymbolSet, use NewFormat
+// To create a new Format instance, use NewFormat.
 type Format struct {
 	Name     string
 	FieldSep string
@@ -111,21 +111,6 @@ func NewFormat(name string, fieldSep string, fields map[Field]int, nFields int, 
 		return Format{}, fmt.Errorf(strings.Join(errs, " : "))
 	}
 	return f, nil
-}
-
-// IndexOf : shorthand to get the index of a particular field
-func (f Format) IndexOf(field Field) int {
-	return f.Fields[field]
-}
-
-// valueOf : shorthand to get the field name for a certain index (not used at the moment)
-func (f Format) valueOf(index int) Field {
-	for field, i := range f.Fields {
-		if i == index {
-			return field
-		}
-	}
-	return -1
 }
 
 // Parse is used for parsing input lines
