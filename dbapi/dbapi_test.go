@@ -1,7 +1,6 @@
 package dbapi
 
 import (
-	"bytes"
 	"database/sql"
 	"log"
 	"os"
@@ -11,6 +10,7 @@ import (
 func Test_InsertEntries(t *testing.T) {
 
 	err := os.Remove("./testlex.db")
+	ff("failed to remove testlex.db : %v", err)
 
 	db, err := sql.Open("sqlite3", "./testlex.db")
 	if err != nil {
@@ -109,6 +109,7 @@ func Test_InsertEntries(t *testing.T) {
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
+
 	if len(ess) != 1 {
 		t.Error("ERRRRRRROR")
 	}
@@ -172,10 +173,6 @@ func Test_InsertEntries(t *testing.T) {
 	if eApax.Language != "gummiapa" {
 		t.Errorf(fs, "gummiapa", eApax.Language)
 	}
-
-	//var rezz bytes.Buffer
-	//Export(db, l, &rezz)
-	//t.Errorf(">>>>>>>>>%v", &rezz)
 
 }
 

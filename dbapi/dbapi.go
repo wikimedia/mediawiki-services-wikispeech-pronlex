@@ -494,15 +494,48 @@ func GetEntryFromID(db *sql.DB, id int64) Entry {
 	return Entry{}
 }
 
-// Queries db for all entries with transcriptions and optional lemma forms.
-var hugeSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+type EntriesWriter interface {
+	Write(Entry) error
+}
 
-// TODO print n entries at a time, rather than printing each entry?
-// Or can caller use some write buffer?
-//func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
-func Export(db *sql.DB, l Lexicon, out io.Writer) error {
+// EntriesFileWriter outputs formated entries to an io.Writer.
+// Exmaple usage:
+//	bf := bufio.NewWriter(f)
+//	defer bf.Flush()
+//	bfx := dbapi.EntriesFileWriter{bf}
+//	dbapi.LookUp(db, q, bfx)
+type EntriesFileWriter struct {
+	Writer io.Writer
+}
+
+func (w EntriesFileWriter) Write(e Entry) error {
+	_, err := fmt.Fprintf(w.Writer, "%v\n", e)
+	return err
+}
+
+type EntriesSliceWriter struct {
+	Entries []Entry
+}
+
+func (w *EntriesSliceWriter) Write(e Entry) error {
+	w.Entries = append(w.Entries, e)
+	return nil // fmt.Errorf("not implemented")
+}
+
+// This is a dummy thingumybob to make it possible to pass either a real writer (such as a file) to LookUp or the fake writer EntriesWriter, used as a bucket for collecting entries to return
+
+// func (ew EntriesWriter) Write(p []byte) (int, error) {
+// 	return len(ew.Entries), nil
+// }
+
+func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
+
+	//var eOut EntriesWriter
+
+	//_ = entriesWriter
 	//var ids []int64
-	rows, err := db.Query(hugeSQL, l.ID)
+	sqlString, values := SelectEntriesSQL(q)
+	rows, err := db.Query(sqlString, values...)
 	if err != nil {
 		return err
 	}
@@ -511,6 +544,7 @@ func Export(db *sql.DB, l Lexicon, out io.Writer) error {
 	var entryStrn, entryLanguage, partOfSpeech, wordParts string
 	var transcriptionID, transcriptionEntryID int64
 	var transcriptionStrn, transcriptionLanguage string
+	var lemmaID sql.NullInt64
 	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
 
 	var currE Entry
@@ -530,6 +564,112 @@ func Export(db *sql.DB, l Lexicon, out io.Writer) error {
 			&transcriptionStrn,
 			&transcriptionLanguage,
 
+			&lemmaID,
+			&lemmaStrn,
+			&lemmaReading,
+			&lemmaParadigm,
+		)
+		// new entry starts here.
+		// print last entry.
+		// all rows with same entryID belongs to the same entry.
+		// rows ordered by entryID
+		if lastE != entryID {
+			if lastE != -1 {
+				// TODO call to line formatting of Entry
+
+				//fmt.Fprintf(out, "%v\n", currE)
+				out.Write(currE)
+			}
+			currE = Entry{
+				LexiconID:    lexiconID,
+				ID:           entryID,
+				Strn:         entryStrn,
+				Language:     entryLanguage,
+				PartOfSpeech: partOfSpeech,
+				WordParts:    wordParts,
+			}
+			if lemmaStrn.Valid {
+				l := Lemma{Strn: lemmaStrn.String}
+				if lemmaID.Valid {
+					l.ID = lemmaID.Int64
+				}
+				if lemmaReading.Valid {
+					l.Reading = lemmaReading.String
+				}
+				if lemmaParadigm.Valid {
+					l.Paradigm = lemmaParadigm.String
+				}
+				currE.Lemma = l
+			}
+		}
+		// transcriptions ordered by id so they will be added
+		// in correct order
+		currT := Transcription{
+			ID:       transcriptionID,
+			EntryID:  transcriptionEntryID,
+			Strn:     transcriptionStrn,
+			Language: transcriptionLanguage,
+		}
+
+		currE.Transcriptions = append(currE.Transcriptions, currT)
+
+		lastE = entryID
+	}
+
+	// TODO call to line formatting of Entry
+
+	// mustn't forget last entry, or lexicon will shrink by one
+	// entry for each export/import...
+	//	fmt.Fprintf(out, "%v\n", currE)
+
+	out.Write(currE)
+
+	//fmt.Fprintf(out, "%v\n", currE)
+
+	if rows.Err() != nil {
+		return rows.Err()
+	}
+	return nil
+}
+
+// TODO make general search
+var hugeSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+
+// TODO print n entries at a time, rather than printing each entry?
+// Or can caller use some write buffer?
+//func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
+func Export(db *sql.DB, l Lexicon, out io.Writer) error {
+	//var ids []int64
+	rows, err := db.Query(hugeSQL, l.ID)
+	if err != nil {
+		return err
+	}
+
+	var lexiconID, entryID int64
+	var entryStrn, entryLanguage, partOfSpeech, wordParts string
+	var transcriptionID, transcriptionEntryID int64
+	var transcriptionStrn, transcriptionLanguage string
+	var lemmaID sql.NullInt64
+	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
+
+	var currE Entry
+	var lastE int64
+	lastE = -1
+	for rows.Next() {
+		rows.Scan(
+			&lexiconID,
+			&entryID,
+			&entryStrn,
+			&entryLanguage,
+			&partOfSpeech,
+			&wordParts,
+
+			&transcriptionID,
+			&transcriptionEntryID,
+			&transcriptionStrn,
+			&transcriptionLanguage,
+
+			&lemmaID,
 			&lemmaStrn,
 			&lemmaReading,
 			&lemmaParadigm,
@@ -553,6 +693,9 @@ func Export(db *sql.DB, l Lexicon, out io.Writer) error {
 			}
 			if lemmaStrn.Valid {
 				l := Lemma{Strn: lemmaStrn.String}
+				if lemmaID.Valid {
+					l.ID = lemmaID.Int64
+				}
 				if lemmaReading.Valid {
 					l.Reading = lemmaReading.String
 				}

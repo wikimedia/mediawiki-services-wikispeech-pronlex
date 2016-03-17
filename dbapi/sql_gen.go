@@ -149,6 +149,24 @@ func lemmas(q Query) (string, []interface{}) {
 	return res, resv
 }
 
+func transcriptionsV2(q Query) (string, []interface{}) {
+	// TODO ?
+	// The link between entry.id and transcription.entryid
+	// is already established elsewhere, since every entry is supposed to have at least one transcription.
+	// This assumption may have to change, if we want an entry to be able to have zero transcriptions
+	var res string
+	var resv []interface{}
+	t := trm(q.TranscriptionLike)
+	if "" == t {
+		return res, resv
+	}
+
+	res += "transcription.strn like ?"
+	resv = append(resv, t)
+
+	return res, resv
+}
+
 func transcriptions(q Query) (string, []interface{}) {
 	// TODO ?
 	// The link between entry.id and transcription.entryid
@@ -218,6 +236,46 @@ func idiotSQL(q Query) (string, []interface{}) {
 	res += " limit " + strconv.FormatInt(q.PageLength, 10) + " offset " + strconv.FormatInt(q.PageLength*q.Page, 10)
 
 	return res, resv
+}
+
+// Queries db for all entries with transcriptions and optional lemma forms.
+var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid ` // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+
+func SelectEntriesSQL(q Query) (string, []interface{}) {
+	var sqlQuery string
+	var args []interface{}
+
+	sqlQuery += baseSQL
+
+	// Query.Lexicons
+	l, lv := lexicons(q)
+	args = append(args, lv...)
+	// Query.Words, Query.WordsLike, Query.PartOfSpeechLike
+	w, wv := words(q)
+	args = append(args, wv...)
+	// Query.Lemmas, Query.LemmaLike, Query.ReadingLike, Query.ParadigmLike
+	le, lev := lemmas(q)
+	args = append(args, lev...)
+	// Query.TranscriptionLike
+	t, tv := transcriptionsV2(q) // V2 simply returns 'transkription.strn like ?' + param value
+	args = append(args, tv...)
+
+	// puts together pieces of sql created above with " and " in between
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " AND "))
+	if "" != qRes {
+		sqlQuery += " AND " + qRes
+	}
+
+	// sort by id to make sql rows -> Entry simpler
+	sqlQuery += " ORDER BY entry.id, transcription.id"
+
+	// When both PageLenth and Page values are zero, no page limit is used
+	// This is useful for example when exporting a complete lexicon
+	if q.PageLength > 0 || q.Page > 0 {
+		sqlQuery += " LIMIT " + strconv.FormatInt(q.PageLength, 10) + " OFFSET " + strconv.FormatInt(q.PageLength*q.Page, 10)
+	}
+	return sqlQuery, args
+
 }
 
 // entriesFromIdsSelect builds an sql select and returns it along with slice of matching id values

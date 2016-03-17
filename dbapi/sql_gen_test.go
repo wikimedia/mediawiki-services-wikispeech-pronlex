@@ -91,3 +91,17 @@ func TestSql_idiotSQL(t *testing.T) {
 	}
 
 }
+
+func TestSql_SelectEntriesSQL(t *testing.T) {
+	q := Query{LemmaLike: "%gal_", ReadingLike: "%grus_"}
+	sqlS, vs := SelectEntriesSQL(q)
+	if sqlS == "" {
+		t.Error(fs, "non empty", sqlS)
+	}
+
+	//fmt.Printf("%s\n\n%v\n", sqlS, vs)
+
+	if len(vs) != 2 {
+		t.Error(fs, 2, len(vs))
+	}
+}
