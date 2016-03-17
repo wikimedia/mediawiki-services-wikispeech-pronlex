@@ -69,6 +69,9 @@ const (
 	// Lemma the lemma form. Ttypically orthographic lemmma + some kind of (disambiguation) identifier, eg., wind_01.
 	Lemma
 
+	// Inflected TODO what's this??
+	Inflected
+
 	// InflectionRule rule reference (id) for generating inflected forms from lemma
 	InflectionRule
 )
