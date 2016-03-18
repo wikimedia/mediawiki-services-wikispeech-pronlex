@@ -23,7 +23,7 @@ func main() {
 	// TODO read lexicon name from command line
 	// + db look up
 	ls := []dbapi.Lexicon{dbapi.Lexicon{ID: 1}}
-	q := dbapi.Query{Lexicons: ls, Words: []string{"hundar"}}
+	q := dbapi.Query{Lexicons: ls}
 	f, err := os.Create(os.Args[2])
 	if err != nil {
 		log.Fatalf("aouch : %v", err)
