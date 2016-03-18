@@ -1,8 +1,10 @@
-// The dbapi package contains code wrapped around an SQL(ite3) DB.
-// It is used for inserting, updating and retrieving lexical entries from
-// a pronounciation lexicon database. A lexical entry is represented by
-// the dbapi.Entry struct, that mirrors entries of the entry database
-// table, along with associated tables such as transcription and lemma.
+/*
+Package dbapi contains code wrapped around an SQL(ite3) DB.
+It is used for inserting, updating and retrieving lexical entries from
+a pronounciation lexicon database. A lexical entry is represented by
+the dbapi.Entry struct, that mirrors entries of the entry database
+table, along with associated tables such as transcription and lemma.
+*/
 package dbapi
 
 //go get github.com/mattn/go-sqlite3
@@ -19,7 +21,8 @@ import (
 )
 
 // ListLexicons returns a list of the lexicons defined in the db
-// (i.e., the rows of the lexicon table)
+// (i.e., Lexicon structs corresponding to the rows of the lexicon
+// table)
 func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	var res []Lexicon
 	sql := "select id, name, symbolsetname from lexicon"
