@@ -176,7 +176,7 @@ func NewNST() (NST, error) {
 }
 
 // NSTFileWriter is used for printing entries line by line in NST lexicon format.
-// It can be used as type dbapi.EntryFileWriter in dbapi.Lookup. See export.go for example code.
+// It can be used as type dbapi.EntryFileWriter in dbapi.Lookup. See export/main for example code.
 type NSTFileWriter struct {
 	NST    NST
 	Writer io.Writer
