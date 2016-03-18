@@ -12,58 +12,6 @@ import (
 	"github.com/stts-se/pronlex/line"
 )
 
-func loadLineFmt() (line.Format, error) {
-	tests := []line.FormatTest{
-		line.FormatTest{"storstaden;NN;SIN|DEF|NOM|UTR;stor+staden;JJ+NN;LEX|INFL;SWE;;;;;\"\"stu:$%s`t`A:$den;1;STD;SWE;;;;;;;;;;;;;;18174;enter_se|inflector;;INFLECTED;storstad|95522;s111n, a->ä, stad;s111;;;;;;;;;;;;;storstaden;;;88748",
-			map[line.Field]string{
-				line.Orth:           "storstaden",
-				line.Pos:            "NN",
-				line.Morph:          "SIN|DEF|NOM|UTR",
-				line.Decomp:         "stor+staden",
-				line.WordLang:       "SWE",
-				line.Trans1:         "\"\"stu:$%s`t`A:$den",
-				line.Translang1:     "SWE",
-				line.Trans2:         "",
-				line.Translang2:     "",
-				line.Trans3:         "",
-				line.Translang3:     "",
-				line.Trans4:         "",
-				line.Translang4:     "",
-				line.Lemma:          "storstad|95522",
-				line.InflectionRule: "s111n, a->ä, stad",
-			},
-			"storstaden;NN;SIN|DEF|NOM|UTR;stor+staden;;;SWE;;;;;\"\"stu:$%s`t`A:$den;;;SWE;;;;;;;;;;;;;;;;;;storstad|95522;s111n, a->ä, stad;;;;;;;;;;;;;;;;;",
-		},
-	}
-	f, err := line.NewFormat(
-		"NST",
-		";",
-		map[line.Field]int{
-			line.Orth:           0,
-			line.Pos:            1,
-			line.Morph:          2,
-			line.Decomp:         3,
-			line.WordLang:       6,
-			line.Trans1:         11,
-			line.Translang1:     14,
-			line.Trans2:         15,
-			line.Translang2:     18,
-			line.Trans3:         19,
-			line.Translang3:     22,
-			line.Trans4:         23,
-			line.Translang4:     26,
-			line.Lemma:          32,
-			line.InflectionRule: 33,
-		},
-		51,
-		tests,
-	)
-	if err != nil {
-		return f, err
-	}
-	return f, nil
-}
-
 func appendTrans(ts []dbapi.Transcription, t string, l string) []dbapi.Transcription {
 	if "" == strings.TrimSpace(t) {
 		return ts
@@ -81,8 +29,8 @@ func getTranses(fs map[line.Field]string) []dbapi.Transcription {
 	return res
 }
 
-func nstLine2Entry(lineFmt line.Format, l string) (dbapi.Entry, error) {
-	fs, err := lineFmt.Parse(l)
+func nstLine2Entry(nstFmt line.NST, l string) (dbapi.Entry, error) {
+	fs, err := nstFmt.Parse(l)
 	if err != nil {
 		return dbapi.Entry{}, err
 	}
@@ -161,7 +109,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lineFmt, err := loadLineFmt()
+	nstFmt, err := line.NewNST()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -174,7 +122,7 @@ func main() {
 			log.Fatal(err)
 		}
 		l := s.Text()
-		e, err := nstLine2Entry(lineFmt, l)
+		e, err := nstLine2Entry(nstFmt, l)
 		if err != nil {
 			log.Fatal(err)
 		}
