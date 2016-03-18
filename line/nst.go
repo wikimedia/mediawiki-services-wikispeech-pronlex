@@ -187,6 +187,6 @@ func (w NSTFileWriter) Write(e dbapi.Entry) error {
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprint(w.Writer, s)
+	_, err = fmt.Fprintf(w.Writer, "%s\n", s)
 	return err
 }
