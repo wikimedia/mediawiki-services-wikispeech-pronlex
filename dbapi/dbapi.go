@@ -1,11 +1,9 @@
-/*
-The dbapi package contains code wrapped around an SQL(ite3) DB.
+// The dbapi package contains code wrapped around an SQL(ite3) DB.
 
-It is used for inserting, updating and retrieving lexical entries from
-a pronounciation lexicon database. A lexical entry is represented by
-the dbapi.Entry struct, that mirrors entries of the entry database
-table, along with associated tables such as transcription and lemma.
-*/
+// It is used for inserting, updating and retrieving lexical entries from
+// a pronounciation lexicon database. A lexical entry is represented by
+// the dbapi.Entry struct, that mirrors entries of the entry database
+// table, along with associated tables such as transcription and lemma.
 package dbapi
 
 //go get github.com/mattn/go-sqlite3
