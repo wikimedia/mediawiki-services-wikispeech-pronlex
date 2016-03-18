@@ -115,6 +115,43 @@ type Entry struct {
 	Transcriptions []Transcription `json:"transcriptions"`
 }
 
+// EntryWriter is an interface defining things to which one can write an Entry.
+// See EntrySliceWriter, for returning i sice of Entry, and EntryFileWriter, for writing Entries to file.
+type EntryWriter interface {
+	Write(Entry) error
+}
+
+// EntryFileWriter outputs formated entries to an io.Writer.
+// Exmaple usage:
+//	bf := bufio.NewWriter(f)
+//	defer bf.Flush()
+//	bfx := dbapi.EntriesFileWriter{bf}
+//	dbapi.LookUp(db, q, bfx)
+type EntryFileWriter struct {
+	Writer io.Writer
+}
+
+func (w EntryFileWriter) Write(e Entry) error {
+	// TODO call to line formatting of Entry
+	_, err := fmt.Fprintf(w.Writer, "%v\n", e)
+	return err
+}
+
+// EntrySliceWriter is a container for returning Entries from a LookUp call to the db
+// Example usage:
+//	var q := dbapi.Query{ ... }
+//	var esw dbapi.EntrySliceWriter
+//	err := dbapi.LookUp(db, q, &esw)
+//	[...] esw.Entries // process Entries
+type EntrySliceWriter struct {
+	Entries []Entry
+}
+
+func (w *EntrySliceWriter) Write(e Entry) error {
+	w.Entries = append(w.Entries, e)
+	return nil // fmt.Errorf("not implemented")
+}
+
 // Lemma corresponds to a row of the lemma db table
 type Lemma struct {
 	ID       int64  `json:"id"` // Är noll ett pålitligt 'None'-värde? Dvs börjar databaser alltid räkna från 1?

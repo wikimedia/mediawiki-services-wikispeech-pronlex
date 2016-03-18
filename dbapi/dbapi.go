@@ -11,7 +11,7 @@ package dbapi
 
 import (
 	"database/sql"
-	"errors"
+	//"errors"
 	"fmt"
 	// installs sqlite3 driver
 	_ "github.com/mattn/go-sqlite3"
@@ -47,7 +47,21 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	return res, err
 }
 
-// GetLexicons returns a list of Lexicons in db
+// GetLexicon returns a Lexicon struct matching a lexicon name in the db.
+// Returns error if no such lexicon name in db
+func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
+	res0, err := GetLexicons(db, []string{name})
+	if err != nil {
+		return Lexicon{}, fmt.Errorf("failed to retrieve lexicon %s : %v", name, err)
+	}
+	if len(res0) != 1 {
+		return Lexicon{}, fmt.Errorf("failed to retrieve lexicon %s : %v", name, err)
+	}
+	return res0[0], nil
+}
+
+// GetLexicons takes a list of lexicon names and returns a list of
+// Lexicon structs corresponding to rows of db lexicon table with those name fields.
 func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	var res []Lexicon
 	if 0 == len(names) {
@@ -76,28 +90,6 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	return res, err
 }
 
-// GetLexicon returns a Lexicon struct matching a lexicon name in the db.
-// Returns error if no such lexicon name in db
-func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
-	var id int64
-	var lname string
-	var symbolsetname string
-
-	if "" == strings.TrimSpace(name) {
-		return Lexicon{}, errors.New("lexicon name must not be the empty string")
-	}
-
-	err := db.QueryRow("select id, name, symbolsetname from lexicon where name = ?", strings.ToLower(name)).Scan(&id, &lname, &symbolsetname)
-	if err != nil {
-		//log.Fatalf("DISASTER: %s", err)
-		return Lexicon{}, fmt.Errorf("db query failed : %v", err)
-	}
-
-	return Lexicon{ID: id, Name: lname, SymbolSetName: symbolsetname}, nil
-}
-
-// LexiconFromID returns a Lexicon struct corresponding to the db row
-// with that ID
 func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
 	res := Lexicon{}
 	var dbID int64
@@ -185,7 +177,6 @@ func insertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 }
 
 // InsertLexicon saves the name of a new lexicon to the db.
-// TODO change input arg to sql.Tx ?
 func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -368,51 +359,6 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (Lemma, error) {
 	res.Paradigm = paradigm
 
 	return res, nil
-}
-
-func entryMapToEntrySlice(em map[string][]Entry) []Entry {
-	var res []Entry
-	for _, v := range em {
-		res = append(res, v...)
-	}
-	return res
-}
-
-// EntryWriter is an interface defining things to which one can write an Entry.
-// See EntrySliceWriter, for returning i sice of Entry, and EntryFileWriter, for writing Entries to file.
-type EntryWriter interface {
-	Write(Entry) error
-}
-
-// EntryFileWriter outputs formated entries to an io.Writer.
-// Exmaple usage:
-//	bf := bufio.NewWriter(f)
-//	defer bf.Flush()
-//	bfx := dbapi.EntriesFileWriter{bf}
-//	dbapi.LookUp(db, q, bfx)
-type EntryFileWriter struct {
-	Writer io.Writer
-}
-
-func (w EntryFileWriter) Write(e Entry) error {
-	// TODO call to line formatting of Entry
-	_, err := fmt.Fprintf(w.Writer, "%v\n", e)
-	return err
-}
-
-// EntrySliceWriter is a container for returning Entries from a LookUp call to the db
-// Example usage:
-//	var q := dbapi.Query{ ... }
-//	var esw dbapi.EntrySliceWriter
-//	err := dbapi.LookUp(db, q, &esw)
-//	[...] esw.Entries // process Entries
-type EntrySliceWriter struct {
-	Entries []Entry
-}
-
-func (w *EntrySliceWriter) Write(e Entry) error {
-	w.Entries = append(w.Entries, e)
-	return nil // fmt.Errorf("not implemented")
 }
 
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
