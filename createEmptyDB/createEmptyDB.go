@@ -1,15 +1,16 @@
+// createEmptyDB initialises an Sqlite3 relational database from the schema defining a lexicon database, but empty of data.
+// See dbapi.Schema.
 package main
 
 import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/stts-se/pronlex/dbapi"
 	"log"
 	"os"
-	"github.com/stts-se/pronlex/dbapi"
 )
 
-// createEmptyDB creates an empty Sqlite3 relational database according to a schema defining a lexicon database
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Fprintln(os.Stderr, "createEmptyDB <OUTPUT FILE NAME>")
@@ -38,4 +39,3 @@ func main() {
 	}
 
 }
-
