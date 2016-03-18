@@ -29,8 +29,8 @@ func checkNSTResult(t *testing.T, x dbapi.Entry, r dbapi.Entry) {
 		t.Errorf("Expected %v transcriptions, got %v", len(x.Transcriptions), len(r.Transcriptions))
 	} else {
 		for i, trans := range x.Transcriptions {
-			transID := fmt.Sprintf("Trans%s", (i + 1))
-			translangID := fmt.Sprintf("Translang%s", (i + 1))
+			transID := fmt.Sprintf("Trans%d", (i + 1))
+			translangID := fmt.Sprintf("Translang%d", (i + 1))
 			checkNSTResultField(t, transID, trans.Strn, r.Transcriptions[i].Strn)
 			checkNSTResultField(t, translangID, trans.Language, r.Transcriptions[i].Language)
 		}
