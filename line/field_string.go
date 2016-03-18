@@ -4,9 +4,9 @@ package line
 
 import "fmt"
 
-const _Field_name = "OrthPosMorphDecompWordLangTrans1Translang1Trans2Translang2Trans3Translang3Trans4Translang4Trans5Translang5Trans6Translang6LemmaInflectionRule"
+const _Field_name = "OrthPosMorphWordPartsLangTrans1Translang1Trans2Translang2Trans3Translang3Trans4Translang4Trans5Translang5Trans6Translang6LemmaParadigm"
 
-var _Field_index = [...]uint8{0, 4, 7, 12, 18, 26, 32, 42, 48, 58, 64, 74, 80, 90, 96, 106, 112, 122, 127, 141}
+var _Field_index = [...]uint8{0, 4, 7, 12, 21, 25, 31, 41, 47, 57, 63, 73, 79, 89, 95, 105, 111, 121, 126, 134}
 
 func (i Field) String() string {
 	if i < 0 || i >= Field(len(_Field_index)-1) {

@@ -24,11 +24,11 @@ const (
 	// Morph morphological tags (case, gender, tense, etc)
 	Morph
 
-	// Decomp decompounded orthography field (for compounds)
-	Decomp
+	// WordParts decompounded orthography field (for compounds)
+	WordParts
 
-	// WordLang the word's language
-	WordLang
+	// Lang the word's language
+	Lang
 
 	// Trans1 the primary transcription
 	Trans1
@@ -69,8 +69,8 @@ const (
 	// Lemma the lemma form. Ttypically orthographic lemmma + some kind of (disambiguation) identifier, eg., wind_01.
 	Lemma
 
-	// InflectionRule rule reference (id) for generating inflected forms from lemma
-	InflectionRule
+	// Paradigm rule reference (id) for generating inflected forms from lemma
+	Paradigm
 )
 
 // FormatTest defines a test to run upon initialization of Format (using NewFormat)

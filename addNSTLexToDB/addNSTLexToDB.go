@@ -6,62 +6,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/line"
 )
-
-func appendTrans(ts []dbapi.Transcription, t string, l string) []dbapi.Transcription {
-	if "" == strings.TrimSpace(t) {
-		return ts
-	}
-	ts = append(ts, dbapi.Transcription{Strn: t, Language: l})
-	return ts
-}
-
-func getTranses(fs map[line.Field]string) []dbapi.Transcription {
-	res := make([]dbapi.Transcription, 0)
-	res = appendTrans(res, fs[line.Trans1], fs[line.Translang1])
-	res = appendTrans(res, fs[line.Trans2], fs[line.Translang2])
-	res = appendTrans(res, fs[line.Trans3], fs[line.Translang3])
-	res = appendTrans(res, fs[line.Trans4], fs[line.Translang4])
-	return res
-}
-
-func nstLine2Entry(nstFmt line.NST, l string) (dbapi.Entry, error) {
-	fs, err := nstFmt.Parse(l)
-	if err != nil {
-		return dbapi.Entry{}, err
-	}
-
-	res := dbapi.Entry{
-		Strn:           strings.ToLower(fs[line.Orth]),
-		Language:       fs[line.WordLang],
-		PartOfSpeech:   fs[line.Pos] + " " + fs[line.Morph],
-		WordParts:      fs[line.Decomp],
-		Transcriptions: getTranses(fs),
-	}
-
-	lemmaReading := strings.SplitN(fs[line.Lemma], "|", 2)
-	lemma := ""
-	reading := ""
-	if len(lemmaReading) == 2 {
-		lemma = lemmaReading[0]
-		reading = lemmaReading[1]
-	}
-	if len(lemmaReading) == 1 {
-		lemma = lemmaReading[0]
-	}
-	paradigm := fs[line.InflectionRule]
-	lemmaStruct := dbapi.Lemma{Strn: lemma, Reading: reading, Paradigm: paradigm}
-
-	if "" != lemmaStruct.Strn {
-		res.Lemma = lemmaStruct
-	}
-
-	return res, nil
-}
 
 func main() {
 
@@ -122,7 +70,7 @@ func main() {
 			log.Fatal(err)
 		}
 		l := s.Text()
-		e, err := nstLine2Entry(nstFmt, l)
+		e, err := nstFmt.Parse(l)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -1,9 +1,6 @@
 package line
 
-import (
-	"fmt"
-	"testing"
-)
+import "testing"
 
 var fsExpField = "For field %v, expected: '%v' got: '%v'"
 var fsExp = "Expected: '%v' got: '%v'"
@@ -26,8 +23,8 @@ func Test_Parse_01(t *testing.T) {
 		Orth:       0,
 		Pos:        1,
 		Morph:      2,
-		Decomp:     3,
-		WordLang:   6,
+		WordParts:  3,
+		Lang:       6,
 		Trans1:     11,
 		Translang1: 14,
 		Lemma:      15,
@@ -40,8 +37,8 @@ func Test_Parse_01(t *testing.T) {
 		Orth:       "hannas",
 		Pos:        "PM",
 		Morph:      "GEN",
-		Decomp:     "hannas",
-		WordLang:   "swe",
+		WordParts:  "hannas",
+		Lang:       "swe",
 		Trans1:     "\"\" h a . n a s",
 		Translang1: "swe",
 		Lemma:      "hanna_01",
@@ -60,8 +57,8 @@ func Test_Parse_02(t *testing.T) {
 		Orth:       0,
 		Pos:        1,
 		Morph:      2,
-		Decomp:     3,
-		WordLang:   6,
+		WordParts:  3,
+		Lang:       6,
 		Trans1:     11,
 		Translang1: 14,
 		Lemma:      15,
@@ -82,8 +79,8 @@ func Test_String_01(t *testing.T) {
 		Orth:       0,
 		Pos:        1,
 		Morph:      2,
-		Decomp:     3,
-		WordLang:   6,
+		WordParts:  3,
+		Lang:       6,
 		Trans1:     11,
 		Translang1: 14,
 		Lemma:      15,
@@ -96,8 +93,8 @@ func Test_String_01(t *testing.T) {
 		Orth:       "hannas",
 		Pos:        "PM",
 		Morph:      "GEN",
-		Decomp:     "hannas",
-		WordLang:   "eng",
+		WordParts:  "hannas",
+		Lang:       "eng",
 		Trans1:     "\"\" h a . n a s",
 		Translang1: "swe",
 		Lemma:      "hanna_01",
@@ -116,8 +113,8 @@ func Test_NewFormat_01(t *testing.T) {
 		Orth:       0,
 		Pos:        1,
 		Morph:      2,
-		Decomp:     3,
-		WordLang:   6,
+		WordParts:  3,
+		Lang:       6,
 		Trans1:     11,
 		Translang1: 14,
 		Lemma:      15,
@@ -130,8 +127,8 @@ func Test_NewFormat_01(t *testing.T) {
 				Orth:       "hannas",
 				Pos:        "PM",
 				Morph:      "GEN",
-				Decomp:     "hannas",
-				WordLang:   "eng",
+				WordParts:  "hannas",
+				Lang:       "eng",
 				Trans1:     "\"\" h a . n a s",
 				Translang1: "swe",
 				Lemma:      "hanna_01",
@@ -150,8 +147,8 @@ func Test_NewFormat_02(t *testing.T) {
 		Orth:       0,
 		Pos:        1,
 		Morph:      2,
-		Decomp:     3,
-		WordLang:   6,
+		WordParts:  3,
+		Lang:       6,
 		Trans1:     11,
 		Translang1: 14,
 		Lemma:      15,
@@ -164,8 +161,8 @@ func Test_NewFormat_02(t *testing.T) {
 				Orth:       "hannas",
 				Pos:        "PM",
 				Morph:      "GEN",
-				Decomp:     "hannas",
-				WordLang:   "eng",
+				WordParts:  "hannas",
+				Lang:       "eng",
 				Trans1:     "\"\" h a . n a s",
 				Translang1: "swe",
 				Lemma:      "hanna_01"},
@@ -176,8 +173,8 @@ func Test_NewFormat_02(t *testing.T) {
 				Orth:       "hannas_x",
 				Pos:        "PM",
 				Morph:      "GEN",
-				Decomp:     "hannas",
-				WordLang:   "eng",
+				WordParts:  "hannas",
+				Lang:       "eng",
 				Trans1:     "\"\" h a . n a s",
 				Translang1: "swe",
 				Lemma:      "hanna_01"},
@@ -198,6 +195,4 @@ func Test_FieldString(t *testing.T) {
 	if result != expect {
 		t.Errorf(fsExp, "Orth", result)
 	}
-	fmt.Println(result)
-
 }

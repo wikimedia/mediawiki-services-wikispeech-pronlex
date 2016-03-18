@@ -3,9 +3,11 @@ package main
 import (
 	"bufio"
 	"database/sql"
-	"github.com/stts-se/pronlex/dbapi"
 	"log"
 	"os"
+
+	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/line"
 )
 
 func main() {
@@ -29,8 +31,8 @@ func main() {
 
 	bf := bufio.NewWriter(f)
 	defer bf.Flush()
-	bfx := dbapi.EntryFileWriter{bf}
-	dbapi.LookUp(db, q, bfx)
+	// bfx := dbapi.EntryFileWriter{bf}
+	// dbapi.LookUp(db, q, bfx)
 
 	//fmt.Println()
 
@@ -39,4 +41,13 @@ func main() {
 	// for _, v := range ew.Entries {
 	// 	fmt.Printf("%v\n", v)
 	// }
+
+	// HL 20160318 : TEMPLATE CODE TO GENERATE NST OUTPUT:
+	nstFmt, err := line.NewNST()
+	if err != nil {
+		log.Fatal(err)
+	}
+	nstW := line.NSTFileWriter{nstFmt, bf}
+	dbapi.LookUp(db, q, nstW)
+
 }
