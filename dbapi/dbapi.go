@@ -11,11 +11,9 @@ package dbapi
 
 import (
 	"database/sql"
-	//"errors"
 	"fmt"
 	// installs sqlite3 driver
 	_ "github.com/mattn/go-sqlite3"
-	"io"
 	"strconv"
 	"strings"
 )
@@ -90,6 +88,8 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	return res, err
 }
 
+// LexiconFromID returns a Lexicon struct corresponding to a row in
+// the lexicon table with the given id
 func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
 	res := Lexicon{}
 	var dbID int64
@@ -111,6 +111,7 @@ func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
 
 // DeleteLexicon deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
+// TODO ? make it impossible to delete the Lexicon table entry if associated to any entries?
 func DeleteLexicon(db *sql.DB, id int64) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -122,6 +123,7 @@ func DeleteLexicon(db *sql.DB, id int64) error {
 
 // DeleteLexiconTx deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
+// TODO ? make it impossible to delete the Lexicon table entry if associated to any entries?
 func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 	var n int
 	err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
@@ -152,6 +154,7 @@ func InsertOrUpdateLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	}
 	return insertOrUpdateLexiconTx(tx, l)
 }
+
 func insertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	res := Lexicon{}
@@ -284,16 +287,6 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 	return ids, err
 }
 
-// AssociateLemma2Entry adds a Lemma to an Entry via a linking table
-func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
-	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
-	_, err := db.Exec(sql, l.ID, e.ID)
-	if err != nil {
-		err = fmt.Errorf("failed to associate lemma "+l.Strn+" and entry "+e.Strn+":%v", err)
-	}
-	return err
-}
-
 // InsertLemma saves a Lemma to the db, but does not associate it with an Entry
 // TODO do we need both InsertLemma and SetOrGetLemma?
 func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
@@ -334,7 +327,16 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	return res, err
 }
 
-// TODO return error
+// AssociateLemma2Entry adds a Lemma to an Entry via a linking table
+func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
+	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
+	_, err := db.Exec(sql, l.ID, e.ID)
+	if err != nil {
+		err = fmt.Errorf("failed to associate lemma "+l.Strn+" and entry "+e.Strn+":%v", err)
+	}
+	return err
+}
+
 func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (Lemma, error) {
 	res := Lemma{}
 	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
@@ -352,7 +354,6 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (Lemma, error) {
 	}
 
 	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
-	// Return err when there is an err
 	res.ID = lID
 	res.Strn = strn
 	res.Reading = reading
@@ -738,8 +739,8 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	return nil
 }
 
-// SymbolSet returns the set of Symbols defined for a lexicon with the given db id
-func SymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
+// GetSymbolSet returns the set of Symbols defined for a lexicon with the given db id
+func GetSymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {

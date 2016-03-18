@@ -1,6 +1,8 @@
 package dbapi
 
 import (
+	"fmt"
+	"io"
 	"strings"
 )
 
