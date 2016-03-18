@@ -64,7 +64,7 @@ func main() {
 
 	s := bufio.NewScanner(fh)
 	n := 0
-	eBuf := make([]dbapi.Entry, 0)
+	var eBuf []dbapi.Entry
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			log.Fatal(err)

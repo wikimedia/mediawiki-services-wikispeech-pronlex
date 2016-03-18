@@ -1,5 +1,6 @@
 package dbapi
 
+// Schema is a string containing the SQL definition of the lexicon database
 var Schema = `
 CREATE TABLE Lexicon (
     name varchar(128) not null,
