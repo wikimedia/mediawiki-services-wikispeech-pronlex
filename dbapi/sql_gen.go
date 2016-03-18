@@ -153,24 +153,6 @@ func lemmas(q Query) (string, []interface{}) {
 	return res, resv
 }
 
-func transcriptionsV2(q Query) (string, []interface{}) {
-	// TODO ?
-	// The link between entry.id and transcription.entryid
-	// is already established elsewhere, since every entry is supposed to have at least one transcription.
-	// This assumption may have to change, if we want an entry to be able to have zero transcriptions
-	var res string
-	var resv []interface{}
-	t := trm(q.TranscriptionLike)
-	if "" == t {
-		return res, resv
-	}
-
-	res += "transcription.strn like ?"
-	resv = append(resv, t)
-
-	return res, resv
-}
-
 func transcriptions(q Query) (string, []interface{}) {
 	// TODO ?
 	// The link between entry.id and transcription.entryid
@@ -183,7 +165,7 @@ func transcriptions(q Query) (string, []interface{}) {
 		return res, resv
 	}
 
-	res += "entry.id = transcription.entryid and transcription.strn like ?"
+	res += "transcription.strn like ?"
 	resv = append(resv, t)
 
 	return res, resv
@@ -213,38 +195,12 @@ func ToLower(ss []string) []string {
 	return res
 }
 
-// idiotSQL generates an sql query string and an accompanying list of parameter values from a query struct.
-// idiotSQL is brittle, as the name suggests
-func idiotSQL(q Query) (string, []interface{}) {
-	res := "select entry.id from " + tables(q) // extracts list of sql tables needed for query
-	var resv []interface{}
-
-	l, lv := lexicons(q)
-	resv = append(resv, lv...)
-	w, wv := words(q)
-	resv = append(resv, wv...)
-	le, lev := lemmas(q)
-	resv = append(resv, lev...)
-	t, tv := transcriptions(q)
-	resv = append(resv, tv...)
-
-	// ... etc...
-
-	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " and "))
-	if "" != qRes {
-		res += " where " + qRes
-	}
-
-	// res += " order by entry.strn" // TODO ???
-	res += " limit " + strconv.FormatInt(q.PageLength, 10) + " offset " + strconv.FormatInt(q.PageLength*q.Page, 10)
-
-	return res, resv
-}
-
 // Queries db for all entries with transcriptions and optional lemma forms.
 var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid ` // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
 
+// SelectEntriesSQL creates a SQL query string based on the values of
+// a Query struct instance, along with a slice of values,
+// corresponding to the params to be set (the '?':s of the query)
 func SelectEntriesSQL(q Query) (string, []interface{}) {
 	var sqlQuery string
 	var args []interface{}
@@ -261,7 +217,7 @@ func SelectEntriesSQL(q Query) (string, []interface{}) {
 	le, lev := lemmas(q)
 	args = append(args, lev...)
 	// Query.TranscriptionLike
-	t, tv := transcriptionsV2(q) // V2 simply returns 'transkription.strn like ?' + param value
+	t, tv := transcriptions(q) // V2 simply returns 'transkription.strn like ?' + param value
 	args = append(args, tv...)
 
 	// puts together pieces of sql created above with " and " in between

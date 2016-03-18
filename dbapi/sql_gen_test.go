@@ -74,23 +74,23 @@ func TestSql_nQs(t *testing.T) {
 	}
 }
 
-func TestSql_idiotSQL(t *testing.T) {
-	q := NewQuery()
-	s, _ := idiotSQL(q)
-	x := "select entry.id from entry limit 25 offset 0"
-	if s != x {
-		t.Errorf(fs, x, s)
-	}
+// func TestSql_idiotSQL(t *testing.T) {
+// 	q := NewQuery()
+// 	s, _ := idiotSQL(q)
+// 	x := "select entry.id from entry limit 25 offset 0"
+// 	if s != x {
+// 		t.Errorf(fs, x, s)
+// 	}
 
-	q = NewQuery() // Query{Lexicons : []Lexicon{Lexicon{}, Lexicon{}}}
-	q.Lexicons = []Lexicon{Lexicon{}, Lexicon{}}
-	s, _ = idiotSQL(q)
-	x = "select entry.id from lexicon, entry where lexicon.id in (?,?) limit 25 offset 0"
-	if s != x {
-		t.Errorf(fs, x, s)
-	}
+// 	q = NewQuery() // Query{Lexicons : []Lexicon{Lexicon{}, Lexicon{}}}
+// 	q.Lexicons = []Lexicon{Lexicon{}, Lexicon{}}
+// 	s, _ = idiotSQL(q)
+// 	x = "select entry.id from lexicon, entry where lexicon.id in (?,?) limit 25 offset 0"
+// 	if s != x {
+// 		t.Errorf(fs, x, s)
+// 	}
 
-}
+// }
 
 func TestSql_SelectEntriesSQL(t *testing.T) {
 	q := Query{LemmaLike: "%gal_", ReadingLike: "%grus_"}
