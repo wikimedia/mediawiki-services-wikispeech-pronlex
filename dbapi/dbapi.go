@@ -43,6 +43,7 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	return res, err
 }
 
+// GetLexicons returns a list of Lexicons in db
 func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	var res []Lexicon
 	if 0 == len(names) {
@@ -71,6 +72,8 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	return res, err
 }
 
+// GetLexicon returns a Lexicon struct matching a lexicon name in the db.
+// Returns error if no such lexicon name in db
 func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 	var id int64
 	var lname string
@@ -144,6 +147,7 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 	return nil
 }
 
+// InsertOrUpdateLexicon takes a Lexicon struct and either inserts it into the db, if its id = 0, or updates its string fields if the id is greater than 0.
 func InsertOrUpdateLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -295,8 +299,8 @@ func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
 	return err
 }
 
-// TODO do we need both InsertLemma and SetOrGetLemma?
 // InsertLemma saves a Lemma to the db, but does not associate it with an Entry
+// TODO do we need both InsertLemma and SetOrGetLemma?
 func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
 	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
@@ -311,8 +315,8 @@ func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	return l, err
 }
 
-// TODO do we need both InsertLemma and SetOrGetLemma?
 // SetOrGetLemma saves a new Lemma to the db, or returns a matching already existing one
+// TODO do we need both InsertLemma and SetOrGetLemma?
 func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
 	res := Lemma{}
 
@@ -370,11 +374,13 @@ func entryMapToEntrySlice(em map[string][]Entry) []Entry {
 	return res
 }
 
+// EntryWriter is an interface defining things to which one can write an Entry.
+// See EntrySliceWriter, for returning i sice of Entry, and EntryFileWriter, for writing Entries to file.
 type EntryWriter interface {
 	Write(Entry) error
 }
 
-// EntriesFileWriter outputs formated entries to an io.Writer.
+// EntryFileWriter outputs formated entries to an io.Writer.
 // Exmaple usage:
 //	bf := bufio.NewWriter(f)
 //	defer bf.Flush()
@@ -390,6 +396,12 @@ func (w EntryFileWriter) Write(e Entry) error {
 	return err
 }
 
+// EntrySliceWriter is a container for returning Entries from a LookUp call to the db
+// Example usage:
+//	var q := dbapi.Query{ ... }
+//	var esw dbapi.EntrySliceWriter
+//	err := dbapi.LookUp(db, q, &esw)
+//	[...] esw.Entries // process Entries
 type EntrySliceWriter struct {
 	Entries []Entry
 }
@@ -399,6 +411,8 @@ func (w *EntrySliceWriter) Write(e Entry) error {
 	return nil // fmt.Errorf("not implemented")
 }
 
+// LookUp takes a Query struct, searches the lexicon db, and writes the result to the
+// EntryWriter.
 func LookUp(db *sql.DB, q Query, out EntryWriter) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -409,6 +423,8 @@ func LookUp(db *sql.DB, q Query, out EntryWriter) error {
 	return LookUpTx(tx, q, out)
 }
 
+// LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
+// EntryWriter.
 func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
 	sqlString, values := SelectEntriesSQL(q)
@@ -504,6 +520,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 	return nil
 }
 
+// LookUpIntoSlice is a wrapper around LookUp, returning a slice of Entries
 func LookUpIntoSlice(db *sql.DB, q Query) ([]Entry, error) {
 	var esw EntrySliceWriter
 	err := LookUp(db, q, &esw)
@@ -512,6 +529,9 @@ func LookUpIntoSlice(db *sql.DB, q Query) ([]Entry, error) {
 	}
 	return esw.Entries, nil
 }
+
+// LookUpIntoMap is a wrapper around LookUp, returning a map where the
+// keys are word forms and the values are slices of Entries. (There may be several entries with the same Strn value.)
 func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
 	res := make(map[string][]Entry)
 	var esw EntrySliceWriter
@@ -527,6 +547,7 @@ func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
 	return res, err
 }
 
+// GetEntryFromID is a wrapper around LookUp and returns the Entry corresponding to the db id
 func GetEntryFromID(db *sql.DB, id int64) (Entry, error) {
 	res := Entry{}
 	q := Query{EntryIDs: []int64{id}}
