@@ -36,7 +36,7 @@ func main() {
 		PageLength: 100}
 
 	//res, err := dbapi.GetEntries(db, q)
-	var res dbapi.EntriesSliceWriter
+	var res dbapi.EntrySliceWriter
 	err = dbapi.LookUp(db, q, &res)
 	ff("LookUp failed : %v", err)
 

@@ -29,7 +29,7 @@ func main() {
 
 	bf := bufio.NewWriter(f)
 	defer bf.Flush()
-	bfx := dbapi.EntriesFileWriter{bf}
+	bfx := dbapi.EntryFileWriter{bf}
 	dbapi.LookUp(db, q, bfx)
 
 	//fmt.Println()

@@ -13,27 +13,9 @@ import (
 	// installs sqlite3 driver
 	_ "github.com/mattn/go-sqlite3"
 	"io"
-	"log"
-	"sort"
 	"strconv"
 	"strings"
 )
-
-// TODO
-//f is a place holder to be replaced by proper error handling
-func f(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// TODO
-// ff is a place holder to be replaced by proper error handling
-func ff(f string, err error) {
-	if err != nil {
-		log.Fatalf(f, err)
-	}
-}
 
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., the rows of the lexicon table)
@@ -354,7 +336,7 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 }
 
 // TODO return error
-func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) Lemma {
+func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (Lemma, error) {
 	res := Lemma{}
 	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
 		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
@@ -366,7 +348,8 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) Lemma {
 		// TODO No row:
 		// Silently return empty Lemma below
 	case err != nil:
-		ff("getLemmaFromENtryId: %v", err)
+		//ff("getLemmaFromENtryId: %v", err)
+		return res, fmt.Errorf("QueryRow failure : %v", err)
 	}
 
 	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
@@ -376,7 +359,7 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) Lemma {
 	res.Reading = reading
 	res.Paradigm = paradigm
 
-	return res
+	return res, nil
 }
 
 func entryMapToEntrySlice(em map[string][]Entry) []Entry {
@@ -387,118 +370,7 @@ func entryMapToEntrySlice(em map[string][]Entry) []Entry {
 	return res
 }
 
-// TODO probably not needed. See LookUp
-// GetEntriesFromIDsTx takes a list of Entry db IDs, and return a list
-// of structs of corresponding db entries
-// TODO return error
-// TODO this should return []Entry rather than map[string][]Entry?
-func GetEntriesFromIDsTx(tx *sql.Tx, entryIds []int64) map[string][]Entry {
-	res := make(map[string][]Entry)
-	if len(entryIds) == 0 {
-		return res
-	}
-
-	qString, values := entriesFromIdsSelect(entryIds)
-	rows, err := tx.Query(qString, values...)
-	if err != nil {
-		log.Fatalf("EntriesFromIds: %s", err)
-	}
-	defer rows.Close()
-
-	// entries map Entries so far. One entry may have several transcriptions, resulting in multiple rows for a single entry
-	entries := make(map[int64]Entry)
-	transes := make(map[int64]Transcription)
-	for rows.Next() {
-		var entryID, entryLexiconID int64
-		var entryStrn, entryLanguage, entryPartofSpeech, entryWordParts string
-		var transcriptionID, transcriptionEntryID int64
-		var transcriptionStrn, transcriptionLanguage string
-
-		if err := rows.Scan(&entryID,
-			&entryLexiconID,
-			&entryStrn,
-			&entryLanguage,
-			&entryPartofSpeech,
-			&entryWordParts,
-			&transcriptionID,
-			&transcriptionEntryID,
-			&transcriptionStrn,
-			&transcriptionLanguage); err != nil {
-			log.Fatal(err)
-		}
-
-		// collect Entry and Transcription separately. insert []Transcription into Entry below
-
-		// collect unique Entries
-		if _, ok := entries[entryID]; !ok {
-			e := Entry{
-				ID:           entryID,
-				LexiconID:    entryLexiconID,
-				Strn:         entryStrn,
-				Language:     entryLanguage,
-				PartOfSpeech: entryPartofSpeech,
-				WordParts:    entryWordParts,
-				Lemma:        getLemmaFromEntryIDTx(tx, entryID),
-			}
-
-			entries[entryID] = e
-		}
-
-		// collect unique Transcriptions
-		if _, ok := transes[transcriptionID]; !ok {
-			t := Transcription{
-				ID:       transcriptionID,
-				EntryID:  transcriptionEntryID,
-				Strn:     transcriptionStrn,
-				Language: transcriptionLanguage,
-			}
-			transes[transcriptionID] = t
-		}
-
-	} // rows.Next()
-	// TODO error
-	// err = rows.Err()
-	//
-	// map entry ids to transcriptions
-	eID2ts := make(map[int64][]Transcription)
-	for _, t := range transes {
-		eID2ts[t.EntryID] = append(eID2ts[t.EntryID], t)
-	}
-
-	// Put together Entries and Transcriptions and build up return map res
-	for id, e := range entries {
-		var ts []Transcription
-		var ok bool
-		ts, ok = eID2ts[id]
-		if !ok {
-			log.Fatal("EntriesFromIds: Entry id unknown")
-		}
-		sort.Sort(TranscriptionSlice(ts)) // Sort according to id. See structs_dbapi.go.
-		e.Transcriptions = ts
-		res[e.Strn] = append(res[e.Strn], e)
-	}
-
-	return res
-}
-
-// TODO should be changed internally to use LookUp instead. Query and the SQL generation, etc, have to be modified.
-// GetEntryFromID returns an Entry struct given a db entry id
-// TODO return error
-// TODO error handling!!!
-func GetEntryFromID(db *sql.DB, id int64) Entry {
-	res := GetEntriesFromIDs(db, []int64{id})
-	// if len(res) != 1 {
-	// 	return nil
-	// }
-	//return
-	for _, v := range res {
-		return v[0]
-	}
-
-	return Entry{}
-}
-
-type EntriesWriter interface {
+type EntryWriter interface {
 	Write(Entry) error
 }
 
@@ -508,38 +380,26 @@ type EntriesWriter interface {
 //	defer bf.Flush()
 //	bfx := dbapi.EntriesFileWriter{bf}
 //	dbapi.LookUp(db, q, bfx)
-type EntriesFileWriter struct {
+type EntryFileWriter struct {
 	Writer io.Writer
 }
 
-func (w EntriesFileWriter) Write(e Entry) error {
+func (w EntryFileWriter) Write(e Entry) error {
 	// TODO call to line formatting of Entry
 	_, err := fmt.Fprintf(w.Writer, "%v\n", e)
 	return err
 }
 
-type EntriesSliceWriter struct {
+type EntrySliceWriter struct {
 	Entries []Entry
 }
 
-func (w *EntriesSliceWriter) Write(e Entry) error {
+func (w *EntrySliceWriter) Write(e Entry) error {
 	w.Entries = append(w.Entries, e)
 	return nil // fmt.Errorf("not implemented")
 }
 
-func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
-	res := make(map[string][]Entry)
-	var esw EntriesSliceWriter
-	err := LookUp(db, q, &esw)
-	for _, e := range esw.Entries {
-		es := res[e.Strn]
-		es = append(es, e)
-		res[e.Strn] = es
-	}
-	return res, err
-}
-
-func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
+func LookUp(db *sql.DB, q Query, out EntryWriter) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -549,12 +409,12 @@ func LookUp(db *sql.DB, q Query, out EntriesWriter) error {
 	return LookUpTx(tx, q, out)
 }
 
-func LookUpTx(tx *sql.Tx, q Query, out EntriesWriter) error {
+func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
 	sqlString, values := SelectEntriesSQL(q)
 	rows, err := tx.Query(sqlString, values...)
 	if err != nil {
-		//tx.Rollback()
+		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return err
 	}
 
@@ -638,160 +498,52 @@ func LookUpTx(tx *sql.Tx, q Query, out EntriesWriter) error {
 	out.Write(currE)
 
 	if rows.Err() != nil {
-		//tx.Rollback()
+		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return rows.Err()
 	}
 	return nil
 }
 
-// TODO remove
-// TODO make general search
-var hugeSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm FROM lexicon, entry, transcription LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
-
-// TODO remove: use LookUp/LookUpIntoMap instead
-// TODO print n entries at a time, rather than printing each entry?
-// Or can caller use some write buffer?
-//func LexiconToFile(db *sql.DB, l Lexicon, fName string) error {
-func Export(db *sql.DB, l Lexicon, out io.Writer) error {
-	//var ids []int64
-	rows, err := db.Query(hugeSQL, l.ID)
+func LookUpIntoSlice(db *sql.DB, q Query) ([]Entry, error) {
+	var esw EntrySliceWriter
+	err := LookUp(db, q, &esw)
 	if err != nil {
-		return err
+		return esw.Entries, fmt.Errorf("failed lookup : %v", err)
 	}
-
-	var lexiconID, entryID int64
-	var entryStrn, entryLanguage, partOfSpeech, wordParts string
-	var transcriptionID, transcriptionEntryID int64
-	var transcriptionStrn, transcriptionLanguage string
-	var lemmaID sql.NullInt64
-	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
-
-	var currE Entry
-	var lastE int64
-	lastE = -1
-	for rows.Next() {
-		rows.Scan(
-			&lexiconID,
-			&entryID,
-			&entryStrn,
-			&entryLanguage,
-			&partOfSpeech,
-			&wordParts,
-
-			&transcriptionID,
-			&transcriptionEntryID,
-			&transcriptionStrn,
-			&transcriptionLanguage,
-
-			&lemmaID,
-			&lemmaStrn,
-			&lemmaReading,
-			&lemmaParadigm,
-		)
-		// new entry starts here.
-		// print last entry.
-		// all rows with same entryID belongs to the same entry.
-		// rows ordered by entryID
-		if lastE != entryID {
-			if lastE != -1 {
-				// TODO call to line formatting of Entry
-				fmt.Fprintf(out, "%v\n", currE)
-			}
-			currE = Entry{
-				LexiconID:    lexiconID,
-				ID:           entryID,
-				Strn:         entryStrn,
-				Language:     entryLanguage,
-				PartOfSpeech: partOfSpeech,
-				WordParts:    wordParts,
-			}
-			if lemmaStrn.Valid {
-				l := Lemma{Strn: lemmaStrn.String}
-				if lemmaID.Valid {
-					l.ID = lemmaID.Int64
-				}
-				if lemmaReading.Valid {
-					l.Reading = lemmaReading.String
-				}
-				if lemmaParadigm.Valid {
-					l.Paradigm = lemmaParadigm.String
-				}
-				currE.Lemma = l
-			}
-		}
-		// transcriptions ordered by id so they will be added
-		// in correct order
-		currT := Transcription{
-			ID:       transcriptionID,
-			EntryID:  transcriptionEntryID,
-			Strn:     transcriptionStrn,
-			Language: transcriptionLanguage,
-		}
-
-		currE.Transcriptions = append(currE.Transcriptions, currT)
-
-		lastE = entryID
-	}
-
-	// TODO call to line formatting of Entry
-
-	// mustn't forget last entry, or lexicon will shrink by one
-	// entry for each export/import...
-	fmt.Fprintf(out, "%v\n", currE)
-
-	if rows.Err() != nil {
-		return rows.Err()
-	}
-	return nil
+	return esw.Entries, nil
 }
-
-// TODO remove this: add an IDs field to Query instead, and if needed
-// GetEntriesFromIDs returns map of Entry structs given a db entry id list.
-// The key of the map is the entries orthography.
-// TODO return error
-// TODO this should return []Entry rather than map[string][]Entry?
-func GetEntriesFromIDs(db *sql.DB, entryIds []int64) map[string][]Entry {
-	tx, err := db.Begin()
-	f(err)
-	defer tx.Commit()
-	return GetEntriesFromIDsTx(tx, entryIds)
-}
-
-// TODO remove this: use LookUp/LookUpIntoMap instead
-// GetEntries returns a map of Entry structs given a db query in the
-// form of a Query struct.
-//TODO return error TODO should be a wrapper
-// to GetEntriesTx
-func GetEntries(db *sql.DB, q Query) (map[string][]Entry, error) {
+func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
 	res := make(map[string][]Entry)
-	if q.Empty() { // TODO report to client?
-		log.Printf("dbapi.GetEntries: Query empty of search constraints: %v", q)
-		return res, nil // report error, or think the caller knows whiat it's doing?
-	}
-
-	qString, vs := idiotSQL(q)
-
-	rows, err := db.Query(qString, vs...)
-	defer rows.Close()
+	var esw EntrySliceWriter
+	err := LookUp(db, q, &esw)
 	if err != nil {
-		log.Printf("dbapi.GetEntries:\t%s", err)
-		return res, fmt.Errorf("db query failed : %v", err)
+		return res, fmt.Errorf("failed lookup : %v", err)
 	}
-
-	var ids []int64
-	for rows.Next() {
-		var id int64
-		if err := rows.Scan(&id); err != nil {
-			log.Printf("GetEntries(2):\t%s", err)
-			return res, fmt.Errorf("rows scan failed : %v", err)
-		}
-		ids = append(ids, id)
+	for _, e := range esw.Entries {
+		es := res[e.Strn]
+		es = append(es, e)
+		res[e.Strn] = es
 	}
-	// TODO err = rows.Err()
-
-	// TODO return map shuold be built here rather than by GetEntriesFromIds?
-	res = GetEntriesFromIDs(db, ids)
 	return res, err
+}
+
+func GetEntryFromID(db *sql.DB, id int64) (Entry, error) {
+	res := Entry{}
+	q := Query{EntryIDs: []int64{id}}
+	esw := EntrySliceWriter{}
+	err := LookUp(db, q, &esw)
+	if err != nil {
+		return res, fmt.Errorf("LookUp failed : %v", err)
+	}
+
+	if len(esw.Entries) == 0 {
+		return res, fmt.Errorf("no entry found with id %d", id)
+	}
+	if len(esw.Entries) > 1 {
+		return res, fmt.Errorf("LookUp resulted in more than one entry")
+	}
+	return esw.Entries[0], nil
+
 }
 
 // UpdateEntry wraps call to UpdateEntryTx with a transaction
@@ -802,6 +554,44 @@ func UpdateEntry(db *sql.DB, e Entry) (updated bool, err error) { // TODO return
 	}
 	defer tx.Commit()
 	return UpdateEntryTx(tx, e)
+}
+
+// UpdateEntryTx updates the fields of an Entry that do not match the
+// corresponding values in the db
+func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
+	// updated == false
+	//dbEntryMap := //GetEntriesFromIDsTx(tx, []int64{(e.ID)})
+	var esw EntrySliceWriter
+	err = LookUpTx(tx, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
+	dbEntries := esw.Entries
+	if len(dbEntries) == 0 {
+
+		return updated, fmt.Errorf("no entry with id '%d'", e.ID)
+	}
+	if len(dbEntries) > 1 {
+
+		return updated, fmt.Errorf("very bad error, more than one entry with id '%d'", e.ID)
+	}
+
+	updated1, err := updateTranscriptions(tx, e, dbEntries[0])
+	if err != nil {
+		return updated1, err
+	}
+	updated2, err := updateLemma(tx, e, dbEntries[0])
+	if err != nil {
+		return updated2, err
+	}
+
+	updated3, err := updateWordParts(tx, e, dbEntries[0])
+	if err != nil {
+		return updated3, err
+	}
+	updated4, err := updateLanguage(tx, e, dbEntries[0])
+	if err != nil {
+		return updated4, err
+	}
+
+	return updated1 || updated2 || updated3 || updated4, err
 }
 
 func getTIDs(ts []Transcription) []int64 {
@@ -911,42 +701,6 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 	}
 	// Nothing happened
 	return false, err
-}
-
-// UpdateEntryTx updates the fields of an Entry that do not match the
-// corresponding values in the db
-func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
-	// updated == false
-	dbEntryMap := GetEntriesFromIDsTx(tx, []int64{(e.ID)})
-	dbEntries := entryMapToEntrySlice(dbEntryMap)
-	if len(dbEntries) == 0 {
-
-		return updated, fmt.Errorf("no entry with id '%d'", e.ID)
-	}
-	if len(dbEntries) > 1 {
-
-		return updated, fmt.Errorf("very bad error, more than one entry with id '%d'", e.ID)
-	}
-
-	updated1, err := updateTranscriptions(tx, e, dbEntries[0])
-	if err != nil {
-		return updated1, err
-	}
-	updated2, err := updateLemma(tx, e, dbEntries[0])
-	if err != nil {
-		return updated2, err
-	}
-
-	updated3, err := updateWordParts(tx, e, dbEntries[0])
-	if err != nil {
-		return updated3, err
-	}
-	updated4, err := updateLanguage(tx, e, dbEntries[0])
-	if err != nil {
-		return updated4, err
-	}
-
-	return updated1 || updated2 || updated3 || updated4, err
 }
 
 func unique(ns []int64) []int64 {

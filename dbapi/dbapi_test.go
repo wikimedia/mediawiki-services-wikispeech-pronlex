@@ -7,6 +7,13 @@ import (
 	"testing"
 )
 
+// ff is a place holder to be replaced by proper error handling
+func ff(f string, err error) {
+	if err != nil {
+		log.Fatalf(f, err)
+	}
+}
+
 func Test_InsertEntries(t *testing.T) {
 
 	err := os.Remove("./testlex.db")
@@ -79,7 +86,7 @@ func Test_InsertEntries(t *testing.T) {
 	le := Lemma{Strn: "apa", Reading: "67t", Paradigm: "7(c)"}
 	tx0, err := db.Begin()
 	defer tx0.Commit()
-	f(err)
+	ff("transaction failed : %v", err)
 	le2, err := InsertLemma(tx0, le)
 	tx0.Commit()
 	if le2.ID < 1 {
@@ -87,7 +94,7 @@ func Test_InsertEntries(t *testing.T) {
 	}
 
 	tx00, err := db.Begin()
-	f(err)
+	ff("tx failed : %v", err)
 	defer tx00.Commit()
 
 	le3, err := SetOrGetLemma(tx00, "apa", "67t", "7(c)")
@@ -97,7 +104,7 @@ func Test_InsertEntries(t *testing.T) {
 	tx00.Commit()
 
 	tx01, err := db.Begin()
-	f(err)
+	ff("tx failed : %v", err)
 	defer tx01.Commit()
 	err = AssociateLemma2Entry(tx01, le3, entries["apa"][0])
 	if err != nil {
@@ -105,7 +112,9 @@ func Test_InsertEntries(t *testing.T) {
 	}
 	tx01.Commit()
 
-	ess, err := GetEntries(db, q)
+	//ess, err := GetEntries(db, q)
+	//var esw EntrySliceWriter
+	ess, err := LookUpIntoMap(db, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -125,7 +134,11 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "67t", lm.Reading)
 	}
 
-	ees := GetEntriesFromIDs(db, []int64{ess["apa"][0].ID})
+	//ees := GetEntriesFromIDs(db, []int64{ess["apa"][0].ID})
+	ees, err := LookUpIntoMap(db, Query{EntryIDs: []int64{ess["apa"][0].ID}})
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(ees) != 1 {
 		t.Errorf(fs, 1, len(ees))
 	}
@@ -147,9 +160,12 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, nil, err)
 	}
 
-	eApa := GetEntryFromID(db, ees0.ID)
+	eApa, err := GetEntryFromID(db, ees0.ID)
 	if len(eApa.Transcriptions) != 3 {
 		t.Errorf(fs, 3, len(eApa.Transcriptions))
+	}
+	if err != nil {
+		t.Errorf(fs, nil, err)
 	}
 
 	eApa.Lemma.Strn = "tjubba"
@@ -163,7 +179,10 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, true, updated)
 	}
 
-	eApax := GetEntryFromID(db, ees0.ID)
+	eApax, err := GetEntryFromID(db, ees0.ID)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if eApax.Lemma.Strn != "tjubba" {
 		t.Errorf(fs, "tjubba", eApax.Lemma.Strn)
 	}

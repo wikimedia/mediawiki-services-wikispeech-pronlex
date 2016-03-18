@@ -6,22 +6,33 @@ import (
 
 // TODO Lägga till bolska fält för 'not'?
 // Kunna sätta sortering eller ej?
-// Nu är det en inbyggd order by entry.strn, men det kanske segar ner stora sökningar?
 
 // Query represents an sql search query to the lexicon database
 type Query struct {
-	Lexicons          []Lexicon `json:"lexicons"` // Lexicons to be searched. Empty means 'all' (TODO I think)
-	Words             []string  `json:"words"`    // list of words to get corresponding entries for
-	WordLike          string    `json:"wordLike"` // a 'like' db search expression matching words
-	EntryIDs          []int64   `json:"entryIds"`
-	TranscriptionLike string    `json:"transcriptionLike"` // a 'like' db search expression matching transcriptions
-	PartOfSpeechLike  string    `json:"partOfSpeechLike"`  // a 'like' db search expression matching part of speech strings
-	Lemmas            []string  `json:"lemmas"`            // list of lemma forms to get corresponding entries for
-	LemmaLike         string    `json:"lemmaLike"`
-	ReadingLike       string    `json:"readingLike"`
-	ParadigmLike      string    `json:"paradigmLike"`
-	Page              int64     `json:"page"`
-	PageLength        int64     `json:"pageLength"`
+	// Lexicons to be searched. Empty means 'all' (TODO I think)
+	Lexicons []Lexicon `json:"lexicons"`
+	// list of words to get corresponding entries for
+	Words []string `json:"words"`
+	// a 'like' db search expression matching words
+	WordLike string `json:"wordLike"`
+	// a slice of Entry.IDs to search for
+	EntryIDs []int64 `json:"entryIds"`
+	// a 'like' db search expression matching transcriptions
+	TranscriptionLike string `json:"transcriptionLike"`
+	// a 'like' db search expression matching part of speech strings
+	PartOfSpeechLike string `json:"partOfSpeechLike"`
+	// list of lemma forms to get corresponding entries for
+	Lemmas []string `json:"lemmas"`
+	// an SQL 'like' expression to match lemma forms
+	LemmaLike string `json:"lemmaLike"`
+	// an SQL 'like' expression to match lemma readings
+	ReadingLike string `json:"readingLike"`
+	// an SQL 'like' expression to match lemma paradigms
+	ParadigmLike string `json:"paradigmLike"`
+	// the page returned by the SQL query's 'LIMIT' (starts at 1)
+	Page int64 `json:"page"`
+	// the page length of the SQL query's 'LIMIT'
+	PageLength int64 `json:"pageLength"`
 }
 
 // Empty returns true if there are not search criteria values
