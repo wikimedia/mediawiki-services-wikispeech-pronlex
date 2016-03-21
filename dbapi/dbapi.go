@@ -19,15 +19,28 @@ import (
 	"strings"
 )
 
-func Sqlite3WithRegex() {
-	regex := func(re, s string) (bool, error) {
-		//return regexp.MatchString(re, s)
-		return regexp.MatchString(re, s)
+var remem = make(map[string]*regexp.Regexp)
+var regexMem = func(re, s string) (bool, error) {
+	if r, ok := remem[re]; ok {
+		return r.MatchString(s), nil
 	}
+	r, err := regexp.Compile(re)
+	if err != nil {
+		return false, err
+	}
+	remem[re] = r
+	return r.MatchString(s), nil
+}
+
+func Sqlite3WithRegex() {
+	// regex := func(re, s string) (bool, error) {
+	// 	//return regexp.MatchString(re, s)
+	// 	return regexp.MatchString(re, s)
+	// }
 	sql.Register("sqlite3_with_regexp",
 		&sqlite3.SQLiteDriver{
 			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
-				return conn.RegisterFunc("regexp", regex, true)
+				return conn.RegisterFunc("regexp", regexMem, true)
 			},
 		})
 }
