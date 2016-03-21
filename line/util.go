@@ -37,10 +37,11 @@ func (f Format) Equals(other Format) bool {
 	return true
 }
 
-type stringSlice []string
+// stringSlice used for sorting if necessary
+// type stringSlice []string
 
-func (a stringSlice) Len() int      { return len(a) }
-func (a stringSlice) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a stringSlice) Less(i, j int) bool {
-	return a[i] < a[j]
-}
+// func (a stringSlice) Len() int      { return len(a) }
+// func (a stringSlice) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+// func (a stringSlice) Less(i, j int) bool {
+// 	return a[i] < a[j]
+// }
