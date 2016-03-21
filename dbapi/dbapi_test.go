@@ -2,8 +2,10 @@ package dbapi
 
 import (
 	"database/sql"
+	"github.com/mattn/go-sqlite3"
 	"log"
 	"os"
+	"regexp"
 	"testing"
 )
 
@@ -19,10 +21,21 @@ func Test_InsertEntries(t *testing.T) {
 	err := os.Remove("./testlex.db")
 	ff("failed to remove testlex.db : %v", err)
 
-	db, err := sql.Open("sqlite3", "./testlex.db")
+	regex := func(re, s string) (bool, error) {
+		return regexp.MatchString(re, s)
+	}
+	sql.Register("sqlite3_with_go_func",
+		&sqlite3.SQLiteDriver{
+			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
+				return conn.RegisterFunc("regexp", regex, true)
+			},
+		})
+
+	db, err := sql.Open("sqlite3_with_go_func", "./testlex.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 		log.Fatal(err)
@@ -191,6 +204,16 @@ func Test_InsertEntries(t *testing.T) {
 	}
 	if eApax.Language != "gummiapa" {
 		t.Errorf(fs, "gummiapa", eApax.Language)
+	}
+
+	rezz, err := db.Query("select entry.strn from entry where strn regexp '^a'")
+	if err != nil {
+		log.Fatalf("Agh: %v", err)
+	}
+	var strn string
+	for rezz.Next() {
+		rezz.Scan(&strn)
+		log.Printf(">>> %s", strn)
 	}
 
 }

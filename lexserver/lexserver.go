@@ -201,9 +201,33 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))                               // TODO should not be called if error occurs?
 }
 
-// func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
+func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
+	entryJson := r.FormValue("entry")
+	//body, err := ioutil.ReadAll(r.Body)
+	var e dbapi.Entry
+	err := json.Unmarshal([]byte(entryJson), &e)
+	if err != nil {
+		log.Printf("lexserver: Failed to unmarshal json: %v", err)
+		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
+		return
+	}
 
-// }
+	updated, err2 := dbapi.UpdateEntry(db, e)
+	if err2 != nil {
+		log.Printf("lexserver: Failed to update entry : %v", err2)
+		http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
+		return
+	}
+	// TODO This is not necessarily an error
+	if !updated {
+		http.Error(w, fmt.Sprintf("Entry not updated : %v", e), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("HÄR KOMMER ETT ENTRY: %v", e)
+	fmt.Fprint(w, "ok") // TODO What should be returned on success?
+	return
+}
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/index.html")
@@ -277,7 +301,7 @@ func main() {
 	// function calls
 	http.HandleFunc("/listlexicons", listLexsHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
-	//http.HandleFunc("/updateentry", updateEntryHandler)
+	http.HandleFunc("/updateentry", updateEntryHandler)
 
 	// admin pages/calls
 	http.HandleFunc("/admin", adminHandler)

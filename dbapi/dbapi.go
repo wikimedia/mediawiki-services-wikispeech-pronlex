@@ -646,6 +646,10 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 		return false, fmt.Errorf("update and db entry id differ")
 	}
 
+	if len(e.Transcriptions) == 0 {
+		return false, fmt.Errorf("cannot update to an empty list of transcriptions")
+	}
+
 	// the easy way would be to simply nuke any transcriptions for
 	// the entry and substitute for the new ones, but we only want
 	// to save new transcriptions if there are changes
