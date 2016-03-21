@@ -16,21 +16,27 @@ type Query struct {
 	// list of words to get corresponding entries for
 	Words []string `json:"words"`
 	// a 'like' db search expression matching words
-	WordLike string `json:"wordLike"`
+	WordLike   string `json:"wordLike"`
+	WordRegexp string `json:"wordRegexp"`
 	// a slice of Entry.IDs to search for
 	EntryIDs []int64 `json:"entryIds"`
 	// a 'like' db search expression matching transcriptions
-	TranscriptionLike string `json:"transcriptionLike"`
+	TranscriptionLike   string `json:"transcriptionLike"`
+	TranscriptionRegexp string `json:"transcriptionRegexp"`
 	// a 'like' db search expression matching part of speech strings
-	PartOfSpeechLike string `json:"partOfSpeechLike"`
+	PartOfSpeechLike   string `json:"partOfSpeechLike"`
+	PartOfSpeechRegexp string `json:"partOfSpeechRegexp"`
 	// list of lemma forms to get corresponding entries for
 	Lemmas []string `json:"lemmas"`
 	// an SQL 'like' expression to match lemma forms
-	LemmaLike string `json:"lemmaLike"`
+	LemmaLike   string `json:"lemmaLike"`
+	LemmaRegexp string `json:"lemmaRegexp"`
 	// an SQL 'like' expression to match lemma readings
-	ReadingLike string `json:"readingLike"`
+	ReadingLike   string `json:"readingLike"`
+	ReadingRegexp string `json:"readingRegexp"`
 	// an SQL 'like' expression to match lemma paradigms
-	ParadigmLike string `json:"paradigmLike"`
+	ParadigmLike   string `json:"paradigmLike"`
+	ParadigmRegexp string `json:"paradigmRegexp"`
 	// the page returned by the SQL query's 'LIMIT' (starts at 1)
 	Page int64 `json:"page"`
 	// the page length of the SQL query's 'LIMIT'
@@ -44,21 +50,32 @@ func (q Query) Empty() bool {
 		return false
 	case strings.TrimSpace(q.WordLike) != "":
 		return false
+	case strings.TrimSpace(q.WordRegexp) != "":
+		return false
 	case len(q.EntryIDs) > 0:
 		return false
 	case strings.TrimSpace(q.TranscriptionLike) != "":
 		return false
+	case strings.TrimSpace(q.TranscriptionRegexp) != "":
+		return false
 	case strings.TrimSpace(q.PartOfSpeechLike) != "":
+		return false
+	case strings.TrimSpace(q.PartOfSpeechRegexp) != "":
 		return false
 	case len(q.Lemmas) > 0:
 		return false
 	case strings.TrimSpace(q.LemmaLike) != "":
 		return false
+	case strings.TrimSpace(q.LemmaRegexp) != "":
+		return false
 	case strings.TrimSpace(q.ReadingLike) != "":
+		return false
+	case strings.TrimSpace(q.ReadingRegexp) != "":
 		return false
 	case strings.TrimSpace(q.ParadigmLike) != "":
 		return false
-
+	case strings.TrimSpace(q.ParadigmRegexp) != "":
+		return false
 	}
 
 	//log.Printf("dbapi.EmptyQuery: query struct appears to lack any search constraint: %v", q)

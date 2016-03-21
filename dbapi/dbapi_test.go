@@ -2,10 +2,10 @@ package dbapi
 
 import (
 	"database/sql"
-	"github.com/mattn/go-sqlite3"
+	//"github.com/mattn/go-sqlite3"
 	"log"
 	"os"
-	"regexp"
+	//"regexp"
 	"testing"
 )
 
@@ -21,17 +21,9 @@ func Test_InsertEntries(t *testing.T) {
 	err := os.Remove("./testlex.db")
 	ff("failed to remove testlex.db : %v", err)
 
-	regex := func(re, s string) (bool, error) {
-		return regexp.MatchString(re, s)
-	}
-	sql.Register("sqlite3_with_go_func",
-		&sqlite3.SQLiteDriver{
-			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
-				return conn.RegisterFunc("regexp", regex, true)
-			},
-		})
+	Sqlite3WithRegex()
 
-	db, err := sql.Open("sqlite3_with_go_func", "./testlex.db")
+	db, err := sql.Open("sqlite3_with_regexp", "./testlex.db")
 	if err != nil {
 		log.Fatal(err)
 	}

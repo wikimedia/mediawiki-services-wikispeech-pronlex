@@ -13,10 +13,24 @@ import (
 	"database/sql"
 	"fmt"
 	// installs sqlite3 driver
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
+	"regexp"
 	"strconv"
 	"strings"
 )
+
+func Sqlite3WithRegex() {
+	regex := func(re, s string) (bool, error) {
+		//return regexp.MatchString(re, s)
+		return regexp.MatchString(re, s)
+	}
+	sql.Register("sqlite3_with_regexp",
+		&sqlite3.SQLiteDriver{
+			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
+				return conn.RegisterFunc("regexp", regex, true)
+			},
+		})
+}
 
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., Lexicon structs corresponding to the rows of the lexicon

@@ -102,18 +102,24 @@ func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 
 // TODO Gör konstanter som kan användas istället för strängar
 var knownParams = map[string]int{
-	"lexicons":          1,
-	"words":             1,
-	"lemmas":            1,
-	"wordlike":          1,
-	"transcriptionlike": 1,
-	"partofspeechlike":  1,
-	"lemmalike":         1,
-	"readinglike":       1,
-	"paradigmlike":      1,
-	"page":              1,
-	"pagelike":          1,
-	"pp":                1,
+	"lexicons":            1,
+	"words":               1,
+	"lemmas":              1,
+	"wordlike":            1,
+	"wordregexp":          1,
+	"transcriptionlike":   1,
+	"transcriptionregexp": 1,
+	"partofspeechlike":    1,
+	"partofspeechregexp":  1,
+	"lemmalike":           1,
+	"lemmaregexp":         1,
+	"readinglike":         1,
+	"readingregexp":       1,
+	"paradigmlike":        1,
+	"paradigmregexp":      1,
+	"page":                1,
+	"pagelength":          1,
+	"pp":                  1,
 }
 
 // TODO return error
@@ -127,11 +133,17 @@ func queryFromParams(r *http.Request) dbapi.Query {
 		regexp.MustCompile("[, ]").Split(r.FormValue("lemmas"), -1))
 
 	wordLike := strings.TrimSpace(r.FormValue("wordlike"))
+	wordRegexp := strings.TrimSpace(r.FormValue("wordregexp"))
 	transcriptionLike := strings.TrimSpace(r.FormValue("transcriptionlike"))
+	transcriptionRegexp := strings.TrimSpace(r.FormValue("transcriptionregexp"))
 	partOfSpeechLike := strings.TrimSpace(r.FormValue("partofspeechlike"))
+	partOfSpeechRegexp := strings.TrimSpace(r.FormValue("partofspeechregexp"))
 	lemmaLike := strings.TrimSpace(r.FormValue("lemmalike"))
+	lemmaRegexp := strings.TrimSpace(r.FormValue("lemmaregexp"))
 	readingLike := strings.TrimSpace(r.FormValue("readinglike"))
+	readingRegexp := strings.TrimSpace(r.FormValue("readingregexp"))
 	paradigmLike := strings.TrimSpace(r.FormValue("paradigmlike"))
+	paradigmRegexp := strings.TrimSpace(r.FormValue("paradigmregexp"))
 
 	page, err := strconv.ParseInt(r.FormValue("page"), 10, 64)
 	if err != nil {
@@ -148,17 +160,23 @@ func queryFromParams(r *http.Request) dbapi.Query {
 		log.Printf("GetLexicons failed : %v", err)
 	}
 	q := dbapi.Query{
-		Lexicons:          dbLexs,
-		Words:             words,
-		WordLike:          wordLike,
-		TranscriptionLike: transcriptionLike,
-		PartOfSpeechLike:  partOfSpeechLike,
-		Lemmas:            lemmas,
-		LemmaLike:         lemmaLike,
-		ReadingLike:       readingLike,
-		ParadigmLike:      paradigmLike,
-		Page:              page,
-		PageLength:        pageLength}
+		Lexicons:            dbLexs,
+		Words:               words,
+		WordLike:            wordLike,
+		WordRegexp:          wordRegexp,
+		TranscriptionLike:   transcriptionLike,
+		TranscriptionRegexp: transcriptionRegexp,
+		PartOfSpeechLike:    partOfSpeechLike,
+		PartOfSpeechRegexp:  partOfSpeechRegexp,
+		Lemmas:              lemmas,
+		LemmaLike:           lemmaLike,
+		LemmaRegexp:         lemmaRegexp,
+		ReadingLike:         readingLike,
+		ReadingRegexp:       readingRegexp,
+		ParadigmLike:        paradigmLike,
+		ParadigmRegexp:      paradigmRegexp,
+		Page:                page,
+		PageLength:          pageLength}
 
 	return q
 }
@@ -183,6 +201,9 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := queryFromParams(r)
+
+	log.Printf("lexlookup db query : %v", q)
+
 	res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
 	if err != nil {
 		log.Printf("lexserver: Failed to get entries: %v", err)
@@ -286,7 +307,9 @@ func main() {
 	_, err = os.Stat(dbFile)
 	ff("lexserver: Cannot find db file. %v", err)
 
-	db, err = sql.Open("sqlite3", dbFile)
+	dbapi.Sqlite3WithRegex()
+
+	db, err = sql.Open("sqlite3_with_regexp", dbFile)
 	ff("Failed to open dbfile %v", err)
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	ff("Failed to exec PRAGMA call %v", err)

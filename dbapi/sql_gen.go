@@ -95,7 +95,7 @@ func words(q Query) (string, []interface{}) {
 
 	// You must study the Query struct to understand this
 
-	if len(q.Words) == 0 && trm(q.WordLike) == "" && trm(q.PartOfSpeechLike) == "" && len(q.EntryIDs) == 0 {
+	if len(q.Words) == 0 && trm(q.WordLike) == "" && trm(q.WordRegexp) == "" && trm(q.PartOfSpeechLike) == "" && trm(q.PartOfSpeechRegexp) == "" && len(q.EntryIDs) == 0 {
 		return res, resv
 	} //else {
 	if len(q.Words) > 0 {
@@ -110,9 +110,18 @@ func words(q Query) (string, []interface{}) {
 		res += "entry.strn like ? "
 		resv = append(resv, q.WordLike)
 	}
+	if trm(q.WordRegexp) != "" {
+		res += "entry.strn REGEXP ? "
+		resv = append(resv, q.WordRegexp)
+	}
+
 	if trm(q.PartOfSpeechLike) != "" {
 		res += "entry.partofspeech like ? "
 		resv = append(resv, q.PartOfSpeechLike)
+	}
+	if trm(q.PartOfSpeechRegexp) != "" {
+		res += "entry.partofspeech REGEXP ? "
+		resv = append(resv, q.PartOfSpeechRegexp)
 	}
 
 	//}
@@ -128,7 +137,9 @@ func lemmas(q Query) (string, []interface{}) {
 	var res string
 	var resv []interface{}
 
-	if len(q.Lemmas) == 0 && trm(q.LemmaLike) == "" && trm(q.ReadingLike) == "" && trm(q.ParadigmLike) == "" {
+	if len(q.Lemmas) == 0 && trm(q.LemmaLike) == "" && trm(q.LemmaRegexp) == "" &&
+		trm(q.ReadingLike) == "" && trm(q.ReadingRegexp) == "" &&
+		trm(q.ParadigmLike) == "" && trm(q.ParadigmRegexp) == "" {
 		return res, resv
 	}
 	if len(q.Lemmas) > 0 {
@@ -139,13 +150,26 @@ func lemmas(q Query) (string, []interface{}) {
 		res += "lemma.strn like ? "
 		resv = append(resv, q.LemmaLike)
 	}
+	if trm(q.LemmaRegexp) != "" {
+		res += "lemma.strn REGEXP ? "
+		resv = append(resv, q.LemmaRegexp)
+	}
+
 	if trm(q.ReadingLike) != "" {
 		res += "lemma.reading like ? "
 		resv = append(resv, q.ReadingLike)
 	}
+	if trm(q.ReadingRegexp) != "" {
+		res += "lemma.reading REGEXP ? "
+		resv = append(resv, q.ReadingRegexp)
+	}
 	if trm(q.ParadigmLike) != "" {
 		res += "lemma.paradigm like ? "
 		resv = append(resv, q.ParadigmLike)
+	}
+	if trm(q.ParadigmRegexp) != "" {
+		res += "lemma.paradigm REGEXP ? "
+		resv = append(resv, q.ParadigmRegexp)
 	}
 
 	res += " and lemma.id = lemma2entry.lemmaid and entry.id = lemma2entry.entryid "
@@ -154,19 +178,19 @@ func lemmas(q Query) (string, []interface{}) {
 }
 
 func transcriptions(q Query) (string, []interface{}) {
-	// TODO ?
-	// The link between entry.id and transcription.entryid
-	// is already established elsewhere, since every entry is supposed to have at least one transcription.
-	// This assumption may have to change, if we want an entry to be able to have zero transcriptions
+
 	var res string
 	var resv []interface{}
-	t := trm(q.TranscriptionLike)
-	if "" == t {
-		return res, resv
+
+	if trm(q.TranscriptionLike) != "" {
+		res += "transcription.strn LIKE ? "
+		resv = append(resv, q.ParadigmLike)
 	}
 
-	res += "transcription.strn like ?"
-	resv = append(resv, t)
+	if trm(q.ParadigmRegexp) != "" {
+		res += "transcription.strn REGEXP ? "
+		resv = append(resv, q.ParadigmRegexp)
+	}
 
 	return res, resv
 }
@@ -210,13 +234,13 @@ func SelectEntriesSQL(q Query) (string, []interface{}) {
 	// Query.Lexicons
 	l, lv := lexicons(q)
 	args = append(args, lv...)
-	// Query.Words, Query.WordsLike, Query.PartOfSpeechLike
+	// Query.Words, Query.WordsLike, Query.PartOfSpeechLike, Query.WordsRegexp, Query.PartOfSpeechRegexp
 	w, wv := words(q)
 	args = append(args, wv...)
-	// Query.Lemmas, Query.LemmaLike, Query.ReadingLike, Query.ParadigmLike
+	// Query.Lemmas, Query.LemmaLike, Query.ReadingLike, Query.ParadigmLike, Query.LemmaRegexp, Query.ReadingRegexp, Query.ParadigmRegexp
 	le, lev := lemmas(q)
 	args = append(args, lev...)
-	// Query.TranscriptionLike
+	// Query.TranscriptionLike, Query.TranscriptionRegexp
 	t, tv := transcriptions(q) // V2 simply returns 'transkription.strn like ?' + param value
 	args = append(args, tv...)
 
