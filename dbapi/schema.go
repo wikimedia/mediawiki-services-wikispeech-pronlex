@@ -39,18 +39,24 @@ CREATE TABLE Entry (
     language varchar(128) not null,
     strn varchar(128) not null,
     lexiconId integer not null,
-    partOfSpeech varchar(128)
-  ,
+    partOfSpeech varchar(128),
 foreign key (lexiconId) references Lexicon(id));
 CREATE INDEX idx28d70584 on Entry (language);
 CREATE INDEX idx15890407 on Entry (strn);
+CREATE TABLE EntryValidation (
+    id integer not null primary key autoincrement,
+    entryid integer not null,
+    name varchar(128) not null,
+    message varchar(128) not null,
+    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
+    foreign key (entryId) references Entry(id) on delete cascade);
 CREATE TABLE EntryStatus (
     name varchar(128) not null,
     source varchar(128) not null,
     entryId integer not null,
-    timestamp timestamp not null,
-    id integer not null primary key autoincrement
-  ,
+    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null, -- timestamp timestamp not null,
+    current boolean default 0 not null,
+    id integer not null primary key autoincrement,
 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE TABLE Transcription (
     entryId integer not null,
@@ -59,16 +65,14 @@ CREATE TABLE Transcription (
     -- symbolSetCode varchar(128) not null,
     id integer not null primary key autoincrement,
     language varchar(128) not null,
-    strn varchar(128) not null
-  ,
+    strn varchar(128) not null,
 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE TABLE TranscriptionStatus (
     name varchar(128) not null,
     source varchar(128) not null,
     timestamp timestamp not null,
     transcriptionId integer not null,
-    id integer not null primary key autoincrement
-  ,
+    id integer not null primary key autoincrement,
 foreign key (transcriptionId) references Transcription(id) on delete cascade);
 CREATE TABLE Lemma2Entry (
     entryId bigint not null,
@@ -81,8 +85,7 @@ CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId); -- NL20160309
 CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 CREATE TABLE SurfaceForm2Entry (
     entryId bigint not null,
-    surfaceFormId bigint not null
-  ,
+    surfaceFormId bigint not null,
 unique(surfaceFormId,entryId));
 CREATE UNIQUE INDEX idx8bc90a52 on Symbolset (lexiconId,symbol);
 CREATE INDEX idx4a250778 on Entry (strn,language);
