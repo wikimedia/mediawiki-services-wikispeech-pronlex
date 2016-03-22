@@ -767,7 +767,7 @@ var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = 
 
 //var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
-// TODO always insert new status, or only when name and source have changed?
+// TODO always insert new status, or only when name and source have changed. Or...?
 func updateEntryStatus(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 	if trm(e.EntryStatus.Name) != "" {
 		_, err := tx.Exec(statusSetCurrentFalse, dbE.ID)
@@ -775,7 +775,7 @@ func updateEntryStatus(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error)
 			tx.Rollback()
 			return false, fmt.Errorf("failed EntryStatus.Current update : %v", err)
 		}
-		_, err = tx.Exec(insertStatus, dbE.ID, e.EntryStatus.Name, e.EntryStatus.Source)
+		_, err = tx.Exec(insertStatus, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
 		if err != nil {
 			tx.Rollback()
 			return false, fmt.Errorf("failed EntryStatus update : %v", err)
