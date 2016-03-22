@@ -318,7 +318,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 			// 	tx.Rollback()
 			// 	return ids, fmt.Errorf("updating EntryStatus.Current failed : %v", err)
 			// }
-			_, err = tx.Exec(insertStatus, e.ID, e.EntryStatus.Name, e.EntryStatus.Source) //, e.EntryStatus.Current) // TODO?
+			_, err = tx.Exec(insertStatus, e.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source)) //, e.EntryStatus.Current) // TODO?
 			if err != nil {
 				tx.Rollback()
 				return ids, fmt.Errorf("inserting EntryStatus failed : %v", err)
