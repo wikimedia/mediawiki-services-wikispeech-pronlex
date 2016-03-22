@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-var fs = "Xpctd:\t'%v' got:\t'%v'"
+var fs = "Wanted: '%v' got: '%v'"
 
 func TestSql_RemoveEmptyStrings(t *testing.T) {
 	ss := []string{"", "a", ""}

@@ -640,10 +640,12 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 	if err != nil {
 		return updated4, err
 	}
+	updated5, err := updateEntryStatus(tx, e, dbEntries[0])
+	if err != nil {
+		return updated5, err
+	}
 
-	// TODO update EntryStatus
-
-	return updated1 || updated2 || updated3 || updated4, err
+	return updated1 || updated2 || updated3 || updated4 || updated5, err
 }
 
 func getTIDs(ts []Transcription) []int64 {
@@ -669,6 +671,7 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 
 func updateLanguage(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 	if e.ID != dbE.ID {
+		tx.Rollback()
 		return false, fmt.Errorf("new and old entries have different ids")
 	}
 	if e.Language == dbE.Language {
@@ -684,6 +687,7 @@ func updateLanguage(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 
 func updateWordParts(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 	if e.ID != dbE.ID {
+		tx.Rollback()
 		return false, fmt.Errorf("new and old entries have different ids")
 	}
 	if e.WordParts == dbE.WordParts {
@@ -757,6 +761,30 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 	}
 	// Nothing happened
 	return false, err
+}
+
+var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = ?"
+
+//var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
+
+// TODO always insert new status, or only when name and source have changed?
+func updateEntryStatus(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+	if trm(e.EntryStatus.Name) != "" {
+		_, err := tx.Exec(statusSetCurrentFalse, dbE.ID)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("failed EntryStatus.Current update : %v", err)
+		}
+		_, err = tx.Exec(insertStatus, dbE.ID, e.EntryStatus.Name, e.EntryStatus.Source)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("failed EntryStatus update : %v", err)
+		}
+
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func unique(ns []int64) []int64 {

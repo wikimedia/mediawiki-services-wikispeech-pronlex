@@ -66,7 +66,7 @@ func Test_InsertEntries(t *testing.T) {
 		WordParts:      "apa",
 		Language:       "XYZZ",
 		Transcriptions: []Transcription{t1, t2},
-		EntryStatus:    EntryStatus{Name: "ok", Source: "tst"}}
+		EntryStatus:    EntryStatus{Name: "old", Source: "tst"}}
 
 	_, errx := InsertEntries(db, l, []Entry{e1})
 	if errx != nil {
@@ -156,6 +156,8 @@ func Test_InsertEntries(t *testing.T) {
 	t10 := Transcription{Strn: "A: p A:", Language: "Apo"}
 	t20 := Transcription{Strn: "a p a", Language: "Sweinsprach"}
 	t30 := Transcription{Strn: "a pp a", Language: "Mysko"}
+	// add new EntryStatus
+	ees0.EntryStatus = EntryStatus{Name: "new", Source: "tst"}
 
 	ees0.Transcriptions = []Transcription{t10, t20, t30}
 
@@ -169,11 +171,15 @@ func Test_InsertEntries(t *testing.T) {
 	}
 
 	eApa, err := GetEntryFromID(db, ees0.ID)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(eApa.Transcriptions) != 3 {
 		t.Errorf(fs, 3, len(eApa.Transcriptions))
 	}
-	if err != nil {
-		t.Errorf(fs, nil, err)
+
+	if got, want := eApa.EntryStatus.Name, "new"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
 	eApa.Lemma.Strn = "tjubba"
