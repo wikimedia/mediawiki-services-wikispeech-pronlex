@@ -57,7 +57,11 @@ CREATE TABLE EntryStatus (
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
     current boolean default 1 not null,
     id integer not null primary key autoincrement,
-foreign key (entryId) references Entry(id) on delete cascade);
+    UNIQUE(entryId,id),
+    foreign key (entryId) references Entry(id) on delete cascade);
+CREATE INDEX esn ON EntryStatus (name);
+CREATE INDEX ess ON EntryStatus (source);
+CREATE INDEX esc ON EntryStatus (current);
 CREATE TABLE Transcription (
     entryId integer not null,
     preference int,
