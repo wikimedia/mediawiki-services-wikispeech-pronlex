@@ -55,7 +55,7 @@ func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
 	}
-	w.Header().Set("Content-Type", "application/javascript") // TODO Behövs denna?
+	w.Header().Set("Content-Type", "application/javascript; charset-utf8")
 	fmt.Fprint(w, string(jsn))
 }
 
@@ -81,6 +81,7 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/javascript; charset-utf8")
 	fmt.Fprint(w, string(jsn))
 }
 
@@ -218,8 +219,8 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/javascript") // TODO Behövs denna?
-	fmt.Fprint(w, string(jsn))                               // TODO should not be called if error occurs?
+	w.Header().Set("Content-Type", "application/javascript; charset-utf8")
+	fmt.Fprint(w, string(jsn)) // TODO should not be called if error occurs?
 }
 
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {

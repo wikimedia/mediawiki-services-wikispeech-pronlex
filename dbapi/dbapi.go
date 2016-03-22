@@ -436,6 +436,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&transcriptionStrn,
 			&transcriptionLanguage,
 
+			// Optional
 			&lemmaID,
 			&lemmaStrn,
 			&lemmaReading,
@@ -457,7 +458,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				PartOfSpeech: partOfSpeech,
 				WordParts:    wordParts,
 			}
-			if lemmaStrn.Valid {
+			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
 				l := Lemma{Strn: lemmaStrn.String}
 				if lemmaID.Valid {
 					l.ID = lemmaID.Int64
@@ -488,9 +489,10 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 	// mustn't forget last entry, or lexicon will shrink by one
 	// entry for each export/import...
 	//	fmt.Fprintf(out, "%v\n", currE)
-
-	out.Write(currE)
-
+	// but only print last entry if there were any entries...
+	if lastE > -1 {
+		out.Write(currE)
+	}
 	if rows.Err() != nil {
 		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return rows.Err()
