@@ -65,10 +65,13 @@ func Test_InsertEntries(t *testing.T) {
 		PartOfSpeech:   "NN",
 		WordParts:      "apa",
 		Language:       "XYZZ",
-		Transcriptions: []Transcription{t1, t2}}
+		Transcriptions: []Transcription{t1, t2},
+		EntryStatus:    EntryStatus{Name: "ok", Source: "tst"}}
 
-	InsertEntries(db, l, []Entry{e1})
-
+	_, errx := InsertEntries(db, l, []Entry{e1})
+	if errx != nil {
+		t.Errorf(fs, "nil", errx)
+	}
 	// Check that there are things in db:
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
@@ -77,8 +80,8 @@ func Test_InsertEntries(t *testing.T) {
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
-	if len(entries) != 1 {
-		t.Errorf(fs, 1, len(entries))
+	if got, want := len(entries), 1; got != want {
+		t.Errorf(fs, got, want)
 	}
 
 	for _, e := range entries {

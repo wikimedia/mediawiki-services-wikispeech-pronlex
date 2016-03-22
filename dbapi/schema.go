@@ -55,7 +55,7 @@ CREATE TABLE EntryStatus (
     source varchar(128) not null,
     entryId integer not null,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
-    current boolean default 0 not null,
+    current boolean default 1 not null,
     id integer not null primary key autoincrement,
 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE TABLE Transcription (

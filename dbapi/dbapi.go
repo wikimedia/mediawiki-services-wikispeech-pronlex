@@ -236,13 +236,16 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 	return Lexicon{ID: id, Name: strings.ToLower(l.Name), SymbolSetName: l.SymbolSetName}, err
 }
 
+// TODO move to function?
+var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
+var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
+
+//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
+var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
+
 // InsertEntries saves a list of Entries and associates them to Lexicon
 // TODO change input arg to sql.Tx
 func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
-
-	// TODO move to function
-	var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
-	var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
 
 	var ids []int64
 	// Transaction -->
@@ -304,6 +307,21 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 			if err != nil {
 				tx.Rollback()
 				return ids, fmt.Errorf("Failed lemma to entry assoc: %v", err)
+			}
+		}
+		if trm(e.EntryStatus.Name) != "" {
+			//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
+			//var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
+
+			// _, err := tx.Exec(statusSetCurrentFalse, e.ID)
+			// if err != nil {
+			// 	tx.Rollback()
+			// 	return ids, fmt.Errorf("updating EntryStatus.Current failed : %v", err)
+			// }
+			_, err = tx.Exec(insertStatus, e.ID, e.EntryStatus.Name, e.EntryStatus.Source) //, e.EntryStatus.Current) // TODO?
+			if err != nil {
+				tx.Rollback()
+				return ids, fmt.Errorf("inserting EntryStatus failed : %v", err)
 			}
 		}
 	}
@@ -488,6 +506,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				currE.Lemma = l
 			}
 
+			// TODO Only add once per Entry as long as single status?
 			// TODO probably should be a slice of statuses?
 			if entryStatusID.Valid && entryStatusName.Valid && trm(entryStatusName.String) != "" {
 				es := EntryStatus{ID: entryStatusID.Int64, Name: entryStatusName.String}
@@ -500,6 +519,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				if entryStatusCurrent.Valid {
 					es.Current = entryStatusCurrent.Bool
 				}
+				currE.EntryStatus = es
 			}
 		}
 		// transcriptions ordered by id so they will be added
@@ -620,6 +640,8 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 	if err != nil {
 		return updated4, err
 	}
+
+	// TODO update EntryStatus
 
 	return updated1 || updated2 || updated3 || updated4, err
 }

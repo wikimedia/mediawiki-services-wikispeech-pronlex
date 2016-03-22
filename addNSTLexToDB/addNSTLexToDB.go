@@ -74,6 +74,8 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		// initial status
+		e.EntryStatus = dbapi.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {
