@@ -113,11 +113,12 @@ type Lemma struct {
 }
 
 type EntryStatus struct {
-	ID        int64  `json:"id"`
-	Name      string `json:"name"`
-	Source    string `json:"source"`
-	EntryID   int64  `json:"entryId"`
-	Timestamp int64  `json:"timestamp"`
+	ID      int64  `json:"id"`
+	Name    string `json:"name"`
+	Source  string `json:"source"`
+	EntryID int64  `json:"entryId"`
+	//Timestamp int64  `json:"timestamp"`
+	Timestamp string `json:"timestamp"`
 	Current   bool   `json:"current"`
 }
 

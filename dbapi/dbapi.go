@@ -425,7 +425,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
 	var entryStatusID sql.NullInt64
 	var entryStatusName, entryStatusSource sql.NullString
-	var entryStatusTimestamp sql.NullInt64
+	var entryStatusTimestamp sql.NullString //sql.NullInt64
 	var entryStatusCurrent sql.NullBool
 
 	var currE Entry
@@ -495,7 +495,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 					es.Source = entryStatusSource.String
 				}
 				if entryStatusTimestamp.Valid {
-					es.Timestamp = entryStatusTimestamp.Int64
+					es.Timestamp = entryStatusTimestamp.String
 				}
 				if entryStatusCurrent.Valid {
 					es.Current = entryStatusCurrent.Bool
