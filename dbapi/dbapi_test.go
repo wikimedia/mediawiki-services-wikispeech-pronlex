@@ -198,15 +198,15 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "gummiapa", eApax.Language)
 	}
 
-	rezz, err := db.Query("select entry.strn from entry where strn regexp '^a'")
-	if err != nil {
-		log.Fatalf("Agh: %v", err)
-	}
-	var strn string
-	for rezz.Next() {
-		rezz.Scan(&strn)
-		log.Printf(">>> %s", strn)
-	}
+	// rezz, err := db.Query("select entry.strn from entry where strn regexp '^a'")
+	// if err != nil {
+	// 	log.Fatalf("Agh: %v", err)
+	// }
+	// var strn string
+	// for rezz.Next() {
+	// 	rezz.Scan(&strn)
+	// 	log.Printf(">>> %s", strn)
+	// }
 
 }
 

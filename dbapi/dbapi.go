@@ -414,10 +414,19 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
 	var lexiconID, entryID int64
 	var entryStrn, entryLanguage, partOfSpeech, wordParts string
+
 	var transcriptionID, transcriptionEntryID int64
 	var transcriptionStrn, transcriptionLanguage string
+
+	// Optional/nullable values
+
 	var lemmaID sql.NullInt64
 	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
+
+	var entryStatusID sql.NullInt64
+	var entryStatusName, entryStatusSource sql.NullString
+	var entryStatusTimestamp sql.NullInt64
+	var entryStatusCurrent sql.NullBool
 
 	var currE Entry
 	var lastE int64
@@ -437,10 +446,17 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&transcriptionLanguage,
 
 			// Optional
+
 			&lemmaID,
 			&lemmaStrn,
 			&lemmaReading,
 			&lemmaParadigm,
+
+			&entryStatusID,
+			&entryStatusName,
+			&entryStatusSource,
+			&entryStatusTimestamp,
+			&entryStatusCurrent,
 		)
 		// new entry starts here.
 		// print last entry.
@@ -470,6 +486,20 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 					l.Paradigm = lemmaParadigm.String
 				}
 				currE.Lemma = l
+			}
+
+			// TODO probably should be a slice of statuses?
+			if entryStatusID.Valid && entryStatusName.Valid && trm(entryStatusName.String) != "" {
+				es := EntryStatus{ID: entryStatusID.Int64, Name: entryStatusName.String}
+				if entryStatusSource.Valid {
+					es.Source = entryStatusSource.String
+				}
+				if entryStatusTimestamp.Valid {
+					es.Timestamp = entryStatusTimestamp.Int64
+				}
+				if entryStatusCurrent.Valid {
+					es.Current = entryStatusCurrent.Bool
+				}
 			}
 		}
 		// transcriptions ordered by id so they will be added

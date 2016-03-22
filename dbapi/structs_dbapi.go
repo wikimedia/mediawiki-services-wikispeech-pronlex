@@ -104,6 +104,23 @@ type Lexicon struct {
 	SymbolSetName string `json:"symbolSetName"`
 }
 
+// Lemma corresponds to a row of the lemma db table
+type Lemma struct {
+	ID       int64  `json:"id"`
+	Strn     string `json:"strn"`
+	Reading  string `json:"reading"`
+	Paradigm string `json:"paradigm"`
+}
+
+type EntryStatus struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	Source    string `json:"source"`
+	EntryID   int64  `json:"entryId"`
+	Timestamp int64  `json:"timestamp"`
+	Current   bool   `json:"current"`
+}
+
 // Transcription corresponds to the transcription db table
 type Transcription struct {
 	ID       int64  `json:"id"`
@@ -132,6 +149,7 @@ type Entry struct {
 	WordParts      string          `json:"wordParts"`
 	Lemma          Lemma           `json:"lemma"`
 	Transcriptions []Transcription `json:"transcriptions"`
+	EntryStatus    EntryStatus     `json:"status"` // TODO Probably should be a slice of statuses?
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.
@@ -169,14 +187,6 @@ type EntrySliceWriter struct {
 func (w *EntrySliceWriter) Write(e Entry) error {
 	w.Entries = append(w.Entries, e)
 	return nil // fmt.Errorf("not implemented")
-}
-
-// Lemma corresponds to a row of the lemma db table
-type Lemma struct {
-	ID       int64  `json:"id"` // Är noll ett pålitligt 'None'-värde? Dvs börjar databaser alltid räkna från 1?
-	Strn     string `json:"strn"`
-	Reading  string `json:"reading"`
-	Paradigm string `json:"paradigm"`
 }
 
 // Symbol corresponds to the symbol db table, and holds a phonetic
