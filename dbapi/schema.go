@@ -61,7 +61,8 @@ CREATE TABLE EntryStatus (
     foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX esn ON EntryStatus (name);
 CREATE INDEX ess ON EntryStatus (source);
-CREATE INDEX esc ON EntryStatus (current);
+-- CREATE INDEX esc ON EntryStatus (current);
+CREATE UNIQUE INDEX eseii ON EntryStatus  (entryId, id);
 CREATE TABLE Transcription (
     entryId integer not null,
     preference int,

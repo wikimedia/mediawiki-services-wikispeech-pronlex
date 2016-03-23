@@ -446,6 +446,11 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 	var entryStatusTimestamp sql.NullString //sql.NullInt64
 	var entryStatusCurrent sql.NullBool
 
+	// transcription ids read so far, in ordet not to add same trans twice
+	transIDs := make(map[int64]int)
+	// entry validation ids read so far, in ordet not to add same validation twice
+	//valiIDs := make(map[int64]int)
+
 	var currE Entry
 	var lastE int64
 	lastE = -1
@@ -477,7 +482,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&entryStatusCurrent,
 		)
 		// new entry starts here.
-		// print last entry.
+		//
 		// all rows with same entryID belongs to the same entry.
 		// rows ordered by entryID
 		if lastE != entryID {
@@ -492,6 +497,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				PartOfSpeech: partOfSpeech,
 				WordParts:    wordParts,
 			}
+			// max one lemma per entry
 			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
 				l := Lemma{Strn: lemmaStrn.String}
 				if lemmaID.Valid {
@@ -508,6 +514,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
 			// TODO Only add once per Entry as long as single status?
 			// TODO probably should be a slice of statuses?
+			// TODO now checks for current = true before adding to Entry
 			if entryStatusID.Valid && entryStatusName.Valid && trm(entryStatusName.String) != "" {
 				es := EntryStatus{ID: entryStatusID.Int64, Name: entryStatusName.String}
 				if entryStatusSource.Valid {
@@ -519,19 +526,28 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				if entryStatusCurrent.Valid {
 					es.Current = entryStatusCurrent.Bool
 				}
-				currE.EntryStatus = es
+				// only update the Entry with status if current = true
+				if entryStatusCurrent.Valid && entryStatusCurrent.Bool {
+					currE.EntryStatus = es
+				}
 			}
 		}
 		// transcriptions ordered by id so they will be added
 		// in correct order
-		currT := Transcription{
-			ID:       transcriptionID,
-			EntryID:  transcriptionEntryID,
-			Strn:     transcriptionStrn,
-			Language: transcriptionLanguage,
-		}
+		// Only add transcriptions that are !ok, i.e. not added already
+		if _, ok := transIDs[transcriptionID]; !ok {
+			currT := Transcription{
+				ID:       transcriptionID,
+				EntryID:  transcriptionEntryID,
+				Strn:     transcriptionStrn,
+				Language: transcriptionLanguage,
+			}
 
-		currE.Transcriptions = append(currE.Transcriptions, currT)
+			currE.Transcriptions = append(currE.Transcriptions, currT)
+			transIDs[transcriptionID]++
+		}
+		// TODO
+		// zero or more EntryValidations
 
 		lastE = entryID
 	}

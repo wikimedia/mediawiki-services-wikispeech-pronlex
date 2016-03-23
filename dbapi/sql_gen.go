@@ -224,8 +224,12 @@ var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.pa
 FROM lexicon, entry, transcription 
 LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id 
 LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid 
-LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1 
+LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1
+LEFT JOIN entryvalidation ON entryvalidation.entryid = entry.id 
 WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid ` // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+
+// TODO Why does the following criterion slow it down so much?!
+// //AND entrystatus.current = 1
 
 // SelectEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,

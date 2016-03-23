@@ -122,6 +122,13 @@ type EntryStatus struct {
 	Current   bool   `json:"current"`
 }
 
+type EntryValidation struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	Message   string `json:"name"`
+	Timestamp string `json:"timestamp"`
+}
+
 // Transcription corresponds to the transcription db table
 type Transcription struct {
 	ID       int64  `json:"id"`
@@ -142,15 +149,16 @@ func (a TranscriptionSlice) Less(i, j int) bool { return a[i].ID < a[j].ID }
 // the entry db table, since it contains data also from associated
 // tabled (Lemma, Transcription)
 type Entry struct {
-	ID             int64           `json:"id"`
-	LexiconID      int64           `json:"lexiconId"`
-	Strn           string          `json:"strn"`
-	Language       string          `json:"language"`
-	PartOfSpeech   string          `json:"partOfSpeech"`
-	WordParts      string          `json:"wordParts"`
-	Lemma          Lemma           `json:"lemma"`
-	Transcriptions []Transcription `json:"transcriptions"`
-	EntryStatus    EntryStatus     `json:"status"` // TODO Probably should be a slice of statuses?
+	ID              int64             `json:"id"`
+	LexiconID       int64             `json:"lexiconId"`
+	Strn            string            `json:"strn"`
+	Language        string            `json:"language"`
+	PartOfSpeech    string            `json:"partOfSpeech"`
+	WordParts       string            `json:"wordParts"`
+	Lemma           Lemma             `json:"lemma"`
+	Transcriptions  []Transcription   `json:"transcriptions"`
+	EntryStatus     EntryStatus       `json:"status"` // TODO Probably should be a slice of statuses?
+	EntryValidation []EntryValidation `json:"entryValidation"`
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.
