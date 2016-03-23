@@ -532,6 +532,8 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				}
 			}
 		}
+		// Things that may appear in several rows of a single Entry below:
+
 		// transcriptions ordered by id so they will be added
 		// in correct order
 		// Only add transcriptions that are !ok, i.e. not added already
