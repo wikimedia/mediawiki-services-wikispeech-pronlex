@@ -219,8 +219,10 @@ func ToLower(ss []string) []string {
 	return res
 }
 
+// This is not sane.
+
 // Queries db for all entries with transcriptions and optional lemma forms.
-var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current  
+var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp
 FROM lexicon, entry, transcription 
 LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id 
 LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid 

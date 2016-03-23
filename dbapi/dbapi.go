@@ -446,10 +446,13 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 	var entryStatusTimestamp sql.NullString //sql.NullInt64
 	var entryStatusCurrent sql.NullBool
 
-	// transcription ids read so far, in ordet not to add same trans twice
+	var entryValidationID sql.NullInt64
+	var entryValidationName, entryValidationMessage, entryValidationTimestamp sql.NullString
+
+	// transcription ids read so far, in order not to add same trans twice
 	transIDs := make(map[int64]int)
-	// entry validation ids read so far, in ordet not to add same validation twice
-	//valiIDs := make(map[int64]int)
+	// entry validation ids read so far, in order not to add same validation twice
+	valiIDs := make(map[int64]int)
 
 	var currE Entry
 	var lastE int64
@@ -468,7 +471,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&transcriptionStrn,
 			&transcriptionLanguage,
 
-			// Optional
+			// Optional/nullable
 
 			&lemmaID,
 			&lemmaStrn,
@@ -480,6 +483,11 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&entryStatusSource,
 			&entryStatusTimestamp,
 			&entryStatusCurrent,
+
+			&entryValidationID,
+			&entryValidationName,
+			&entryValidationMessage,
+			&entryValidationTimestamp,
 		)
 		// new entry starts here.
 		//
@@ -548,9 +556,21 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			currE.Transcriptions = append(currE.Transcriptions, currT)
 			transIDs[transcriptionID]++
 		}
-		// TODO
+
 		// zero or more EntryValidations
 
+		if entryValidationID.Valid && entryValidationName.Valid && entryValidationMessage.Valid && entryValidationTimestamp.Valid {
+			if _, ok := valiIDs[entryValidationID.Int64]; !ok {
+				currV := EntryValidation{
+					ID:        entryValidationID.Int64,
+					Name:      entryValidationName.String,
+					Message:   entryValidationMessage.String,
+					Timestamp: entryValidationTimestamp.String,
+				}
+				currE.EntryValidations = append(currE.EntryValidations, currV)
+				valiIDs[entryValidationID.Int64]++
+			}
+		}
 		lastE = entryID
 	}
 
@@ -625,6 +645,7 @@ func UpdateEntry(db *sql.DB, e Entry) (updated bool, err error) { // TODO return
 	return UpdateEntryTx(tx, e)
 }
 
+// TODO update EntryValidation
 // UpdateEntryTx updates the fields of an Entry that do not match the
 // corresponding values in the db
 func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
@@ -662,6 +683,8 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 	if err != nil {
 		return updated5, err
 	}
+
+	// TODO updateEntryValidation
 
 	return updated1 || updated2 || updated3 || updated4 || updated5, err
 }
