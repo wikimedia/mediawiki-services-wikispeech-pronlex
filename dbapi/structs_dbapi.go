@@ -158,7 +158,7 @@ type Entry struct {
 	Lemma            Lemma             `json:"lemma"`
 	Transcriptions   []Transcription   `json:"transcriptions"`
 	EntryStatus      EntryStatus       `json:"status"` // TODO Probably should be a slice of statuses?
-	EntryValidations []EntryValidation `json:"entryValidation"`
+	EntryValidations []EntryValidation `json:"entryValidations"`
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.
