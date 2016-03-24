@@ -4,7 +4,7 @@ package validation
 import "github.com/stts-se/pronlex/dbapi"
 
 /*
-Result is a validation result with an arbitrary
+Result is a validation result with the following fields:
 	Name - arbitrary string
 	Level - typically indicating severity (e.g. Info/Warning/Fatal/Format)
 	Message - arbitrary string
