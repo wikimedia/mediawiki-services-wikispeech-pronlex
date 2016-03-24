@@ -5,14 +5,14 @@ import "github.com/stts-se/pronlex/dbapi"
 
 /*
 Result is a validation result with the following fields:
-	Name - arbitrary string
+	RuleName - arbitrary string
 	Level - typically indicating severity (e.g. Info/Warning/Fatal/Format)
 	Message - arbitrary string
 */
 type Result struct {
-	Name    string
-	Level   string
-	Message string
+	RuleName string
+	Level    string
+	Message  string
 }
 
 // Rule interface. To create a validation.Rule, make a struct implementing Validate(dbapi.Entry) []Result
