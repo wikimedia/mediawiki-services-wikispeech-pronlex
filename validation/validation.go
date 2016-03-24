@@ -1,3 +1,4 @@
+// Package validation is used to validate entries (transcriptions, language labels, pos tags, etc)
 package validation
 
 import "github.com/stts-se/pronlex/dbapi"
