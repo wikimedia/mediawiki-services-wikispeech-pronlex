@@ -324,7 +324,12 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 				return ids, fmt.Errorf("inserting EntryStatus failed : %v", err)
 			}
 		}
-		// TODO insert EntryValidation
+
+		err = insertEntryValidations(tx, e, e.EntryValidations)
+		if err != nil {
+			tx.Rollback()
+			return ids, fmt.Errorf("inserting EntryValidations failed : %v", err)
+		}
 	}
 
 	tx.Commit()
@@ -558,8 +563,10 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			transIDs[transcriptionID]++
 		}
 
+		if currE.EntryValidations == nil {
+			currE.EntryValidations = []EntryValidation{}
+		}
 		// zero or more EntryValidations
-
 		if entryValidationID.Valid && entryValidationName.Valid && entryValidationMessage.Valid && entryValidationTimestamp.Valid {
 			if _, ok := valiIDs[entryValidationID.Int64]; !ok {
 				currV := EntryValidation{
@@ -868,18 +875,26 @@ func newValidations(e1 Entry, e2 Entry) ([]EntryValidation, []EntryValidation) {
 
 var insVali = "INSERT INTO entryvalidation (entryid, name, message) values (?, ?, ?)"
 
-func updateEntryValidation(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+func insertEntryValidations(tx *sql.Tx, e Entry, eValis []EntryValidation) error {
+	for _, v := range eValis {
+		_, err := tx.Exec(insVali, e.ID, v.Name, v.Message)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to insert EntryValidation : %v", err)
+		}
+	}
+	return nil
+}
+
+func updateEntryValidation(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 	newValidations, removeValidations := newValidations(e, dbE)
 	if len(newValidations) == 0 && len(removeValidations) == 0 {
 		return false, nil
 	}
 
-	for _, v := range newValidations {
-		_, err := tx.Exec(insVali, dbE.ID, v.Name, v.Message)
-		if err != nil {
-			tx.Rollback()
-			return false, fmt.Errorf("failed to insert EntryValidation : %v", err)
-		}
+	err := insertEntryValidations(tx, dbE, newValidations)
+	if err != nil {
+		return false, err
 	}
 
 	for _, v := range removeValidations {
