@@ -324,6 +324,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 				return ids, fmt.Errorf("inserting EntryStatus failed : %v", err)
 			}
 		}
+		// TODO insert EntryValidation
 	}
 
 	tx.Commit()
@@ -684,9 +685,12 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 		return updated5, err
 	}
 
-	// TODO updateEntryValidation
+	updated6, err := updateEntryValidation(tx, e, dbEntries[0])
+	if err != nil {
+		return updated6, err
+	}
 
-	return updated1 || updated2 || updated3 || updated4 || updated5, err
+	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6, err
 }
 
 func getTIDs(ts []Transcription) []int64 {
@@ -826,6 +830,67 @@ func updateEntryStatus(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error)
 	}
 
 	return false, nil
+}
+
+type vali struct {
+	name string
+	msg  string
+}
+
+// TODO test me
+// returns the validations of e1 not found in e2 as fist return arg
+// returns the validations found only in e2, to be removed, as second arg
+func newValidations(e1 Entry, e2 Entry) ([]EntryValidation, []EntryValidation) {
+	var res1 []EntryValidation
+	var res2 []EntryValidation
+	e1M := make(map[vali]int)
+	e2M := make(map[vali]int)
+	for _, v := range e1.EntryValidations {
+		e1M[vali{name: v.Name, msg: v.Message}]++
+	}
+	for _, v := range e2.EntryValidations {
+		e2M[vali{name: v.Name, msg: v.Message}]++
+	}
+
+	for _, v := range e1.EntryValidations {
+		if _, ok := e2M[vali{name: v.Name, msg: v.Message}]; !ok {
+			res1 = append(res1, v) // only in e1
+		}
+	}
+	for _, v := range e2.EntryValidations {
+		if _, ok := e1M[vali{name: v.Name, msg: v.Message}]; !ok {
+			res2 = append(res2, v) // only in e2
+		}
+	}
+
+	return res1, res2
+}
+
+var insVali = "INSERT INTO entryvalidation (entryid, name, message) values (?, ?, ?)"
+
+func updateEntryValidation(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+	newValidations, removeValidations := newValidations(e, dbE)
+	if len(newValidations) == 0 && len(removeValidations) == 0 {
+		return false, nil
+	}
+
+	for _, v := range newValidations {
+		_, err := tx.Exec(insVali, dbE.ID, v.Name, v.Message)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("failed to insert EntryValidation : %v", err)
+		}
+	}
+
+	for _, v := range removeValidations {
+		_, err := tx.Exec("DELETE FROM entryvalidation WHERE id = ?", v.ID)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("failed deleting EntryValidation : %v", err)
+		}
+	}
+
+	return true, nil
 }
 
 func unique(ns []int64) []int64 {

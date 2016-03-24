@@ -156,10 +156,11 @@ func Test_InsertEntries(t *testing.T) {
 	t10 := Transcription{Strn: "A: p A:", Language: "Apo"}
 	t20 := Transcription{Strn: "a p a", Language: "Sweinsprach"}
 	t30 := Transcription{Strn: "a pp a", Language: "Mysko"}
+	ees0.Transcriptions = []Transcription{t10, t20, t30}
 	// add new EntryStatus
 	ees0.EntryStatus = EntryStatus{Name: "new", Source: "tst"}
-
-	ees0.Transcriptions = []Transcription{t10, t20, t30}
+	// new validation
+	ees0.EntryValidations = []EntryValidation{EntryValidation{Name: "barf", Message: "it hurts"}}
 
 	updated, err := UpdateEntry(db, ees0)
 
@@ -182,9 +183,20 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
+	if got, want := len(eApa.EntryValidations), 1; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+	if got, want := eApa.EntryValidations[0].Name, "barf"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+	if got, want := eApa.EntryValidations[0].Message, "it hurts"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
 	eApa.Lemma.Strn = "tjubba"
 	eApa.WordParts = "fin+krog"
 	eApa.Language = "gummiapa"
+	eApa.EntryValidations = []EntryValidation{}
 	updated, err = UpdateEntry(db, eApa)
 	if err != nil {
 		t.Errorf(fs, "nil", err)
@@ -205,6 +217,9 @@ func Test_InsertEntries(t *testing.T) {
 	}
 	if eApax.Language != "gummiapa" {
 		t.Errorf(fs, "gummiapa", eApax.Language)
+	}
+	if got, want := len(eApax.EntryValidations), 0; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
 	// rezz, err := db.Query("select entry.strn from entry where strn regexp '^a'")
