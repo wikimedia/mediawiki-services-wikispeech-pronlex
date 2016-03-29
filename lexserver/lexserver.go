@@ -224,10 +224,10 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
-	entryJson := r.FormValue("entry")
+	entryJSON := r.FormValue("entry")
 	//body, err := ioutil.ReadAll(r.Body)
 	var e dbapi.Entry
-	err := json.Unmarshal([]byte(entryJson), &e)
+	err := json.Unmarshal([]byte(entryJSON), &e)
 	if err != nil {
 		log.Printf("lexserver: Failed to unmarshal json: %v", err)
 		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
