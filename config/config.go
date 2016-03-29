@@ -10,7 +10,7 @@ import (
 
 // JSON representation of a configuration used with a lexicon (string values only)
 type JSON struct {
-	Lexicons    []string `json:"lexicons"`
+	Lexicons    []string `json:"lexicons"`    // lexicon name(s) in lex db
 	StatusNames []string `json:"statusNames"` // should be in lex db
 	PosTags     []string `json:"posTags"`     // should be in lex db
 	Languages   []string `json:"languages"`   // should be in lex db
