@@ -46,10 +46,13 @@ CREATE INDEX idx15890407 on Entry (strn);
 CREATE TABLE EntryValidation (
     id integer not null primary key autoincrement,
     entryid integer not null,
+    level varchar(128) not null,
     name varchar(128) not null,
     message varchar(128) not null,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
     foreign key (entryId) references Entry(id) on delete cascade);
+CREATE INDEX evallev ON EntryValidation(level);
+CREATE INDEX evalnam ON EntryValidation(name);
 CREATE TABLE EntryStatus (
     name varchar(128) not null,
     source varchar(128) not null,

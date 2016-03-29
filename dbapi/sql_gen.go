@@ -222,16 +222,13 @@ func ToLower(ss []string) []string {
 // This is not sane.
 
 // Queries db for all entries with transcriptions and optional lemma forms.
-var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp
+var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp
 FROM lexicon, entry, transcription 
 LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id 
 LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid 
 LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1
 LEFT JOIN entryvalidation ON entryvalidation.entryid = entry.id 
 WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid ` // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
-
-// TODO Why does the following criterion slow it down so much?!
-// //AND entrystatus.current = 1
 
 // SelectEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
