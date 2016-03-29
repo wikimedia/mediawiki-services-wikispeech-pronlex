@@ -234,21 +234,21 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updated, err2 := dbapi.UpdateEntry(db, e)
+	res, updated, err2 := dbapi.UpdateEntry(db, e)
 	if err2 != nil {
 		log.Printf("lexserver: Failed to update entry : %v", err2)
 		http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
 		return
 	}
 	// TODO This is not necessarily an error
-	if !updated {
-		http.Error(w, fmt.Sprintf("Entry not updated : %v", e), http.StatusInternalServerError)
-		return
-	}
+	// if !updated {
+	// 	http.Error(w, fmt.Sprintf("Entry not updated : %v", e), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	log.Printf("HÄR KOMMER ETT ENTRY: %v", e)
-	fmt.Fprint(w, "ok") // TODO What should be returned on success?
-	return
+	fmt.Fprint(w, json.Marshal(res))
+	//return
 }
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {

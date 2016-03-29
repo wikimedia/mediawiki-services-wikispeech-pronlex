@@ -645,14 +645,28 @@ func GetEntryFromID(db *sql.DB, id int64) (Entry, error) {
 
 }
 
-// UpdateEntry wraps call to UpdateEntryTx with a transaction
-func UpdateEntry(db *sql.DB, e Entry) (updated bool, err error) { // TODO return the updated entry?
+// UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
+func UpdateEntry(db *sql.DB, e Entry) (res Entry, updated bool, err error) {
 	tx, err := db.Begin()
-	if err != nil {
-		return updated, fmt.Errorf("failed updating entry : %v", err)
-	}
 	defer tx.Commit()
-	return UpdateEntryTx(tx, e)
+	if err != nil {
+		tx.Rollback()
+		return res, updated, fmt.Errorf("failed starting transaction for updating entry : %v", err)
+	}
+
+	updated, err = UpdateEntryTx(tx, e)
+	if err != nil {
+		tx.Rollback()
+		return res, updated, fmt.Errorf("failed updating entry : %v", err)
+	}
+
+	res, err = GetEntryFromID(db, e.ID)
+	if err != nil {
+		tx.Rollback()
+		return res, updated, fmt.Errorf("failed getting updated entry : %v", err)
+	}
+
+	return res, updated, err
 }
 
 // UpdateEntryTx updates the fields of an Entry that do not match the
