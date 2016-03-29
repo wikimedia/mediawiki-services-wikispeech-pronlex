@@ -1,7 +1,11 @@
 // Package validation is used to validate entries (transcriptions, language labels, pos tags, etc)
 package validation
 
-import "github.com/stts-se/pronlex/dbapi"
+import (
+	"fmt"
+
+	"github.com/stts-se/pronlex/dbapi"
+)
 
 /*
 Result is a validation result with the following fields:
@@ -15,6 +19,11 @@ type Result struct {
 	Message  string
 }
 
+// String returns a simple string representation of the Result instance
+func (r Result) String() string {
+	return fmt.Sprintf("%s (%s): %s", r.RuleName, r.Level, r.Message)
+}
+
 // Rule interface. To create a validation.Rule, make a struct implementing Validate(dbapi.Entry) []Result
 type Rule interface {
 	Validate(dbapi.Entry) []Result
@@ -25,12 +34,14 @@ type Validator struct {
 	Rules []Rule
 }
 
-// Validate is used to validate an entry using a slice of rules
-func (v Validator) Validate(e dbapi.Entry) []Result {
+// Validate is used to validate entries using a slice of rules
+func (v Validator) Validate(entries []dbapi.Entry) []Result {
 	var result []Result
-	for _, rule := range v.Rules {
-		for _, res := range rule.Validate(e) {
-			result = append(result, res)
+	for _, e := range entries {
+		for _, rule := range v.Rules {
+			for _, res := range rule.Validate(e) {
+				result = append(result, res)
+			}
 		}
 	}
 	return result
