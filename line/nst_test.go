@@ -74,7 +74,7 @@ func Test_NSTParse_01(t *testing.T) {
 			},
 		},
 	}
-	result, err := nst.Parse(input)
+	result, err := nst.ParseToEntry(input)
 	if err != nil {
 		t.Errorf("didn't expect error here : %v", err)
 	} else {

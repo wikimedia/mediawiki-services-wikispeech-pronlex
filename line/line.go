@@ -80,6 +80,15 @@ type FormatTest struct {
 	OutputLine string
 }
 
+type Parser interface {
+
+	// Parse is used for parsing input lines
+	Parse(string) (map[Field]string, error)
+
+	// String is used to generate an output line from a set of fields
+	String(map[Field]string) (string, error)
+}
+
 // Format is used to define a lexicon's line.
 // This a struct for package private usage.
 // To create a new Format instance, use NewFormat.

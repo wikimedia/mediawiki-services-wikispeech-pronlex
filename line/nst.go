@@ -16,7 +16,12 @@ type NST struct {
 }
 
 // Parse is used for parsing input lines (calls underlying Format.Parse)
-func (nst NST) Parse(line string) (dbapi.Entry, error) {
+func (nst NST) Parse(line string) (map[Field]string, error) {
+	return nst.format.Parse(line)
+}
+
+// ParseToEntry is used for parsing input lines (calls underlying Format.Parse)
+func (nst NST) ParseToEntry(line string) (dbapi.Entry, error) {
 	fs, err := nst.format.Parse(line)
 	if err != nil {
 		return dbapi.Entry{}, err
@@ -67,7 +72,24 @@ func getTranses(fs map[Field]string) []dbapi.Transcription {
 }
 
 // String is used to generate an output line from a set of fields (calls underlying Format.Parse)
-func (nst NST) String(e dbapi.Entry) (string, error) {
+func (nst NST) String(fields map[Field]string) (string, error) {
+	return nst.format.String(fields)
+}
+
+// String is used to generate an output line from a set of fields (calls underlying Format.Parse)
+func (nst NST) Entry2String(e dbapi.Entry) (string, error) {
+	fs, err := nst.Fields(e)
+	if err != nil {
+		return "", err
+	}
+	s, err := nst.format.String(fs)
+	if err != nil {
+		return "", err
+	}
+	return s, nil
+}
+
+func (nst NST) Fields(e dbapi.Entry) (map[Field]string, error) {
 
 	// Fields ID and LexiconID are database internal  and not processed here
 
@@ -85,7 +107,7 @@ func (nst NST) String(e dbapi.Entry) (string, error) {
 	case 1:
 		fs[Pos] = posMorph[0]
 	default:
-		return "", fmt.Errorf("couldn't split db partofspeech into pos+morph: %s", e.PartOfSpeech)
+		return map[Field]string{}, fmt.Errorf("couldn't split db partofspeech into pos+morph: %s", e.PartOfSpeech)
 	}
 
 	// Lemma
@@ -116,10 +138,10 @@ func (nst NST) String(e dbapi.Entry) (string, error) {
 			fs[Trans4] = t.Strn
 			fs[Translang4] = t.Language
 		default:
-			return "", fmt.Errorf("nst line format can contain max 4 transcriptions, but found %v in: %v", len(e.Transcriptions), e)
+			return map[Field]string{}, fmt.Errorf("nst line format can contain max 4 transcriptions, but found %v in: %v", len(e.Transcriptions), e)
 		}
 	}
-	return nst.format.String(fs)
+	return fs, nil
 }
 
 // NewNST is used to create an instance of the NST line format handler
@@ -183,7 +205,7 @@ type NSTFileWriter struct {
 }
 
 func (w NSTFileWriter) Write(e dbapi.Entry) error {
-	s, err := w.NST.String(e)
+	s, err := w.NST.Entry2String(e)
 	if err != nil {
 		return err
 	}
