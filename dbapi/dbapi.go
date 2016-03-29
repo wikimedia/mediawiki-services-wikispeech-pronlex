@@ -453,7 +453,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 	var entryStatusCurrent sql.NullBool
 
 	var entryValidationID sql.NullInt64
-	var entryValidationName, entryValidationMessage, entryValidationTimestamp sql.NullString
+	var entryValidationLevel, entryValidationName, entryValidationMessage, entryValidationTimestamp sql.NullString
 
 	// transcription ids read so far, in order not to add same trans twice
 	transIDs := make(map[int64]int)
@@ -491,6 +491,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&entryStatusCurrent,
 
 			&entryValidationID,
+			&entryValidationLevel,
 			&entryValidationName,
 			&entryValidationMessage,
 			&entryValidationTimestamp,
@@ -567,10 +568,11 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			currE.EntryValidations = []EntryValidation{}
 		}
 		// zero or more EntryValidations
-		if entryValidationID.Valid && entryValidationName.Valid && entryValidationMessage.Valid && entryValidationTimestamp.Valid {
+		if entryValidationID.Valid && entryValidationLevel.Valid && entryValidationName.Valid && entryValidationMessage.Valid && entryValidationTimestamp.Valid {
 			if _, ok := valiIDs[entryValidationID.Int64]; !ok {
 				currV := EntryValidation{
 					ID:        entryValidationID.Int64,
+					Level:     entryValidationLevel.String,
 					Name:      entryValidationName.String,
 					Message:   entryValidationMessage.String,
 					Timestamp: entryValidationTimestamp.String,
@@ -653,7 +655,6 @@ func UpdateEntry(db *sql.DB, e Entry) (updated bool, err error) { // TODO return
 	return UpdateEntryTx(tx, e)
 }
 
-// TODO update EntryValidation
 // UpdateEntryTx updates the fields of an Entry that do not match the
 // corresponding values in the db
 func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
@@ -840,8 +841,9 @@ func updateEntryStatus(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error)
 }
 
 type vali struct {
-	name string
-	msg  string
+	level string
+	name  string
+	msg   string
 }
 
 // TODO test me
@@ -853,19 +855,19 @@ func newValidations(e1 Entry, e2 Entry) ([]EntryValidation, []EntryValidation) {
 	e1M := make(map[vali]int)
 	e2M := make(map[vali]int)
 	for _, v := range e1.EntryValidations {
-		e1M[vali{name: v.Name, msg: v.Message}]++
+		e1M[vali{level: v.Level, name: v.Name, msg: v.Message}]++
 	}
 	for _, v := range e2.EntryValidations {
-		e2M[vali{name: v.Name, msg: v.Message}]++
+		e2M[vali{level: v.Level, name: v.Name, msg: v.Message}]++
 	}
 
 	for _, v := range e1.EntryValidations {
-		if _, ok := e2M[vali{name: v.Name, msg: v.Message}]; !ok {
+		if _, ok := e2M[vali{level: v.Level, name: v.Name, msg: v.Message}]; !ok {
 			res1 = append(res1, v) // only in e1
 		}
 	}
 	for _, v := range e2.EntryValidations {
-		if _, ok := e1M[vali{name: v.Name, msg: v.Message}]; !ok {
+		if _, ok := e1M[vali{level: v.Level, name: v.Name, msg: v.Message}]; !ok {
 			res2 = append(res2, v) // only in e2
 		}
 	}
@@ -873,11 +875,11 @@ func newValidations(e1 Entry, e2 Entry) ([]EntryValidation, []EntryValidation) {
 	return res1, res2
 }
 
-var insVali = "INSERT INTO entryvalidation (entryid, name, message) values (?, ?, ?)"
+var insVali = "INSERT INTO entryvalidation (entryid, level, name, message) values (?, ?, ?, ?)"
 
 func insertEntryValidations(tx *sql.Tx, e Entry, eValis []EntryValidation) error {
 	for _, v := range eValis {
-		_, err := tx.Exec(insVali, e.ID, v.Name, v.Message)
+		_, err := tx.Exec(insVali, e.ID, v.Level, v.Name, v.Message)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed to insert EntryValidation : %v", err)

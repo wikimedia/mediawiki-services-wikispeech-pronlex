@@ -203,7 +203,7 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	q := queryFromParams(r)
 
-	log.Printf("lexlookup db query : %v", q)
+	//log.Printf("lexlookup db query : %v", q)
 
 	res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
 	if err != nil {

@@ -124,8 +124,9 @@ type EntryStatus struct {
 
 type EntryValidation struct {
 	ID        int64  `json:"id"`
+	Level     string `json:"level"`
 	Name      string `json:"name"`
-	Message   string `json:"name"`
+	Message   string `json:"Message"`
 	Timestamp string `json:"timestamp"`
 }
 
