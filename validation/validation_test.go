@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -13,9 +14,11 @@ type mustHaveTrans struct {
 }
 
 func (r mustHaveTrans) Validate(e dbapi.Entry) []Result {
+	name := "MustHaveTrans"
+	level := "Format"
 	var result = make([]Result, 0)
 	if len(e.Transcriptions) == 0 {
-		result = append(result, Result{"MustHaveTrans", "Format", "At least one transcription is required"})
+		result = append(result, Result{name, level, "At least one transcription is required"})
 	}
 	return result
 }
@@ -24,11 +27,27 @@ type noEmptyTrans struct {
 }
 
 func (r noEmptyTrans) Validate(e dbapi.Entry) []Result {
+	name := "NoEmptyTrans"
+	level := "Format"
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
 		if len(strings.TrimSpace(t.Strn)) == 0 {
-			result = append(result, Result{"NoEmptyTrans", "Format", "Empty transcriptions are not allowed"})
+			result = append(result, Result{name, level, "Empty transcriptions are not allowed"})
 		}
+	}
+	return result
+}
+
+type decomp2Orth struct {
+}
+
+func (r decomp2Orth) Validate(e dbapi.Entry) []Result {
+	name := "Decomp2Orth"
+	level := "Fatal"
+	var result = make([]Result, 0)
+	expectOrth := strings.Replace(e.WordParts, "+", "", -1)
+	if expectOrth != e.Strn {
+		result = append(result, Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
 	}
 	return result
 }
@@ -90,16 +109,16 @@ func Test2(t *testing.T) {
 
 func Test3(t *testing.T) {
 	var vali = Validator{
-		[]Rule{mustHaveTrans{}, noEmptyTrans{}}}
+		[]Rule{mustHaveTrans{}, noEmptyTrans{}, decomp2Orth{}}}
 
 	var e = dbapi.Entry{
-		Strn:         "anka",
+		Strn:         "ankstjärt",
 		Language:     "swe",
 		PartOfSpeech: "NN",
-		WordParts:    "anka",
+		WordParts:    "ank+sjärt",
 		Transcriptions: []dbapi.Transcription{
 			dbapi.Transcription{
-				Strn:     "   ",
+				Strn:     "\"\" a N k + % x { rt",
 				Language: "swe",
 			},
 		},
@@ -109,17 +128,41 @@ func Test3(t *testing.T) {
 
 	var expect = []Result{
 		Result{
-			RuleName: "NoEmptyTrans",
-			Level:    "Format",
+			RuleName: "Decomp2Orth",
+			Level:    "Fatal",
 			Message:  "[...]",
 		},
 	}
-
 	if len(result) != 1 {
 		t.Errorf(fsExp, expect, result)
 	} else {
-		if result[0].RuleName != "NoEmptyTrans" {
+		if result[0].RuleName != "Decomp2Orth" {
 			t.Errorf(fsExp, expect, result)
 		}
+	}
+}
+
+func Test4(t *testing.T) {
+	var vali = Validator{
+		[]Rule{mustHaveTrans{}, noEmptyTrans{}, decomp2Orth{}}}
+
+	var e = dbapi.Entry{
+		Strn:         "ankstjärtsbad",
+		Language:     "swe",
+		PartOfSpeech: "NN",
+		WordParts:    "ank+stjärts+bad",
+		Transcriptions: []dbapi.Transcription{
+			dbapi.Transcription{
+				Strn:     "\"\" a N k + x { rt rs + % b A: d",
+				Language: "swe",
+			},
+		},
+	}
+
+	var result = vali.Validate([]dbapi.Entry{e})
+
+	var expect = []Result{}
+	if len(result) != 0 {
+		t.Errorf(fsExp, expect, result)
 	}
 }
