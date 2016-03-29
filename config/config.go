@@ -8,8 +8,9 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
-type Json struct {
-	Lexicons    []string `json:"lexicons"`    // lexicon name(s) in lex db
+// JSON representation of a configuration used with a lexicon (string values only)
+type JSON struct {
+	Lexicons    []string `json:"lexicons"`
 	StatusNames []string `json:"statusNames"` // should be in lex db
 	PosTags     []string `json:"posTags"`     // should be in lex db
 	Languages   []string `json:"languages"`   // should be in lex db
@@ -19,6 +20,7 @@ type Json struct {
 	LineParsers []string `json:"lineParsers"` // should NOT be in lex db
 }
 
+// Config configuration used with a lexicon
 type Config struct {
 	Lexicons    []string             // lexicon name(s) in lex db
 	StatusNames []string             // should be in lex db
@@ -30,7 +32,8 @@ type Config struct {
 	LineParsers []line.Parser        // should NOT be in lex db
 }
 
-func New(json Json) (Config, error) {
+// New creates a new Config instance from a JSON representation
+func New(json JSON) (Config, error) {
 
 	v, err := validatorForName(json.Validator)
 	if err != nil {
@@ -57,9 +60,8 @@ func New(json Json) (Config, error) {
 func validatorForName(name string) (validation.Validator, error) {
 	if v, ok := validators()[name]; ok {
 		return v, nil
-	} else {
-		return validation.Validator{}, fmt.Errorf("No validator for name: %s", name)
 	}
+	return validation.Validator{}, fmt.Errorf("No validator for name: %s", name)
 }
 
 func lineParsersForNames(names []string) ([]line.Parser, error) {

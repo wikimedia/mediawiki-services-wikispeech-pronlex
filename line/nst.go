@@ -76,9 +76,9 @@ func (nst NST) String(fields map[Field]string) (string, error) {
 	return nst.format.String(fields)
 }
 
-// String is used to generate an output line from a set of fields (calls underlying Format.Parse)
+// Entry2String is used to generate an output line from a dbapi.Entry (calls underlying Format.Parse)
 func (nst NST) Entry2String(e dbapi.Entry) (string, error) {
-	fs, err := nst.Fields(e)
+	fs, err := nst.fields(e)
 	if err != nil {
 		return "", err
 	}
@@ -89,7 +89,7 @@ func (nst NST) Entry2String(e dbapi.Entry) (string, error) {
 	return s, nil
 }
 
-func (nst NST) Fields(e dbapi.Entry) (map[Field]string, error) {
+func (nst NST) fields(e dbapi.Entry) (map[Field]string, error) {
 
 	// Fields ID and LexiconID are database internal  and not processed here
 

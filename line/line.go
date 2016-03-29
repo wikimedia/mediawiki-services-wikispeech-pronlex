@@ -80,6 +80,8 @@ type FormatTest struct {
 	OutputLine string
 }
 
+// Parser is used to define a lexicon's line parser.
+// To implement your own parser, make sure to implement functions Parse(string) and String(map[Field]string)
 type Parser interface {
 
 	// Parse is used for parsing input lines
