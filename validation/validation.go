@@ -34,14 +34,23 @@ type Validator struct {
 	Rules []Rule
 }
 
-// Validate is used to validate entries using a slice of rules
+// ValidateEntry is used to validate single entries
+func (v Validator) ValidateEntry(e dbapi.Entry) []Result {
+	var result []Result
+	for _, rule := range v.Rules {
+		for _, res := range rule.Validate(e) {
+			result = append(result, res)
+		}
+	}
+	return result
+}
+
+// Validate is used to validate a slice of entries
 func (v Validator) Validate(entries []dbapi.Entry) []Result {
 	var result []Result
 	for _, e := range entries {
-		for _, rule := range v.Rules {
-			for _, res := range rule.Validate(e) {
-				result = append(result, res)
-			}
+		for _, res := range v.ValidateEntry(e) {
+			result = append(result, res)
 		}
 	}
 	return result
