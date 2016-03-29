@@ -162,13 +162,17 @@ func Test_InsertEntries(t *testing.T) {
 	// new validation
 	ees0.EntryValidations = []EntryValidation{EntryValidation{Level: "severe", Name: "barf", Message: "it hurts"}}
 
-	updated, err := UpdateEntry(db, ees0)
+	newE, updated, err := UpdateEntry(db, ees0)
 
 	if !updated {
 		t.Errorf(fs, true, updated)
 	}
 	if err != nil {
 		t.Errorf(fs, nil, err)
+	}
+
+	if want, got := true, newE.Strn == ees0.Strn; !got {
+		t.Errorf(fs, got, want)
 	}
 
 	eApa, err := GetEntryFromID(db, ees0.ID)
@@ -201,12 +205,15 @@ func Test_InsertEntries(t *testing.T) {
 	eApa.WordParts = "fin+krog"
 	eApa.Language = "gummiapa"
 	eApa.EntryValidations = []EntryValidation{}
-	updated, err = UpdateEntry(db, eApa)
+	newE2, updated, err := UpdateEntry(db, eApa)
 	if err != nil {
 		t.Errorf(fs, "nil", err)
 	}
 	if !updated {
 		t.Errorf(fs, true, updated)
+	}
+	if want, got := true, newE2.Strn == eApa.Strn; !got {
+		t.Errorf(fs, got, want)
 	}
 
 	eApax, err := GetEntryFromID(db, ees0.ID)
