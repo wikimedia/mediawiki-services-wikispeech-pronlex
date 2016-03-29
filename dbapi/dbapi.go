@@ -32,6 +32,7 @@ var regexMem = func(re, s string) (bool, error) {
 	return r.MatchString(s), nil
 }
 
+// Sqlite3WithRegex registers an Sqlite3 driver with regexp support. (Unfortunately quite slow regexp matching)
 func Sqlite3WithRegex() {
 	// regex := func(re, s string) (bool, error) {
 	// 	//return regexp.MatchString(re, s)

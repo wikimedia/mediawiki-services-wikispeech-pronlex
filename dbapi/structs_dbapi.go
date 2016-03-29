@@ -112,6 +112,7 @@ type Lemma struct {
 	Paradigm string `json:"paradigm"`
 }
 
+// EntryStatus associates a status to an Entry. The status has a name (such as 'ok') and a source (a string identifying who or what generated the status)
 type EntryStatus struct {
 	ID     int64  `json:"id"`
 	Name   string `json:"name"`
@@ -122,6 +123,7 @@ type EntryStatus struct {
 	Current   bool   `json:"current"`
 }
 
+// EntryValidation associates a validation result to an Entry
 type EntryValidation struct {
 	ID int64 `json:"id"`
 
