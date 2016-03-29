@@ -477,7 +477,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&transcriptionStrn,
 			&transcriptionLanguage,
 
-			// Optional/nullable
+			// Optional, from LEFT JOIN
 
 			&lemmaID,
 			&lemmaStrn,
@@ -879,7 +879,7 @@ var insVali = "INSERT INTO entryvalidation (entryid, level, name, message) value
 
 func insertEntryValidations(tx *sql.Tx, e Entry, eValis []EntryValidation) error {
 	for _, v := range eValis {
-		_, err := tx.Exec(insVali, e.ID, v.Level, v.Name, v.Message)
+		_, err := tx.Exec(insVali, e.ID, strings.ToLower(v.Level), v.Name, v.Message)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed to insert EntryValidation : %v", err)

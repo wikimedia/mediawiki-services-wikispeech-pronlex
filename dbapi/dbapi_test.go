@@ -160,7 +160,7 @@ func Test_InsertEntries(t *testing.T) {
 	// add new EntryStatus
 	ees0.EntryStatus = EntryStatus{Name: "new", Source: "tst"}
 	// new validation
-	ees0.EntryValidations = []EntryValidation{EntryValidation{Name: "barf", Message: "it hurts"}}
+	ees0.EntryValidations = []EntryValidation{EntryValidation{Level: "severe", Name: "barf", Message: "it hurts"}}
 
 	updated, err := UpdateEntry(db, ees0)
 
@@ -186,6 +186,10 @@ func Test_InsertEntries(t *testing.T) {
 	if got, want := len(eApa.EntryValidations), 1; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
+	if got, want := eApa.EntryValidations[0].Level, "severe"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
 	if got, want := eApa.EntryValidations[0].Name, "barf"; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}

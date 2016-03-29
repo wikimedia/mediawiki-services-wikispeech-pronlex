@@ -123,7 +123,9 @@ type EntryStatus struct {
 }
 
 type EntryValidation struct {
-	ID        int64  `json:"id"`
+	ID int64 `json:"id"`
+
+	// Lower case name of level of severity
 	Level     string `json:"level"`
 	Name      string `json:"name"`
 	Message   string `json:"Message"`
