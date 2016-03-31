@@ -216,6 +216,11 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 	return err
 }
 
+// ValidSymbol checks if a string is a valid symbol or not
+func (ss SymbolSet) ValidSymbol(symbol string) bool {
+	return ss.symbolRe.MatchString(symbol)
+}
+
 // SplitTranscription splits the input transcription into separate symbols
 func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 	delim := ss.phonemeDelimiterRe

@@ -78,13 +78,13 @@ func lineParsersForNames(names []string) ([]line.Parser, error) {
 
 func validators() map[string]validation.Validator {
 	return map[string]validation.Validator{
-		"NlbDemoValidator": validator.NewNLBDemoValidator(),
+		"NstDemoValidator": validator.NewNSTDemoValidator(),
 	}
 
 }
 func lineParser(name string) (line.Parser, error) {
 	switch strings.ToLower(name) {
-	case "nlb":
+	case "nst":
 		return line.NewNST()
 	default:
 		return line.Format{}, fmt.Errorf("no line format for name %s", name)

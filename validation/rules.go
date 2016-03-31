@@ -10,20 +10,21 @@ import (
 )
 
 type SymbolSetRule struct {
-	Name      string
-	Level     string
-	Message   string
 	SymbolSet symbolset.SymbolSet
 }
 
 func (r SymbolSetRule) Validate(e dbapi.Entry) []Result {
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
-		for _, symbol := range r.SymbolSet.SplitTranscription(t.Strn) {
-			panic("not implemented")
-			//if r.Re.MatchString(strings.TrimSpace(t.Strn)) {
-			//	result = append(result, Result{r.Name, r.Level, r.Message})
-			//}
+		splitted, err := r.SymbolSet.SplitTranscription(t.Strn)
+		if err != nil {
+			result = append(result, Result{"SymbolSet", "Fatal", fmt.Sprintf("Couldn't split transcription: /%s/", t.Strn)})
+		} else {
+			for _, symbol := range splitted {
+				if !r.SymbolSet.ValidSymbol(symbol) {
+					result = append(result, Result{"SymbolSet", "Fatal", fmt.Sprintf("Invalid transcription symbol: %s in /%s/", symbol, t.Strn)})
+				}
+			}
 		}
 	}
 	return result
@@ -33,14 +34,14 @@ type IllegalTransRe struct {
 	Name    string
 	Level   string
 	Message string
-	Re      regexp.Regexp
+	Re      *regexp.Regexp
 }
 
 func (r IllegalTransRe) Validate(e dbapi.Entry) []Result {
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
 		if r.Re.MatchString(strings.TrimSpace(t.Strn)) {
-			result = append(result, Result{r.Name, r.Level, r.Message})
+			result = append(result, Result{r.Name, r.Level, fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
 		}
 	}
 	return result
@@ -50,14 +51,14 @@ type RequiredTransRe struct {
 	Name    string
 	Level   string
 	Message string
-	Re      regexp.Regexp
+	Re      *regexp.Regexp
 }
 
 func (r RequiredTransRe) Validate(e dbapi.Entry) []Result {
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
 		if !r.Re.MatchString(strings.TrimSpace(t.Strn)) {
-			result = append(result, Result{r.Name, r.Level, r.Message})
+			result = append(result, Result{r.Name, r.Level, fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
 		}
 	}
 	return result
