@@ -78,7 +78,7 @@ func lineParsersForNames(names []string) ([]line.Parser, error) {
 
 func validators() map[string]validation.Validator {
 	return map[string]validation.Validator{
-	//"NlbDemoValidator": validator.NewNLBDemoValidator(),
+		"NlbDemoValidator": validator.NewNLBDemoValidator(),
 	}
 
 }
