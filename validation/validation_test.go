@@ -10,10 +10,10 @@ import (
 
 var fsExp = "Expected: '%v' got: '%v'"
 
-type mustHaveTrans struct {
+type testMustHaveTrans struct {
 }
 
-func (r mustHaveTrans) Validate(e dbapi.Entry) []Result {
+func (r testMustHaveTrans) Validate(e dbapi.Entry) []Result {
 	name := "MustHaveTrans"
 	level := "Format"
 	var result = make([]Result, 0)
@@ -23,10 +23,10 @@ func (r mustHaveTrans) Validate(e dbapi.Entry) []Result {
 	return result
 }
 
-type noEmptyTrans struct {
+type testNoEmptyTrans struct {
 }
 
-func (r noEmptyTrans) Validate(e dbapi.Entry) []Result {
+func (r testNoEmptyTrans) Validate(e dbapi.Entry) []Result {
 	name := "NoEmptyTrans"
 	level := "Format"
 	var result = make([]Result, 0)
@@ -38,10 +38,10 @@ func (r noEmptyTrans) Validate(e dbapi.Entry) []Result {
 	return result
 }
 
-type decomp2Orth struct {
+type testDecomp2Orth struct {
 }
 
-func (r decomp2Orth) Validate(e dbapi.Entry) []Result {
+func (r testDecomp2Orth) Validate(e dbapi.Entry) []Result {
 	name := "Decomp2Orth"
 	level := "Fatal"
 	var result = make([]Result, 0)
@@ -54,7 +54,7 @@ func (r decomp2Orth) Validate(e dbapi.Entry) []Result {
 
 func Test1(t *testing.T) {
 	var vali = Validator{
-		[]Rule{mustHaveTrans{}, noEmptyTrans{}}}
+		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
 	var e = dbapi.Entry{
 		Strn:         "anka",
@@ -78,7 +78,7 @@ func Test1(t *testing.T) {
 
 func Test2(t *testing.T) {
 	var vali = Validator{
-		[]Rule{mustHaveTrans{}, noEmptyTrans{}}}
+		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
 	var e = dbapi.Entry{
 		Strn:           "anka",
@@ -109,7 +109,7 @@ func Test2(t *testing.T) {
 
 func Test3(t *testing.T) {
 	var vali = Validator{
-		[]Rule{mustHaveTrans{}, noEmptyTrans{}, decomp2Orth{}}}
+		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = dbapi.Entry{
 		Strn:         "ankstjärt",
@@ -144,7 +144,7 @@ func Test3(t *testing.T) {
 
 func Test4(t *testing.T) {
 	var vali = Validator{
-		[]Rule{mustHaveTrans{}, noEmptyTrans{}, decomp2Orth{}}}
+		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = dbapi.Entry{
 		Strn:         "ankstjärtsbad",
