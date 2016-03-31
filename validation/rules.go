@@ -99,7 +99,7 @@ func (r Decomp2Orth) Validate(e dbapi.Entry) []Result {
 	name := "Decomp2Orth"
 	level := "Fatal"
 	var result = make([]Result, 0)
-	expectOrth := strings.Replace(e.WordParts, "+", "", -1)
+	expectOrth := strings.Replace(e.WordParts, "+", "", -1) // hardwired
 	if expectOrth != e.Strn {
 		result = append(result, Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
 	}
