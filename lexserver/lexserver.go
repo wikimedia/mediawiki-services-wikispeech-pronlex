@@ -234,7 +234,8 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, updated, err2 := dbapi.UpdateEntry(db, e)
+	// Underscore below matches bool indicating if any update has taken place. Return this info?
+	res, _, err2 := dbapi.UpdateEntry(db, e)
 	if err2 != nil {
 		log.Printf("lexserver: Failed to update entry : %v", err2)
 		http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
@@ -246,8 +247,14 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	log.Printf("HÄR KOMMER ETT ENTRY: %v", e)
-	fmt.Fprint(w, json.Marshal(res))
+	//log.Printf("HÄR KOMMER ETT ENTRY: %v", e)
+	res0, err3 := json.Marshal(res)
+	if err3 != nil {
+		log.Printf("lexserver: Failed to marshal entry : %v", err3)
+		http.Error(w, fmt.Sprintf("failed return updated Entry : %v", err3), http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprint(w, res0)
 	//return
 }
 
