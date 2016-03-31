@@ -70,7 +70,7 @@ func main() {
 			log.Fatal(err)
 		}
 		l := s.Text()
-		e, err := nstFmt.Parse(l)
+		e, err := nstFmt.ParseToEntry(l)
 		if err != nil {
 			log.Fatal(err)
 		}
