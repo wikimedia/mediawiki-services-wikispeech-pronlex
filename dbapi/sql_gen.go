@@ -270,18 +270,18 @@ func SelectEntriesSQL(q Query) (string, []interface{}) {
 
 }
 
-// entriesFromIdsSelect builds an sql select and returns it along with slice of matching id values
-func entriesFromIdsSelect(ids []int64) (string, []interface{}) {
-	res := ""
-	resv := convI(ids)
-	qs := nQs(len(ids))
-	// TODO assumes that every Entry has at least one transcription
-	res += "select entry.id, entry.lexiconid, entry.strn, entry.language, entry.partofspeech, entry.wordparts, "
-	res += "transcription.id, transcription.entryid, transcription.strn, transcription.language "
-	res += "from lexicon, entry, transcription "
-	res += "where lexicon.id = entry.lexiconid "
-	res += "and entry.id = transcription.entryId "
-	res += "and entry.id in " + qs
-	// res += " order by entry.strn asc" // TODO ???
-	return res, resv
-}
+// // entriesFromIdsSelect builds an sql select and returns it along with slice of matching id values
+// func entriesFromIdsSelect(ids []int64) (string, []interface{}) {
+// 	res := ""
+// 	resv := convI(ids)
+// 	qs := nQs(len(ids))
+// 	// TODO assumes that every Entry has at least one transcription
+// 	res += "select entry.id, entry.lexiconid, entry.strn, entry.language, entry.partofspeech, entry.wordparts, "
+// 	res += "transcription.id, transcription.entryid, transcription.strn, transcription.language "
+// 	res += "from lexicon, entry, transcription "
+// 	res += "where lexicon.id = entry.lexiconid "
+// 	res += "and entry.id = transcription.entryId "
+// 	res += "and entry.id in " + qs
+// 	// res += " order by entry.strn asc" // TODO ???
+// 	return res, resv
+// }
