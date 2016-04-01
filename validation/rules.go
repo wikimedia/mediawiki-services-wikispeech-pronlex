@@ -33,12 +33,12 @@ func (r SymbolSetRule) Validate(e dbapi.Entry) []Result {
 /*
 ProcessTransRe converts pre-defined entities to the appropriate symbols. Strings replaced are: syllabic, nonsyllabic, phoneme, symbol.
 */
-func ProcessTransRe(SymbolSet symbolset.SymbolSet, Regexp string) *regexp.Regexp {
+func ProcessTransRe(SymbolSet symbolset.SymbolSet, Regexp string) (*regexp.Regexp, error) {
 	Regexp = strings.Replace(Regexp, "nonsyllabic", SymbolSet.NonSyllabicRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "syllabic", SymbolSet.SyllabicRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "phoneme", SymbolSet.PhonemeRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "symbol", SymbolSet.SymbolRe.String(), -1)
-	return regexp.MustCompile(Regexp)
+	return regexp.Compile(Regexp)
 }
 
 type IllegalTransRe struct {
@@ -49,11 +49,8 @@ type IllegalTransRe struct {
 }
 
 func (r IllegalTransRe) Validate(e dbapi.Entry) []Result {
-	fmt.Println(r.Re.String())
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
-		fmt.Println(t.Strn)
-
 		if r.Re.MatchString(strings.TrimSpace(t.Strn)) {
 			result = append(result, Result{r.Name, r.Level, fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
 		}
@@ -106,20 +103,26 @@ func (r NoEmptyTrans) Validate(e dbapi.Entry) []Result {
 	return result
 }
 
+func NewDecomp2Orth(SS symbolset.SymbolSet, PreFilterWordPartString func(string) string) (Decomp2Orth, error) {
+	compDelims := symbolset.FilterSymbolsByType(SS.Symbols, []symbolset.SymbolType{symbolset.CompoundDelimiter})
+	if len(compDelims) > 0 {
+		compDelim := compDelims[0].String
+		return Decomp2Orth{compDelim, PreFilterWordPartString}, nil
+	}
+	return Decomp2Orth{}, fmt.Errorf("no compound delimiter in symbol set")
+}
+
 type Decomp2Orth struct {
-	SymbolSet symbolset.SymbolSet
+	compDelim               string
+	preFilterWordPartString func(string) string
 }
 
 func (r Decomp2Orth) Validate(e dbapi.Entry) []Result {
-	var compDelim = "+"
-	compDelims := symbolset.FilterSymbolsByType(r.SymbolSet.Symbols, []symbolset.SymbolType{symbolset.CompoundDelimiter})
-	if len(compDelims) > 0 {
-		compDelim = compDelims[0].String
-	}
 	name := "Decomp2Orth"
 	level := "Fatal"
 	var result = make([]Result, 0)
-	expectOrth := strings.Replace(e.WordParts, compDelim, "", -1) // hardwired
+	filteredWordParts := r.preFilterWordPartString(e.WordParts)
+	expectOrth := strings.Replace(filteredWordParts, r.compDelim, "", -1)
 	if expectOrth != e.Strn {
 		result = append(result, Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
 	}

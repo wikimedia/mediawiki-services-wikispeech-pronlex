@@ -181,7 +181,7 @@ func TestNst1(t *testing.T) {
 		WordParts:    "banen",
 		Transcriptions: []dbapi.Transcription{
 			dbapi.Transcription{
-				Strn:     "b \" a: $n n=",
+				Strn:     "\" b A: $ n @ n",
 				Language: "nor",
 			},
 		},
@@ -190,7 +190,6 @@ func TestNst1(t *testing.T) {
 	var result = vali.Validate([]dbapi.Entry{e})
 
 	var expect = []Result{}
-	fmt.Println(result)
 	if len(result) != 0 {
 		t.Errorf(fsExp, expect, result)
 	}
@@ -204,7 +203,7 @@ func TestNst1(t *testing.T) {
 		WordParts:    "banen",
 		Transcriptions: []dbapi.Transcription{
 			dbapi.Transcription{
-				Strn:     "b a $ \"n e: n",
+				Strn:     "b a $ \" n e: n",
 				Language: "nor",
 			},
 		},
