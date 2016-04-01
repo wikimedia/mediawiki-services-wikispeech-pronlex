@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func filterSymbolsByType(symbols []Symbol, types []SymbolType) []Symbol {
+func FilterSymbolsByType(symbols []Symbol, types []SymbolType) []Symbol {
 	var res = make([]Symbol, 0)
 	for _, s := range symbols {
 		if containsType(types, s.Type) {

@@ -24,13 +24,13 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	var nilRes SymbolSet
 
 	// filtered lists
-	phonemes := filterSymbolsByType(symbols, []SymbolType{Syllabic, NonSyllabic, Stress})
-	phoneticSymbols := filterSymbolsByType(symbols, []SymbolType{Syllabic, NonSyllabic})
-	stressSymbols := filterSymbolsByType(symbols, []SymbolType{Stress})
-	syllabic := filterSymbolsByType(symbols, []SymbolType{Syllabic})
-	nonSyllabic := filterSymbolsByType(symbols, []SymbolType{NonSyllabic})
-	phonemeDelimiters := filterSymbolsByType(symbols, []SymbolType{PhonemeDelimiter})
-	explicitPhonemeDelimiters := filterSymbolsByType(symbols, []SymbolType{ExplicitPhonemeDelimiter})
+	phonemes := FilterSymbolsByType(symbols, []SymbolType{Syllabic, NonSyllabic, Stress})
+	phoneticSymbols := FilterSymbolsByType(symbols, []SymbolType{Syllabic, NonSyllabic})
+	stressSymbols := FilterSymbolsByType(symbols, []SymbolType{Stress})
+	syllabic := FilterSymbolsByType(symbols, []SymbolType{Syllabic})
+	nonSyllabic := FilterSymbolsByType(symbols, []SymbolType{NonSyllabic})
+	phonemeDelimiters := FilterSymbolsByType(symbols, []SymbolType{PhonemeDelimiter})
+	explicitPhonemeDelimiters := FilterSymbolsByType(symbols, []SymbolType{ExplicitPhonemeDelimiter})
 
 	// specific symbol initialization
 	if len(phonemeDelimiters) < 1 {
