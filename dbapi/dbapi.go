@@ -14,6 +14,7 @@ import (
 	"fmt"
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -729,7 +730,9 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 		return false
 	}
 	for i := range ts1 {
-		if ts1[i] != ts2[i] {
+		//if ts1[i] != ts2[i] {
+		// TODO? Define Equal(Transcription) on Transcription
+		if !reflect.DeepEqual(ts1[i], ts2[i]) {
 			return false
 		}
 	}
