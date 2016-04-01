@@ -240,7 +240,7 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 // TODO move to function?
 var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
-var transAfterEntrySTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
+var transAfterEntrySTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
 //var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
 var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
@@ -291,7 +291,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 		// res.Close()
 
 		for _, t := range e.Transcriptions {
-			_, err := tx.Stmt(stmt2).Exec(id, t.Strn, t.Language)
+			_, err := tx.Stmt(stmt2).Exec(id, t.Strn, t.Language, t.SourcesString())
 			if err != nil {
 				tx.Rollback()
 				return ids, fmt.Errorf("failed exec : %v", err)
@@ -442,7 +442,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 	var entryStrn, entryLanguage, partOfSpeech, wordParts string
 
 	var transcriptionID, transcriptionEntryID int64
-	var transcriptionStrn, transcriptionLanguage string
+	var transcriptionStrn, transcriptionLanguage, transcriptionSources string
 
 	// Optional/nullable values
 
@@ -478,7 +478,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&transcriptionEntryID,
 			&transcriptionStrn,
 			&transcriptionLanguage,
-
+			&transcriptionSources,
 			// Optional, from LEFT JOIN
 
 			&lemmaID,
@@ -560,6 +560,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				EntryID:  transcriptionEntryID,
 				Strn:     transcriptionStrn,
 				Language: transcriptionLanguage,
+				Sources:  strings.Split(transcriptionSources, SourceDelimiter),
 			}
 
 			currE.Transcriptions = append(currE.Transcriptions, currT)
@@ -795,7 +796,7 @@ func updateLemma(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 }
 
 // TODO move to function
-var transSTMT = "insert into transcription (entryid, strn, language) values (?, ?, ?)"
+var transSTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
 func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 	if e.ID != dbE.ID {
@@ -821,7 +822,7 @@ func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err err
 			return false, fmt.Errorf("failed transcription delete : %v", err)
 		}
 		for _, t := range e.Transcriptions {
-			_, err := tx.Exec(transSTMT, e.ID, t.Strn, t.Language)
+			_, err := tx.Exec(transSTMT, e.ID, t.Strn, t.Language, t.SourcesString())
 			if err != nil {
 				tx.Rollback()
 				return false, fmt.Errorf("failed transcription update : %v", err)

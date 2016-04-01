@@ -168,6 +168,10 @@ func (t Transcription) AddSource(s string) error {
 	return nil
 }
 
+func (t Transcription) SourcesString() string {
+	return strings.Join(t.Sources, SourceDelimiter)
+}
+
 // TranscriptionSlice is used for
 // soring according to ascending id
 type TranscriptionSlice []Transcription
