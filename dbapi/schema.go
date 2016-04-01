@@ -74,6 +74,7 @@ CREATE TABLE Transcription (
     id integer not null primary key autoincrement,
     language varchar(128) not null,
     strn varchar(128) not null,
+    sources TEXT not null,
 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE TABLE TranscriptionStatus (
     name varchar(128) not null,

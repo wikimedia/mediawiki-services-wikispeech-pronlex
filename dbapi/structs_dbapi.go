@@ -10,6 +10,8 @@ import (
 // Kunna sätta sortering eller ej?
 
 // Query represents an sql search query to the lexicon database
+// TODO Change to list(s) of search critieria.
+// TODO add boolean for include/exclude (i.e., "NOT" in the generated SQL).
 type Query struct {
 	// Lexicons to be searched. Empty means 'all' (TODO I think)
 	Lexicons []Lexicon `json:"lexicons"`
@@ -44,6 +46,7 @@ type Query struct {
 }
 
 // Empty returns true if there are not search criteria values
+// This is no longer a sane way to do it, since the number of search criteria has grown.
 func (q Query) Empty() bool {
 	switch {
 	case len(q.Words) > 0:
@@ -134,12 +137,39 @@ type EntryValidation struct {
 	Timestamp string `json:"timestamp"`
 }
 
+// SourceDelimiter is used to split a string of sevaral sources into a slice
+var SourceDelimiter = " : "
+
 // Transcription corresponds to the transcription db table
 type Transcription struct {
-	ID       int64  `json:"id"`
-	EntryID  int64  `json:"entryId"`
-	Strn     string `json:"strn"`
-	Language string `json:"language"`
+	ID       int64    `json:"id"`
+	EntryID  int64    `json:"entryId"`
+	Strn     string   `json:"strn"`
+	Language string   `json:"language"`
+	Sources  []string `json:"sources"`
+}
+
+// AddSource ... adds a source string at the beginning of the Transcription.Sources slice. If the source is already present,
+// AddSource silently ignores to add the already existing source.
+func (t Transcription) AddSource(s string) error {
+	sDC := strings.ToLower(strings.TrimSpace(s))
+	if strings.Contains(sDC, SourceDelimiter) {
+		return fmt.Errorf("cannot add source containing the source delimiter : '%v'", SourceDelimiter)
+	}
+
+	for i, _ := range t.Sources {
+		if sDC == t.Sources[i] {
+			return nil // source already there
+		}
+	}
+
+	t.Sources = append([]string{sDC}, t.Sources...)
+
+	return nil
+}
+
+func (t Transcription) SourcesString() string {
+	return strings.Join(t.Sources, SourceDelimiter)
 }
 
 // TranscriptionSlice is used for
