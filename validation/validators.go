@@ -2,6 +2,7 @@ package validation
 
 import "github.com/stts-se/pronlex/symbolset"
 
+// NewNSTDemoValidator used for testing
 func NewNSTDemoValidator() (Validator, error) {
 	symbolset, err := symbolset.NewNSTSymbolSet()
 	if err != nil {

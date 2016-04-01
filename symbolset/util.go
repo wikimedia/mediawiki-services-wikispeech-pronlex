@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// FilterSymbolsByType is used to filter out specific symbol types from the symbol set (syllabic, non syllabic, etc)
 func FilterSymbolsByType(symbols []Symbol, types []SymbolType) []Symbol {
 	var res = make([]Symbol, 0)
 	for _, s := range symbols {
