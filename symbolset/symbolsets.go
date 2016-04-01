@@ -1,6 +1,6 @@
 package symbolset
 
-// NewNSTSymbolSet used for testing
+// NewNSTSymbolSet is used for testing
 func NewNSTSymbolSet() (SymbolSet, error) {
 	name := "NST nob sampa"
 	symbols := []Symbol{
