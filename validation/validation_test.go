@@ -1,3 +1,4 @@
+// Package validation is used to validate entries (transcriptions, language labels, pos tags, etc)
 package validation
 
 import (
@@ -98,7 +99,7 @@ func Test2(t *testing.T) {
 		},
 	}
 
-	if len(result) != 1 {
+	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	} else {
 		if result[0].RuleName != "MustHaveTrans" {
@@ -133,7 +134,7 @@ func Test3(t *testing.T) {
 			Message:  "[...]",
 		},
 	}
-	if len(result) != 1 {
+	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	} else {
 		if result[0].RuleName != "Decomp2Orth" {
@@ -162,7 +163,7 @@ func Test4(t *testing.T) {
 	var result = vali.Validate([]dbapi.Entry{e})
 
 	var expect = []Result{}
-	if len(result) != 0 {
+	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	}
 }
@@ -190,7 +191,7 @@ func TestNst1(t *testing.T) {
 	var result = vali.Validate([]dbapi.Entry{e})
 
 	var expect = []Result{}
-	if len(result) != 0 {
+	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	}
 
@@ -215,7 +216,127 @@ func TestNst1(t *testing.T) {
 		Result{"final_nostress_nolong", "Warning", "[...]"},
 	}
 
-	if len(result) != 1 {
+	if len(result) != len(expect) {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = dbapi.Entry{
+		Strn:         "bantorget",
+		Language:     "nor",
+		PartOfSpeech: "NN",
+		WordParts:    "ban+torget",
+		Transcriptions: []dbapi.Transcription{
+			dbapi.Transcription{
+				Strn:     "\"\" b A: n - % t O r $ g @ t",
+				Language: "nor",
+			},
+		},
+	}
+
+	result = vali.Validate([]dbapi.Entry{e})
+
+	expect = []Result{}
+
+	if len(result) != len(expect) {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = dbapi.Entry{
+		Strn:         "battorget",
+		Language:     "nor",
+		PartOfSpeech: "NN",
+		WordParts:    "bat+torget",
+		Transcriptions: []dbapi.Transcription{
+			dbapi.Transcription{
+				Strn:     "\"\" b A: t - % t O r $ g @ t",
+				Language: "nor",
+			},
+		},
+	}
+
+	result = vali.Validate([]dbapi.Entry{e})
+
+	expect = []Result{}
+
+	if len(result) != len(expect) {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = dbapi.Entry{
+		Strn:         "battorget",
+		Language:     "nor",
+		PartOfSpeech: "NN",
+		WordParts:    "batt+torget",
+		Transcriptions: []dbapi.Transcription{
+			dbapi.Transcription{
+				Strn:     "\"\" b a t - % t O r $ g @ t",
+				Language: "nor",
+			},
+		},
+	}
+
+	result = vali.Validate([]dbapi.Entry{e})
+
+	expect = []Result{}
+
+	if len(result) != len(expect) {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = dbapi.Entry{
+		Strn:         "batttorget",
+		Language:     "nor",
+		PartOfSpeech: "NN",
+		WordParts:    "batt+torget",
+		Transcriptions: []dbapi.Transcription{
+			dbapi.Transcription{
+				Strn:     "\"\" b a t - % t O r $ g @ t",
+				Language: "nor",
+			},
+		},
+	}
+
+	result = vali.Validate([]dbapi.Entry{e})
+
+	expect = []Result{
+		Result{"Decomp2Orth", "Fatal", "[...]"},
+	}
+
+	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	}
 }
+
+// func TestPCREBackrefs(t *testing.T) {
+// 	reFrom, err := pcre.Compile("(.)\\1[+]\\1", pcre.CASELESS)
+// 	if err != nil {
+// 		t.Errorf(err.String())
+// 	}
+// 	reTo := "$1+$1"
+// 	input := "hatt+torget"
+// 	expect := "hattorget"
+// 	result := string(reFrom.ReplaceAll([]byte(input), []byte(reTo), 0))
+
+// 	if result != expect {
+// 		t.Errorf(fsExp, expect, result)
+// 	}
+
+// 	//
+
+// 	input = "hats+torget"
+// 	expect = "hatstorget"
+// 	result = string(reFrom.ReplaceAll([]byte(input), []byte(reTo), 0))
+
+// 	if result != expect {
+// 		t.Errorf(fsExp, expect, result)
+// 	}
+
+// }

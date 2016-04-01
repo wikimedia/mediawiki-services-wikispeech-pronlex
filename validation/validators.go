@@ -1,6 +1,11 @@
 package validation
 
-import "github.com/stts-se/pronlex/symbolset"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/stts-se/pronlex/symbolset"
+)
 
 // NewNSTDemoValidator is used for testing
 func NewNSTDemoValidator() (Validator, error) {
@@ -20,6 +25,19 @@ func NewNSTDemoValidator() (Validator, error) {
 	if err != nil {
 		return Validator{}, err
 	}
+
+	conses := []string{
+		"q", "w", "r", "t", "p", "s", "d", "f", "g", "h", "j", "k", "l", "z", "x", "c", "v", "b", "n", "m",
+	}
+	decomp2Orth := Decomp2Orth{"+", func(s string) string {
+		var res = s
+		for _, cons := range conses {
+			from := fmt.Sprintf("%v%v+%v", cons, cons, cons)
+			to := fmt.Sprintf("%v%v", cons, cons)
+			res = strings.Replace(res, from, to, -1)
+		}
+		return res
+	}}
 
 	var vali = Validator{[]Rule{
 		MustHaveTrans{},
@@ -42,6 +60,7 @@ func NewNSTDemoValidator() (Validator, error) {
 			Message: "Each syllable needs a syllabic phoneme",
 			Re:      syllabicRe,
 		},
+		decomp2Orth,
 		SymbolSetRule{
 			SymbolSet: symbolset,
 		},

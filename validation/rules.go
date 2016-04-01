@@ -108,16 +108,6 @@ func (r NoEmptyTrans) Validate(e dbapi.Entry) []Result {
 	return result
 }
 
-// NewDecomp2Orth is a constructor to create a Decomp2Orth rule with a pre-defined compound delimiter symbol, and a filter function for filtering triple consonants, etc.
-func NewDecomp2Orth(SS symbolset.SymbolSet, PreFilterWordPartString func(string) string) (Decomp2Orth, error) {
-	compDelims := symbolset.FilterSymbolsByType(SS.Symbols, []symbolset.SymbolType{symbolset.CompoundDelimiter})
-	if len(compDelims) > 0 {
-		compDelim := compDelims[0].String
-		return Decomp2Orth{compDelim, PreFilterWordPartString}, nil
-	}
-	return Decomp2Orth{}, fmt.Errorf("no compound delimiter in symbol set")
-}
-
 // Decomp2Orth is a general rule type to validate the word parts vs. the orthography. A filter is used to control the filtering, typically how to treat triple consonants at boundaries.
 type Decomp2Orth struct {
 	compDelim               string
