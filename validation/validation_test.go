@@ -166,3 +166,57 @@ func Test4(t *testing.T) {
 		t.Errorf(fsExp, expect, result)
 	}
 }
+
+func TestNst1(t *testing.T) {
+	var vali, err = NewNSTDemoValidator()
+	if err != nil {
+		t.Errorf("%s", err)
+		return
+	}
+
+	var e = dbapi.Entry{
+		Strn:         "banen",
+		Language:     "nor",
+		PartOfSpeech: "NN",
+		WordParts:    "banen",
+		Transcriptions: []dbapi.Transcription{
+			dbapi.Transcription{
+				Strn:     "b \" a: $n n=",
+				Language: "nor",
+			},
+		},
+	}
+
+	var result = vali.Validate([]dbapi.Entry{e})
+
+	var expect = []Result{}
+	fmt.Println(result)
+	if len(result) != 0 {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = dbapi.Entry{
+		Strn:         "banen",
+		Language:     "nor",
+		PartOfSpeech: "NN",
+		WordParts:    "banen",
+		Transcriptions: []dbapi.Transcription{
+			dbapi.Transcription{
+				Strn:     "b a $ \"n e: n",
+				Language: "nor",
+			},
+		},
+	}
+
+	result = vali.Validate([]dbapi.Entry{e})
+
+	expect = []Result{
+		Result{"final_nostress_nolong", "Warning", "[...]"},
+	}
+
+	if len(result) != 1 {
+		t.Errorf(fsExp, expect, result)
+	}
+}
