@@ -82,11 +82,11 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 		explicitPhonemeDelimiter:    explicitPhonemeDelimiter,
 		hasExplicitPhonemeDelimiter: len(explicitPhonemeDelimiter.String) > 0,
 
-		phonemeRe:          phonemeRe,
-		syllabicRe:         syllabicRe,
-		nonSyllabicRe:      nonSyllabicRe,
+		PhonemeRe:          phonemeRe,
+		SyllabicRe:         syllabicRe,
+		NonSyllabicRe:      nonSyllabicRe,
+		SymbolRe:           symbolRe,
 		phonemeDelimiterRe: phonemeDelimiterRe,
-		symbolRe:           symbolRe,
 	}
 	return res, nil
 
