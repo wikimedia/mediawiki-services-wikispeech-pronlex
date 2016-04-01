@@ -25,11 +25,11 @@ type SymbolSet struct {
 	explicitPhonemeDelimiter    Symbol
 	hasExplicitPhonemeDelimiter bool
 
-	phonemeRe          *regexp.Regexp
-	syllabicRe         *regexp.Regexp
-	nonSyllabicRe      *regexp.Regexp
+	PhonemeRe          *regexp.Regexp
+	SyllabicRe         *regexp.Regexp
+	NonSyllabicRe      *regexp.Regexp
+	SymbolRe           *regexp.Regexp
 	phonemeDelimiterRe *regexp.Regexp
-	symbolRe           *regexp.Regexp
 }
 
 // Mapper is a struct for package private usage.
@@ -218,7 +218,7 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
-	return ss.symbolRe.MatchString(symbol)
+	return ss.SymbolRe.MatchString(symbol)
 }
 
 // SplitTranscription splits the input transcription into separate symbols
@@ -228,7 +228,7 @@ func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 		rest := input
 		var acc = make([]string, 0)
 		for len(rest) > 0 {
-			match := ss.symbolRe.FindStringIndex(rest)
+			match := ss.SymbolRe.FindStringIndex(rest)
 			switch match {
 			case nil:
 				return nil, fmt.Errorf("transcription not splittable (invalid symbols?)! input=/%s/, acc=/%s/, rest=/%s/", input, strings.Join(acc, ss.phonemeDelimiter.String), rest)
@@ -275,7 +275,7 @@ func (ipa ipa) filterBeforeMappingFromIpa(trans string, ss SymbolSet) (string, e
 	if err != nil {
 		return "", err
 	}
-	s := ipa.accentI + "(" + ss.phonemeRe.String() + "+)" + ipa.accentII
+	s := ipa.accentI + "(" + ss.PhonemeRe.String() + "+)" + ipa.accentII
 	repl, err := regexp.Compile(s)
 	if err != nil {
 		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
@@ -292,7 +292,7 @@ func (ipa ipa) filterAfterMappingToIpa(trans string, ss SymbolSet) (string, erro
 		if err != nil {
 			return "", err
 		}
-		repl, err := regexp.Compile(ipa.accentI + ipa.accentII + "(" + ss.nonSyllabicRe.String() + "*)(" + ss.syllabicRe.String() + ")")
+		repl, err := regexp.Compile(ipa.accentI + ipa.accentII + "(" + ss.NonSyllabicRe.String() + "*)(" + ss.SyllabicRe.String() + ")")
 		res := repl.ReplaceAllString(trans, ipa.accentI+"$1$2"+ipa.accentII)
 		return res, nil
 	}

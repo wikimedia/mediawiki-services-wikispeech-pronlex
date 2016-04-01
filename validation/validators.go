@@ -1,19 +1,11 @@
 package validation
 
-import (
-	"regexp"
-
-	"github.com/stts-se/pronlex/symbolset"
-)
-
-//"fmt"
-
-//"github.com/stts-se/pronlex/dbapi"
+import "github.com/stts-se/pronlex/symbolset"
 
 func NewNSTDemoValidator() (Validator, error) {
 	symbolset, err := symbolset.NewNSTSymbolSet()
 	if err != nil {
-		return err
+		return Validator{}, err
 	}
 	var vali = Validator{[]Rule{
 		MustHaveTrans{},
@@ -22,13 +14,13 @@ func NewNSTDemoValidator() (Validator, error) {
 			Name:    "final_nostress_nolong",
 			Level:   "Warning",
 			Message: "final syllable should normally be unstressed with short vowel",
-			Re:      regexp.MustCompile("\\$ (consonant )*(@|A|E|I|O|U|u0|Y|{|9|n=|l=|n`=|l`=)( consonant)*$"),
+			Re:      ProcessTransRe(symbolset, "\\$ (syllabic )*(@|A|E|I|O|U|u0|Y|{|9|n=|l=|n`=|l`=)( syllabic)*$"),
 		},
-		IllegalTransRe{
+		RequiredTransRe{
 			Name:    "primary_stress",
 			Level:   "Fatal",
 			Message: "Primary stress required",
-			Re:      regexp.MustCompile("\""),
+			Re:      ProcessTransRe(symbolset, "\""),
 		},
 		SymbolSetRule{
 			SymbolSet: symbolset,
