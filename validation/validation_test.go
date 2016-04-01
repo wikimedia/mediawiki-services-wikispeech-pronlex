@@ -99,7 +99,7 @@ func Test2(t *testing.T) {
 		},
 	}
 
-	if len(result) != len(expect) {
+	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
 	} else {
 		if result[0].RuleName != "MustHaveTrans" {
@@ -134,7 +134,7 @@ func Test3(t *testing.T) {
 			Message:  "[...]",
 		},
 	}
-	if len(result) != len(expect) {
+	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
 	} else {
 		if result[0].RuleName != "Decomp2Orth" {
@@ -216,7 +216,7 @@ func TestNst1(t *testing.T) {
 		Result{"final_nostress_nolong", "Warning", "[...]"},
 	}
 
-	if len(result) != len(expect) {
+	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
 	}
 
@@ -262,7 +262,7 @@ func TestNst1(t *testing.T) {
 
 	expect = []Result{}
 
-	if len(result) != len(expect) {
+	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
 	}
 
@@ -285,7 +285,7 @@ func TestNst1(t *testing.T) {
 
 	expect = []Result{}
 
-	if len(result) != len(expect) {
+	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
 	}
 
@@ -310,7 +310,7 @@ func TestNst1(t *testing.T) {
 		Result{"Decomp2Orth", "Fatal", "[...]"},
 	}
 
-	if len(result) != len(expect) {
+	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName || result[0].RuleName != expect[0].RuleName {
 		t.Errorf(fsExp, expect, result)
 	}
 }
@@ -325,7 +325,7 @@ func TestNst1(t *testing.T) {
 // 	expect := "hattorget"
 // 	result := string(reFrom.ReplaceAll([]byte(input), []byte(reTo), 0))
 
-// 	if result != expect {
+//	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName {
 // 		t.Errorf(fsExp, expect, result)
 // 	}
 
@@ -335,7 +335,7 @@ func TestNst1(t *testing.T) {
 // 	expect = "hatstorget"
 // 	result = string(reFrom.ReplaceAll([]byte(input), []byte(reTo), 0))
 
-// 	if result != expect {
+//	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName {
 // 		t.Errorf(fsExp, expect, result)
 // 	}
 
