@@ -151,7 +151,7 @@ type Transcription struct {
 
 // AddSource ... adds a source string at the beginning of the Transcription.Sources slice. If the source is already present,
 // AddSource silently ignores to add the already existing source.
-func (t Transcription) AddSource(s string) error {
+func (t *Transcription) AddSource(s string) error {
 	sDC := strings.ToLower(strings.TrimSpace(s))
 	if strings.Contains(sDC, SourceDelimiter) {
 		return fmt.Errorf("cannot add source containing the source delimiter : '%v'", SourceDelimiter)

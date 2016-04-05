@@ -154,8 +154,12 @@ func Test_InsertEntries(t *testing.T) {
 	// Change transcriptions and update db
 	ees0 := ees["apa"][0]
 	t10 := Transcription{Strn: "A: p A:", Language: "Apo"}
+	t10.AddSource("orangu1")
 	t20 := Transcription{Strn: "a p a", Language: "Sweinsprach"}
+	t20.AddSource("orangu2")
 	t30 := Transcription{Strn: "a pp a", Language: "Mysko"}
+	t30.AddSource("orangu3")
+	t30.AddSource("orangu4")
 	ees0.Transcriptions = []Transcription{t10, t20, t30}
 	// add new EntryStatus
 	ees0.EntryStatus = EntryStatus{Name: "new", Source: "tst"}
@@ -181,6 +185,10 @@ func Test_InsertEntries(t *testing.T) {
 	}
 	if len(eApa.Transcriptions) != 3 {
 		t.Errorf(fs, 3, len(eApa.Transcriptions))
+	}
+
+	if got, want := eApa.Transcriptions[0].Sources[0], "orangu1"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
 	if got, want := eApa.EntryStatus.Name, "new"; got != want {
