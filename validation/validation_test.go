@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/dbapi"
 )
 
@@ -315,28 +316,35 @@ func TestNst1(t *testing.T) {
 	}
 }
 
-// func TestPCREBackrefs(t *testing.T) {
-// 	reFrom, err := pcre.Compile("(.)\\1[+]\\1", pcre.CASELESS)
-// 	if err != nil {
-// 		t.Errorf(err.String())
-// 	}
-// 	reTo := "$1+$1"
-// 	input := "hatt+torget"
-// 	expect := "hattorget"
-// 	result := string(reFrom.ReplaceAll([]byte(input), []byte(reTo), 0))
+func TestRegexp2Backrefs(t *testing.T) {
+	reFrom, err := regexp2.Compile("(.)\\1[+]\\1", regexp2.None)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	//
 
-//	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName {
-// 		t.Errorf(fsExp, expect, result)
-// 	}
+	reTo := "$1+$1"
+	input := "hatt+torget"
+	expect := "hat+torget"
+	result, err := reFrom.Replace(input, reTo, 0, -1)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if result != expect {
+		t.Errorf(fsExp, expect, result)
+	}
 
-// 	//
+	//
 
-// 	input = "hats+torget"
-// 	expect = "hatstorget"
-// 	result = string(reFrom.ReplaceAll([]byte(input), []byte(reTo), 0))
+	input = "hats+torget"
+	expect = "hats+torget"
+	result, err = reFrom.Replace(input, reTo, 0, -1)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 
-//	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName {
-// 		t.Errorf(fsExp, expect, result)
-// 	}
+	if result != expect {
+		t.Errorf(fsExp, expect, result)
+	}
 
-// }
+}

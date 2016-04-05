@@ -1,9 +1,7 @@
 package validation
 
 import (
-	"fmt"
-	"strings"
-
+	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/symbolset"
 )
 
@@ -26,17 +24,16 @@ func NewNSTDemoValidator() (Validator, error) {
 		return Validator{}, err
 	}
 
-	conses := []string{
-		"q", "w", "r", "t", "p", "s", "d", "f", "g", "h", "j", "k", "l", "z", "x", "c", "v", "b", "n", "m",
+	reFrom, err := regexp2.Compile("(.)\\1[+]\\1", regexp2.None)
+	if err != nil {
+		return Validator{}, err
 	}
-	decomp2Orth := Decomp2Orth{"+", func(s string) string {
-		var res = s
-		for _, cons := range conses {
-			from := fmt.Sprintf("%v%v+%v", cons, cons, cons)
-			to := fmt.Sprintf("%v%v", cons, cons)
-			res = strings.Replace(res, from, to, -1)
+	decomp2Orth := Decomp2Orth{"+", func(s string) (string, error) {
+		res, err := reFrom.Replace(s, "$1+$1", 0, -1)
+		if err != nil {
+			return s, err
 		}
-		return res
+		return res, nil
 	}}
 
 	var vali = Validator{[]Rule{

@@ -111,14 +111,17 @@ func (r NoEmptyTrans) Validate(e dbapi.Entry) []Result {
 // Decomp2Orth is a general rule type to validate the word parts vs. the orthography. A filter is used to control the filtering, typically how to treat triple consonants at boundaries.
 type Decomp2Orth struct {
 	compDelim               string
-	preFilterWordPartString func(string) string
+	preFilterWordPartString func(string) (string, error)
 }
 
 func (r Decomp2Orth) Validate(e dbapi.Entry) []Result {
 	name := "Decomp2Orth"
 	level := "Fatal"
 	var result = make([]Result, 0)
-	filteredWordParts := r.preFilterWordPartString(e.WordParts)
+	filteredWordParts, err := r.preFilterWordPartString(e.WordParts)
+	if err != nil {
+		result = append(result, Result{name, level, fmt.Sprintf("decomp/orth rule returned error on replace call: %v", err)})
+	}
 	expectOrth := strings.Replace(filteredWordParts, r.compDelim, "", -1)
 	if expectOrth != e.Strn {
 		result = append(result, Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
