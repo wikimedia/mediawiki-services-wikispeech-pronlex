@@ -149,8 +149,11 @@ type Transcription struct {
 	Sources  []string `json:"sources"`
 }
 
-// AddSource ... adds a source string at the beginning of the Transcription.Sources slice. If the source is already present,
-// AddSource silently ignores to add the already existing source.
+// AddSource ... adds a source string at the beginning of the
+// Transcription.Sources slice. If the source is already present,
+// AddSource silently ignores to add the already existing
+// source. AddSource returns an error when the input string contains the
+// SourceDelimiter string.
 func (t *Transcription) AddSource(s string) error {
 	sDC := strings.ToLower(strings.TrimSpace(s))
 	if strings.Contains(sDC, SourceDelimiter) {
