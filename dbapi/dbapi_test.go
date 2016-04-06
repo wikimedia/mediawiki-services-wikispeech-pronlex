@@ -191,6 +191,13 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
+	if got, want := len(eApa.Transcriptions[2].Sources), 2; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+	if got, want := eApa.Transcriptions[2].Sources[0], "orangu4"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
 	if got, want := eApa.EntryStatus.Name, "new"; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
