@@ -429,6 +429,7 @@ func LookUp(db *sql.DB, q Query, out EntryWriter) error {
 
 // LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
 // EntryWriter.
+// TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
 func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
 	sqlString, values := SelectEntriesSQL(q)
@@ -479,6 +480,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			&transcriptionStrn,
 			&transcriptionLanguage,
 			&transcriptionSources,
+
 			// Optional, from LEFT JOIN
 
 			&lemmaID,
@@ -560,7 +562,14 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				EntryID:  transcriptionEntryID,
 				Strn:     transcriptionStrn,
 				Language: transcriptionLanguage,
-				Sources:  strings.Split(transcriptionSources, SourceDelimiter),
+				//Sources:  strings.Split(transcriptionSources, SourceDelimiter),
+			}
+			// Sources may be empty string in db
+			if trm(transcriptionSources) == "" {
+				currT.Sources = make([]string, 0)
+			} else {
+				// strings.Split returns the empty string if input the empty string
+				currT.Sources = strings.Split(transcriptionSources, SourceDelimiter)
 			}
 
 			currE.Transcriptions = append(currE.Transcriptions, currT)
