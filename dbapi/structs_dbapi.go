@@ -160,7 +160,7 @@ func (t *Transcription) AddSource(s string) error {
 		return fmt.Errorf("cannot add source containing the source delimiter : '%v'", SourceDelimiter)
 	}
 
-	for i, _ := range t.Sources {
+	for i := range t.Sources {
 		if sDC == t.Sources[i] {
 			return nil // source already there
 		}
@@ -171,6 +171,7 @@ func (t *Transcription) AddSource(s string) error {
 	return nil
 }
 
+// SourcesString returns the []string items of Transcription.Sources as a string, where the items are delimited by SourceDelimiter
 func (t Transcription) SourcesString() string {
 	return strings.Join(t.Sources, SourceDelimiter)
 }
