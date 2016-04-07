@@ -971,7 +971,7 @@ func SaveSymbolSet(db *sql.DB, symbolSet []Symbol) error {
 
 // SaveSymbolSetTx saves list of symbols that share the same LexiconID
 // to the db. Prior to saving the list, it removes all current Symbols
-// of the same LexiconID
+// of the same LexiconID. Silently ingnores the symbol if Symbol.Symbol == "".
 func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	if len(symbolSet) == 0 {
 		return nil //li vanilli
@@ -992,14 +992,15 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 
 	for _, s := range symbolSet {
 		// TODO prepared statement?
-		_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, subcat, description, ipa) values (?, ?, ?, ?, ?, ?)",
-			s.LexiconID, s.Symbol, s.Category, s.Subcat, s.Description, s.IPA)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed inserting symbol : %v", err)
+		if trm(s.Symbol) != "" {
+			_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, subcat, description, ipa) values (?, ?, ?, ?, ?, ?)",
+				s.LexiconID, s.Symbol, s.Category, s.Subcat, s.Description, s.IPA)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed inserting symbol : %v", err)
+			}
 		}
 	}
-
 	return nil
 }
 

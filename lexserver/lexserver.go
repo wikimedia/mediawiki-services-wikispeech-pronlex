@@ -263,13 +263,13 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
-	//http.ServeFile(w, r, "./static/admin/create_lex.html")
-	fmt.Fprint(w, "HEJ DU 1")
+	http.ServeFile(w, r, "./static/admin/create_lex.html")
+	//fmt.Fprint(w, "HEJ DU 1")
 }
 
 func adminEditSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	//http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
-	fmt.Fprint(w, "HEJ DU 2")
+	http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
+	//fmt.Fprint(w, "HEJ DU 2")
 }
 
 func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
@@ -287,7 +287,6 @@ func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("failed json unmashaling : %v", err), http.StatusBadRequest)
 		return
 	}
-
 	err = dbapi.SaveSymbolSet(db, ss)
 	if err != nil {
 		log.Printf("failed save symbol set %v\t%v", err, ss)
