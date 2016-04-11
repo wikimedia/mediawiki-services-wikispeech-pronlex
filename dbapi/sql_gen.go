@@ -184,12 +184,12 @@ func transcriptions(q Query) (string, []interface{}) {
 
 	if trm(q.TranscriptionLike) != "" {
 		res += "transcription.strn LIKE ? "
-		resv = append(resv, q.ParadigmLike)
+		resv = append(resv, q.TranscriptionLike)
 	}
 
-	if trm(q.ParadigmRegexp) != "" {
+	if trm(q.TranscriptionRegexp) != "" {
 		res += "transcription.strn REGEXP ? "
-		resv = append(resv, q.ParadigmRegexp)
+		resv = append(resv, q.TranscriptionRegexp)
 	}
 
 	return res, resv

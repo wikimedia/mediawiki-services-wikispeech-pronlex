@@ -433,6 +433,7 @@ func LookUp(db *sql.DB, q Query, out EntryWriter) error {
 func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
 	sqlString, values := SelectEntriesSQL(q)
+
 	rows, err := tx.Query(sqlString, values...)
 	if err != nil {
 		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction

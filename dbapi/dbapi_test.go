@@ -101,6 +101,16 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "more than zero", le2.ID)
 	}
 
+	que := Query{TranscriptionLike: "%pp%"}
+	var queRez EntrySliceWriter
+	err = LookUp(db, que, &queRez)
+	if err != nil {
+		t.Errorf("Wanted nil, got %v", err)
+	}
+	if got, want := len(queRez.Entries), 1; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
 	tx00, err := db.Begin()
 	ff("tx failed : %v", err)
 	defer tx00.Commit()
