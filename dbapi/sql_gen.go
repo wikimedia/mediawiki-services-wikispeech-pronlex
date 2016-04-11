@@ -72,7 +72,7 @@ func lexicons(q Query) (string, []interface{}) {
 		return res, resv
 	}
 
-	res += "lexicon.id in " + nQs(len(q.Lexicons))
+	res += "entry.lexiconid = lexicon.id AND lexicon.id in " + nQs(len(q.Lexicons))
 
 	lIds := make([]interface{}, len(q.Lexicons))
 	for i, l := range q.Lexicons {
@@ -228,7 +228,7 @@ LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id
 LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid 
 LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1
 LEFT JOIN entryvalidation ON entryvalidation.entryid = entry.id 
-WHERE lexicon.id = entry.lexiconid AND entry.id = transcription.entryid ` // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+WHERE entry.id = transcription.entryid ` // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
 
 // SelectEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,

@@ -155,7 +155,10 @@ func queryFromParams(r *http.Request) dbapi.Query {
 		pageLength = 25
 	}
 
+	log.Printf(">>>>>>>> LEXICONS %v", lexs)
 	dbLexs, err := dbapi.GetLexicons(db, lexs)
+	log.Printf(">>>>>>>> DBLEXICONS %v", dbLexs)
+
 	// TODO return error
 	if err != nil {
 		log.Printf("GetLexicons failed : %v", err)

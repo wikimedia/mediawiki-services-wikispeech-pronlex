@@ -432,7 +432,13 @@ func LookUp(db *sql.DB, q Query, out EntryWriter) error {
 // TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
 func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 
+	fmt.Printf("QUWRY %v\n\n", q)
+
 	sqlString, values := SelectEntriesSQL(q)
+
+	fmt.Printf("SQL %v\n\n", sqlString)
+
+	fmt.Printf("VALUES %v\n\n", values)
 
 	rows, err := tx.Query(sqlString, values...)
 	if err != nil {
