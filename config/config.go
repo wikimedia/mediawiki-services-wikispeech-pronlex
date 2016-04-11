@@ -105,6 +105,6 @@ func lineParser(name string) (line.Parser, error) {
 	case "nst":
 		return line.NewNST()
 	default:
-		return line.Format{}, fmt.Errorf("no line format for name %s", name)
+		return nil, fmt.Errorf("no line format for name %s", name)
 	}
 }
