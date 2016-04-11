@@ -15,6 +15,11 @@ type NST struct {
 	format Format
 }
 
+// Format is the line.Format instance used for line parsing inside of this parser
+func (nst NST) Format() Format {
+	return nst.format
+}
+
 // Parse is used for parsing input lines (calls underlying Format.Parse)
 func (nst NST) Parse(line string) (map[Field]string, error) {
 	return nst.format.Parse(line)

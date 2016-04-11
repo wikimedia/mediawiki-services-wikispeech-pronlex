@@ -1,4 +1,3 @@
-// Package line is used to define lexicon line format for parsing input and printing output
 package line
 
 import (
@@ -80,9 +79,11 @@ type FormatTest struct {
 	OutputLine string
 }
 
-// Parser is used to define a lexicon's line parser.
-// To implement your own parser, make sure to implement functions Parse(string) and String(map[Field]string)
+// Parser is used to define a lexicon's line parser. To implement your own parser, make sure to implement functions Parse(string) and String(map[Field]string)
 type Parser interface {
+
+	// Format is the line.Format instance used for line parsing inside of this parser
+	Format() Format
 
 	// Parse is used for parsing input lines
 	Parse(string) (map[Field]string, error)
