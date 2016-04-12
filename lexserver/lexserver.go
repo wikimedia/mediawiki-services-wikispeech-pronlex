@@ -15,11 +15,7 @@ import (
 	"strings"
 )
 
-func f(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+// TODO remove calls to this, add error handling
 func ff(f string, err error) {
 	if err != nil {
 		log.Fatalf(f, err)
@@ -124,7 +120,7 @@ var knownParams = map[string]int{
 }
 
 // TODO return error
-func queryFromParams(r *http.Request) dbapi.Query {
+func queryFromParams(r *http.Request) (dbapi.Query, error) {
 
 	lexs := dbapi.RemoveEmptyStrings(
 		regexp.MustCompile("[, ]").Split(r.FormValue("lexicons"), -1))
@@ -146,13 +142,20 @@ func queryFromParams(r *http.Request) dbapi.Query {
 	paradigmLike := strings.TrimSpace(r.FormValue("paradigmlike"))
 	paradigmRegexp := strings.TrimSpace(r.FormValue("paradigmregexp"))
 
+	// TODO report error if r.FormValue("page") != ""?
+	// Silently sets deafault if no value, or faulty value
 	page, err := strconv.ParseInt(r.FormValue("page"), 10, 64)
 	if err != nil {
 		page = 0
+		//log.Printf("failed to parse page parameter (using default value 0): %v", err)
 	}
+
+	// TODO report error if r.FormValue("pagelength") != ""?
+	// Silently sets deafault if no value, or faulty value
 	pageLength, err := strconv.ParseInt(r.FormValue("pagelength"), 10, 64)
 	if err != nil {
 		pageLength = 25
+		//log.Printf("failed to parse pagelength parameter (using default value 25) : %v", err)
 	}
 
 	//log.Printf(">>>>>>>> LEXICONS %v", lexs)
@@ -182,7 +185,7 @@ func queryFromParams(r *http.Request) dbapi.Query {
 		Page:                page,
 		PageLength:          pageLength}
 
-	return q
+	return q, err
 }
 
 func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
@@ -204,9 +207,12 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	q := queryFromParams(r)
-
-	//log.Printf("lexlookup db query : %v", q)
+	q, err := queryFromParams(r)
+	if err != nil {
+		log.Printf("failed to process query params: %v", err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
 
 	res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
 	if err != nil {
@@ -298,10 +304,10 @@ func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func listSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("hhhhhhhhhhhhhhhhh")
-	fmt.Fprint(w, "EN APA")
-}
+// func listSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
+// 	log.Println("hhhhhhhhhhhhhhhhh")
+// 	fmt.Fprint(w, "EN APA")
+// }
 
 var db *sql.DB
 
@@ -340,7 +346,7 @@ func main() {
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
 	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
-	http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
+	//http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
 	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)

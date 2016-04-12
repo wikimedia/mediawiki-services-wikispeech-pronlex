@@ -91,6 +91,7 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 // Lexicon structs corresponding to rows of db lexicon table with those name fields.
 func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	var res []Lexicon
+	found := make(map[string]bool)
 	if 0 == len(names) {
 		return res, nil
 	}
@@ -109,10 +110,27 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 		if err != nil {
 			return res, fmt.Errorf("failed rows scan : %v", err)
 		}
+		found[strings.ToLower(lname)] = true
 		res = append(res, Lexicon{ID: id, Name: lname, SymbolSetName: symbolsetname})
 	}
 	err = rows.Err()
 	rows.Close()
+
+	if len(res) != len(names) {
+		var missing []string
+		for _, n := range names {
+			if _, ok := found[strings.ToLower(n)]; !ok {
+				missing = append(missing, n)
+			}
+		}
+
+		err0 := fmt.Errorf("unknown lexicon(s): %v", strings.Join(missing, ", "))
+		if err != nil {
+			err = fmt.Errorf("%v : %v", err, err0)
+		} else {
+			err = err0
+		}
+	}
 
 	return res, err
 }
