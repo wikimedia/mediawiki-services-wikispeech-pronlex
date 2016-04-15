@@ -119,15 +119,16 @@ var knownParams = map[string]int{
 	"pp":                  1,
 }
 
-// TODO return error
+var splitRE = regexp.MustCompile("[, ]")
+
 func queryFromParams(r *http.Request) (dbapi.Query, error) {
 
 	lexs := dbapi.RemoveEmptyStrings(
-		regexp.MustCompile("[, ]").Split(r.FormValue("lexicons"), -1))
+		splitRE.Split(r.FormValue("lexicons"), -1))
 	words := dbapi.RemoveEmptyStrings(
-		regexp.MustCompile("[, ]").Split(r.FormValue("words"), -1))
+		splitRE.Split(r.FormValue("words"), -1))
 	lemmas := dbapi.RemoveEmptyStrings(
-		regexp.MustCompile("[, ]").Split(r.FormValue("lemmas"), -1))
+		splitRE.Split(r.FormValue("lemmas"), -1))
 
 	wordLike := strings.TrimSpace(r.FormValue("wordlike"))
 	wordRegexp := strings.TrimSpace(r.FormValue("wordregexp"))
@@ -328,13 +329,19 @@ func main() {
 
 	dbapi.Sqlite3WithRegex()
 
+	log.Print("lexserver: connecting to Sqlite3 db", dbFile)
 	db, err = sql.Open("sqlite3_with_regexp", dbFile)
 	ff("Failed to open dbfile %v", err)
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	ff("Failed to exec PRAGMA call %v", err)
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
-
+	log.Print("lexserver: running the Sqlite3 ANALYZE command...")
+	_, err = db.Exec("ANALYZE")
+	ff("Failed to exec ANALYZE %v", err)
+	if err == nil {
+		log.Print("... done")
+	}
 	// static
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/favicon.ico", faviconHandler)
@@ -358,6 +365,6 @@ func main() {
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
-	log.Print("Lexicon server listening on port ", port)
+	log.Print("lexserver: listening on port ", port)
 	log.Fatal(http.ListenAndServe(port, nil))
 }
