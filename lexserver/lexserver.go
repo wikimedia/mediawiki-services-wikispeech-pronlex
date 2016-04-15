@@ -225,8 +225,9 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/javascript; charset-utf8")
-	fmt.Fprint(w, string(jsn)) // TODO should not be called if error occurs?
+	//w.Header().Set("Content-Type", "application/javascript; charset-utf8")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(jsn))
 }
 
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
@@ -260,8 +261,13 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("failed return updated Entry : %v", err3), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, res0)
 	//return
+}
+
+func adminAdminHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/admin/admin.html")
 }
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
@@ -340,6 +346,7 @@ func main() {
 	http.HandleFunc("/updateentry", updateEntryHandler)
 
 	// admin pages/calls
+	http.HandleFunc("/admin/admin.html", adminAdminHandler)
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
 	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)

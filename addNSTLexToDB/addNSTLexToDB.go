@@ -89,5 +89,10 @@ func main() {
 	}
 	dbapi.InsertEntries(db, lex, eBuf) // flushing the buffer
 
+	_, err = db.Exec("ANALYZE")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	log.Printf("Lines read:\t%d", n)
 }
