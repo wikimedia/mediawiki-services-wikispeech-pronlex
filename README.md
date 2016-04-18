@@ -29,9 +29,9 @@ Create a pronlex.db and place it in the lexserver directory.
 ```
 github.com/stts-se/pronlex/lexserver$ createEmptyDB pronlex.db
 github.com/stts-se/pronlex/lexserver$ addNSTLexToDB sv.se.nst pronlex.db [PATH TO NST LEX]/swe030224NST.pron_utf8.txt 
-github.com/stts-se/pronlex/lexserver$ CompileDaemon -command lexserver
+github.com/stts-se/pronlex/lexserver$ go run lexserver.go
 ```
-(Or just `go run lexserver.go` if you don't use [Compile Daemon](https://github.com/githubnemo/CompileDaemon))
+(Or `CompileDaemon -command lexserver` if you use [Compile Daemon](https://github.com/githubnemo/CompileDaemon))
 
 
 ---
