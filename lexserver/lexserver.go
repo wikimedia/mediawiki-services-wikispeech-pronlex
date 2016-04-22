@@ -275,6 +275,10 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/index.html")
 }
 
+func adminLexDefinitionHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/admin_lex_definition.html")
+}
+
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/create_lex.html")
 	//fmt.Fprint(w, "HEJ DU 1")
@@ -342,6 +346,7 @@ func main() {
 	if err == nil {
 		log.Print("... done")
 	}
+
 	// static
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/favicon.ico", faviconHandler)
@@ -353,6 +358,8 @@ func main() {
 	http.HandleFunc("/updateentry", updateEntryHandler)
 
 	// admin pages/calls
+
+	http.HandleFunc("/admin_lex_definition.html", adminLexDefinitionHandler)
 	http.HandleFunc("/admin/admin.html", adminAdminHandler)
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)

@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>Admin lex definition</title>
+  </head>
+  <body>
+    <h1>Admin lex definition</h1>
+
+    <table>
+      <thead>
+	<tr>
+	  <td>Id</td>
+	  <td>Name</td>
+	  <td>Symbol Set</td>
+	</tr>
+      </thead>
+      <tbody data-bind="foreach: lexicons"> 
+	
+	<tr>
+	  <td data-bind="text: id"></td>
+	  
+	  <td data-bind="text: name"></td>
+	  
+	  <td data-bind="text: symbolSetName"></td>
+	
+	  <td><button data-bind="click: $root.showSymbolSet">Show symbol set</button></td>
+	  
+	</tr>
+
+      </tbody>
+      
+    </table>
+    
+    <p></p>
+    
+    <table>
+      <thead>
+	<tr>
+	  <td>Symbol</td>
+	  <td>Category</td>
+	  <td>Subcat</td>
+	  <td>Description</td>
+	  <td>IPA</td>
+	</tr>
+      </thead>
+      <tbody data-bind="foreach: selectedSymbolSet">
+	<tr>
+	  <td data-bind="text: symbol"></td>
+	</tr>
+      </tbody>
+    </table>
+    
+    
+    
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
+    <script type="text/javascript" src="../../static/admin_lex_definition.js"></script>
+  </body>
+</html>
