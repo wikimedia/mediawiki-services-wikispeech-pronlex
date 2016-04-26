@@ -1,6 +1,12 @@
 <html>
   <head>
-    <title>Admin lex definition</title>
+    <title>Admin lex definition</title>    
+    <style>
+      tr.selected {
+      background-color: #FFCF8B
+      }
+    </style>
+
   </head>
   <body>
     <h1>Admin lex definition</h1>
@@ -11,41 +17,62 @@
 	  <!-- <td>Id</td> -->
 	  <td>Name</td>
 	  <td>SymbolSet Name</td>
+	  <td>Import</td>
+	  <td>Select lexicon</td>
 	</tr>
       </thead>
       <tfoot>
 	<tr>
 	  <td>
 	    <input/>
-	  <td>
+	  </td>
 	  <td>
 	    <input/>
-	  <td>
+	  </td>
 	  <td>
 	    <button>Add</button>
-	  <td>
+	  </td>
+	  <td></td>
 	</tr>
       </tfoot>
       <tbody data-bind="foreach: lexicons"> 
 	
-	<tr>
+	<tr class="selectable">
 	  <!-- <td data-bind="text: id"></td> -->
 	  
 	  <td data-bind="text: name"></td>
 	  
 	  <td data-bind="text: symbolSetName"></td>
 	  
-	  <td><button data-bind="click: $root.showSymbolSet">Show symbol set</button></td>
+	  <td><input id="xapa" type="file" onchange="ADMLD.readLexiconFile(this.files[0])"></input></td>
 	  
+	  <td><button data-bind="click: $root.showSymbolSet">Show symbol set</button></td>
+	  <!-- <td><button data-bind="click: $root.importLexiconFile">Import lexicon file</button></td> -->
+
 	</tr>
 	
       </tbody>
       
     </table>
-      
-    <p></p>
     
-    <table>
+    <p>Lines read: <span style="text-align:right" data-bind="text: $root.nRead"></span></p>
+    
+    <p>Selected lexicon: <span data-bind="if: $root.selectedLexicon"><span  data-bind="text: $root.selectedLexicon().name"></span></span> </p>
+    <p>Symbol set name: 
+      <span data-bind="if: $root.selectedLexicon">
+	<span  data-bind="text: $root.selectedLexicon().symbolSetName"></span>
+	Import: <input type="file"></input>
+      </span> 
+    </p>
+    
+    <p>Selected Symbol: 
+      <span data-bind="if: $root.selectedSymbol">
+	<span  data-bind="text: $root.selectedSymbol().symbol"></span>
+      </span> 
+    </p>
+
+
+    <table data-bind="if: $root.selectedSymbolSet">
       <thead>
 	<tr>
 	  <td>Symbol</td>
@@ -53,10 +80,31 @@
 	  <td>Subcat</td>
 	  <td>Description</td>
 	  <td>IPA</td>
+	  <td></td>
 	</tr>
       </thead>
-      <tbody data-bind="foreach: selectedSymbolSet">
+      <tfoot>
 	<tr>
+	  <td>
+	    <input></input>
+	  </td>
+	  <td>
+	    <input></input>
+	  </td>
+	  <td>
+	    <input></input>
+	  </td>
+	  <td>
+	    <input></input>
+	  </td>
+	  <td>
+	    <input></input>
+	  </td>
+	  <td><button>Add</button></td>
+	</tr>
+      </tfoot>
+      <tbody data-bind="foreach: selectedSymbolSet">
+	<tr class="selectable" data-bind="click: $root.setSelectedSymbol">
 	  <td data-bind="text: symbol"></td>
 	  
 	  <td data-bind="text: category"></td>
@@ -72,9 +120,14 @@
     </table>
     
     
-    
+
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
-    <script type="text/javascript" src="../../static/admin_lex_definition.js"></script>
+
+    <script type="text/javascript" src="static/admin_lex_definition.js"></script>
+    
+    <script type="text/javascript" src="static/linereader.js"></script>
+<!--    <script type="text/javascript" src="line-navigator/node_modules/file-navigator.js"></script> -->
+
   </body>
 </html>
