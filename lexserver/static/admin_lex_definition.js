@@ -73,54 +73,65 @@ ADMLD.AdminLexDefModel = function () {
 	//console.log(self.symbolSets());
     };
     
-    self.selectedIPA = ko.observable();
+    self.selectedIPA = ko.observable({'symbol': ''});
     self.setSelectedIPA = function(symbol) {
 	console.log(">>>>> " + JSON.stringify(symbol));
 	self.selectedIPA(symbol);
     };
-
+    
+    self.nColumns = ko.observable(6);
+    
     self.createIPATableRows = function (nColumns, ipaList ) {
+	console.log('*** '+ nColumns);
 	var res = [];
-	//var row = [];
-	var tr = document.createElement("tr");
+	var row = [];
+	//var tr = document.createElement("tr");
 	var j = 0;
 	for(var i = 0; i < ipaList.length; i++) {
-	    var td = document.createElement("td")
-	    td.setAttribute("data-bind", "click: $root.setSelectedIPA");
+	    // var td = document.createElement("td")
+	    var ipaChar = {'symbol': ipaList[i]};
+	    //td.setAttribute("data-bind", "click: $root.setSelectedIPA");
 	    //td.setAttribute("text", ipaList[i]);
-	    td.innerHTML = ipaList[i];
+	    //td.innerHTML = ipaList[i];
 	    //ko.applyBindingsToNode(td);
-	    tr.appendChild(td);
+	    //tr.appendChild(td);
+	    row.push(ipaChar);
 	    j++;
 	    if ( j === nColumns) {
-		res.push(tr);
-		tr = document.createElement("tr");
+		res.push(row);
+		row = [];// document.createElement("tr");
 		j = 0;
 	    };
 	}; // <- for
 	// "flush":
-	if ( ipaList.length % nColumns !== 0) {
-	    res.push(tr);
+	if ( j !== nColumns) {
+	    res.push(row);
 	};
 	return res;
     }; 
 
 
-    self.ipaTableRows = ko.observableArray();
-    
     self.dummyIPA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'å', 'ä', 'ö'];
     
-    self.ipaTableRows(self.createIPATableRows(5, self.dummyIPA));
+    self.ipaTableRows = ko.computed(function() {
+	var n = self.nColumns();
+	console.log("... "+ n);
+	return self.createIPATableRows(n, self.dummyIPA);
+    });// ko.observableArray();
+    
+    
+    
+    //self.ipaTableRows();
     
 
 
-    self.ipaTable = ko.computed(function() {
-	var tbody = document.createElement("tbody");
-	for(var i = 0; i < self.ipaTableRows().length; i++) {
-	    tbody.appendChild( self.ipaTableRows()[i] );
-	}; 
-	return tbody.outerHTML;
-    }, this);
+    // self.ipaTable = ko.computed(function() {
+    // 	var tbody = document.createElement("tbody");
+    // 	for(var i = 0; i < self.ipaTableRows().length; i++) {
+    // 	    tbody.appendChild( self.ipaTableRows()[i] );
+    // 	}; 
+    // 	return tbody.outerHTML;
+    // }, this);
     
 };
 

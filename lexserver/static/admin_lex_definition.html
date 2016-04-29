@@ -5,6 +5,12 @@
       tr.selected {
       background-color: #FFCF8B
       }
+
+      
+      .hovable:hover  {
+      background: #c7d4dd
+      }
+
     </style>
     
   </head>
@@ -12,16 +18,19 @@
     <h1>Admin lex definition</h1>
 
 
-    <table style="width: 40px">
-      <tr data-bind="foreach $ipaSymbols">
-	<td data-bind="click: setSelectedIPA; text: $data"></td>
-	<td data-bind="click: setSelectedIPA">b</td>
-	<td data-bind="click: setSelectedIPA">c</td>
+    <p>
+      n columns <input type="number" data-bind="value: $root.nColumns"></input>
+    </p>
+
+    <table data-bind="foreach: $root.ipaTableRows">
+      <tr data-bind="foreach: $data">
+	<td class="hovable" data-bind="click: $root.setSelectedIPA, text: $data.symbol"></td>
       </tr>
     </table>
     
+    
     <p>
-      Selected symbol: <span data-bind="text: $root.selectedIPA"></span>
+      Selected symbol: <span data-bind="text: $root.selectedIPA().symbol"></span>
     </p>
     
 
@@ -136,13 +145,7 @@
     </table>
     
     
-    <table data-bind="html: $root.ipaTable">
-      
-    </table>
 
-    <p></p>
-
- 
 
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
