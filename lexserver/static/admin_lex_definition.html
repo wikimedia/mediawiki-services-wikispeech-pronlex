@@ -6,11 +6,27 @@
       background-color: #FFCF8B
       }
     </style>
-
+    
   </head>
   <body>
     <h1>Admin lex definition</h1>
 
+
+    <table style="width: 40px">
+      <tr data-bind="foreach $ipaSymbols">
+	<td data-bind="click: setSelectedIPA; text: $data"></td>
+	<td data-bind="click: setSelectedIPA">b</td>
+	<td data-bind="click: setSelectedIPA">c</td>
+      </tr>
+    </table>
+    
+    <p>
+      Selected symbol: <span data-bind="text: $root.selectedIPA"></span>
+    </p>
+    
+
+
+    
     <table>
       <thead>
 	<tr>
@@ -120,6 +136,14 @@
     </table>
     
     
+    <table data-bind="html: $root.ipaTable">
+      
+    </table>
+
+    <p></p>
+
+ 
+
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
@@ -127,7 +151,5 @@
     <script type="text/javascript" src="static/admin_lex_definition.js"></script>
     
     <script type="text/javascript" src="static/linereader.js"></script>
-<!--    <script type="text/javascript" src="line-navigator/node_modules/file-navigator.js"></script> -->
-
   </body>
 </html>

@@ -33,7 +33,7 @@ ADMLD.AdminLexDefModel = function () {
     
     self.selectedSymbolSet = ko.observable();
     self.selectedSymbol = ko.observable({});
-
+    
     self.showSymbolSet = function(lexicon) {
 	self.selectedSymbol({});
 	self.selectedLexicon(lexicon);
@@ -43,17 +43,16 @@ ADMLD.AdminLexDefModel = function () {
 	} else {
 	    self.selectedSymbolSet(self.symbolSets()[symbolSetName]);
 	};
-	
     };
     
     self.setSelectedSymbol= function (symbol) {
 	self.selectedSymbol(symbol);
     };
- 
+    
     // self.importLexiconFile = function() {
     // 	console.log("Opening file");
     // }
-
+    
     
     self.addLexicon = function(lexiconName, symbolSetName) {
 	//self = this;
@@ -70,11 +69,59 @@ ADMLD.AdminLexDefModel = function () {
 	    ss[symbolSetName] = [];
 	};
 	self.symbolSets()[symbolSetName].push(symbol);
-   
+	
 	//console.log(self.symbolSets());
     };
+    
+    self.selectedIPA = ko.observable();
+    self.setSelectedIPA = function(symbol) {
+	console.log(">>>>> " + JSON.stringify(symbol));
+	self.selectedIPA(symbol);
+    };
+
+    self.createIPATableRows = function (nColumns, ipaList ) {
+	var res = [];
+	//var row = [];
+	var tr = document.createElement("tr");
+	var j = 0;
+	for(var i = 0; i < ipaList.length; i++) {
+	    var td = document.createElement("td")
+	    td.setAttribute("data-bind", "click: $root.setSelectedIPA");
+	    //td.setAttribute("text", ipaList[i]);
+	    td.innerHTML = ipaList[i];
+	    //ko.applyBindingsToNode(td);
+	    tr.appendChild(td);
+	    j++;
+	    if ( j === nColumns) {
+		res.push(tr);
+		tr = document.createElement("tr");
+		j = 0;
+	    };
+	}; // <- for
+	// "flush":
+	if ( ipaList.length % nColumns !== 0) {
+	    res.push(tr);
+	};
+	return res;
+    }; 
 
 
+    self.ipaTableRows = ko.observableArray();
+    
+    self.dummyIPA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'å', 'ä', 'ö'];
+    
+    self.ipaTableRows(self.createIPATableRows(5, self.dummyIPA));
+    
+
+
+    self.ipaTable = ko.computed(function() {
+	var tbody = document.createElement("tbody");
+	for(var i = 0; i < self.ipaTableRows().length; i++) {
+	    tbody.appendChild( self.ipaTableRows()[i] );
+	}; 
+	return tbody.outerHTML;
+    }, this);
+    
 };
 
 
