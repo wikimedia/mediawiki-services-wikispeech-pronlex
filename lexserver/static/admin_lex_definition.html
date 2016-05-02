@@ -17,23 +17,8 @@
   <body>
     <h1>Admin lex definition</h1>
 
-
-    <p>
-      n columns <input type="number" data-bind="value: $root.nColumns"></input>
-    </p>
-
-    <table data-bind="foreach: $root.ipaTableRows">
-      <tr data-bind="foreach: $data">
-	<td class="hovable" data-bind="click: $root.setSelectedIPA, text: $data.symbol"></td>
-      </tr>
-    </table>
     
-    
-    <p>
-      Selected symbol: <span data-bind="text: $root.selectedIPA().symbol"></span>
-    </p>
-    
-
+  
 
     
     <table>
@@ -86,17 +71,12 @@
     <p>Symbol set name: 
       <span data-bind="if: $root.selectedLexicon">
 	<span  data-bind="text: $root.selectedLexicon().symbolSetName"></span>
-	Import: <input type="file"></input>
+	Import: <input type="file" data-bind="event: { change: function() { $root.readSymbolSetFile($element.files[0]) } }"></input>
       </span> 
     </p>
+
+
     
-    <p>Selected Symbol: 
-      <span data-bind="if: $root.selectedSymbol">
-	<span  data-bind="text: $root.selectedSymbol().symbol"></span>
-      </span> 
-    </p>
-
-
     <table data-bind="if: $root.selectedSymbolSet">
       <thead>
 	<tr>
@@ -123,7 +103,8 @@
 	    <input></input>
 	  </td>
 	  <td>
-	    <input></input>
+	    <!-- TODO validation of manual user input (must be defined in IPA table) -->
+	    <input  data-bind="value: $root.selectedIPA().symbol"></input>
 	  </td>
 	  <td><button>Add</button></td>
 	</tr>
@@ -145,9 +126,18 @@
     </table>
     
     
-
-
-
+    <!-- table for selecting an IPA symbol -->
+    <table data-bind="foreach: $root.ipaTableRows">
+      <tr data-bind="foreach: $data">
+	<td class="hovable" data-bind="click: $root.setSelectedIPA, text: $data.symbol"></td>
+      </tr>
+    </table>
+  
+    <p>
+      Selected symbol: <span data-bind="text: $root.selectedIPA().symbol"></span>
+    </p>
+    
+    
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
 

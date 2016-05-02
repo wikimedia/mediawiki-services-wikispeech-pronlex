@@ -4,6 +4,7 @@ var ADMLD = {};
 ADMLD.baseURL = window.location.origin;
 
 
+
 ADMLD.AdminLexDefModel = function () {
     var self = this; 
     
@@ -28,9 +29,12 @@ ADMLD.AdminLexDefModel = function () {
     
     
     self.lexicons = ko.observableArray();
+    // Sample lexicon object: {"id":0,"name":"nisse2","symbolSetName":"kvack2"}
     self.selectedLexicon = ko.observable();
+    // An object/hash with symbol set name as key and a list of symbol objects as value
     self.symbolSets = ko.observable({});
     
+    // A sample symbol: {"symbol":"O","category":"Phoneme","subcat":"Syllabic","description":"h(å)ll","ipa":"ɔ"}
     self.selectedSymbolSet = ko.observable();
     self.selectedSymbol = ko.observable({});
     
@@ -48,6 +52,27 @@ ADMLD.AdminLexDefModel = function () {
     self.setSelectedSymbol= function (symbol) {
 	self.selectedSymbol(symbol);
     };
+
+    self.readSymbolSetFile = function (symbolSetfile) {
+	console.log(symbolSetfile.name);
+	var reader = new FileReader();
+
+	reader.onloadend = function(evt) {      
+	    // Currently expecting hard wired tab separated format: 
+	    // DESC/EXAMPLE	NST-XSAMPA	WS-SAMPA	IPA	TYPE
+	    // Lines starting with # are descarded 
+	    
+            lines = evt.target.result.split(/\r?\n/);
+            lines.forEach(function (line) {
+		
+		console.log(line);
+            }); 
+	};
+	
+	reader.readAsText(symbolSetfile,"UTF-8");
+    };
+    
+
     
     // self.importLexiconFile = function() {
     // 	console.log("Opening file");
@@ -75,14 +100,13 @@ ADMLD.AdminLexDefModel = function () {
     
     self.selectedIPA = ko.observable({'symbol': ''});
     self.setSelectedIPA = function(symbol) {
-	console.log(">>>>> " + JSON.stringify(symbol));
+	//console.log(">>>>> " + JSON.stringify(symbol));
 	self.selectedIPA(symbol);
     };
     
     self.nColumns = ko.observable(6);
     
     self.createIPATableRows = function (nColumns, ipaList ) {
-	console.log('*** '+ nColumns);
 	var res = [];
 	var row = [];
 	//var tr = document.createElement("tr");
@@ -111,14 +135,16 @@ ADMLD.AdminLexDefModel = function () {
     }; 
 
 
+    // TODO remove hard wired test
     self.dummyIPA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'å', 'ä', 'ö'];
     
     self.ipaTableRows = ko.computed(function() {
 	var n = self.nColumns();
-	console.log("... "+ n);
 	return self.createIPATableRows(n, self.dummyIPA);
     });// ko.observableArray();
     
+    
+    // TODO remove hard-wired test
     
     
     //self.ipaTableRows();
@@ -150,9 +176,8 @@ adm.addSymbolToSet("kvack1", {'symbol': 'b', 'category': 'Phoneme', 'subcat' : '
 adm.addSymbolToSet("kvack2", {'symbol': 'O', 'category': 'Phoneme', 'subcat' : 'Syllabic', 'description': 'h(å)ll', 'ipa' : 'ɔ'});
 adm.addSymbolToSet("kvack2", {'symbol': 'p', 'category': 'Phoneme', 'subcat' : 'NonSyllabic', 'description': '(p)il', 'ipa' : 'p'});
 
-
+adm.showSymbolSet({"id":0,"name":"nisse2","symbolSetName":"kvack2"});
 
 $(document).on('click', '.selectable', (function(){
-    console.log(this);
     $(this).addClass("selected").siblings().removeClass("selected");
 }));
