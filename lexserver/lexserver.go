@@ -370,7 +370,12 @@ func main() {
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 
 	//            (Why this http.StripPrefix?)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	//http.Handle("/line-navigator/", http.StripPrefix("/line-navigator/node_modules/", http.FileServer(http.Dir("./static/node_modules/line-navigator/"))))
+
+	//http.Handle("/line-by-line/", http.StripPrefix("/line-by-line/node_modules/", http.FileServer(http.Dir("./static/node_modules/line-by-line/"))))
+
+	//http.FileServer(http.Dir("./static/"))
 
 	log.Print("lexserver: listening on port ", port)
 	log.Fatal(http.ListenAndServe(port, nil))
