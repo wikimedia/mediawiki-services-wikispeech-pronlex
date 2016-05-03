@@ -478,10 +478,24 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	}
 }
 
-func testMapTranscription(t *testing.T, ssm Mapper, input string, expect string) {
+func testMapTranscription1(t *testing.T, ssm Mapper, input string, expect string) {
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
+	if result != expect {
+		t.Errorf(fsExpTrans, expect, result)
+	}
+}
+
+func testMapTranscriptionX(t *testing.T, ssms []Mapper, input string, expect string) {
+	result := input
+	for _, m := range ssms {
+		r, err := m.mapTranscription(result)
+		result = r
+		if err != nil {
+			t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		}
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
@@ -497,8 +511,8 @@ func Test_LoadMapper_NST2IPA(t *testing.T) {
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
-	testMapTranscription(t, ssm, "\"bOt`", "\u02C8bɔʈ")
-	testMapTranscription(t, ssm, "\"ku0r-ds", "\u02C8kɵrds")
+	testMapTranscription1(t, ssm, "\"bOt`", "\u02C8bɔʈ")
+	testMapTranscription1(t, ssm, "\"ku0r-ds", "\u02C8kɵrds")
 }
 
 func Test_LoadMapper_WS2IPA(t *testing.T) {
@@ -510,29 +524,44 @@ func Test_LoadMapper_WS2IPA(t *testing.T) {
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
-	testMapTranscription(t, ssm, "\" b O rt", "\u02C8bɔʈ")
-	testMapTranscription(t, ssm, "\" k u0 r d s", "\u02C8kɵrds")
+	testMapTranscription1(t, ssm, "\" b O rt", "\u02C8bɔʈ")
+	testMapTranscription1(t, ssm, "\" k u0 r d s", "\u02C8kɵrds")
 }
 
-// func Test_LoadMapper_NST2WS(t *testing.T) {
-// 	name := "NST-XSAMPA"
-// 	fromColumn := "SYMBOL"
-// 	toColumn := "IPA"
-// 	fName := "static/sv_nst-xsampa_maptable.csv"
-// 	ssmNST, err := LoadMapper(name, fName, fromColumn, toColumn)
-// 	if err != nil {
-// 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
-// 	}
+func Test_LoadMapper_IPA2WS(t *testing.T) {
+	name := "WS-SAMPA"
+	fromColumn := "IPA"
+	toColumn := "SYMBOL"
+	fName := "static/sv_ws-sampa_maptable.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
+	testMapTranscription1(t, ssm, "\u02C8bɔʈ", "\" b O rt")
+	testMapTranscription1(t, ssm, "\u02C8kɵrds", "\" k u0 r d s")
+}
 
-// 	name = "WS-SAMPA"
-// 	fromColumn = "SYMBOL"
-// 	toColumn = "IPA"
-// 	fName = "static/sv_ws-sampa_maptable.csv"
-// 	ssmWS, err := LoadMapper(name, fName, fromColumn, toColumn)
-// 	if err != nil {
-// 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
-// 	}
+func Test_LoadMapper_NST2WS(t *testing.T) {
+	name := "NST-XSAMPA"
+	fromColumn := "SYMBOL"
+	toColumn := "IPA"
+	fName := "static/sv_nst-xsampa_maptable.csv"
+	ssmNST, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
 
-// 	testMapTranscription(t, ssmWS, "\"bOt`", "\" b O rt")
-// 	testMapTranscription(t, ssmWS, "\"ku0r-d", "\" k u0 r d")
-// }
+	name = "WS-SAMPA"
+	fromColumn = "IPA"
+	toColumn = "SYMBOL"
+	fName = "static/sv_ws-sampa_maptable.csv"
+	ssmWS, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
+
+	mappers := []Mapper{ssmNST, ssmWS}
+
+	testMapTranscriptionX(t, mappers, "\"bOt`", "\" b O rt")
+	testMapTranscriptionX(t, mappers, "\"ku0r-d", "\" k u0 r d")
+}
