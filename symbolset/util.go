@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-// FilterSymbolsByType is used to filter out specific symbol types from the symbol set (syllabic, non syllabic, etc)
-func FilterSymbolsByType(symbols []Symbol, types []SymbolType) []Symbol {
+// FilterSymbolsByCat is used to filter out specific symbol types from the symbol set (syllabic, non syllabic, etc)
+func FilterSymbolsByCat(symbols []Symbol, types []SymbolCat) []Symbol {
 	var res = make([]Symbol, 0)
 	for _, s := range symbols {
-		if containsType(types, s.Type) {
+		if containsCat(types, s.Cat) {
 			res = append(res, s)
 		}
 	}
@@ -49,7 +49,7 @@ func buildRegexpWithGroup(symbols []Symbol, removeEmpty bool, anonGroup bool) (*
 	return re, nil
 }
 
-func containsType(types []SymbolType, t SymbolType) bool {
+func containsCat(types []SymbolCat, t SymbolCat) bool {
 	for _, t0 := range types {
 		if t0 == t {
 			return true

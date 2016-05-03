@@ -24,13 +24,13 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	var nilRes SymbolSet
 
 	// filtered lists
-	phonemes := FilterSymbolsByType(symbols, []SymbolType{Syllabic, NonSyllabic, Stress})
-	phoneticSymbols := FilterSymbolsByType(symbols, []SymbolType{Syllabic, NonSyllabic})
-	stressSymbols := FilterSymbolsByType(symbols, []SymbolType{Stress})
-	syllabic := FilterSymbolsByType(symbols, []SymbolType{Syllabic})
-	nonSyllabic := FilterSymbolsByType(symbols, []SymbolType{NonSyllabic})
-	phonemeDelimiters := FilterSymbolsByType(symbols, []SymbolType{PhonemeDelimiter})
-	explicitPhonemeDelimiters := FilterSymbolsByType(symbols, []SymbolType{ExplicitPhonemeDelimiter})
+	phonemes := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic, Stress})
+	phoneticSymbols := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic})
+	stressSymbols := FilterSymbolsByCat(symbols, []SymbolCat{Stress})
+	syllabic := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic})
+	nonSyllabic := FilterSymbolsByCat(symbols, []SymbolCat{NonSyllabic})
+	phonemeDelimiters := FilterSymbolsByCat(symbols, []SymbolCat{PhonemeDelimiter})
+	explicitPhonemeDelimiters := FilterSymbolsByCat(symbols, []SymbolCat{ExplicitPhonemeDelimiter})
 
 	// specific symbol initialization
 	if len(phonemeDelimiters) < 1 {
@@ -153,14 +153,13 @@ func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper,
 }
 
 // LoadMapper loads a Mapper from file
-func LoadMapper(fName string, fromName string, toName string) (Mapper, error) {
+func LoadMapper(name string, fName string, fromColumn string, toColumn string) (Mapper, error) {
 	var nilRes Mapper
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
 		return nilRes, err
 	}
-
 	s := bufio.NewScanner(fh)
 	n := 0
 	var descIndex, fromIndex, toIndex, typeIndex int
@@ -174,44 +173,56 @@ func LoadMapper(fName string, fromName string, toName string) (Mapper, error) {
 		if len(strings.TrimSpace(l)) > 0 && !strings.HasPrefix(strings.TrimSpace(l), "#") {
 			fs := strings.Split(l, "\t")
 			if n == 1 { // header
-				descIndex = indexOf(fs, "DESC/EXAMPLE")
-				fromIndex = indexOf(fs, fromName)
-				toIndex = indexOf(fs, toName)
-				typeIndex = indexOf(fs, "TYPE")
+				descIndex = indexOf(fs, "DESCRIPTION")
+				fromIndex = indexOf(fs, fromColumn)
+				toIndex = indexOf(fs, toColumn)
+				typeIndex = indexOf(fs, "CATEGORY")
 
 			} else {
 				from := fs[fromIndex]
 				to := fs[toIndex]
 				desc := fs[descIndex]
 				typeS := fs[typeIndex]
-				var symType SymbolType
+				var symCat SymbolCat
 				switch typeS {
 				case "syllabic":
-					symType = Syllabic
+					symCat = Syllabic
 				case "non syllabic":
-					symType = NonSyllabic
+					symCat = NonSyllabic
 				case "stress":
-					symType = Stress
+					symCat = Stress
 				case "phoneme delimiter":
-					symType = PhonemeDelimiter
+					symCat = PhonemeDelimiter
 				case "explicit phoneme delimiter":
-					symType = ExplicitPhonemeDelimiter
+					symCat = ExplicitPhonemeDelimiter
 				case "syllable delimiter":
-					symType = SyllableDelimiter
+					symCat = SyllableDelimiter
 				case "morpheme delimiter":
-					symType = MorphemeDelimiter
+					symCat = MorphemeDelimiter
 				case "compound delimiter":
-					symType = CompoundDelimiter
+					symCat = CompoundDelimiter
 				case "word delimiter":
-					symType = WordDelimiter
+					symCat = WordDelimiter
 				default:
 					return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
 				}
-				symFrom := Symbol{String: from, Type: symType, Desc: desc}
-				symTo := Symbol{String: to, Type: symType, Desc: desc}
+				symFrom := Symbol{String: from, Cat: symCat, Desc: desc}
+				symTo := Symbol{String: to, Cat: symCat, Desc: desc}
 				maptable = append(maptable, SymbolPair{symFrom, symTo})
 			}
 		}
+	}
+	fromName := ""
+	toName := ""
+	if fromColumn == "SYMBOL" {
+		fromName = name
+	} else {
+		fromName = fromColumn
+	}
+	if toColumn == "SYMBOL" {
+		toName = name
+	} else {
+		toName = toColumn
 	}
 	m, err := NewMapper(fromName, toName, maptable)
 	if err != nil {

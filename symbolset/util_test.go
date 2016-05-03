@@ -96,7 +96,7 @@ func Test_buildRegexp3(t *testing.T) {
 	}
 }
 
-func Test_FilterSymbolsByType(t *testing.T) {
+func Test_FilterSymbolsByCat(t *testing.T) {
 	symbols := []Symbol{
 		Symbol{"a", Syllabic, ""},
 		Symbol{"t", NonSyllabic, ""},
@@ -115,7 +115,7 @@ func Test_FilterSymbolsByType(t *testing.T) {
 		Symbol{"%", Stress, ""},
 		Symbol{"\"", Stress, ""},
 	}
-	stressR := FilterSymbolsByType(symbols, []SymbolType{Stress})
+	stressR := FilterSymbolsByCat(symbols, []SymbolCat{Stress})
 	testEqSymbols(t, stressE, stressR)
 
 	delimE := []Symbol{
@@ -125,7 +125,7 @@ func Test_FilterSymbolsByType(t *testing.T) {
 		Symbol{"", PhonemeDelimiter, ""},
 		Symbol{"+", MorphemeDelimiter, ""},
 	}
-	delimR := FilterSymbolsByType(symbols, []SymbolType{SyllableDelimiter, PhonemeDelimiter, ExplicitPhonemeDelimiter, MorphemeDelimiter})
+	delimR := FilterSymbolsByCat(symbols, []SymbolCat{SyllableDelimiter, PhonemeDelimiter, ExplicitPhonemeDelimiter, MorphemeDelimiter})
 	testEqSymbols(t, delimE, delimR)
 }
 

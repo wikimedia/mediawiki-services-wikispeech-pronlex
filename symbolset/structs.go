@@ -86,7 +86,7 @@ func (m Mapper) mapTranscription(input string) (string, error) {
 			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
 		}
 		to := m.symbolMap[from]
-		//if to.Type == UndefinedSymbol {
+		//if to.Cat == UndefinedSymbol {
 		//	return "", fmt.Errorf("couldn't map symbol /%s/", fromS)
 		//}
 		if len(to.String) > 0 {
@@ -122,12 +122,12 @@ func (a symbolSlice) Less(i, j int) bool {
 	return a[i].String < a[j].String
 }
 
-// SymbolType is used to categorize transcription symbols.
-type SymbolType int
+// SymbolCat is used to categorize transcription symbols.
+type SymbolCat int
 
 const (
 	// Syllabic is used for syllabic phonemes (typically vowels and syllabic consonants)
-	Syllabic SymbolType = iota
+	Syllabic SymbolCat = iota
 
 	// NonSyllabic is used for non-syllabic phonemes (typically consonants)
 	NonSyllabic
@@ -161,7 +161,7 @@ const (
 // Symbol represent a phoneme, stress or delimiter symbol used in transcriptions
 type Symbol struct {
 	String string
-	Type   SymbolType
+	Cat    SymbolCat
 	Desc   string
 }
 

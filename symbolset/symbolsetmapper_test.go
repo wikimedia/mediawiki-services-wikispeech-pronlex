@@ -488,26 +488,51 @@ func testMapTranscription(t *testing.T, ssm Mapper, input string, expect string)
 	}
 }
 
-func Test_LoadMapper_NST2WS(t *testing.T) {
-	fromName := "NST-XSAMPA"
-	toName := "WS-SAMPA"
-	fName := "static/sv_maptable.csv"
-	ssm, err := LoadMapper(fName, fromName, toName)
-	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
-	}
-	testMapTranscription(t, ssm, "\"bOt`", "\" b O rt")
-	testMapTranscription(t, ssm, "\"ku0r-d", "\" k u0 r d")
-}
-
 func Test_LoadMapper_NST2IPA(t *testing.T) {
-	fromName := "NST-XSAMPA"
-	toName := "IPA"
-	fName := "static/sv_maptable.csv"
-	ssm, err := LoadMapper(fName, fromName, toName)
+	name := "NST-XSAMPA"
+	fromColumn := "SYMBOL"
+	toColumn := "IPA"
+	fName := "static/sv_nst-xsampa_maptable.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	testMapTranscription(t, ssm, "\"bOt`", "\u02C8bɔʈ")
 	testMapTranscription(t, ssm, "\"ku0r-ds", "\u02C8kɵrds")
 }
+
+func Test_LoadMapper_WS2IPA(t *testing.T) {
+	name := "WS-SAMPA"
+	fromColumn := "SYMBOL"
+	toColumn := "IPA"
+	fName := "static/sv_ws-sampa_maptable.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+	}
+	testMapTranscription(t, ssm, "\" b O rt", "\u02C8bɔʈ")
+	testMapTranscription(t, ssm, "\" k u0 r d s", "\u02C8kɵrds")
+}
+
+// func Test_LoadMapper_NST2WS(t *testing.T) {
+// 	name := "NST-XSAMPA"
+// 	fromColumn := "SYMBOL"
+// 	toColumn := "IPA"
+// 	fName := "static/sv_nst-xsampa_maptable.csv"
+// 	ssmNST, err := LoadMapper(name, fName, fromColumn, toColumn)
+// 	if err != nil {
+// 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+// 	}
+
+// 	name = "WS-SAMPA"
+// 	fromColumn = "SYMBOL"
+// 	toColumn = "IPA"
+// 	fName = "static/sv_ws-sampa_maptable.csv"
+// 	ssmWS, err := LoadMapper(name, fName, fromColumn, toColumn)
+// 	if err != nil {
+// 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+// 	}
+
+// 	testMapTranscription(t, ssmWS, "\"bOt`", "\" b O rt")
+// 	testMapTranscription(t, ssmWS, "\"ku0r-d", "\" k u0 r d")
+// }
