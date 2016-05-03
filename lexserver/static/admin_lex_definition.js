@@ -34,8 +34,9 @@ ADMLD.AdminLexDefModel = function () {
     // An object/hash with symbol set name as key and a list of symbol objects as value
     self.symbolSets = ko.observable({});
     
-    // A sample symbol: {"symbol":"O","category":"Phoneme","subcat":"Syllabic","description":"h(å)ll","ipa":"ɔ"}
-    self.selectedSymbolSet = ko.observable();
+    // List of Symbol objects
+    self.selectedSymbolSet = ko.observableArray();
+    // A sample symbol: {"symbol":"O","category":"Phoneme","description":"h(å)ll","ipa":"ɔ"}
     self.selectedSymbol = ko.observable({});
     
     self.showSymbolSet = function(lexicon) {
@@ -43,7 +44,7 @@ ADMLD.AdminLexDefModel = function () {
 	self.selectedLexicon(lexicon);
      	var symbolSetName = lexicon.symbolSetName;
 	if (! self.symbolSets().hasOwnProperty(symbolSetName)) {
-	    self.selectedSymbolSet({});
+	    self.selectedSymbolSet().removeAll();
 	} else {
 	    self.selectedSymbolSet(self.symbolSets()[symbolSetName]);
 	};
@@ -53,19 +54,60 @@ ADMLD.AdminLexDefModel = function () {
 	self.selectedSymbol(symbol);
     };
 
+    // TODO hard wired list of symbol set file header field names  
+    self.headerFields = {'DESCRIPTION' : true, 'SYMBOL': true, 'IPA': true, 'CATEGORY': true};
     self.readSymbolSetFile = function (symbolSetfile) {
-	console.log(symbolSetfile.name);
-	var reader = new FileReader();
+	
+	// returns hash of header field name -> field index
+	function headerIndexMap(header) {
+	    var rez = {};
+	    
+	    var fields = header.trim().split(/\t/); 
+	    // TODO hard wired number of fields
+	    // TODO proper error handling
+	    if (fields.length !== 4) { 
+		alert("Wrong number of fields in header: "+ header);
+		return;
+	    };
+	    for(var i = 0; i < fields.length; i++) {
+		if (! self.headerFields.hasOwnProperty(fields[i])) {
+		    // TODO proper error handling
+		    alert("Unknown header field: "+ fields[i]);
+		}  
+		rez[fields[i]] = i;
+	    };
+	    return rez;
+	};
 
+	var reader = new FileReader();
 	reader.onloadend = function(evt) {      
 	    // Currently expecting hard wired tab separated format: 
 	    // DESC/EXAMPLE	NST-XSAMPA	WS-SAMPA	IPA	TYPE
-	    // Lines starting with # are descarded 
+	    // Lines starting with # are descarded
 	    
             lines = evt.target.result.split(/\r?\n/);
-            lines.forEach(function (line) {
+            if( lines.length > 0 ) {
+		var header = lines.shift();
+		var headerIndexes = headerIndexMap(header);
 		
-		console.log(line);
+	    } else {  // TODO How do you do error handling when asynchronously reading a file?
+		alert("Empty input file: "+ symbolSetfile.name)
+		return; // ?
+	    }
+	    lines.forEach(function (line) {
+		if (line.trim() === "") return; // "continue"
+		if (line.trim().startsWith("#")) return; // "continue"
+		
+		var fs = line.split(/\t/);
+		// TODO hard wired
+		if (fs.length !== 4 ) alert("Wrong number of fields in line: "+ line);
+		var symbol = {'symbol': fs[headerIndexes['SYMBOL']],
+			      'category': fs[headerIndexes['CATEGORY']],
+			      'description': fs[headerIndexes['DESCRIPTION']],
+			      'ipa': fs[headerIndexes['IPA']]
+			     };
+		self.selectedSymbolSet.push(symbol);
+		console.log(JSON.stringify(symbol));
             }); 
 	};
 	
@@ -176,7 +218,7 @@ adm.addSymbolToSet("kvack1", {'symbol': 'b', 'category': 'Phoneme', 'subcat' : '
 adm.addSymbolToSet("kvack2", {'symbol': 'O', 'category': 'Phoneme', 'subcat' : 'Syllabic', 'description': 'h(å)ll', 'ipa' : 'ɔ'});
 adm.addSymbolToSet("kvack2", {'symbol': 'p', 'category': 'Phoneme', 'subcat' : 'NonSyllabic', 'description': '(p)il', 'ipa' : 'p'});
 
-adm.showSymbolSet({"id":0,"name":"nisse2","symbolSetName":"kvack2"});
+//adm.showSymbolSet({"id":0,"name":"nisse2","symbolSetName":"kvack2"});
 
 $(document).on('click', '.selectable', (function(){
     $(this).addClass("selected").siblings().removeClass("selected");
