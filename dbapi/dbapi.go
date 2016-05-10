@@ -1018,8 +1018,8 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 	for _, s := range symbolSet {
 		// TODO prepared statement?
 		if trm(s.Symbol) != "" {
-			_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, subcat, description, ipa) values (?, ?, ?, ?, ?, ?)",
-				s.LexiconID, s.Symbol, s.Category, s.Subcat, s.Description, s.IPA)
+			_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, description, ipa) values (?, ?, ?, ?, ?)",
+				s.LexiconID, s.Symbol, s.Category, s.Description, s.IPA)
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("failed inserting symbol : %v", err)
@@ -1042,20 +1042,19 @@ func GetSymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
 // SymbolSetTx returns the set of Symbols defined for a lexicon with the given db id
 func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
 	var res []Symbol
-	rows, err := tx.Query("select lexiconid, symbol, category, subcat, description, ipa from symbolset where lexiconid = ?", lexiconID)
+	rows, err := tx.Query("select lexiconid, symbol, category, description, ipa from symbolset where lexiconid = ?", lexiconID)
 	if err != nil {
 		return res, fmt.Errorf("failed db query : %v", err)
 	}
 
 	var lexID int64
-	var symbol, category, subcat, description, ipa string
+	var symbol, category, description, ipa string
 	for rows.Next() {
-		rows.Scan(&lexID, &symbol, &category, &subcat, &description, &ipa)
+		rows.Scan(&lexID, &symbol, &category, &description, &ipa)
 		s := Symbol{
 			LexiconID:   lexID,
 			Symbol:      symbol,
 			Category:    category,
-			Subcat:      subcat,
 			Description: description,
 			IPA:         ipa,
 		}

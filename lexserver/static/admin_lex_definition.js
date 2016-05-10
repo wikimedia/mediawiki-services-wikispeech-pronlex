@@ -212,11 +212,11 @@ ko.applyBindings(adm);
 adm.addLexicon("nisse1", "kvack1");
 adm.addLexicon("nisse2", "kvack2");
 
-adm.addSymbolToSet("kvack1", {'symbol': 'a:', 'category': 'Phoneme', 'subcat' : 'Syllabic', 'description': 'h(a)t', 'ipa' : 'ɒː'});
-adm.addSymbolToSet("kvack1", {'symbol': 'b', 'category': 'Phoneme', 'subcat' : 'NonSyllabic', 'description': '(b)il', 'ipa' : 'b'});
+adm.addSymbolToSet("kvack1", {'symbol': 'a:', 'category': 'Syllabic', 'description': 'h(a)t', 'ipa' : 'ɒː'});
+adm.addSymbolToSet("kvack1", {'symbol': 'b', 'category': 'NonSyllabic', 'description': '(b)il', 'ipa' : 'b'});
 
-adm.addSymbolToSet("kvack2", {'symbol': 'O', 'category': 'Phoneme', 'subcat' : 'Syllabic', 'description': 'h(å)ll', 'ipa' : 'ɔ'});
-adm.addSymbolToSet("kvack2", {'symbol': 'p', 'category': 'Phoneme', 'subcat' : 'NonSyllabic', 'description': '(p)il', 'ipa' : 'p'});
+adm.addSymbolToSet("kvack2", {'symbol': 'O', 'category': 'Syllabic', 'description': 'h(å)ll', 'ipa' : 'ɔ'});
+adm.addSymbolToSet("kvack2", {'symbol': 'p', 'category': 'NonSyllabic', 'description': '(p)il', 'ipa' : 'p'});
 
 //adm.showSymbolSet({"id":0,"name":"nisse2","symbolSetName":"kvack2"});
 

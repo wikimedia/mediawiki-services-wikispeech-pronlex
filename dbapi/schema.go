@@ -10,7 +10,6 @@ CREATE TABLE Lexicon (
 CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);
 CREATE TABLE Symbolset (
     description varchar(128),
-    subcat varchar(128) not null,
     symbol varchar(128) not null,
     id integer not null primary key autoincrement,
     category varchar(128) not null,

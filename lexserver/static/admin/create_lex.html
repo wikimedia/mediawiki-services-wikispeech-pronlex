@@ -5,8 +5,8 @@
   </head>
   <body>
     <h1>Create lexicon</h1>
-
-
+    
+    
     Select lexicon
     <select data-bind="options: DMCRLX.lexicons, optionsText: 'name', value: DMCRLX.selectedLexicon"></select>
     
@@ -21,7 +21,7 @@
 	  <td></td> <!-- delete btn -->
 	</tr>
       </thead>
-      <tbody data-bind="if: DMCRLX.selectedLexicon"> 
+      <tbody data-bind="foreach: DMCRLX.lexicons"> 
 	<tr>
 	  <td data-bind="text: DMCRLX.selectedLexicon().id"></td>
 	  <!-- TODO downcase lexicon name on input -->
@@ -37,9 +37,9 @@
       <button data-bind="click: DMCRLX.addLexicon">Add lexicon</button>
     </p>
     
-<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
-<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
-<!-- There is something fishy with this src path: -->
-<script type="text/javascript" src="../../static/admin/create_lex.js"></script>
-</body>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
+    <!-- There is something fishy with this src path: -->
+    <script type="text/javascript" src="../../static/admin/create_lex.js"></script>
+  </body>
 </html>

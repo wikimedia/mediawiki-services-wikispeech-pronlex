@@ -243,7 +243,6 @@ type Symbol struct {
 	LexiconID   int64  `json:"lexiconId"`
 	Symbol      string `json:"symbol"`
 	Category    string `json:"category"`
-	Subcat      string `json:"subcat"`
 	Description string `json:"description"`
 	IPA         string `json:"ipa"`
 }

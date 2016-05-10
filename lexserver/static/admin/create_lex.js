@@ -16,12 +16,11 @@ DMCRLX.CreateLexModel = function() {
 	, 'Delimiter': ["PhonemeDelimiter", "ExplicitPhonemeDelimiter", "SyllableDelimiter", "MorphemeDelimiter", "WordDelimiter"] 
     };
     
-    DMCRLX.Symbol = function(lexiconId, symbol, category, subcat, description, ipa) {
+    DMCRLX.Symbol = function(lexiconId, symbol, category, description, ipa) {
 	var self = this;
 	self.lexiconId = lexiconId;
 	self.symbol = symbol;
 	self.category = category; //ko.observable(category);
-	self.subcat = subcat;
 	self.description = description;
 	self.ipa = ipa;// ko.observable(ipa);
 	//self.symSubCats = ko.computed(function() {
@@ -131,7 +130,7 @@ DMCRLX.CreateLexModel = function() {
 	    $.getJSON(DMCRLX.baseURL +"/admin/listsymbolset", {lexiconId: lexid}, function (data) {
 		console.log("FFFFFFFFFFFFFFFFFFFF")
 		var syms = _.map(data, function (s) {
-		    return new DMCRLX.Symbol(s.lexiconId, s.symbol, s.category, s.subcat, s.description, s.ipa);
+		    return new DMCRLX.Symbol(s.lexiconId, s.symbol, s.category, s.description, s.ipa);
 		}); 
 		DMCRLX.symbolSet(syms);
 	    })
