@@ -8,10 +8,8 @@ ADMLD.baseURL = window.location.origin;
 ADMLD.AdminLexDefModel = function () {
     var self = this; 
     
-    self.symbolCategories = {
-	'Phoneme': ["Syllabic", "NonSyllabic", "Stress"]
-	, 'Delimiter': ["PhonemeDelimiter", "ExplicitPhonemeDelimiter", "SyllableDelimiter", "MorphemeDelimiter", "WordDelimiter"] 
-    };
+    self.symbolCategories = 
+	["syllabic", "non syllabic", "stress", "phoneme delimiter", "explicit phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
     
     self.nRead = ko.observable(0);
     
@@ -130,6 +128,11 @@ ADMLD.AdminLexDefModel = function () {
 	self.lexicons.push(newLex);
     };
     
+    self.addSymbol = function(symbol) {
+	console.log(">>>>>>>>>> "+ JSON.stringify(symbol));
+	self.addSymbolToSet(self.selectedSymbolSet(), symbol);
+    };
+
     self.addSymbolToSet = function(symbolSetName, symbol) {
 	if ( ! self.symbolSets().hasOwnProperty(symbolSetName) ) {
 	    var ss = self.symbolSets();		
@@ -146,16 +149,16 @@ ADMLD.AdminLexDefModel = function () {
 	self.selectedIPA(symbol);
     };
     
-    self.nColumns = ko.observable(6);
+    self.nColumns = ko.observable(15);
     
     self.createIPATableRows = function (nColumns, ipaList ) {
 	var res = [];
 	var row = [];
 	//var tr = document.createElement("tr");
 	var j = 0;
-	for(var i = 0; i < ipaList.length; i++) {
+	for(var i = 0; i < self.ipaTable.length; i++) {
 	    // var td = document.createElement("td")
-	    var ipaChar = {'symbol': ipaList[i]};
+	    var ipaChar = {'symbol': self.ipaTable[i].symbol, 'description': self.ipaTable[i].description};
 	    //td.setAttribute("data-bind", "click: $root.setSelectedIPA");
 	    //td.setAttribute("text", ipaList[i]);
 	    //td.innerHTML = ipaList[i];
@@ -177,7 +180,174 @@ ADMLD.AdminLexDefModel = function () {
     }; 
 
 
-    // TODO remove hard wired test
+    // TODO remove hard wired IPA table
+    // This should be downloaded from lexserver: ipa_table.txt
+    self.ipaTable = [{"symbol": "ɐ", "description":  "Near-open central vowel"},
+		     {"symbol": "ɑ", "description":  "Open back unrounded vowel"},
+		     {"symbol": "ɒ", "description":  "Open back rounded vowel"},
+		     {"symbol": "ɓ", "description":  "Voiced bilabial implosive"},
+		     {"symbol": "ɔ", "description":  "Open-mid back rounded vowel"},
+		     {"symbol": "ɕ", "description":  "Voiceless alveolo-palatal fricative"},
+		     {"symbol": "ɖ", "description":  "Voiced retroflex plosive"},
+		     {"symbol": "ɗ", "description":  "Voiced alveolar implosive"},
+		     {"symbol": "ɘ", "description":  "Close-mid central unrounded vowel"},
+		     {"symbol": "ə", "description":  "Mid central vowel"},
+		     {"symbol": "ɚ", "description":  "Rhotacized Mid central vowel"},
+		     {"symbol": "ɛ", "description":  "Open-mid front unrounded vowel"},
+		     {"symbol": "ɜ", "description":  "Open-mid central unrounded vowel"},
+		     {"symbol": "ɝ", "description":  "Rhotacized Open-mid central unrounded vowel"},
+		     {"symbol": "ɞ", "description":  "Open-mid central rounded vowel"},
+		     {"symbol": "ɟ", "description":  "Voiced palatal plosive"},
+		     {"symbol": "ɠ", "description":  "Voiced velar implosive"},
+		     {"symbol": "ɡ", "description":  "Voiced velar plosive"},
+		     {"symbol": "ɢ", "description":  "Voiced uvular plosive"},
+		     {"symbol": "ɣ", "description":  "Voiced velar fricative"},
+		     {"symbol": "ɤ", "description":  "Close-mid back unrounded vowel"},
+		     {"symbol": "ɥ", "description":  "Labial-palatal approximant"},
+		     {"symbol": "ɦ", "description":  "Voiced glottal fricative"},
+		     {"symbol": "ɧ", "description":  "Swedish sj-sound. Similar to: Voiceless postalveolar fricative, Voiceless velar fricative"},
+		     {"symbol": "ɨ", "description":  "Close central unrounded vowel"},
+		     {"symbol": "ɩ", "description":  "pre-1989 form of 'ɪ' (obsolete)"},
+		     {"symbol": "ɪ", "description":  "Near-close near-front unrounded vowel"},
+		     {"symbol": "ɫ", "description":  "Velar/pharyngeal Alveolar lateral approximant"},
+		     {"symbol": "ɬ", "description":  "Voiceless alveolar lateral fricative"},
+		     {"symbol": "ɭ", "description":  "Retroflex lateral approximant"},
+		     {"symbol": "ɮ", "description":  "Voiced alveolar lateral fricative"},
+		     {"symbol": "ɯ", "description":  "Close back unrounded vowel"},
+		     {"symbol": "ɰ", "description":  "Velar approximant"},
+		     {"symbol": "ɱ", "description":  "Labiodental nasal"},
+		     {"symbol": "ɲ", "description":  "Palatal nasal"},
+		     {"symbol": "ɳ", "description":  "Retroflex nasal"},
+		     {"symbol": "ɴ", "description":  "Uvular nasal"},
+		     {"symbol": "ɵ", "description":  "Close-mid central rounded vowel"},
+		     {"symbol": "ɶ", "description":  "Open front rounded vowel"},
+		     {"symbol": "ɷ", "description":  "pre-1989 form of 'ʊ' (obsolete)"},
+		     {"symbol": "ɸ", "description":  "Voiceless bilabial fricative"},
+		     {"symbol": "ɹ", "description":  "Alveolar approximant"},
+		     {"symbol": "ɺ", "description":  "Alveolar lateral flap"},
+		     {"symbol": "ɻ", "description":  "Retroflex approximant"},
+		     {"symbol": "ɼ", "description":  "Alveolar trill"},
+		     {"symbol": "ɽ", "description":  "Retroflex flap"},
+		     {"symbol": "ɾ", "description":  "Alveolar tap"},
+		     {"symbol": "ɿ", "description":  "Syllabic voiced alveolar fricative (Sinologist usage)"},
+		     {"symbol": "ʀ", "description":  "Uvular trill"},
+		     {"symbol": "ʁ", "description":  "Voiced uvular fricative"},
+		     {"symbol": "ʂ", "description":  "Voiceless retroflex fricative"},
+		     {"symbol": "ʃ", "description":  "Voiceless postalveolar fricative"},
+		     {"symbol": "ʄ", "description":  "Voiced palatal implosive"},
+		     {"symbol": "ʅ", "description":  "Syllabic voiced retroflex fricative (Sinologist usage)"},
+		     {"symbol": "ʆ", "description":  "Voiceless alveolo-palatal fricative (obsolete)"},
+		     {"symbol": "ʇ", "description":  "Dental click (obsolete)"},
+		     {"symbol": "ʈ", "description":  "Voiceless retroflex plosive"},
+		     {"symbol": "ʉ", "description":  "Close central rounded vowel"},
+		     {"symbol": "ʊ", "description":  "Near-close near-back rounded vowel"},
+		     {"symbol": "ʋ", "description":  "Labiodental approximant"},
+		     {"symbol": "ʌ", "description":  "Open-mid back unrounded vowel"},
+		     {"symbol": "ʍ", "description":  "Voiceless labiovelar approximant"},
+		     {"symbol": "ʎ", "description":  "Palatal lateral approximant"},
+		     {"symbol": "ʏ", "description":  "Near-close near-front rounded vowel"},
+		     {"symbol": "ʐ", "description":  "Voiced retroflex fricative"},
+		     {"symbol": "ʑ", "description":  "Voiced alveolo-palatal fricative"},
+		     {"symbol": "ʒ", "description":  "Voiced postalveolar fricative"},
+		     {"symbol": "ʓ", "description":  "Voiced alveolo-palatal fricative (obsolete)"},
+		     {"symbol": "ʔ", "description":  "Glottal stop"},
+		     {"symbol": "ʕ", "description":  "Voiced pharyngeal fricative"},
+		     {"symbol": "ʖ", "description":  "Alveolar lateral click (obsolete)"},
+		     {"symbol": "ʗ", "description":  "Postalveolar click (obsolete)"},
+		     {"symbol": "ʘ", "description":  "Bilabial click"},
+		     {"symbol": "ʙ", "description":  "Bilabial trill"},
+		     {"symbol": "ʚ", "description":  "A mistake for [œ]"},
+		     {"symbol": "ʛ", "description":  "Voiced uvular implosive"},
+		     {"symbol": "ʜ", "description":  "Voiceless epiglottal fricative"},
+		     {"symbol": "ʝ", "description":  "Voiced palatal fricative"},
+		     {"symbol": "ʞ", "description":  "Velar click (obsolete)"},
+		     {"symbol": "ʟ", "description":  "Velar lateral approximant"},
+		     {"symbol": "ʠ", "description":  "'Voiceless' uvular implosive (obsolete)"},
+		     {"symbol": "ʡ", "description":  "Epiglottal plosive"},
+		     {"symbol": "ʢ", "description":  "Voiced epiglottal fricative"},
+		     {"symbol": "ʣ", "description":  "Voiced alveolar affricate (obsolete)"},
+		     {"symbol": "ʤ", "description":  "Voiced postalveolar affricate (obsolete)"},
+		     {"symbol": "ʥ", "description":  "Voiced alveolo-palatal affricate (obsolete)"},
+		     {"symbol": "ʦ", "description":  "Voiceless alveolar affricate (obsolete)"},
+		     {"symbol": "ʧ", "description":  "Voiceless postalveolar affricate (obsolete)"},
+		     {"symbol": "ʨ", "description":  "Voiceless alveolo-palatal affricate (obsolete)"},
+		     {"symbol": "ʩ", "description":  "velopharyngeal fricative"},
+		     {"symbol": "ʪ", "description":  "voiceless lateral alveolar fricative"},
+		     {"symbol": "ʫ", "description":  "voiced lateral alveolar fricative"},
+		     {"symbol": "ʬ", "description":  "Bilabial percussive"},
+		     {"symbol": "ʭ", "description":  "Bidental percussive"},
+		     {"symbol": "ʮ", "description":  "Syllabic labialized voiced alveolar fricative (Sinologist usage)"},
+		     {"symbol": "ʯ", "description":  "Syllabic labialized voiced retroflex fricative (Sinologist usage)"},
+		     {"symbol": "a", "description":  "Open front unrounded vowel"},
+		     {"symbol": "b", "description":  "bilabial plosive"},
+		     {"symbol": "c", "description":  "palatal plosive"},
+		     {"symbol": "d", "description":  "alveolar plosive"},
+		     {"symbol": "e", "description":  "close-mid front unrounded vowel"},
+		     {"symbol": "f", "description":  "labiodental fricative"},
+		     {"symbol": "g", "description":  "velar plosive Ascii g"},
+		     {"symbol": "h", "description":  "glottal fricative"},
+		     {"symbol": "i", "description":  "close front unrounded vowel"},
+		     {"symbol": "j", "description":  "palatal approximant"},
+		     {"symbol": "k", "description":  "velar plosive"},
+		     {"symbol": "l", "description":  "lateral alveolar approximant"},
+		     {"symbol": "l̩̩̩", "description":  "syllabic l"},
+		     {"symbol": "m", "description":  "bilabial nasal"},
+		     {"symbol": "m̩̩", "description":  "syllabic m"},
+		     {"symbol": "n", "description":  "alveolar nasal"},
+		     {"symbol": "n̩̩̩", "description":  "syllabic n"},
+		     {"symbol": "o", "description":  "close-mid back rounded vowel"},
+		     {"symbol": "p", "description":  "bilabial plosive"},
+		     {"symbol": "q", "description":  "uvular plosive"},
+		     {"symbol": "r", "description":  "alveolar trill"},
+		     {"symbol": "s", "description":  "alveolar fricative"},
+		     {"symbol": "t", "description":  "alveolar plosive"},
+		     {"symbol": "u", "description":  "close back rounded vowel"},
+		     {"symbol": "v", "description":  "labiodental fricative"},
+		     {"symbol": "w", "description":  "labial-velar approximant"},
+		     {"symbol": "x", "description":  "velar fricative"},
+		     {"symbol": "y", "description":  "close front rounded vowel"},
+		     {"symbol": "z", "description":  "alveolar fricative"},
+		     {"symbol": "æ", "description":  "raised-open front unrounded vowel"},
+		     {"symbol": "ç", "description":  "palatal fricative"},
+		     {"symbol": "ð", "description":  "dental fricative"},
+		     {"symbol": "ø", "description":  "close-mid front rounded vowel"},
+		     {"symbol": "ħ", "description":  "pharyngeal fricative"},
+		     {"symbol": "ŋ", "description":  "velar nasal"},
+		     {"symbol": "œ", "description":  "Open-mid front rounded vowel"},
+		     {"symbol": "β", "description":  "bilabial fricative"},
+		     {"symbol": "θ", "description":  "dental fricative"},
+		     {"symbol": "χ", "description":  "uvular fricative"},
+		     {"symbol": "aː", "description":  "Open front unrounded vowel (long)"},
+		     {"symbol": "eː", "description":  "close-mid front unrounded vowel (long)"},
+		     {"symbol": "iː", "description":  "close front unrounded vowel (long)"},
+		     {"symbol": "oː", "description":  "close-mid back rounded vowel (long)"},
+		     {"symbol": "uː", "description":  "close back rounded vowel (long)"},
+		     {"symbol": "yː", "description":  "close front rounded vowel (long)"},
+		     {"symbol": "æː", "description":  "raised-open front unrounded vowel (long)"},
+		     {"symbol": "øː", "description":  "close-mid front rounded vowel (long)"},
+		     {"symbol": "œː", "description":  "Open-mid front rounded vowel (long)"},
+		     {"symbol": "ɐː", "description":  "Near-open central vowel (long)"},
+		     {"symbol": "ɑː", "description":  "Open back unrounded vowel (long)"},
+		     {"symbol": "ɒː", "description":  "Open back rounded vowel (long)"},
+		     {"symbol": "ɔː", "description":  "Open-mid back rounded vowel (long)"},
+		     {"symbol": "ɘː", "description":  "Close-mid central unrounded vowel (long)"},
+		     {"symbol": "əː", "description":  "Mid central vowel (long)"},
+		     {"symbol": "ɚː", "description":  "Rhotacized Mid central vowel (long)"},
+		     {"symbol": "ɛː", "description":  "Open-mid front unrounded vowel (long)"},
+		     {"symbol": "ɜː", "description":  "Open-mid central unrounded vowel (long)"},
+		     {"symbol": "ɝː", "description":  "Rhotacized Open-mid central unrounded vowel (long)"},
+		     {"symbol": "ɞː", "description":  "Open-mid central rounded vowel (long)"},
+		     {"symbol": "ɤː", "description":  "Close-mid back unrounded vowel (long)"},
+		     {"symbol": "ɨː", "description":  "Close central unrounded vowel (long)"},
+		     {"symbol": "ɪː", "description":  "Near-close near-front unrounded vowel (long)"},
+		     {"symbol": "ɯː", "description":  "Close back unrounded vowel (long)"},
+		     {"symbol": "ɵː", "description":  "Close-mid central rounded vowel (long)"},
+		     {"symbol": "ɶː", "description":  "Open front rounded vowel (long)"},
+		     {"symbol": "ʉː", "description":  "Close central rounded vowel (long)"},
+		     {"symbol": "ʊː", "description":  "Near-close near-back rounded vowel (long)"},
+		     {"symbol": "ʌː", "description":  "Open-mid back unrounded vowel (long)"},
+		     {"symbol": "ʏː", "description":  "Near-close near-front rounded vowel (long)"}];
+
     self.dummyIPA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'å', 'ä', 'ö'];
     
     self.ipaTableRows = ko.computed(function() {

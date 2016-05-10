@@ -40,7 +40,7 @@
 	    <input/>
 	  </td>
 	  <td>
-	    <button>Add</button>
+	    <button>Add lexicon</button>
 	  </td>
 	  <td></td>
 	</tr>
@@ -93,7 +93,7 @@
 	    <input></input>
 	  </td>
 	  <td>
-	    <input></input>
+	    <select data-bind="options: $root.symbolCategories"></select>
 	  </td>
 	  <td>
 	    <input></input>
@@ -102,14 +102,16 @@
 	    <!-- TODO validation of manual user input (must be defined in IPA table) -->
 	    <input  data-bind="value: $root.selectedIPA().symbol"></input>
 	  </td>
-	  <td><button>Add</button></td>
+	  <td>
+	    <button data-bind="click: $root.addSymbol">Add</button>
+	  </td>
 	</tr>
       </tfoot>
       <tbody data-bind="foreach: selectedSymbolSet">
 	<tr class="selectable" data-bind="click: $root.setSelectedSymbol">
 	  <td data-bind="text: symbol"></td>
 	  
-	  <td data-bind="text: category"></td>
+	  <td> <select data-bind="options: $root.symbolCategories, value: category"></select> </td>
 	  
 	  <td data-bind="text: description"></td>
 	  
@@ -123,7 +125,7 @@
     <!-- table for selecting an IPA symbol -->
     <table data-bind="foreach: $root.ipaTableRows">
       <tr data-bind="foreach: $data">
-	<td class="hovable" data-bind="click: $root.setSelectedIPA, text: $data.symbol"></td>
+	<td class="hovable" data-bind="click: $root.setSelectedIPA, text: $data.symbol, attr: {title: $data.description}" style="cursor:pointer"></td>
       </tr>
     </table>
     
