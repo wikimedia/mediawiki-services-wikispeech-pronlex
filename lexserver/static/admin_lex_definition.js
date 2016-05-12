@@ -43,6 +43,7 @@ ADMLD.AdminLexDefModel = function () {
 
 	var ssName = self.selectedLexicon().symbolSetName;
 	var ss = self.symbolSets()[ssName];
+	if (typeof ss === 'undefined' ) return;
 	for(var i = 0; i < ss.length; i++) {
 	    console.log(JSON.stringify(ss[i]));
 	};
