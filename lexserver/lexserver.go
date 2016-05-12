@@ -22,6 +22,7 @@ func ff(f string, err error) {
 	}
 }
 
+// TODO remove pretty-print option, since you can use the JSONView plugin to Chrome instead
 // pretty print if the URL paramer 'pp' has a value
 func marshal(v interface{}, r *http.Request) ([]byte, error) {
 

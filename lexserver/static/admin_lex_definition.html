@@ -54,7 +54,7 @@
 	  
 	  <td data-bind="text: symbolSetName"></td>
 	  
-	  <td><input id="xapa" type="file" onchange="ADMLD.readLexiconFile(this.files[0])"></input></td>
+	  <td><input id="xapa" type="file" onchange="$root.readLexiconFile(this.files[0])"></input></td>
 	  
 	  <td><button data-bind="click: $root.showSymbolSet">Show symbol set</button></td>
 	  <!-- <td><button data-bind="click: $root.importLexiconFile">Import lexicon file</button></td> -->
@@ -75,8 +75,8 @@
       </span> 
     </p>
 
-
     
+    <!-- Table for editing the symbol set -->
     <table data-bind="if: $root.selectedSymbolSet">
       <thead>
 	<tr>
@@ -96,31 +96,42 @@
 	    <select data-bind="options: $root.symbolCategories"></select>
 	  </td>
 	  <td>
-	    <input></input>
+	    <input data-bind="value: $root.selectedIPA().description"></input>
 	  </td>
 	  <td>
-	    <!-- TODO validation of manual user input (must be defined in IPA table) -->
-	    <input  data-bind="value: $root.selectedIPA().symbol"></input>
+	    <label  data-bind="text: $root.selectedIPA().symbol"></label>
 	  </td>
 	  <td>
 	    <button data-bind="click: $root.addSymbol">Add</button>
 	  </td>
 	</tr>
       </tfoot>
+      <!-- The actual symbol set -->
       <tbody data-bind="foreach: selectedSymbolSet">
 	<tr class="selectable" data-bind="click: $root.setSelectedSymbol">
-	  <td data-bind="text: symbol"></td>
+	  <td>
+	    <input data-bind="value: symbol"></input>
+	  </td>
 	  
-	  <td> <select data-bind="options: $root.symbolCategories, value: category"></select> </td>
+	  <td>
+	    <select data-bind="options: $root.symbolCategories, value: category"></select> 
+	  </td>
 	  
-	  <td data-bind="text: description"></td>
+	  <td>
+	    <input data-bind="value: description"></input>
+	  </td>
 	  
-	  <td data-bind="text: ipa"></td>
-	</tr>
-	
+	  <!-- <td data-bind="text: ipa, click: $root.selectNewIPASymbol"></td> -->
+	  <td>
+	    <select data-bind="options: $root.ipaSymbols, value: ipa">
+	  </td>
+	</Tr>	
       </tbody>
     </table>
     
+    <p>
+      <button data-bind="click: saveSymbolSetToDB">Save symbol set</button>
+    </p>
     
     <!-- table for selecting an IPA symbol -->
     <table data-bind="foreach: $root.ipaTableRows">

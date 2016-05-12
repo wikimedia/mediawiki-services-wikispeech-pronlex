@@ -8,12 +8,17 @@ ADMLD.baseURL = window.location.origin;
 ADMLD.AdminLexDefModel = function () {
     var self = this; 
     
+    // TODO hard wired names. Fetch from somewhere?
     self.symbolCategories = 
 	["syllabic", "non syllabic", "stress", "phoneme delimiter", "explicit phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
     
-    self.nRead = ko.observable(0);
-    
-    ADMLD.readLexiconFile = function(fileObject) {
+
+
+    // TODO remove this (see below)
+    self.nRead = ko.observable(0);    
+
+    // TODO remove this. Too slow for large files. Use file upload instead.
+    self.readLexiconFile = function(fileObject) {
 	var i = 0;
 	new LineReader(fileObject).readLines(function(line){
 	    i = i + 1;
@@ -28,12 +33,22 @@ ADMLD.AdminLexDefModel = function () {
     
     self.lexicons = ko.observableArray();
     // Sample lexicon object: {"id":0,"name":"nisse2","symbolSetName":"kvack2"}
-    self.selectedLexicon = ko.observable();
+    self.selectedLexicon = ko.observable({'id': 0, 'name': '', 'symbolSetName': ''});
     // An object/hash with symbol set name as key and a list of symbol objects as value
     self.symbolSets = ko.observable({});
     
     // List of Symbol objects
     self.selectedSymbolSet = ko.observableArray();
+    self.saveSymbolSetToDB = function () {
+
+	var ssName = self.selectedLexicon().symbolSetName;
+	var ss = self.symbolSets()[ssName];
+	for(var i = 0; i < ss.length; i++) {
+	    console.log(JSON.stringify(ss[i]));
+	};
+    };
+
+
     // A sample symbol: {"symbol":"O","category":"Phoneme","description":"h(å)ll","ipa":"ɔ"}
     self.selectedSymbol = ko.observable({});
     
@@ -52,7 +67,8 @@ ADMLD.AdminLexDefModel = function () {
 	self.selectedSymbol(symbol);
     };
 
-    // TODO hard wired list of symbol set file header field names  
+    // TODO hard wired list of symbol set file header field names
+    // Fetch from somewhere?
     self.headerFields = {'DESCRIPTION' : true, 'SYMBOL': true, 'IPA': true, 'CATEGORY': true};
     self.readSymbolSetFile = function (symbolSetfile) {
 	
@@ -105,7 +121,7 @@ ADMLD.AdminLexDefModel = function () {
 			      'ipa': fs[headerIndexes['IPA']]
 			     };
 		self.selectedSymbolSet.push(symbol);
-		console.log(JSON.stringify(symbol));
+		//
             }); 
 	};
 	
@@ -129,10 +145,10 @@ ADMLD.AdminLexDefModel = function () {
     };
     
     self.addSymbol = function(symbol) {
-	console.log(">>>>>>>>>> "+ JSON.stringify(symbol));
+	//console.log(">>>>>>>>>> "+ JSON.stringify(symbol));
 	self.addSymbolToSet(self.selectedSymbolSet(), symbol);
     };
-
+    
     self.addSymbolToSet = function(symbolSetName, symbol) {
 	if ( ! self.symbolSets().hasOwnProperty(symbolSetName) ) {
 	    var ss = self.symbolSets();		
@@ -143,12 +159,24 @@ ADMLD.AdminLexDefModel = function () {
 	//console.log(self.symbolSets());
     };
     
-    self.selectedIPA = ko.observable({'symbol': ''});
+    self.selectedIPA = ko.observable({'symbol': '', 'description': ''});
     self.setSelectedIPA = function(symbol) {
 	//console.log(">>>>> " + JSON.stringify(symbol));
 	self.selectedIPA(symbol);
     };
     
+    // self.selectedIPA2 = ko.observable({'symbol': '', 'description': ''});
+    // self.setSelectedIPA2 = function(symbol) {
+    // 	//console.log(">>>>> " + JSON.stringify(symbol));
+    // 	self.selectedIPA2(symbol);
+    // };
+    
+    
+    // self.selectNewIPASymbol = function (symbol) {
+    // };
+
+
+
     self.nColumns = ko.observable(15);
     
     self.createIPATableRows = function (nColumns, ipaList ) {
@@ -180,6 +208,7 @@ ADMLD.AdminLexDefModel = function () {
     }; 
 
 
+ 
     // TODO remove hard wired IPA table
     // This should be downloaded from lexserver: ipa_table.txt
     self.ipaTable = [{"symbol": "ɐ", "description":  "Near-open central vowel"},
@@ -348,7 +377,16 @@ ADMLD.AdminLexDefModel = function () {
 		     {"symbol": "ʌː", "description":  "Open-mid back unrounded vowel (long)"},
 		     {"symbol": "ʏː", "description":  "Near-close near-front rounded vowel (long)"}];
 
-    self.dummyIPA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'å', 'ä', 'ö'];
+    self.ipaSymbols = ko.observableArray();
+    self.loadIPASymbols = function () {
+	self.ipaSymbols.push("");
+	for(var i = 0; i < self.ipaTable.length; i++) {
+	    self.ipaSymbols.push(self.ipaTable[i].symbol);
+	}
+    };
+    
+
+    //self.dummyIPA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'å', 'ä', 'ö'];
     
     self.ipaTableRows = ko.computed(function() {
 	var n = self.nColumns();
@@ -375,6 +413,7 @@ ADMLD.AdminLexDefModel = function () {
 
 
 var adm = new ADMLD.AdminLexDefModel();
+adm.loadIPASymbols();
 ko.applyBindings(adm);
 
 
