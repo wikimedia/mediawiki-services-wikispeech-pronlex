@@ -8,11 +8,13 @@ ADMLD.baseURL = window.location.origin;
 ADMLD.AdminLexDefModel = function () {
     var self = this; 
     
+    
+    
     // TODO hard wired names. Fetch from somewhere?
     self.symbolCategories = 
 	["syllabic", "non syllabic", "stress", "phoneme delimiter", "explicit phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
     
-
+    
 
     // TODO remove this (see below)
     self.nRead = ko.observable(0);    
@@ -34,6 +36,63 @@ ADMLD.AdminLexDefModel = function () {
     self.lexicons = ko.observableArray();
     // Sample lexicon object: {"id":0,"name":"nisse2","symbolSetName":"kvack2"}
     self.selectedLexicon = ko.observable({'id': 0, 'name': '', 'symbolSetName': ''});
+    
+    self.addLexiconName = ko.observable("");
+    self.addSymbolSetName = ko.observable("");
+
+    self.loadLexiconNames = function () {
+	
+	$.getJSON(ADMLD.baseURL +"/listlexicons")
+	    .done(function (data) {
+		self.lexicons(data);
+	    })
+    	    .fail(function (xhr, textStatus, errorThrown) {
+		alert("loadLexiconNames says: "+ xhr.responseText);
+	    });
+    };
+    
+    self.updateLexicon = function () {
+	
+    	if ( self.selectedLexicon().name.trim() === "" || self.selectedLexicon().symbolSetName.trim() === "" ) {
+    	    alert("Name and Symbol set name field must not be empty")
+    	    return;
+    	}
+	
+    	var params = {'id' : self.selectedLexicon().id, 'name' : self.selectedLexicon().name, 'symbolsetname' : self.selectedLexicon().symbolSetName}
+	
+	console.log("updateLexicon params: "+ JSON.stringify(params));
+    	
+	$.get(ADMLD.baseURL + "/admin/insertorupdatelexicon", params)
+    	    .done(function(data){
+		console.log("updateLexicon $get return data: "+ JSON.stringify(data));
+    		self.loadLexiconNames();
+    		self.selectedLexicon(data); // ?
+    	    })
+    	    .fail(function (xhr, textStatus, errorThrown) {
+		console.log("updateLexicon fail xhr: "+ JSON.stringify(xhr));
+		console.log("updateLexicon xhr.responseText: "+ xhr.responseText);
+    		console.log("updateLexicon fail textStatus: "+ textStatus);
+		console.log("updateLexicon fail errorThrown: "+ errorThrown);
+		alert("updateLexicon says: "+ xhr.responseText);
+    	    });	
+    };
+    
+    self.deleteLexicon = function () {
+    	var params = {'id' : self.selectedLexicon().id} // , 'name' : DMCRLX.selectedLexicon().name, 'symbolsetname' : DMCRLX.selectedLexicon().symbolSetName}
+	
+	console.log("params: "+ JSON.stringify(params))
+    	$.get(ADMLD.baseURL + "/admin/deletelexicon", params)
+    	    .done(function(data){
+    		// dumdelidum
+    		self.loadLexiconNames();
+    	    })
+    	    .fail(function (xhr, textStatus, errorThrown) {
+    		alert(xhr.responseText);	    
+    	    });
+    };
+    
+
+    
     // An object/hash with symbol set name as key and a list of symbol objects as value
     self.symbolSets = ko.observable({});
     
@@ -58,7 +117,7 @@ ADMLD.AdminLexDefModel = function () {
 	self.selectedLexicon(lexicon);
      	var symbolSetName = lexicon.symbolSetName;
 	if (! self.symbolSets().hasOwnProperty(symbolSetName)) {
-	    self.selectedSymbolSet().removeAll();
+	    self.selectedSymbolSet.removeAll();
 	} else {
 	    self.selectedSymbolSet(self.symbolSets()[symbolSetName]);
 	};
@@ -131,22 +190,18 @@ ADMLD.AdminLexDefModel = function () {
     
 
     
-    // self.importLexiconFile = function() {
-    // 	console.log("Opening file");
-    // }
-    
-    
-    self.addLexicon = function(lexiconName, symbolSetName) {
-	//self = this;
-	//self.lexiconName = lexiconName;
-	//self.symbolSetName = symbolSetName;
+    self.addLexicon = function() {
+		
+	var newLex = {'id': 0, 'name' :  self.addLexiconName(), 'symbolSetName': self.addSymbolSetName()};
+	self.selectedLexicon(newLex);
 	
-	var newLex = {'id': 0, 'name' :  lexiconName, 'symbolSetName': symbolSetName};
-	self.lexicons.push(newLex);
+	self.updateLexicon();
+	
+	self.addLexiconName("");
+	self.addSymbolSetName("");
     };
     
     self.addSymbol = function(symbol) {
-	//console.log(">>>>>>>>>> "+ JSON.stringify(symbol));
 	self.addSymbolToSet(self.selectedSymbolSet(), symbol);
     };
     
@@ -416,17 +471,17 @@ ADMLD.AdminLexDefModel = function () {
 var adm = new ADMLD.AdminLexDefModel();
 adm.loadIPASymbols();
 ko.applyBindings(adm);
+adm.loadLexiconNames();
 
 
+// adm.addLexicon("nisse1", "kvack1");
+// adm.addLexicon("nisse2", "kvack2");
 
-adm.addLexicon("nisse1", "kvack1");
-adm.addLexicon("nisse2", "kvack2");
+// adm.addSymbolToSet("kvack1", {'symbol': 'a:', 'category': 'Syllabic', 'description': 'h(a)t', 'ipa' : 'ɒː'});
+// adm.addSymbolToSet("kvack1", {'symbol': 'b', 'category': 'NonSyllabic', 'description': '(b)il', 'ipa' : 'b'});
 
-adm.addSymbolToSet("kvack1", {'symbol': 'a:', 'category': 'Syllabic', 'description': 'h(a)t', 'ipa' : 'ɒː'});
-adm.addSymbolToSet("kvack1", {'symbol': 'b', 'category': 'NonSyllabic', 'description': '(b)il', 'ipa' : 'b'});
-
-adm.addSymbolToSet("kvack2", {'symbol': 'O', 'category': 'Syllabic', 'description': 'h(å)ll', 'ipa' : 'ɔ'});
-adm.addSymbolToSet("kvack2", {'symbol': 'p', 'category': 'NonSyllabic', 'description': '(p)il', 'ipa' : 'p'});
+// adm.addSymbolToSet("kvack2", {'symbol': 'O', 'category': 'Syllabic', 'description': 'h(å)ll', 'ipa' : 'ɔ'});
+// adm.addSymbolToSet("kvack2", {'symbol': 'p', 'category': 'NonSyllabic', 'description': '(p)il', 'ipa' : 'p'});
 
 //adm.showSymbolSet({"id":0,"name":"nisse2","symbolSetName":"kvack2"});
 

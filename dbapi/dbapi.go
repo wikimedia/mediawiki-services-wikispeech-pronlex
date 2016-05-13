@@ -158,7 +158,7 @@ func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
 
 // DeleteLexicon deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
-// TODO ? make it impossible to delete the Lexicon table entry if associated to any entries?
+// It should be impossible to delete the Lexicon table entry if associated to any entries.
 func DeleteLexicon(db *sql.DB, id int64) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -170,12 +170,16 @@ func DeleteLexicon(db *sql.DB, id int64) error {
 
 // DeleteLexiconTx deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
-// TODO ? make it impossible to delete the Lexicon table entry if associated to any entries?
+// It should be impossible to delete the Lexicon table entry if associated to any entries.
 func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 	var n int
 	err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
 	// must always return a row, no need to check for empty row
 	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("HEJ DIN FAN")
+			return fmt.Errorf("The was no lexicon with id %d : %v", id, err)
+		}
 		return err
 	}
 
@@ -206,23 +210,24 @@ func insertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	res := Lexicon{}
 
-	if l.ID == 0 {
+	if l.ID <= 0 {
 		return InsertLexiconTx(tx, l)
 	}
 
-	if l.ID > 0 {
-		res, err := LexiconFromID(tx, l.ID)
+	// else if l.ID > 0
+	res, err := LexiconFromID(tx, l.ID)
+
+	if err != nil {
+		return res, fmt.Errorf("faild get lexicon : %v", err)
+	}
+	if l != res {
+		_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", strings.ToLower(l.Name), l.SymbolSetName, res.ID)
 		if err != nil {
-			return res, fmt.Errorf("faild get lexicon : %v", err)
-		}
-		if l != res {
-			_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", strings.ToLower(l.Name), l.SymbolSetName, res.ID)
-			if err != nil {
-				tx.Rollback()
-				return res, fmt.Errorf("failed to update lex : %v", err)
-			}
+			tx.Rollback()
+			return res, fmt.Errorf("failed to update lex : %v", err)
 		}
 	}
+
 	return res, nil
 }
 

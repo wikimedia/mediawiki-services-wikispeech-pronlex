@@ -27,20 +27,22 @@
 	  <!-- <td>Id</td> -->
 	  <td>Name</td>
 	  <td>SymbolSet Name</td>
+	  <td>Update names</td>
 	  <td>Import</td>
 	  <td>Select lexicon</td>
+	  <td>Delete lexicon</td>
 	</tr>
       </thead>
       <tfoot>
 	<tr>
 	  <td>
-	    <input/>
+	    <input data-bind="value: $root.addLexiconName"></input>
 	  </td>
 	  <td>
-	    <input/>
+	    <input data-bind="value: $root.addSymbolSetName"></input>
 	  </td>
 	  <td>
-	    <button>Add lexicon</button>
+	    <button data-bind="click: $root.addLexicon">Add lexicon</button>
 	  </td>
 	  <td></td>
 	</tr>
@@ -50,15 +52,30 @@
 	<tr class="selectable">
 	  <!-- <td data-bind="text: id"></td> -->
 	  
-	  <td data-bind="text: name"></td>
+	  <td>
+	    <input data-bind="value: name"></input>
+	  </td>
 	  
-	  <td data-bind="text: symbolSetName"></td>
+	  <td>
+	    <input data-bind="value: symbolSetName"></input>
+	  </td>
 	  
-	  <td><input id="xapa" type="file" onchange="$root.readLexiconFile(this.files[0])"></input></td>
-	  
-	  <td><button data-bind="click: $root.showSymbolSet">Show symbol set</button></td>
-	  <!-- <td><button data-bind="click: $root.importLexiconFile">Import lexicon file</button></td> -->
+	  <td>
+	    <button data-bind="click: $root.updateLexicon">Update</button>
+	  </td>
 
+	  <td>
+	    <input id="xapa" type="file" onchange="$root.readLexiconFile(this.files[0])"></input>
+	  </td>
+	  
+	  <td>
+	    <button data-bind="click: $root.showSymbolSet">Show symbol set</button>
+	  </td>
+	  <!-- <td><button data-bind="click: $root.importLexiconFile">Import lexicon file</button></td> -->
+	  
+	  <td>
+	    <button data-bind="click: $root.deleteLexicon">Delete from db</button>
+	  </td>
 	</tr>
 	
       </tbody>

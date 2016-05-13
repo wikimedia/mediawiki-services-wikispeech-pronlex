@@ -51,8 +51,9 @@ func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 	jsn, err := marshal(lexs, r)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+		return
 	}
-	w.Header().Set("Content-Type", "application/javascript; charset-utf8")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, string(jsn))
 }
 
@@ -61,8 +62,9 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
 	name := strings.TrimSpace(r.FormValue("name"))
 	symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
+
 	if name == "" || symbolSetName == "" {
-		http.Error(w, fmt.Sprintf("missing parameter value, expecting value for 'name' and 'symbolsetname'"), http.StatusExpectationFailed)
+		http.Error(w, fmt.Sprint("missing parameter value, expecting value for 'name' and 'symbolsetname'"), http.StatusExpectationFailed)
 		return
 	}
 
@@ -78,22 +80,19 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/javascript; charset-utf8")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, string(jsn))
 }
 
 func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
-	//name := strings.TrimSpace(r.FormValue("name"))
-	//symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
 
-	err := dbapi.DeleteLexicon(db, id) //dbapi.Lexicon{Id: id, Name: name, SymbolSetName: symbolSetName})
+	err := dbapi.DeleteLexicon(db, id)
 	if err != nil {
 
-		http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusExpectationFailed)
 		return
 	}
-
 }
 
 // TODO report unused URL parameters
@@ -157,12 +156,9 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 	pageLength, err := strconv.ParseInt(r.FormValue("pagelength"), 10, 64)
 	if err != nil {
 		pageLength = 25
-		//log.Printf("failed to parse pagelength parameter (using default value 25) : %v", err)
 	}
 
-	//log.Printf(">>>>>>>> LEXICONS %v", lexs)
 	dbLexs, err := dbapi.GetLexicons(db, lexs)
-	//log.Printf(">>>>>>>> DBLEXICONS %v", dbLexs)
 
 	q := dbapi.Query{
 		Lexicons:            dbLexs,
@@ -227,7 +223,6 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//w.Header().Set("Content-Type", "application/javascript; charset-utf8")
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, string(jsn))
 }
@@ -250,13 +245,7 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
 		return
 	}
-	// TODO This is not necessarily an error
-	// if !updated {
-	// 	http.Error(w, fmt.Sprintf("Entry not updated : %v", e), http.StatusInternalServerError)
-	// 	return
-	// }
 
-	//log.Printf("HÄR KOMMER ETT ENTRY: %v", e)
 	res0, err3 := json.Marshal(res)
 	if err3 != nil {
 		log.Printf("lexserver: Failed to marshal entry : %v", err3)
@@ -265,7 +254,6 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, res0)
-	//return
 }
 
 func adminAdminHandler(w http.ResponseWriter, r *http.Request) {
@@ -312,11 +300,6 @@ func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-// func listSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-// 	log.Println("hhhhhhhhhhhhhhhhh")
-// 	fmt.Fprint(w, "EN APA")
-// }
 
 var db *sql.DB
 
