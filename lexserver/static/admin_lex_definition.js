@@ -94,7 +94,27 @@ ADMLD.AdminLexDefModel = function () {
     
     // An object/hash with symbol set name as key and a list of symbol objects as value
     self.symbolSets = ko.observable({});
-    
+
+    self.deleteSymbol = function(zymbl) {
+	var currSyms = self.symbolSets()[self.selectedLexicon().symbolSetName];
+	var i = currSyms.indexOf(zymbl);
+	if(i != -1) {
+	    currSyms.splice(i, 1);
+	}
+	
+	
+
+	// update to trigger event
+	// TODO why is this needed?
+	self.selectedLexicon(self.selectedLexicon());
+
+	//self.symbolSets()[self.selectedLexicon().symbolSetName] = currSyms;
+	
+	//console.log("i: "+ i);
+	//console.log("ccc> "+ JSON.stringify(currSyms));
+    };
+
+
     // List of Symbol objects
     self.selectedSymbolSet = ko.computed(function() {
 	console.log("CCCCC "+ self.selectedLexicon().name);

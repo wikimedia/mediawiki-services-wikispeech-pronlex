@@ -99,7 +99,7 @@
 	  <td>Category</td>
 	  <td>Description</td>
 	  <td>IPA</td>
-	  <td></td>
+	  <td></td> <!-- 'Delete' button -->
 	</tr>
       </thead>
       <tfoot>
@@ -119,6 +119,7 @@
 	  <td>
 	    <button data-bind="click: $root.addSymbol">Add symbol</button>
 	  </td>
+	  <td></td> <!-- place holder for 'delete' -->
 	</tr>
       </tfoot>
       <!-- The actual symbol set -->
@@ -140,7 +141,11 @@
 	  <td>
 	    <select data-bind="options: $root.ipaSymbols, value: ipa">
 	  </td>
-	</Tr>	
+	  
+	  <td>
+	    <button data-bind="click: $root.deleteSymbol">Delete</button>
+	  </td>
+	</tr>	
       </tbody>
     </table>
     
