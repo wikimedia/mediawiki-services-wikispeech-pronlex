@@ -254,7 +254,9 @@ ADMLD.AdminLexDefModel = function () {
     self.categoryToAdd = ko.observable();
     self.descriptionToAdd = ko.observable();
     self.ipaToAdd = ko.observable();
-    
+
+
+    //TODO add input validation
     self.addSymbol = function() {
 	
 	var newSymbol = {'symbol': self.symbolToAdd(), 
@@ -264,6 +266,13 @@ ADMLD.AdminLexDefModel = function () {
 	
 	self.addSymbolToSet(self.selectedLexicon().symbolSetName, newSymbol);
 	
+	// empty input after adding new symbol
+	self.symbolToAdd("");
+	//self.categoryToAdd("");
+	self.descriptionToAdd("");
+	self.ipaToAdd("");
+
+
 	// update to trigger event
 	// TODO why is this needed?
 	self.selectedLexicon(self.selectedLexicon());
@@ -274,6 +283,17 @@ ADMLD.AdminLexDefModel = function () {
 	    var ss = self.symbolSets();		
 	    ss[symbolSetName] = [];
 	};
+	if(symbol.symbol === "" || symbol.symbol === undefined) {
+	    alert("Symbol field cannot be empty");
+	    return;
+	};
+	if(symbol.description === "" || symbol.description === undefined) {
+	    alert("Description field cannot be empty");
+	    return;
+	};
+	// TODO validate that syllabic/non... etc has an IPA symbol
+	
+	    
 	self.symbolSets()[symbolSetName].push(symbol);
     };
     
