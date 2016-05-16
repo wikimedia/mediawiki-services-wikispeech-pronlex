@@ -49,8 +49,7 @@
       </tfoot>
       <tbody data-bind="foreach: lexicons"> 
 	
-	<tr class="selectable">
-	  <!-- <td data-bind="text: id"></td> -->
+	<tr class="selectable" data-bind="click: $root.selectedLexicon">
 	  
 	  <td>
 	    <input data-bind="value: name"></input>
@@ -71,7 +70,6 @@
 	  <td>
 	    <button data-bind="click: $root.showSymbolSet">Show symbol set</button>
 	  </td>
-	  <!-- <td><button data-bind="click: $root.importLexiconFile">Import lexicon file</button></td> -->
 	  
 	  <td>
 	    <button data-bind="click: $root.deleteLexicon">Delete from db</button>
@@ -91,7 +89,7 @@
 	Import: <input type="file" data-bind="event: { change: function() { $root.readSymbolSetFile($element.files[0]) } }"></input>
       </span> 
     </p>
-
+    
     
     <!-- Table for editing the symbol set -->
     <table data-bind="if: $root.selectedSymbolSet">
@@ -107,19 +105,19 @@
       <tfoot>
 	<tr>
 	  <td>
-	    <input></input>
+	    <input data-bind="value: $root.symbolToAdd"></input>
 	  </td>
 	  <td>
-	    <select data-bind="options: $root.symbolCategories"></select>
+	    <select data-bind="options: $root.symbolCategories, value: $root.categoryToAdd"></select>
 	  </td>
 	  <td>
-	    <input data-bind="value: $root.selectedIPA().description"></input>
+	    <input data-bind="value: $root.descriptionToAdd"></input>
 	  </td>
 	  <td>
-	    <label  data-bind="text: $root.selectedIPA().symbol"></label>
+	    <label  data-bind="text: $root.ipaToAdd"></label>
 	  </td>
 	  <td>
-	    <button data-bind="click: $root.addSymbol">Add</button>
+	    <button data-bind="click: $root.addSymbol">Add symbol</button>
 	  </td>
 	</tr>
       </tfoot>
@@ -158,14 +156,16 @@
     </table>
     
     <p>
-      Selected symbol: <span data-bind="text: $root.selectedIPA().symbol"></span>
+      Selected symbol: <span data-bind="text: $root.ipaToAdd"></span>
     </p>
     
-    
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
 
     <script type="text/javascript" src="static/admin_lex_definition.js"></script>
+    
     
     <script type="text/javascript" src="static/linereader.js"></script>
   </body>

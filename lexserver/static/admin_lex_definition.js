@@ -35,7 +35,7 @@ ADMLD.AdminLexDefModel = function () {
     
     self.lexicons = ko.observableArray();
     // Sample lexicon object: {"id":0,"name":"nisse2","symbolSetName":"kvack2"}
-    self.selectedLexicon = ko.observable({'id': 0, 'name': '', 'symbolSetName': ''});
+    self.selectedLexicon = ko.observable({'id': 0, 'name': '', 'symbolSetName': ''});//.extend({notify: 'always'});
     
     self.addLexiconName = ko.observable("");
     self.addSymbolSetName = ko.observable("");
@@ -77,10 +77,9 @@ ADMLD.AdminLexDefModel = function () {
     	    });	
     };
     
-    self.deleteLexicon = function () {
-    	var params = {'id' : self.selectedLexicon().id} // , 'name' : DMCRLX.selectedLexicon().name, 'symbolsetname' : DMCRLX.selectedLexicon().symbolSetName}
+    self.deleteLexicon = function (lexicon) {
 	
-	console.log("params: "+ JSON.stringify(params))
+	var params = {'id' : lexicon.id}
     	$.get(ADMLD.baseURL + "/admin/deletelexicon", params)
     	    .done(function(data){
     		// dumdelidum
@@ -97,9 +96,16 @@ ADMLD.AdminLexDefModel = function () {
     self.symbolSets = ko.observable({});
     
     // List of Symbol objects
-    self.selectedSymbolSet = ko.observableArray();
+    self.selectedSymbolSet = ko.computed(function() {
+	console.log("CCCCC "+ self.selectedLexicon().name);
+	if (self.symbolSets().hasOwnProperty(self.selectedLexicon().symbolSetName)) {
+	    return self.symbolSets()[self.selectedLexicon().symbolSetName];
+	} else {
+	    return [];
+	};
+    }, this);
     self.saveSymbolSetToDB = function () {
-
+	
 	var ssName = self.selectedLexicon().symbolSetName;
 	var ss = self.symbolSets()[ssName];
 	if (typeof ss === 'undefined' ) return;
@@ -111,22 +117,57 @@ ADMLD.AdminLexDefModel = function () {
 
     // A sample symbol: {"symbol":"O","category":"Phoneme","description":"h(å)ll","ipa":"ɔ"}
     self.selectedSymbol = ko.observable({});
-    
-    self.showSymbolSet = function(lexicon) {
-	self.selectedSymbol({});
-	self.selectedLexicon(lexicon);
-     	var symbolSetName = lexicon.symbolSetName;
-	if (! self.symbolSets().hasOwnProperty(symbolSetName)) {
-	    self.selectedSymbolSet.removeAll();
-	} else {
-	    self.selectedSymbolSet(self.symbolSets()[symbolSetName]);
-	};
+
+    self.loadSymbolSet = function () {
+	if(self.selectedLexicon() !== undefined) { // TODO Gör man så?
+	    //$.getJSON(DMCRLX.baseURL +"/admin/listphonemesymbols", {lexiconId: DMCRLX.selectedLexicon().id}, function (data) {
+	    $.getJSON(ADMLD.baseURL +"/admin/listsymbolset", {lexiconId: self.selectedLexicon.id}, function (data) {
+		console.log("FFFFF> "+ JSON.stringify(data));
+		var syms = _.map(data, function (s) {
+		    return {'lexiconId': s.lexiconId, 'symbol': s.symbol, 'category': s.category, 'description': s.description, 'ipa': s.ipa};
+		}); 
+		DMCRLX.symbolSet(syms);
+	    })
+		.fail(function (xhr, textStatus, errorThrown) {
+		    alert(xhr.responseText);
+		});
+	}
     };
+	//, this);
+    
+    self.saveSymbolSet = function () {
+	$.post(ADMLD.baseURL +"/admin/savesymbolset", JSON.stringify(self.selectedSymbolSet))
+	    .fail(function (xhr, textStatus, errorThrown) {
+		alert(xhr.responseText);
+	    });
+    };
+    
+
+    
+    // self.showSymbolSet = function(lexicon) {
+	
+    // 	console.log("XXXX> "+ JSON.stringify(lexicon));
+	
+    // 	//self.selectedSymbol({}); // nuke current symbol set
+    // 	//self.selectedSymbolSet.removeAll(); // nuke current symbol set
+    // 	self.selectedLexicon(lexicon);
+    //  	var symbolSetName = lexicon.symbolSetName;
+    // 	if (! self.symbolSets().hasOwnProperty(symbolSetName)) {
+	    
+    // 	    // This lexicon doesn't appear to have symbol set loaded:
+    // 	    // fetch existing symbol set (possibly empty) from server
+	    
+
+	    
+    // 	}; //else { // there was already a symbol set for this lexicon
+    // 	  //  self.selectedSymbolSet(self.symbolSets()[symbolSetName]);
+    // 	//};
+    // };
     
     self.setSelectedSymbol= function (symbol) {
 	self.selectedSymbol(symbol);
     };
-
+    
     // TODO hard wired list of symbol set file header field names
     // Fetch from somewhere?
     self.headerFields = {'DESCRIPTION' : true, 'SYMBOL': true, 'IPA': true, 'CATEGORY': true};
@@ -168,6 +209,7 @@ ADMLD.AdminLexDefModel = function () {
 		alert("Empty input file: "+ symbolSetfile.name)
 		return; // ?
 	    }
+	    //var newSyms = [];
 	    lines.forEach(function (line) {
 		if (line.trim() === "") return; // "continue"
 		if (line.trim().startsWith("#")) return; // "continue"
@@ -180,9 +222,17 @@ ADMLD.AdminLexDefModel = function () {
 			      'description': fs[headerIndexes['DESCRIPTION']],
 			      'ipa': fs[headerIndexes['IPA']]
 			     };
-		self.selectedSymbolSet.push(symbol);
-		//
-            }); 
+		
+		if(! self.symbolSets().hasOwnProperty(self.selectedLexicon().symbolSetName)) {
+		    self.symbolSets()[self.selectedLexicon().symbolSetName] = [];
+		};
+		
+		self.addSymbolToSet(self.selectedLexicon().symbolSetName, symbol);
+		
+            });
+	    
+	    // TODO why is this needed?
+	    self.selectedLexicon(self.selectedLexicon());
 	};
 	
 	reader.readAsText(symbolSetfile,"UTF-8");
@@ -201,58 +251,52 @@ ADMLD.AdminLexDefModel = function () {
 	self.addSymbolSetName("");
     };
     
-    self.addSymbol = function(symbol) {
-	self.addSymbolToSet(self.selectedSymbolSet(), symbol);
+    // These fields maka up the definition of a symbol
+    self.symbolToAdd = ko.observable();
+    self.categoryToAdd = ko.observable();
+    self.descriptionToAdd = ko.observable();
+    self.ipaToAdd = ko.observable();
+    
+    self.addSymbol = function() {
+	
+	var newSymbol = {'symbol': self.symbolToAdd(), 
+			 'category': self.categoryToAdd(), 
+			 'description': self.descriptionToAdd(), 
+			 'ipa': self.ipaToAdd()};
+	
+	self.addSymbolToSet(self.selectedLexicon().symbolSetName, newSymbol);
+	// TODO why is this needed?
+	self.selectedLexicon(self.selectedLexicon());
     };
     
-    self.addSymbolToSet = function(symbolSetName, symbol) {
+    self.addSymbolToSet = function(symbolSetName, symbol) {	
 	if ( ! self.symbolSets().hasOwnProperty(symbolSetName) ) {
 	    var ss = self.symbolSets();		
 	    ss[symbolSetName] = [];
 	};
 	self.symbolSets()[symbolSetName].push(symbol);
-	
-	//console.log(self.symbolSets());
     };
     
-    self.selectedIPA = ko.observable({'symbol': '', 'description': ''});
     self.setSelectedIPA = function(symbol) {
-	//console.log(">>>>> " + JSON.stringify(symbol));
-	self.selectedIPA(symbol);
+	self.ipaToAdd(symbol.symbol);
+	self.descriptionToAdd(symbol.description);
     };
     
-    // self.selectedIPA2 = ko.observable({'symbol': '', 'description': ''});
-    // self.setSelectedIPA2 = function(symbol) {
-    // 	//console.log(">>>>> " + JSON.stringify(symbol));
-    // 	self.selectedIPA2(symbol);
-    // };
     
-    
-    // self.selectNewIPASymbol = function (symbol) {
-    // };
-
-
-
     self.nColumns = ko.observable(15);
     
     self.createIPATableRows = function (nColumns, ipaList ) {
 	var res = [];
 	var row = [];
-	//var tr = document.createElement("tr");
 	var j = 0;
 	for(var i = 0; i < self.ipaTable.length; i++) {
-	    // var td = document.createElement("td")
+	    
 	    var ipaChar = {'symbol': self.ipaTable[i].symbol, 'description': self.ipaTable[i].description};
-	    //td.setAttribute("data-bind", "click: $root.setSelectedIPA");
-	    //td.setAttribute("text", ipaList[i]);
-	    //td.innerHTML = ipaList[i];
-	    //ko.applyBindingsToNode(td);
-	    //tr.appendChild(td);
 	    row.push(ipaChar);
 	    j++;
 	    if ( j === nColumns) {
 		res.push(row);
-		row = [];// document.createElement("tr");
+		row = [];
 		j = 0;
 	    };
 	}; // <- for
@@ -262,9 +306,9 @@ ADMLD.AdminLexDefModel = function () {
 	};
 	return res;
     }; 
+    
 
-
- 
+    
     // TODO remove hard wired IPA table
     // This should be downloaded from lexserver: ipa_table.txt
     self.ipaTable = [{"symbol": "ɐ", "description":  "Near-open central vowel"},
@@ -450,21 +494,6 @@ ADMLD.AdminLexDefModel = function () {
     });// ko.observableArray();
     
     
-    // TODO remove hard-wired test
-    
-    
-    //self.ipaTableRows();
-    
-
-
-    // self.ipaTable = ko.computed(function() {
-    // 	var tbody = document.createElement("tbody");
-    // 	for(var i = 0; i < self.ipaTableRows().length; i++) {
-    // 	    tbody.appendChild( self.ipaTableRows()[i] );
-    // 	}; 
-    // 	return tbody.outerHTML;
-    // }, this);
-    
 };
 
 
@@ -474,17 +503,7 @@ ko.applyBindings(adm);
 adm.loadLexiconNames();
 
 
-// adm.addLexicon("nisse1", "kvack1");
-// adm.addLexicon("nisse2", "kvack2");
-
-// adm.addSymbolToSet("kvack1", {'symbol': 'a:', 'category': 'Syllabic', 'description': 'h(a)t', 'ipa' : 'ɒː'});
-// adm.addSymbolToSet("kvack1", {'symbol': 'b', 'category': 'NonSyllabic', 'description': '(b)il', 'ipa' : 'b'});
-
-// adm.addSymbolToSet("kvack2", {'symbol': 'O', 'category': 'Syllabic', 'description': 'h(å)ll', 'ipa' : 'ɔ'});
-// adm.addSymbolToSet("kvack2", {'symbol': 'p', 'category': 'NonSyllabic', 'description': '(p)il', 'ipa' : 'p'});
-
-//adm.showSymbolSet({"id":0,"name":"nisse2","symbolSetName":"kvack2"});
-
+// For marking the selected row in a table
 $(document).on('click', '.selectable', (function(){
     $(this).addClass("selected").siblings().removeClass("selected");
 }));
