@@ -18,7 +18,7 @@ ADMLD.AdminLexDefModel = function () {
 
     // TODO remove this (see below)
     self.nRead = ko.observable(0);    
-
+    
     // TODO remove this. Too slow for large files. Use file upload instead.
     self.readLexiconFile = function(fileObject) {
 	var i = 0;
@@ -34,8 +34,10 @@ ADMLD.AdminLexDefModel = function () {
     
     
     self.lexicons = ko.observableArray();
+    
+    // selectedLexicon is a trigger for different things
     // Sample lexicon object: {"id":0,"name":"nisse2","symbolSetName":"kvack2"}
-    self.selectedLexicon = ko.observable({'id': 0, 'name': '', 'symbolSetName': ''});//.extend({notify: 'always'});
+    self.selectedLexicon = ko.observable({'id': 0, 'name': '', 'symbolSetName': ''});
     
     self.addLexiconName = ko.observable("");
     self.addSymbolSetName = ko.observable("");
@@ -97,27 +99,23 @@ ADMLD.AdminLexDefModel = function () {
 
     self.deleteSymbol = function(zymbl) {
 	var currSyms = self.symbolSets()[self.selectedLexicon().symbolSetName];
+	
+	// This appears to be JavaScript's way of removing an entry from an array: 
 	var i = currSyms.indexOf(zymbl);
 	if(i != -1) {
 	    currSyms.splice(i, 1);
 	}
 	
-	
-
 	// update to trigger event
 	// TODO why is this needed?
 	self.selectedLexicon(self.selectedLexicon());
-
-	//self.symbolSets()[self.selectedLexicon().symbolSetName] = currSyms;
 	
-	//console.log("i: "+ i);
-	//console.log("ccc> "+ JSON.stringify(currSyms));
     };
-
+    
 
     // List of Symbol objects
     self.selectedSymbolSet = ko.computed(function() {
-	console.log("CCCCC "+ self.selectedLexicon().name);
+	
 	if (self.symbolSets().hasOwnProperty(self.selectedLexicon().symbolSetName)) {
 	    return self.symbolSets()[self.selectedLexicon().symbolSetName];
 	} else {
@@ -153,7 +151,7 @@ ADMLD.AdminLexDefModel = function () {
 		});
 	}
     };
-	//, this);
+
     
     self.saveSymbolSet = function () {
 	$.post(ADMLD.baseURL +"/admin/savesymbolset", JSON.stringify(self.selectedSymbolSet))
@@ -163,27 +161,6 @@ ADMLD.AdminLexDefModel = function () {
     };
     
 
-    
-    // self.showSymbolSet = function(lexicon) {
-	
-    // 	console.log("XXXX> "+ JSON.stringify(lexicon));
-	
-    // 	//self.selectedSymbol({}); // nuke current symbol set
-    // 	//self.selectedSymbolSet.removeAll(); // nuke current symbol set
-    // 	self.selectedLexicon(lexicon);
-    //  	var symbolSetName = lexicon.symbolSetName;
-    // 	if (! self.symbolSets().hasOwnProperty(symbolSetName)) {
-	    
-    // 	    // This lexicon doesn't appear to have symbol set loaded:
-    // 	    // fetch existing symbol set (possibly empty) from server
-	    
-
-	    
-    // 	}; //else { // there was already a symbol set for this lexicon
-    // 	  //  self.selectedSymbolSet(self.symbolSets()[symbolSetName]);
-    // 	//};
-    // };
-    
     self.setSelectedSymbol= function (symbol) {
 	self.selectedSymbol(symbol);
     };
@@ -251,6 +228,7 @@ ADMLD.AdminLexDefModel = function () {
 		
             });
 	    
+	    // update to trigger event
 	    // TODO why is this needed?
 	    self.selectedLexicon(self.selectedLexicon());
 	};
@@ -285,6 +263,8 @@ ADMLD.AdminLexDefModel = function () {
 			 'ipa': self.ipaToAdd()};
 	
 	self.addSymbolToSet(self.selectedLexicon().symbolSetName, newSymbol);
+	
+	// update to trigger event
 	// TODO why is this needed?
 	self.selectedLexicon(self.selectedLexicon());
     };
@@ -505,15 +485,11 @@ ADMLD.AdminLexDefModel = function () {
 	}
     };
     
-
-    //self.dummyIPA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'å', 'ä', 'ö'];
     
     self.ipaTableRows = ko.computed(function() {
 	var n = self.nColumns();
 	return self.createIPATableRows(n, self.dummyIPA);
-    });// ko.observableArray();
-    
-    
+    }); 
 };
 
 
