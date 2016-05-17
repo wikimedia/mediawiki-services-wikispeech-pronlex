@@ -16,20 +16,20 @@ ADMLD.AdminLexDefModel = function () {
     
     
 
-    // TODO remove this (see below)
-    self.nRead = ko.observable(0);    
+    // // TODO remove this (see below)
+    // self.nRead = ko.observable(0);    
     
-    // TODO remove this. Too slow for large files. Use file upload instead.
-    self.readLexiconFile = function(fileObject) {
-	var i = 0;
-	new LineReader(fileObject).readLines(function(line){
-	    i = i + 1;
-	    if (i % 1000 === 0 ) {
-		//console.log(i);
-		self.nRead(i);
-	    };
-	});
-    };
+    // // TODO remove this. Too slow for large files. Use file upload instead.
+    // self.readLexiconFile = function(fileObject) {
+    // 	var i = 0;
+    // 	new LineReader(fileObject).readLines(function(line){
+    // 	    i = i + 1;
+    // 	    if (i % 1000 === 0 ) {
+    // 		//console.log(i);
+    // 		self.nRead(i);
+    // 	    };
+    // 	});
+    // };
     
     
     
@@ -38,7 +38,8 @@ ADMLD.AdminLexDefModel = function () {
     // selectedLexicon is a trigger for different things
     // Sample lexicon object: {"id":0,"name":"nisse2","symbolSetName":"kvack2"}
     self.selectedLexicon = ko.observable({'id': 0, 'name': '', 'symbolSetName': ''});
-    
+    //self.selectedLexicon = ko.observable();
+
     self.addLexiconName = ko.observable("");
     self.addSymbolSetName = ko.observable("");
 
@@ -47,6 +48,7 @@ ADMLD.AdminLexDefModel = function () {
 	$.getJSON(ADMLD.baseURL +"/listlexicons")
 	    .done(function (data) {
 		self.lexicons(data);
+		self.loadSymbolSets(data);
 	    })
     	    .fail(function (xhr, textStatus, errorThrown) {
 		alert("loadLexiconNames says: "+ xhr.responseText);
@@ -96,7 +98,7 @@ ADMLD.AdminLexDefModel = function () {
     
     // An object/hash with symbol set name as key and a list of symbol objects as value
     self.symbolSets = ko.observable({});
-
+    
     self.deleteSymbol = function(zymbl) {
 	var currSyms = self.symbolSets()[self.selectedLexicon().symbolSetName];
 	
@@ -111,6 +113,15 @@ ADMLD.AdminLexDefModel = function () {
 	self.selectedLexicon(self.selectedLexicon());
 	
     };
+
+    self.showSymbolSet = function(lexicon) {
+	
+	//console.log("thingy: "+ JSON.stringify(thingy));
+
+	// update to trigger event
+	// TODO why is this needed?
+	self.selectedLexicon(lexicon);
+    };
     
 
     // List of Symbol objects
@@ -122,36 +133,66 @@ ADMLD.AdminLexDefModel = function () {
 	    return [];
 	};
     }, this);
+    
     self.saveSymbolSetToDB = function () {
 	
 	var ssName = self.selectedLexicon().symbolSetName;
+	if("" === ssName) {
+	    console.log("saveSymbolSetToDB: no symbol set name");
+	    return;
+	};
 	var ss = self.symbolSets()[ssName];
-	if (typeof ss === 'undefined' ) return;
+	if (typeof ss === 'undefined' ) {
+	    console.log("saveSymbolSetToDB: no symbol set to save");
+	    return;
+	};
+	
 	for(var i = 0; i < ss.length; i++) {
 	    console.log(JSON.stringify(ss[i]));
-	};
+	 };
+	
+	
+	// TODO signal to user that something is happening/has happened
+
+	$.post(ADMLD.baseURL + "/admin/savesymbolset", JSON.stringify(ss))
+	    .fail(function (xhr, textStatus, errorThrown) {
+		console.log("saveSymbolSetToDB fail xhr: "+ JSON.stringify(xhr));
+		console.log("saveSymbolSetToDB xhr.responseText: "+ xhr.responseText);
+    		console.log("saveSymbolSetToDB fail textStatus: "+ textStatus);
+		console.log("saveSymbolSetToDB fail errorThrown: "+ errorThrown);
+		alert("saveSymbolSetToDB says: "+ xhr.responseText);
+    	    });	
+	
     };
 
 
     // A sample symbol: {"symbol":"O","category":"Phoneme","description":"h(å)ll","ipa":"ɔ"}
     self.selectedSymbol = ko.observable({});
-
-    self.loadSymbolSet = function () {
-	if(self.selectedLexicon() !== undefined) { // TODO Gör man så?
-	    //$.getJSON(DMCRLX.baseURL +"/admin/listphonemesymbols", {lexiconId: DMCRLX.selectedLexicon().id}, function (data) {
-	    $.getJSON(ADMLD.baseURL +"/admin/listsymbolset", {lexiconId: self.selectedLexicon.id}, function (data) {
-		console.log("FFFFF> "+ JSON.stringify(data));
-		var syms = _.map(data, function (s) {
-		    return {'lexiconId': s.lexiconId, 'symbol': s.symbol, 'category': s.category, 'description': s.description, 'ipa': s.ipa};
-		}); 
-		DMCRLX.symbolSet(syms);
-	    })
-		.fail(function (xhr, textStatus, errorThrown) {
-		    alert(xhr.responseText);
-		});
-	}
+    self.loadSymbolSets = function(lexicons) {
+	lexicons.forEach(function(lex) {
+	    console.log("din mamma är ett lexikon: "+ JSON.stringify(lex));
+	    self.loadSymbolSet(lex);
+	}); 
     };
-
+    self.loadSymbolSet = function (lexicon) {
+	console.log("loadSymbolSet: "+ JSON.stringify(lexicon))
+	$.getJSON(ADMLD.baseURL +"/admin/listsymbolset", {lexiconid: lexicon.id}, function (data) {
+	    data.forEach(function(s) {
+		var sym = {'lexiconId': s.lexiconId, 'symbol': s.symbol, 'category': s.category, 'description': s.description, 'ipa': s.ipa};
+		self.addSymbolToSet(lexicon.symbolSetName, sym);
+	    });
+	    //self.selectedLexicon(self.selectedLexicon());
+	})
+	    .fail(function (xhr, textStatus, errorThrown) {
+		console.log("loadSymbolSet fail xhr: "+ JSON.stringify(xhr));
+		console.log("loadSymbolSet xhr.responseText: "+ xhr.responseText);
+    		console.log("loadSymbolSet fail textStatus: "+ textStatus);
+		console.log("loadSymbolSet fail errorThrown: "+ errorThrown);
+		    
+		alert(xhr.responseText);
+	    });	
+    };
+    
     
     self.saveSymbolSet = function () {
 	$.post(ADMLD.baseURL +"/admin/savesymbolset", JSON.stringify(self.selectedSymbolSet))
@@ -217,15 +258,19 @@ ADMLD.AdminLexDefModel = function () {
 		var symbol = {'symbol': fs[headerIndexes['SYMBOL']],
 			      'category': fs[headerIndexes['CATEGORY']],
 			      'description': fs[headerIndexes['DESCRIPTION']],
-			      'ipa': fs[headerIndexes['IPA']]
+			      'ipa': fs[headerIndexes['IPA']],
+			      'lexiconId': self.selectedLexicon().id
 			     };
 		
 		if(! self.symbolSets().hasOwnProperty(self.selectedLexicon().symbolSetName)) {
 		    self.symbolSets()[self.selectedLexicon().symbolSetName] = [];
 		};
 		
-		self.addSymbolToSet(self.selectedLexicon().symbolSetName, symbol);
-		
+		if (symbol.symbol === "" ) {
+		    console.log("No symbol value, skipping line: "+ line);
+		} else { 
+		    self.addSymbolToSet(self.selectedLexicon().symbolSetName, symbol);
+		};
             });
 	    
 	    // update to trigger event
@@ -262,16 +307,17 @@ ADMLD.AdminLexDefModel = function () {
 	var newSymbol = {'symbol': self.symbolToAdd(), 
 			 'category': self.categoryToAdd(), 
 			 'description': self.descriptionToAdd(), 
-			 'ipa': self.ipaToAdd()};
+			 'ipa': self.ipaToAdd(),
+			 'lexiconId': self.selectedLexicon().id};
 	
-	self.addSymbolToSet(self.selectedLexicon().symbolSetName, newSymbol);
-	
+	if( self.symbolToAdd() !== "") { 
+	    self.addSymbolToSet(self.selectedLexicon().symbolSetName, newSymbol);
+	};
 	// empty input after adding new symbol
 	self.symbolToAdd("");
 	//self.categoryToAdd("");
 	self.descriptionToAdd("");
 	self.ipaToAdd("");
-
 
 	// update to trigger event
 	// TODO why is this needed?
@@ -284,17 +330,35 @@ ADMLD.AdminLexDefModel = function () {
 	    ss[symbolSetName] = [];
 	};
 	if(symbol.symbol === "" || symbol.symbol === undefined) {
-	    alert("Symbol field cannot be empty");
+	    var msg = "addSymbolToSet: Symbol field cannot be empty: "+ JSON.stringify(symbol); 
+	    console.log(msg);
+	    alert(msg); // TODO
 	    return;
 	};
 	if(symbol.description === "" || symbol.description === undefined) {
-	    alert("Description field cannot be empty");
+	    var msg = "addSymbolToSet: Description field cannot be empty"; 
+	    console.log(msg);
+	    alert(msg); // TODO 
 	    return;
 	};
+	
+
 	// TODO validate that syllabic/non... etc has an IPA symbol
 	
-	    
-	self.symbolSets()[symbolSetName].push(symbol);
+	
+	// There is an uniqueness constraint in the database 
+	var dupes = self.symbolSets()[symbolSetName].filter(function(obj) {
+	    return obj.symbol === symbol.symbol;
+	});
+	
+	if(dupes.length > 0) {
+	    dupes.push(symbol);
+	    var msg = "addSymbolToSet: duplicate symbols are not allowed: "+ JSON.stringify(dupes);
+	    console.log(msg);
+	    alert(msg); // TODO
+	} else {    
+	    self.symbolSets()[symbolSetName].push(symbol);
+	}
     };
     
     self.setSelectedIPA = function(symbol) {

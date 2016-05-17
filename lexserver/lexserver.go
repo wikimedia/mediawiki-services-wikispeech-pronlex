@@ -270,19 +270,39 @@ func adminLexDefinitionHandler(w http.ResponseWriter, r *http.Request) {
 
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/create_lex.html")
-	//fmt.Fprint(w, "HEJ DU 1")
 }
 
 func adminEditSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
-	//fmt.Fprint(w, "HEJ DU 2")
+}
+
+func listSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
+	var lexIDstr = r.FormValue("lexiconid")
+	lexID, err := strconv.ParseInt(lexIDstr, 10, 64)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("listSymbolSetHandler failed to parse lexicon id : %v", err), http.StatusBadRequest)
+		return
+	}
+	symbolSet, err := dbapi.GetSymbolSet(db, lexID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("listSymbolSetHandler failed to get symbol set from db : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	res, err := json.Marshal(symbolSet)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("listSymbolSetHandler failed to marshal symbol set : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprint(w, string(res))
 }
 
 func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("failed reading request body %v : ", err)
-		http.Error(w, fmt.Sprintf("failed json unmashaling : %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("failed reading request body : %v", err), http.StatusInternalServerError)
 	}
 
 	var ss []dbapi.Symbol
@@ -348,7 +368,7 @@ func main() {
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
 	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
-	//http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
+	http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
 	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)

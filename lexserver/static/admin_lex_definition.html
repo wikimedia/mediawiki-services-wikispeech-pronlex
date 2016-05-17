@@ -24,12 +24,10 @@
     <table>
       <thead>
 	<tr>
-	  <!-- <td>Id</td> -->
 	  <td>Name</td>
 	  <td>SymbolSet Name</td>
 	  <td>Update names</td>
 	  <td>Import</td>
-	  <td>Select lexicon</td>
 	  <td>Delete lexicon</td>
 	</tr>
       </thead>
@@ -44,6 +42,7 @@
 	  <td>
 	    <button data-bind="click: $root.addLexicon">Add lexicon</button>
 	  </td>
+	  <td></td>
 	  <td></td>
 	</tr>
       </tfoot>
@@ -67,32 +66,27 @@
 	    <input id="xapa" type="file" onchange="$root.readLexiconFile(this.files[0])"></input>
 	  </td>
 	  
-	  <td>
-	    <button data-bind="click: $root.showSymbolSet">Show symbol set</button>
-	  </td>
 	  
 	  <td>
 	    <button data-bind="click: $root.deleteLexicon">Delete from db</button>
 	  </td>
 	</tr>
 	
-      </tbody>
-      
+      </tbody> 
     </table>
     
-    <p>Lines read: <span style="text-align:right" data-bind="text: $root.nRead"></span></p>
-    
-    <p>Selected lexicon: <span data-bind="if: $root.selectedLexicon"><span  data-bind="text: $root.selectedLexicon().name"></span></span> </p>
-    <p>Symbol set name: 
-      <span data-bind="if: $root.selectedLexicon">
+    <span data-bind="if: $root.selectedLexicon().id > 0">
+      <p>Selected lexicon:<span  data-bind="text: $root.selectedLexicon().name"></span></p>
+      
+      <p>Symbol set name: 
 	<span  data-bind="text: $root.selectedLexicon().symbolSetName"></span>
 	Import: <input type="file" data-bind="event: { change: function() { $root.readSymbolSetFile($element.files[0]) } }"></input>
-      </span> 
-    </p>
-    
+      </p>
+    </span>
     
     <!-- Table for editing the symbol set -->
-    <table data-bind="if: $root.selectedSymbolSet">
+    <span data-bind="if: $root.selectedLexicon().id > 0">
+    <table>
       <thead>
 	<tr>
 	  <td>Symbol</td>
@@ -152,19 +146,21 @@
     <p>
       <button data-bind="click: saveSymbolSetToDB">Save symbol set</button>
     </p>
-    
-    <!-- table for selecting an IPA symbol -->
-    <table data-bind="foreach: $root.ipaTableRows">
-      <tr data-bind="foreach: $data">
-	<td class="hovable" data-bind="click: $root.setSelectedIPA, text: $data.symbol, attr: {title: $data.description}" style="cursor:pointer"></td>
-      </tr>
-    </table>
-    
-    <p>
-      Selected symbol: <span data-bind="text: $root.ipaToAdd"></span>
-    </p>
-    
+</span>
 
+    <!-- table for selecting an IPA symbol -->
+    <span data-bind="if: $root.selectedLexicon().id > 0">
+      <table data-bind="foreach: $root.ipaTableRows">
+	<tr data-bind="foreach: $data">
+	  <td class="hovable" data-bind="click: $root.setSelectedIPA, text: $data.symbol, attr: {title: $data.description}" style="cursor:pointer"></td>
+	</tr>
+      </table>
+      
+      <p>
+	Selected symbol: <span data-bind="text: $root.ipaToAdd"></span>
+      </p>
+    </span>
+    
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>

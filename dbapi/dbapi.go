@@ -1047,7 +1047,7 @@ func GetSymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
 // SymbolSetTx returns the set of Symbols defined for a lexicon with the given db id
 func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
 	var res []Symbol
-	rows, err := tx.Query("select lexiconid, symbol, category, description, ipa from symbolset where lexiconid = ?", lexiconID)
+	rows, err := tx.Query("select lexiconid, symbol, category, description, ipa from symbolset where lexiconid = ? order by id", lexiconID)
 	if err != nil {
 		return res, fmt.Errorf("failed db query : %v", err)
 	}
