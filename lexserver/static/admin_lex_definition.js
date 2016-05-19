@@ -14,8 +14,24 @@ ADMLD.AdminLexDefModel = function () {
     self.symbolCategories = 
 	["syllabic", "non syllabic", "stress", "phoneme delimiter", "explicit phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
     
-    
 
+    
+    self.uploadLexiconFile = function(lexiconFile) {
+	console.log("KUCKELIKU: "+ JSON.stringify(lexiconFile.name));
+	var url = ADMLD.baseURL + "/admin/lexiconfileupload" ;//'server/index.php';
+	var xhr = new XMLHttpRequest();
+	var fd = new FormData();
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+		// Every thing ok, file uploaded
+		console.log(xhr.responseText); // handle response.
+            }
+	};
+	fd.append("upload_file", lexiconFile);
+	xhr.send(fd);
+    }
+    
     // // TODO remove this (see below)
     // self.nRead = ko.observable(0);    
     
@@ -55,6 +71,10 @@ ADMLD.AdminLexDefModel = function () {
 	    });
     };
     
+    // TODO update also name used in symbol set table, etc
+    //      probably also name of selected lexicon?
+    // Maybe a bit chaotic. 
+    // Seems like an update of lexicon/symbol set name triggers adding already existing symbols to symbol set?! 
     self.updateLexicon = function () {
 	
     	if ( self.selectedLexicon().name.trim() === "" || self.selectedLexicon().symbolSetName.trim() === "" ) {

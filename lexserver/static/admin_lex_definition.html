@@ -4,31 +4,22 @@
     <style>
       tr.selected {
       background-color: #FFCF8B
-      }
-
-      
+      }      
       .hovable:hover  {
       background: #c7d4dd
       }
-
-      
     </style>
     
   </head>
   <body>
     <h1>Admin lex definition</h1>
 
-    
-  
-
-    
     <table>
       <thead>
 	<tr>
 	  <td>Name</td>
 	  <td>SymbolSet Name</td>
 	  <td>Update names</td>
-	  <td>Import</td>
 	  <td>Delete lexicon</td>
 	</tr>
       </thead>
@@ -43,7 +34,6 @@
 	  <td>
 	    <button data-bind="click: $root.addLexicon">Add lexicon</button>
 	  </td>
-	  <td></td>
 	  <td></td>
 	</tr>
       </tfoot>
@@ -60,14 +50,10 @@
 	  </td>
 	  
 	  <td>
+	    <!-- TODO update also symbol sets, selected lexicon, etc -->
 	    <button data-bind="click: $root.updateLexicon">Update</button>
 	  </td>
-
-	  <td>
-	    <input id="xapa" type="file" onchange="$root.readLexiconFile(this.files[0])"></input>
-	  </td>
-	  
-	  
+	   
 	  <td>
 	    <button data-bind="click: $root.deleteLexicon">Delete from db</button>
 	  </td>
@@ -75,6 +61,11 @@
 	
       </tbody> 
     </table>
+    
+    <p>
+      Import lexicon file: <input type="file" data-bind="event: { change: function() { $root.uploadLexiconFile($element.files[0]) } }"></input>
+      <button>Load lexicon file into database</button>
+    </p>
     
     <span data-bind="if: $root.selectedLexicon().id > 0">
       <p>Selected lexicon:<span  data-bind="text: $root.selectedLexicon().name"></span></p>

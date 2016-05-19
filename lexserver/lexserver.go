@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stts-se/pronlex/dbapi"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -321,6 +323,34 @@ func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
+	if r.Method != "POST" {
+		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+		return
+	}
+
+	// Lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
+
+	r.ParseMultipartForm(32 << 20)
+	file, handler, err := r.FormFile("upload_file")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+	fmt.Fprintf(w, "%v", handler.Header)
+	f, err := os.OpenFile(filepath.Join("/tmp", handler.Filename), os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer f.Close()
+	io.Copy(f, file)
+
+	fmt.Fprint(w, "HEJ.")
+}
+
 var db *sql.DB
 
 func main() {
@@ -372,6 +402,7 @@ func main() {
 	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
+	http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
 
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
