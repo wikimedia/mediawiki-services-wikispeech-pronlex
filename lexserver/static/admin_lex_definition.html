@@ -62,10 +62,13 @@
       </tbody> 
     </table>
     
+    
     <p>
+      <span data-bind="if: $root.selectedLexicon().id > 0">
       Upload lexicon file: <input type="file" data-bind="event: { change: function() { $root.uploadLexiconFile($element.files[0]) } }"></input>
       <!-- <button>Load lexicon file into database</button> -->
-     </p>
+      </span>
+    </p>
     
     <span data-bind="if: $root.selectedLexicon().id > 0">
       <p>Selected lexicon:<span  data-bind="text: $root.selectedLexicon().name"></span></p>

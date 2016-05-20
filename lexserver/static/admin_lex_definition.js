@@ -17,7 +17,6 @@ ADMLD.AdminLexDefModel = function () {
 
     
     self.uploadLexiconFile = function(lexiconFile) {
-	console.log("KUCKELIKU: "+ JSON.stringify(lexiconFile.name));
 	var url = ADMLD.baseURL + "/admin/lexiconfileupload" ;//'server/index.php';
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
@@ -25,33 +24,19 @@ ADMLD.AdminLexDefModel = function () {
 	xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
 		// Every thing ok, file uploaded
-		console.log(xhr.responseText); // handle response.
+		console.log("uploadLexiconFile return response text", xhr.responseText); // handle response.
 		//} //else { // TODO  This doesn't seem to be the right way to handle errors here
 		//alert(xhr.responseText);
-		} else {
-		    console.log("error", xhr.statusText);
-		}
-	    };
+	    };// else { // TODO this doesn't work
+ 	//	console.log("uploadLexiconFile return status", xhr.statusText);
+	 //   };
 	};
+	fd.append("lexicon_id", self.selectedLexicon().id);
+	fd.append("lexicon_name", self.selectedLexicon().name);
+	fd.append("symbolset_name", self.selectedLexicon().symbolSetName);
 	fd.append("upload_file", lexiconFile);
 	xhr.send(fd);
-    }
-    
-    // // TODO remove this (see below)
-    // self.nRead = ko.observable(0);    
-    
-    // // TODO remove this. Too slow for large files. Use file upload instead.
-    // self.readLexiconFile = function(fileObject) {
-    // 	var i = 0;
-    // 	new LineReader(fileObject).readLines(function(line){
-    // 	    i = i + 1;
-    // 	    if (i % 1000 === 0 ) {
-    // 		//console.log(i);
-    // 		self.nRead(i);
-    // 	    };
-    // 	});
-    // };
-    
+    };
     
     
     self.lexicons = ko.observableArray();
@@ -69,7 +54,7 @@ ADMLD.AdminLexDefModel = function () {
 	$.getJSON(ADMLD.baseURL +"/listlexicons")
 	    .done(function (data) {
 		self.lexicons(data);
-		self.loadSymbolSets(data);
+		self.loadSymbolSetsIfEmpty(data); 
 	    })
     	    .fail(function (xhr, textStatus, errorThrown) {
 		alert("loadLexiconNames says: "+ xhr.responseText);
@@ -89,11 +74,9 @@ ADMLD.AdminLexDefModel = function () {
 	
     	var params = {'id' : self.selectedLexicon().id, 'name' : self.selectedLexicon().name, 'symbolsetname' : self.selectedLexicon().symbolSetName}
 	
-	console.log("updateLexicon params: "+ JSON.stringify(params));
     	
 	$.get(ADMLD.baseURL + "/admin/insertorupdatelexicon", params)
     	    .done(function(data){
-		console.log("updateLexicon $get return data: "+ JSON.stringify(data));
     		self.loadLexiconNames();
     		self.selectedLexicon(data); // ?
     	    })
@@ -141,8 +124,6 @@ ADMLD.AdminLexDefModel = function () {
 
     self.showSymbolSet = function(lexicon) {
 	
-	//console.log("thingy: "+ JSON.stringify(thingy));
-
 	// update to trigger event
 	// TODO why is this needed?
 	self.selectedLexicon(lexicon);
@@ -172,10 +153,9 @@ ADMLD.AdminLexDefModel = function () {
 	    return;
 	};
 	
-	for(var i = 0; i < ss.length; i++) {
-	    console.log(JSON.stringify(ss[i]));
-	 };
-	
+	// for(var i = 0; i < ss.length; i++) {
+	//     console.log(JSON.stringify(ss[i]));
+	//  };	
 	
 	// TODO signal to user that something is happening/has happened
 
@@ -193,9 +173,27 @@ ADMLD.AdminLexDefModel = function () {
 
     // A sample symbol: {"symbol":"O","category":"Phoneme","description":"h(å)ll","ipa":"ɔ"}
     self.selectedSymbol = ko.observable({});
+    
+    self.symbolSetEmpty = function(lex) {
+	if( ! self.symbolSets().hasOwnProperty(lex.symbolSetName) ) {
+	    return true;
+	};
+	if (self.symbolSets()[lex.symbolSetName].length === 0) {
+	    return true;
+	};
+	return false;
+    };
+
+    self.loadSymbolSetsIfEmpty = function(lexicons) {
+	lexicons.forEach(function(lex) {
+	    if(self.symbolSetEmpty(lex)) {
+		self.loadSymbolSet(lex);
+	    };
+	}); 
+    };
+
     self.loadSymbolSets = function(lexicons) {
 	lexicons.forEach(function(lex) {
-	    console.log("din mamma är ett lexikon: "+ JSON.stringify(lex));
 	    self.loadSymbolSet(lex);
 	}); 
     };

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -349,6 +350,32 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
 		return
 	}
+
+	lexiconID, err := strconv.ParseInt(r.FormValue("lexicon_id"), 10, 64)
+	if err != nil {
+		msg := "lexiconFileUploadHandler got no lexicon id"
+		fmt.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	lexiconName := r.FormValue("lexicon_name")
+	fmt.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", lexiconName)
+	symbolSetName := r.FormValue("symbolset_name")
+	fmt.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", symbolSetName)
+
+	if "" == strings.TrimSpace(lexiconName) {
+		msg := "lexiconFileUploadHandler got no lexicon name"
+		fmt.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	if "" == strings.TrimSpace(symbolSetName) {
+		msg := "lexiconFileUploadHandler got no symbolset name"
+		fmt.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
 	// Lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
 	r.ParseMultipartForm(32 << 20)
@@ -359,7 +386,8 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	f, err := os.OpenFile(filepath.Join(uploadFileArea, handler.Filename), os.O_WRONLY|os.O_CREATE, 0666)
+	fName := filepath.Join(uploadFileArea, handler.Filename)
+	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed opening local output file : %v", err), http.StatusInternalServerError)
@@ -372,7 +400,40 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO temporarely try to directly load the uploaded file
+	// into the database.  However, this should be a step of its
+	// own: first upload file, validate it, etc, and then make it
+	// possible to load into the db, not blindely just adding
+	// stuff.  Should check if there are duplicates:
+	// words+transcription in upload text file already present in
+	// db.
+	f.Close()
+	loadLexiconFileIntoDB(lexiconID, lexiconName, symbolSetName, fName)
+
 	fmt.Fprintf(w, "%v", handler.Header)
+}
+
+// TODO temporary test thingy
+// TODO hard wired to NST file format
+func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
+	fmt.Printf("lexid: %v\n", lexiconID)
+	fmt.Printf("lexiconName: %v\n", lexiconName)
+	fmt.Printf("symbolSetName: %v\n", symbolSetName)
+	fmt.Printf("uploadFile: %v\n", uploadFileName)
+
+	fh, err := os.Open(uploadFileName)
+	if err != nil {
+
+	}
+
+	s := bufio.NewScanner(fh)
+	for s.Scan() {
+		l := s.Text()
+		fmt.Println(l)
+	}
+
+	// TODO
+	return nil
 }
 
 var db *sql.DB
