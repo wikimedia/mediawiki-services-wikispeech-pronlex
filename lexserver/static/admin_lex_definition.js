@@ -23,10 +23,15 @@ ADMLD.AdminLexDefModel = function () {
 	var fd = new FormData();
 	xhr.open("POST", url, true);
 	xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
+            if (xhr.readyState === 4 && xhr.status === 200) {
 		// Every thing ok, file uploaded
 		console.log(xhr.responseText); // handle response.
-            }
+		//} //else { // TODO  This doesn't seem to be the right way to handle errors here
+		//alert(xhr.responseText);
+		} else {
+		    console.log("error", xhr.statusText);
+		}
+	    };
 	};
 	fd.append("upload_file", lexiconFile);
 	xhr.send(fd);

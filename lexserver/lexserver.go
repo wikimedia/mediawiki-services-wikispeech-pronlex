@@ -24,6 +24,26 @@ func ff(f string, err error) {
 	}
 }
 
+// TODO should go into config file
+var uploadFileArea = filepath.Join(".", "upload_area")
+
+// TODO config stuff
+func init() {
+	// TODO sane error handling
+
+	// If the upload area dir doesn't exist, create it
+	if _, err := os.Stat(uploadFileArea); err != nil {
+		if os.IsNotExist(err) {
+			err2 := os.Mkdir(uploadFileArea, 0755)
+			if err2 != nil {
+				fmt.Printf("lexserver.init: failed to create %s : %v", uploadFileArea, err2)
+			}
+		} else {
+			fmt.Printf("lexserver.init: peculiar error : %v", err)
+		}
+	} // else: already exists, hopefullly
+}
+
 // TODO remove pretty-print option, since you can use the JSONView plugin to Chrome instead
 // pretty print if the URL paramer 'pp' has a value
 func marshal(v interface{}, r *http.Request) ([]byte, error) {
@@ -329,26 +349,30 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
 		return
 	}
-
 	// Lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
 	r.ParseMultipartForm(32 << 20)
 	file, handler, err := r.FormFile("upload_file")
 	if err != nil {
 		fmt.Println(err)
+		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed reading file : %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
-	fmt.Fprintf(w, "%v", handler.Header)
-	f, err := os.OpenFile(filepath.Join("/tmp", handler.Filename), os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(filepath.Join(uploadFileArea, handler.Filename), os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		fmt.Println(err)
+		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed opening local output file : %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer f.Close()
-	io.Copy(f, file)
+	_, err = io.Copy(f, file)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed copying local output file : %v", err), http.StatusInternalServerError)
+		return
+	}
 
-	fmt.Fprint(w, "HEJ.")
+	fmt.Fprintf(w, "%v", handler.Header)
 }
 
 var db *sql.DB

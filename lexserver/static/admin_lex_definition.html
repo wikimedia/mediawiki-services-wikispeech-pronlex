@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Admin lex definition</title>    
+    <title>Lexicon administration</title>    
     <style>
       tr.selected {
       background-color: #FFCF8B
@@ -12,7 +12,7 @@
     
   </head>
   <body>
-    <h1>Admin lex definition</h1>
+    <h1 data-bind="text: 'Selected Lexicon ' + $root.selectedLexicon().name">Admin lex definition</h1>
 
     <table>
       <thead>
@@ -63,9 +63,9 @@
     </table>
     
     <p>
-      Import lexicon file: <input type="file" data-bind="event: { change: function() { $root.uploadLexiconFile($element.files[0]) } }"></input>
-      <button>Load lexicon file into database</button>
-    </p>
+      Upload lexicon file: <input type="file" data-bind="event: { change: function() { $root.uploadLexiconFile($element.files[0]) } }"></input>
+      <!-- <button>Load lexicon file into database</button> -->
+     </p>
     
     <span data-bind="if: $root.selectedLexicon().id > 0">
       <p>Selected lexicon:<span  data-bind="text: $root.selectedLexicon().name"></span></p>
