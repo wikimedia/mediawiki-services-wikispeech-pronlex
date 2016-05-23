@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/line"
+	"golang.org/x/net/websocket"
 	"io"
 	"io/ioutil"
 	"log"
@@ -17,6 +18,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // TODO remove calls to this, add error handling
@@ -345,6 +347,18 @@ func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func webSockTestHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/websock_test.html")
+}
+
+// From https://github.com/eliben/go-websocket-sample/blob/master/server.go
+func webSockTickHandler(ws *websocket.Conn) {
+	for range time.Tick(1 * time.Second) {
+		// Once a second, send a message (as a string) with the current time.
+		websocket.Message.Send(ws, time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
+	}
+}
+
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
 	if r.Method != "POST" {
@@ -420,6 +434,7 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 // TODO Return some sort of result? Stats?
 // TODO Set 'status' value for imported entries (now hard-wired to 'import' below)
 // TODO Set 'source' value for imported entries (now hard-wired to 'nst' below)
+// TODO Change to websocket call instead? That way, we could inform client on progress, errors, etc, as they occur.
 func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
 	fmt.Printf("lexid: %v\n", lexiconID)
 	fmt.Printf("lexiconName: %v\n", lexiconName)
@@ -541,7 +556,18 @@ func main() {
 	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
+
+	http.HandleFunc("/websocktest", webSockTestHandler)
+
+	var sock = websocket.Handler(webSockTickHandler)
+	http.Handle("/websocktick", sock)
+
+	//type LexUploadHandler struct {
+	//websocket *websocket.Conn
+	//}
+
 	http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
+	//http.HandleFunc("/admin/lexiconfileupload", LexUploadHandler{websocket: sock})
 
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
