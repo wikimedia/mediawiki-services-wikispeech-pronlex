@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/line"
 	"io"
 	"io/ioutil"
 	"log"
@@ -414,7 +415,9 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO temporary test thingy
-// TODO hard wired to NST file format
+// TODO hard wired to NST file format. There should be a standard lexicon import text format.
+// TODO This guy should somehow report back what it's doing to the client. (Goroutine + Websocket?)
+// TODO Return some sort of result? Stats?
 func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
 	fmt.Printf("lexid: %v\n", lexiconID)
 	fmt.Printf("lexiconName: %v\n", lexiconName)
@@ -423,13 +426,61 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 
 	fh, err := os.Open(uploadFileName)
 	if err != nil {
-
+		return fmt.Errorf("loadLexiconFileIntoDB failed to open file : %v", err)
 	}
 
 	s := bufio.NewScanner(fh)
+	// for s.Scan() {
+	// 	l := s.Text()
+	// 	fmt.Println(l)
+	// }
+
+	// ---------------------------->
+	// TODO Copied from addNSTLexToDB
+	nstFmt, err := line.NewNST()
+	if err != nil {
+		//log.Fatal(err)
+		return fmt.Errorf("lexserver failed to instantiate lexicon line parser : %v", err)
+	}
+	lex := dbapi.Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
+
+	n := 0
+	var eBuf []dbapi.Entry
 	for s.Scan() {
+		if err := s.Err(); err != nil {
+			log.Fatal(err)
+		}
 		l := s.Text()
-		fmt.Println(l)
+		e, err := nstFmt.ParseToEntry(l)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// initial status
+		e.EntryStatus = dbapi.EntryStatus{Name: "imported", Source: "nst"}
+		eBuf = append(eBuf, e)
+		n++
+		if n%10000 == 0 {
+			_, err = dbapi.InsertEntries(db, lex, eBuf)
+			if err != nil {
+				log.Fatal(err)
+			}
+			eBuf = make([]dbapi.Entry, 0)
+			fmt.Printf("\rLines read: %d               \r", n)
+		}
+	}
+	dbapi.InsertEntries(db, lex, eBuf) // flushing the buffer
+
+	_, err = db.Exec("ANALYZE")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Lines read:\t%d", n)
+	// TODO Copied from addNSTLexToDB
+	// <----------------------------
+
+	if err := s.Err(); err != nil {
+		return fmt.Errorf("loadLexiconFileIntoDB error while scanning file : %v", err)
 	}
 
 	// TODO
