@@ -17,6 +17,7 @@
     <table>
       <thead>
 	<tr>
+	  <td>DB id</td>
 	  <td>Name</td>
 	  <td>SymbolSet Name</td>
 	  <td>Update names</td>
@@ -25,6 +26,7 @@
       </thead>
       <tfoot>
 	<tr>
+	  <td></td> <!-- DB id -->
 	  <td>
 	    <input data-bind="value: $root.addLexiconName"></input>
 	  </td>
@@ -40,6 +42,8 @@
       <tbody data-bind="foreach: lexicons"> 
 	
 	<tr class="selectable" data-bind="click: $root.selectedLexicon">
+	  
+	  <td data-bind="text: id"></td>
 	  
 	  <td>
 	    <input data-bind="value: name"></input>

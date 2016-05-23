@@ -418,6 +418,8 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 // TODO hard wired to NST file format. There should be a standard lexicon import text format.
 // TODO This guy should somehow report back what it's doing to the client. (Goroutine + Websocket?)
 // TODO Return some sort of result? Stats?
+// TODO Set 'status' value for imported entries (now hard-wired to 'import' below)
+// TODO Set 'source' value for imported entries (now hard-wired to 'nst' below)
 func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
 	fmt.Printf("lexid: %v\n", lexiconID)
 	fmt.Printf("lexiconName: %v\n", lexiconName)
@@ -455,7 +457,7 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 		if err != nil {
 			log.Fatal(err)
 		}
-		// initial status
+		// TODO hard-wired initial status
 		e.EntryStatus = dbapi.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
 		n++

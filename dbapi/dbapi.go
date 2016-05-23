@@ -47,6 +47,24 @@ func Sqlite3WithRegex() {
 		})
 }
 
+// TODO not tested... but what could possibly go wrong...?:
+func DeleteUnusedSymbolSets(db *sql.DB) error {
+	// TODO this should optimally be taken care of by restrictions/dependencies in the db
+	var sql = "DELETE FROM symbolset WHERE lexiconid NOT IN (SELECT id from lexicon)"
+	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("DeleteUnusedSymbolSets failed starting transaction: %v", err)
+	}
+	defer tx.Commit()
+
+	_, err = tx.Exec(sql)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DeleteUnusedSymbolSets failed : %v", err)
+	}
+	return err
+}
+
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., Lexicon structs corresponding to the rows of the lexicon
 // table)
