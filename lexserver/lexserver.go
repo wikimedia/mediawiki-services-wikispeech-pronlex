@@ -467,7 +467,8 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 				log.Fatal(err)
 			}
 			eBuf = make([]dbapi.Entry, 0)
-			fmt.Printf("\rLines read: %d               \r", n)
+			//fmt.Printf("\rLines read: %d               \r", n)
+			fmt.Printf("Total lines read: %d\n", n)
 		}
 	}
 	dbapi.InsertEntries(db, lex, eBuf) // flushing the buffer
