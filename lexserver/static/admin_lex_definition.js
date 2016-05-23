@@ -598,15 +598,6 @@ ADMLD.AdminLexDefModel = function () {
 	return self.createIPATableRows(n, self.dummyIPA);
     }); 
 
-    // TODO testing, remove
-    
-    self.message = ko.observable("_");
-    self.connectWebSock = function() {
-	var zock = new WebSocket("ws://localhost:8787/websocktick") 
-	zock.onmessage = function(e) {
-	    self.message(e.data);
-	}; 
-    };
 };
 
 
