@@ -434,7 +434,6 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 // TODO Return some sort of result? Stats?
 // TODO Set 'status' value for imported entries (now hard-wired to 'import' below)
 // TODO Set 'source' value for imported entries (now hard-wired to 'nst' below)
-// TODO Change to websocket call instead? That way, we could inform client on progress, errors, etc, as they occur.
 func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
 	fmt.Printf("lexid: %v\n", lexiconID)
 	fmt.Printf("lexiconName: %v\n", lexiconName)

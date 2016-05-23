@@ -597,6 +597,16 @@ ADMLD.AdminLexDefModel = function () {
 	var n = self.nColumns();
 	return self.createIPATableRows(n, self.dummyIPA);
     }); 
+
+    // TODO testing, remove
+    
+    self.message = ko.observable("_");
+    self.connectWebSock = function() {
+	var zock = new WebSocket("ws://localhost:8787/websocktick") 
+	zock.onmessage = function(e) {
+	    self.message(e.data);
+	}; 
+    };
 };
 
 
@@ -604,7 +614,7 @@ var adm = new ADMLD.AdminLexDefModel();
 adm.loadIPASymbols();
 ko.applyBindings(adm);
 adm.loadLexiconNames();
-
+adm.connectWebSock();
 
 // For marking the selected row in a table
 $(document).on('click', '.selectable', (function(){
