@@ -8,13 +8,38 @@ ADMLD.baseURL = window.location.origin;
 ADMLD.AdminLexDefModel = function () {
     var self = this; 
     
+    self.serverMessage = ko.observable();
     
+    self.maxMessages = 10;
+    self.serverMessages = ko.observableArray();
     
+    self.connectServerMessageWS = function() {
+	var zock = new WebSocket( ADMLD.baseURL.replace("http://", "ws://") + "/adminmessages" );
+	zock.onmessage = function(e) {
+	    if (e.data === "WS_KEEPALIVE") {
+		// Dumdeedum
+	    } else {
+		self.serverMessage(e.data);
+		while (self.serverMessages().length >= self.maxMessages) {
+		    self.serverMessages().pop();
+		};
+		self.serverMessages().push(e.data);
+	    };
+	};
+	zock.onerror = function(e){
+	    console.log("websocket error: " + e.data);
+	};
+	zock.onclose = function (e) {
+	    console.log("websocket got close event: "+ e.code)
+        };
+    };
+    
+
     // TODO hard wired names. Fetch from somewhere?
     self.symbolCategories = 
 	["syllabic", "non syllabic", "stress", "phoneme delimiter", "explicit phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
     
-
+    
     
     self.uploadLexiconFile = function(lexiconFile) {
 	var url = ADMLD.baseURL + "/admin/lexiconfileupload" ;//'server/index.php';
