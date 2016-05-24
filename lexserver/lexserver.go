@@ -351,12 +351,23 @@ func webSockTestHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/websock_test.html")
 }
 
-// From https://github.com/eliben/go-websocket-sample/blob/master/server.go
-func webSockTickHandler(ws *websocket.Conn) {
-	for range time.Tick(1 * time.Second) {
-		// Once a second, send a message (as a string) with the current time.
-		websocket.Message.Send(ws, time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
+var wsChan = make(chan string)
+
+func webSockTickHandler(ws *websocket.Conn, msgChan chan string) {
+
+	fmt.Println("webSockTickHandler got called!")
+	//for range time.Tick(1 * time.Second) {
+	// Once a second, send a message (as a string) with the current time.
+	for msg := range msgChan {
+		//websocket.Message.Send(ws, time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
+		websocket.Message.Send(ws, msg)
 	}
+	//}
+}
+
+func timeToChanHandler(w http.ResponseWriter, r *http.Request) {
+	wsChan <- time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST")
+	fmt.Fprint(w, "Yeay!")
 }
 
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -506,6 +517,13 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 
 var db *sql.DB
 
+func keepAlive(wsC chan string) {
+	c := time.Tick(57 * time.Second)
+	for _ = range c {
+		wsC <- "WS_KEEPALIVE"
+	}
+}
+
 func main() {
 
 	port := ":8787"
@@ -558,7 +576,13 @@ func main() {
 
 	http.HandleFunc("/websocktest", webSockTestHandler)
 
-	var sock = websocket.Handler(webSockTickHandler)
+	http.HandleFunc("/timetochan", timeToChanHandler)
+
+	var sock = websocket.Handler(func(c *websocket.Conn) {
+		//
+		go keepAlive(wsChan)
+		webSockTickHandler(c, wsChan)
+	})
 	http.Handle("/websocktick", sock)
 
 	//type LexUploadHandler struct {
