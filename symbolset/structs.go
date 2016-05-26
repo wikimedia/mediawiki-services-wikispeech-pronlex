@@ -133,7 +133,7 @@ const (
 	// Stress is used for stress and accent symbols (primary, secondary, tone accents, etc)
 	Stress
 
-	// PhonemeDelimiter is used for phoneme delimiters such (white space, empty string, etc)
+	// PhonemeDelimiter is used for phoneme delimiters (white space, empty string, etc)
 	PhonemeDelimiter
 
 	// SyllableDelimiter is used for syllable delimiters
