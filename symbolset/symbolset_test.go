@@ -16,6 +16,20 @@ func Test_NewSymbolSet_WithoutPhonemeDelimiter(t *testing.T) {
 	}
 }
 
+func Test_NewSymbolSet_FailIfInputContainsDuplicates(t *testing.T) {
+	name := "ss"
+	symbols := []Symbol{
+		Symbol{"a", Syllabic, ""},
+		Symbol{"a", NonSyllabic, ""},
+		Symbol{"t", NonSyllabic, ""},
+		Symbol{" ", PhonemeDelimiter, "phn delim"},
+	}
+	_, err := NewSymbolSet(name, symbols)
+	if err == nil {
+		t.Errorf("NewSymbolSet() expected error here")
+	}
+}
+
 func Test_SplitTranscription_Normal1(t *testing.T) {
 	name := "ss"
 	symbols := []Symbol{

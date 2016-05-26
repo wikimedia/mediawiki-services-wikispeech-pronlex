@@ -19,10 +19,10 @@ mött,förra	9	ø	syllabic
 mål	o:	oː	syllabic
 moll,håll	O	ɔ	syllabic
 bättre	@	ə	syllabic
-hjärta	n/a	æ	syllabic
-hjärna	n/a	æː	syllabic
-mörk	n/a	œ	syllabic
-bör	n/a	œː	syllabic
+#hjärta	n/a	æ	syllabic
+#hjärna	n/a	æː	syllabic
+#mörk	n/a	œ	syllabic
+#bör	n/a	œː	syllabic
 europa	eu	e⁀ʊ	syllabic
 pol	p	p	non syllabic
 bok	b	b	non syllabic
@@ -38,8 +38,7 @@ lång	N	ŋ	non syllabic
 forna	rn	ɳ	non syllabic
 fot	f	f	non syllabic
 våt	v	v	non syllabic
-kjol (in NST specs)	C	ɕ	non syllabic
-kjol (in NST actual transcriptions)	C	ɕ	non syllabic
+kjol	C	ɕ	non syllabic
 fors	rs	ʂ	non syllabic
 rov	r	r	non syllabic
 lov	l	l	non syllabic
@@ -48,12 +47,9 @@ sjok	x	ɧ	non syllabic
 hot	h	h	non syllabic
 porla	rl	ɭ	non syllabic
 jord	j	j	non syllabic
-schlager	n/a	ʃ	non syllabic
+#schlager	n/a	ʃ	non syllabic
 syllable delimiter	.	.	syllable delimiter
 accent I	"	ˈ	stress
 accent II	""	ˈ̀	stress
 secondary stress	%	ˌ	stress
 phoneme delimiter	 		phoneme delimiter
-explicit phoneme delimiter	 		explicit phoneme delimiter
-			
-## TODO: tester!			

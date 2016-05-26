@@ -107,7 +107,6 @@ func Test_FilterSymbolsByCat(t *testing.T) {
 		Symbol{"$", PhonemeDelimiter, ""},
 		Symbol{"\"", Stress, ""},
 		Symbol{"e", Syllabic, ""},
-		Symbol{"-", ExplicitPhonemeDelimiter, ""},
 		Symbol{"", PhonemeDelimiter, ""},
 		Symbol{"+", MorphemeDelimiter, ""},
 	}
@@ -121,11 +120,10 @@ func Test_FilterSymbolsByCat(t *testing.T) {
 	delimE := []Symbol{
 		Symbol{".", SyllableDelimiter, ""},
 		Symbol{"$", PhonemeDelimiter, ""},
-		Symbol{"-", ExplicitPhonemeDelimiter, ""},
 		Symbol{"", PhonemeDelimiter, ""},
 		Symbol{"+", MorphemeDelimiter, ""},
 	}
-	delimR := FilterSymbolsByCat(symbols, []SymbolCat{SyllableDelimiter, PhonemeDelimiter, ExplicitPhonemeDelimiter, MorphemeDelimiter})
+	delimR := FilterSymbolsByCat(symbols, []SymbolCat{SyllableDelimiter, PhonemeDelimiter, MorphemeDelimiter})
 	testEqSymbols(t, delimE, delimR)
 }
 

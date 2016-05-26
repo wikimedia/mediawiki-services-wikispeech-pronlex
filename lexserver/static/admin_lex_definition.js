@@ -37,7 +37,7 @@ ADMLD.AdminLexDefModel = function () {
 
     // TODO hard wired names. Fetch from somewhere?
     self.symbolCategories = 
-	["syllabic", "non syllabic", "stress", "phoneme delimiter", "explicit phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
+	["syllabic", "non syllabic", "stress", "phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
     
     
     

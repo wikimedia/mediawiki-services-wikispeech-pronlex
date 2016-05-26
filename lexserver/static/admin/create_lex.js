@@ -13,7 +13,7 @@ DMCRLX.CreateLexModel = function() {
 
     DMCRLX.symbolCategories = {
 	'Phoneme': ["Syllabic", "NonSyllabic", "Stress"]
-	, 'Delimiter': ["PhonemeDelimiter", "ExplicitPhonemeDelimiter", "SyllableDelimiter", "MorphemeDelimiter", "WordDelimiter"] 
+	, 'Delimiter': ["PhonemeDelimiter", "SyllableDelimiter", "MorphemeDelimiter", "WordDelimiter"] 
     };
     
     DMCRLX.Symbol = function(lexiconId, symbol, category, description, ipa) {

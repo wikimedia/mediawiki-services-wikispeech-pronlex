@@ -21,6 +21,11 @@ func newIPA() ipa {
 
 // NewSymbolSet is a public constructor for SymbolSet with built-in error checks
 func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
+	return newSymbolSet(name, symbols, true)
+}
+
+// NewSymbolSet is a public constructor for SymbolSet with built-in error checks
+func newSymbolSet(name string, symbols []Symbol, checkForDups bool) (SymbolSet, error) {
 	var nilRes SymbolSet
 
 	// filtered lists
@@ -30,20 +35,12 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	syllabic := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic})
 	nonSyllabic := FilterSymbolsByCat(symbols, []SymbolCat{NonSyllabic})
 	phonemeDelimiters := FilterSymbolsByCat(symbols, []SymbolCat{PhonemeDelimiter})
-	explicitPhonemeDelimiters := FilterSymbolsByCat(symbols, []SymbolCat{ExplicitPhonemeDelimiter})
 
 	// specific symbol initialization
 	if len(phonemeDelimiters) < 1 {
 		return nilRes, fmt.Errorf("no phoneme delimiters defined in symbol set %s", name)
 	}
 	phonemeDelimiter := phonemeDelimiters[0]
-
-	var explicitPhonemeDelimiter Symbol
-	if len(explicitPhonemeDelimiters) < 1 {
-		explicitPhonemeDelimiter = Symbol{"", ExplicitPhonemeDelimiter, ""}
-	} else {
-		explicitPhonemeDelimiter = explicitPhonemeDelimiters[0]
-	}
 
 	// regexps
 	phonemeRe, err := buildRegexp(phonemes)
@@ -68,6 +65,20 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 		return nilRes, err
 	}
 
+	if checkForDups {
+		seenSymbols := make(map[string]Symbol)
+		var dupSymbols []string
+		for _, symbol := range symbols {
+			if _, exists := seenSymbols[symbol.String]; exists {
+				dupSymbols = append(dupSymbols, symbol.String)
+			}
+			seenSymbols[symbol.String] = symbol
+		}
+		if len(dupSymbols) > 0 {
+			return nilRes, fmt.Errorf("input symbol set contains duplicates of phoneme %v. All symbols: %v", dupSymbols, symbols)
+		}
+	}
+
 	res := SymbolSet{
 		Name:    name,
 		Symbols: symbols,
@@ -78,9 +89,7 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 		syllabic:        syllabic,
 		nonSyllabic:     nonSyllabic,
 
-		phonemeDelimiter:            phonemeDelimiter,
-		explicitPhonemeDelimiter:    explicitPhonemeDelimiter,
-		hasExplicitPhonemeDelimiter: len(explicitPhonemeDelimiter.String) > 0,
+		phonemeDelimiter: phonemeDelimiter,
 
 		PhonemeRe:          phonemeRe,
 		SyllabicRe:         syllabicRe,
@@ -106,16 +115,18 @@ func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper,
 	var symbolMap = make(map[Symbol]Symbol)
 
 	for _, pair := range symbolList {
-		symbolMap[pair.Sym1] = pair.Sym2
-		fromSymbols = append(fromSymbols, pair.Sym1)
-		toSymbols = append(toSymbols, pair.Sym2)
+		s1 := pair.Sym1
+		s2 := pair.Sym2
+		symbolMap[s1] = s2
+		fromSymbols = append(fromSymbols, s1)
+		toSymbols = append(toSymbols, s2)
 	}
 
-	from, err := NewSymbolSet(fromName, fromSymbols)
+	from, err := newSymbolSet(fromName, fromSymbols, true) // check for duplicates in input symbol set
 	if err != nil {
 		return nilRes, err
 	}
-	to, err := NewSymbolSet(toName, toSymbols)
+	to, err := newSymbolSet(toName, toSymbols, false) // do not check for duplicates in output phoneme set
 	if err != nil {
 		return nilRes, err
 	}
@@ -193,8 +204,6 @@ func LoadMapper(name string, fName string, fromColumn string, toColumn string) (
 					symCat = Stress
 				case "phoneme delimiter":
 					symCat = PhonemeDelimiter
-				case "explicit phoneme delimiter":
-					symCat = ExplicitPhonemeDelimiter
 				case "syllable delimiter":
 					symCat = SyllableDelimiter
 				case "morpheme delimiter":

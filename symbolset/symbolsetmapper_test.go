@@ -62,7 +62,7 @@ func Test_NewMapper_FailIfBothSymbolSetsHaveTheSameName(t *testing.T) {
 	}
 }
 
-func Test_NewMapper_FailWithAmbiguousPhonemesAndNoExplicitDelimiter(t *testing.T) {
+func Test_NewMapper_FailWithAmbiguousPhonemes(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -135,15 +135,14 @@ func Test_mapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
 		SymbolPair{Symbol{"t", NonSyllabic, ""}, Symbol{"T", NonSyllabic, ""}},
-		SymbolPair{Symbol{"rt", NonSyllabic, ""}, Symbol{"RT", NonSyllabic, ""}},
+		SymbolPair{Symbol{"r*t", NonSyllabic, ""}, Symbol{"RT", NonSyllabic, ""}},
 		SymbolPair{Symbol{"", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
-		SymbolPair{Symbol{"-", ExplicitPhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
-	input := "arttr"
+	input := "ar*ttr"
 	expect := "A RT T R"
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
@@ -161,15 +160,14 @@ func Test_mapTranscription_EmptyDelimiterInInput2(t *testing.T) {
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
 		SymbolPair{Symbol{"t", NonSyllabic, ""}, Symbol{"T", NonSyllabic, ""}},
-		SymbolPair{Symbol{"rt", NonSyllabic, ""}, Symbol{"RT", NonSyllabic, ""}},
+		SymbolPair{Symbol{"r*t", NonSyllabic, ""}, Symbol{"RT", NonSyllabic, ""}},
 		SymbolPair{Symbol{"", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
-		SymbolPair{Symbol{"-", ExplicitPhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
-	input := "arttrr-t"
+	input := "ar*ttrrt"
 	expect := "A RT T R R T"
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
@@ -187,16 +185,15 @@ func Test_mapTranscription_EmptyDelimiterInOutput(t *testing.T) {
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
 		SymbolPair{Symbol{"t", NonSyllabic, ""}, Symbol{"T", NonSyllabic, ""}},
-		SymbolPair{Symbol{"rt", NonSyllabic, ""}, Symbol{"RT", NonSyllabic, ""}},
+		SymbolPair{Symbol{"rt", NonSyllabic, ""}, Symbol{"R*T", NonSyllabic, ""}},
 		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{"", PhonemeDelimiter, ""}},
-		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{"-", ExplicitPhonemeDelimiter, ""}},
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
 	input := "a rt r t"
-	expect := "ARTR-T"
+	expect := "AR*TRT"
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
@@ -425,8 +422,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"r", NonSyllabic, ""}},
 		SymbolPair{Symbol{"k", NonSyllabic, ""}, Symbol{"k", NonSyllabic, ""}},
 		SymbolPair{Symbol{"N", NonSyllabic, ""}, Symbol{"N", NonSyllabic, ""}},
-		SymbolPair{Symbol{"", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
-		SymbolPair{Symbol{"-", ExplicitPhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
+		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 		SymbolPair{Symbol{"$", SyllableDelimiter, ""}, Symbol{".", SyllableDelimiter, ""}},
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\"\"", Stress, ""}},
@@ -435,7 +431,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
-	input := "\"\"braN$ka"
+	input := "\"\" b r a N $ k a"
 	expect := "\"\" b r a N . k a"
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
@@ -457,8 +453,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 		SymbolPair{Symbol{"s", NonSyllabic, ""}, Symbol{"s", NonSyllabic, ""}},
 		SymbolPair{Symbol{"k", NonSyllabic, ""}, Symbol{"k", NonSyllabic, ""}},
 		SymbolPair{Symbol{"N", NonSyllabic, ""}, Symbol{"N", NonSyllabic, ""}},
-		SymbolPair{Symbol{"", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
-		SymbolPair{Symbol{"-", ExplicitPhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
+		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
 		SymbolPair{Symbol{"$", SyllableDelimiter, ""}, Symbol{".", SyllableDelimiter, ""}},
 		SymbolPair{Symbol{"\"", Stress, ""}, Symbol{"\"", Stress, ""}},
 		SymbolPair{Symbol{"\"\"", Stress, ""}, Symbol{"\"\"", Stress, ""}},
@@ -467,7 +462,7 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
-	input := "\"\"bra$rsar-s"
+	input := "\"\" b r a $ rs a r s"
 	expect := "\"\" b r a . rs a r s"
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
@@ -481,9 +476,8 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 func testMapTranscription1(t *testing.T, ssm Mapper, input string, expect string) {
 	result, err := ssm.mapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
-	}
-	if result != expect {
+		t.Errorf("mapTranscription() didn't expect error here; input=%s, expect=%s : %v", input, expect, err)
+	} else if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
@@ -511,8 +505,8 @@ func Test_LoadMapper_NST2IPA(t *testing.T) {
 	if err != nil {
 		t.Errorf("mapTranscription() didn't expect error here : %v", err)
 	}
-	testMapTranscription1(t, ssm, "\"bOt`", "\u02C8bɔʈ")
-	testMapTranscription1(t, ssm, "\"ku0r-ds", "\u02C8kɵrds")
+	testMapTranscription1(t, ssm, "\" b O t`", "\u02C8bɔʈ")
+	testMapTranscription1(t, ssm, "\" k u0 r d s", "\u02C8kɵrds")
 }
 
 func Test_LoadMapper_WS2IPA(t *testing.T) {
@@ -562,6 +556,36 @@ func Test_LoadMapper_NST2WS(t *testing.T) {
 
 	mappers := []Mapper{ssmNST, ssmWS}
 
-	testMapTranscriptionX(t, mappers, "\"bOt`", "\" b O rt")
-	testMapTranscriptionX(t, mappers, "\"ku0r-d", "\" k u0 r d")
+	testMapTranscriptionX(t, mappers, "\" b O t`", "\" b O rt")
+	testMapTranscriptionX(t, mappers, "\" k u0 r d", "\" k u0 r d")
+}
+
+func Test_NewMapper_FailIfInputContainsDuplicates(t *testing.T) {
+	fromName := "ssLC"
+	toName := "ssUC"
+	symbols := []SymbolPair{
+		SymbolPair{Symbol{"A", NonSyllabic, ""}, Symbol{"a", NonSyllabic, ""}},
+		SymbolPair{Symbol{"A", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
+		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
+		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
+	}
+	_, err := NewMapper(fromName, toName, symbols)
+	if err == nil {
+		t.Errorf("NewMapper() expected error when input contains duplicates")
+	}
+}
+
+func Test_NewMapper_DontFailIfInputContainsDuplicates(t *testing.T) {
+	fromName := "ssLC"
+	toName := "ssUC"
+	symbols := []SymbolPair{
+		SymbolPair{Symbol{"a", NonSyllabic, ""}, Symbol{"A", NonSyllabic, ""}},
+		SymbolPair{Symbol{"A", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
+		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
+		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
+	}
+	_, err := NewMapper(fromName, toName, symbols)
+	if err != nil {
+		t.Errorf("NewMapper() didn't expect error when output phoneme set contains duplicates")
+	}
 }

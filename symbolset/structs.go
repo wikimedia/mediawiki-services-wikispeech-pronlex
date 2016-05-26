@@ -21,9 +21,7 @@ type SymbolSet struct {
 	syllabic        []Symbol
 	nonSyllabic     []Symbol
 
-	phonemeDelimiter            Symbol
-	explicitPhonemeDelimiter    Symbol
-	hasExplicitPhonemeDelimiter bool
+	phonemeDelimiter Symbol
 
 	PhonemeRe          *regexp.Regexp
 	SyllabicRe         *regexp.Regexp
@@ -93,10 +91,10 @@ func (m Mapper) mapTranscription(input string) (string, error) {
 			mapped = append(mapped, to.String)
 		}
 	}
-	mapped, err = m.to.filterAmbiguous(mapped)
-	if err != nil {
-		return "", err
-	}
+	//mapped, err = m.to.filterAmbiguous(mapped)
+	//if err != nil {
+	//	return "", err
+	//}
 	res = strings.Join(mapped, m.to.phonemeDelimiter.String)
 
 	// remove repeated phoneme delimiters
@@ -138,11 +136,6 @@ const (
 	// PhonemeDelimiter is used for phoneme delimiters such (white space, empty string, etc)
 	PhonemeDelimiter
 
-	// ExplicitPhonemeDelimiter is used for explicit phoneme delimiters when
-	// the default PhonemeDelimiter is empty, and there are ambiguous phonemes
-	// in the symbol set (for example Swedish SAMPA rt vs. r-t)
-	ExplicitPhonemeDelimiter
-
 	// SyllableDelimiter is used for syllable delimiters
 	SyllableDelimiter
 
@@ -183,16 +176,12 @@ func (ss SymbolSet) Get(symbol string) (Symbol, error) {
 func (ss SymbolSet) filterAmbiguous(trans []string) ([]string, error) {
 	potentiallyAmbs := ss.phoneticSymbols
 	phnDel := ss.phonemeDelimiter.String
-	explicitPhnDel := ss.explicitPhonemeDelimiter
 	var res = make([]string, 0)
 	for i, phn0 := range trans[0 : len(trans)-1] {
 		phn1 := trans[i+1]
 		test := phn0 + phnDel + phn1
 		if contains(potentiallyAmbs, test) {
-			if !ss.hasExplicitPhonemeDelimiter {
-				return nil, fmt.Errorf("explicit phoneme delimiter in %s was undefined when needed for [%s] vs [%s] + [%s]", ss.Name, (phn0 + phn1), phn0, phn1)
-			}
-			res = append(res, phn0+explicitPhnDel.String)
+			return nil, fmt.Errorf("symbol set %s contains ambiguous symbols: [%s] vs [%s] + [%s]", ss.Name, (phn0 + phn1), phn0, phn1)
 		} else {
 			res = append(res, phn0)
 		}
