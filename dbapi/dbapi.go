@@ -48,6 +48,8 @@ func Sqlite3WithRegex() {
 }
 
 // TODO not tested... but what could possibly go wrong...?:
+
+// DeleteUnusedSymbolSets deletes symbols, from the SYMBOLSET table, that have lexiconIDs that do not exist in the LEXICON table.
 func DeleteUnusedSymbolSets(db *sql.DB) error {
 	// TODO this should optimally be taken care of by restrictions/dependencies in the db
 	var sql = "DELETE FROM symbolset WHERE lexiconid NOT IN (SELECT id from lexicon)"
