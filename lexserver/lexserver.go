@@ -18,8 +18,11 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
+
+// TODO Split this file into packages + main?
 
 // TODO remove calls to this, add error handling
 func ff(f string, err error) {
@@ -353,22 +356,104 @@ func webSockTestHandler(w http.ResponseWriter, r *http.Request) {
 
 var wsChan = make(chan string)
 
-func webSockTickHandler(ws *websocket.Conn, msgChan chan string) {
+// TODO mutex? See https://blog.golang.org/go-maps-in-action "Concurrency"
+//var wsClientMap = make(map[string]*websocket.Conn)
 
-	fmt.Println("webSockTickHandler got called!")
-	//for range time.Tick(1 * time.Second) {
-	// Once a second, send a message (as a string) with the current time.
-	for msg := range msgChan {
-		//websocket.Message.Send(ws, time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
+// See https://blog.golang.org/go-maps-in-action "Concurrency"
+var webSocks = struct {
+	sync.RWMutex
+	clients map[string]*websocket.Conn
+}{clients: make(map[string]*websocket.Conn)}
+
+func deleteWebSocketClient(id string) {
+	webSocks.Lock()
+	delete(webSocks.clients, id)
+	webSocks.Unlock()
+}
+
+func messageToClientWebSock(clientUUID string, msg string) {
+	if ws, ok := webSocks.clients[clientUUID]; ok {
 		websocket.Message.Send(ws, msg)
 	}
-	//}
 }
 
-func timeToChanHandler(w http.ResponseWriter, r *http.Request) {
-	wsChan <- time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST")
-	fmt.Fprint(w, "Yeay!")
+// func msgToWSClient(uuid string, msg string, clients map[string]*websocket.Conn) error {
+
+// 	if zock, ok := clients[uuid]; ok {
+// 		websocket.Message.Send(zock, msg)
+// 		return nil
+// 	}
+
+// 	return fmt.Errorf("msgToWSClient: no such client uuid registered: %s", uuid)
+// }
+
+func webSockRegHandler(ws *websocket.Conn) {
+	var id string
+	for {
+		var msg string
+		err := websocket.Message.Receive(ws, &msg)
+		if err != nil {
+			log.Printf("webSockRegHandler error : %v\n", err)
+			log.Printf("webSockRegHandler removing socket with id %s", id)
+			deleteWebSocketClient(id)
+
+		}
+		//fmt.Fscan(ws, &msg)
+
+		log.Printf("webSockRegHandler: " + msg)
+
+		var pref = "CLIENT_ID: "
+		//var id string
+		if strings.HasPrefix(msg, pref) {
+			id = strings.TrimPrefix(strings.TrimSpace(msg), pref)
+			webSocks.Lock()
+			defer webSocks.Unlock()
+			webSocks.clients[id] = ws
+		}
+
+		var reply = "HI THERE! " + time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST")
+		err = websocket.Message.Send(ws, reply)
+		if err != nil {
+			log.Printf("webSockRegHandler error : %v\n", err)
+			deleteWebSocketClient(id)
+		}
+		//log.Printf("webSockHandler replied without error: %v", reply)
+	}
 }
+
+// TODO remove func arg, and replace with call to global mutex
+func keepClientsAlive(clients map[string]*websocket.Conn) {
+	c := time.Tick(27 * time.Second)
+	for _ = range c {
+		log.Printf("keepClientsAlive: pinging number of clients: %v\n", len(clients))
+		for client, ws := range clients {
+
+			err := websocket.Message.Send(ws, "WS_KEEPALIVE") //+time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
+			if err != nil {
+				log.Printf("keepClientsAlive got error from websocket send : %v", err)
+				delete(clients, client)
+				log.Print("keepClientsAlive closed socket to client %s", client)
+			}
+		}
+	}
+}
+
+// func webSockTickHandler(ws *websocket.Conn, msgChan chan string) {
+
+// 	fmt.Println("webSockTickHandler got called!")
+// 	//for range time.Tick(1 * time.Second) {
+// 	// Once a second, send a message (as a string) with the current time.
+// 	for msg := range msgChan {
+// 		//websocket.Message.Send(ws, time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
+// 		websocket.Message.Send(ws, msg)
+// 	}
+// 	//}
+// }
+
+// func timeToChanHandler(w http.ResponseWriter, r *http.Request) {
+// 	wsChan <- time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST")
+// 	fmt.Fprint(w, "Yeay!")
+// }
 
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
@@ -376,6 +461,8 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
 		return
 	}
+
+	clientUUID := r.FormValue("client_uuid")
 
 	lexiconID, err := strconv.ParseInt(r.FormValue("lexicon_id"), 10, 64)
 	if err != nil {
@@ -388,6 +475,13 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", lexiconName)
 	symbolSetName := r.FormValue("symbolset_name")
 	fmt.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", symbolSetName)
+
+	if "" == strings.TrimSpace(clientUUID) {
+		msg := "lexiconFileUploadHandler got no client uuid"
+		fmt.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
 
 	if "" == strings.TrimSpace(lexiconName) {
 		msg := "lexiconFileUploadHandler got no lexicon name"
@@ -434,7 +528,7 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	// words+transcription in upload text file already present in
 	// db.
 	f.Close()
-	loadLexiconFileIntoDB(lexiconID, lexiconName, symbolSetName, fName)
+	loadLexiconFileIntoDB(clientUUID, lexiconID, lexiconName, symbolSetName, fName)
 
 	fmt.Fprintf(w, "%v", handler.Header)
 }
@@ -445,7 +539,8 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 // TODO Return some sort of result? Stats?
 // TODO Set 'status' value for imported entries (now hard-wired to 'import' below)
 // TODO Set 'source' value for imported entries (now hard-wired to 'nst' below)
-func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
+func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
+	fmt.Printf("clientUUID: %s\n", clientUUID)
 	fmt.Printf("lexid: %v\n", lexiconID)
 	fmt.Printf("lexiconName: %v\n", lexiconName)
 	fmt.Printf("symbolSetName: %v\n", symbolSetName)
@@ -453,6 +548,8 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 
 	fh, err := os.Open(uploadFileName)
 	if err != nil {
+		var msg = fmt.Sprintf("loadLexiconFileIntoDB failed to open file : %v", err)
+		messageToClientWebSock(clientUUID, msg)
 		return fmt.Errorf("loadLexiconFileIntoDB failed to open file : %v", err)
 	}
 
@@ -467,6 +564,8 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 	nstFmt, err := line.NewNST()
 	if err != nil {
 		//log.Fatal(err)
+		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
+		messageToClientWebSock(clientUUID, msg)
 		return fmt.Errorf("lexserver failed to instantiate lexicon line parser : %v", err)
 	}
 	lex := dbapi.Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
@@ -493,7 +592,9 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 			}
 			eBuf = make([]dbapi.Entry, 0)
 			//fmt.Printf("\rLines read: %d               \r", n)
-			fmt.Printf("Total lines read: %d\n", n)
+			var msg = fmt.Sprintf("Lines so far: %d", n)
+			messageToClientWebSock(clientUUID, msg)
+			fmt.Println(msg)
 		}
 	}
 	dbapi.InsertEntries(db, lex, eBuf) // flushing the buffer
@@ -503,11 +604,15 @@ func loadLexiconFileIntoDB(lexiconID int64, lexiconName string, symbolSetName st
 		log.Fatal(err)
 	}
 
-	log.Printf("Lines read:\t%d", n)
+	var msg = fmt.Sprintf("Lines read:\t%d", n)
+	messageToClientWebSock(clientUUID, msg)
+	log.Println(msg)
 	// TODO Copied from addNSTLexToDB
 	// <----------------------------
 
 	if err := s.Err(); err != nil {
+		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
+		messageToClientWebSock(clientUUID, msg)
 		return fmt.Errorf("loadLexiconFileIntoDB error while scanning file : %v", err)
 	}
 
@@ -576,14 +681,16 @@ func main() {
 
 	http.HandleFunc("/websocktest", webSockTestHandler)
 
-	http.HandleFunc("/timetochan", timeToChanHandler)
+	//http.HandleFunc("/timetochan", timeToChanHandler)
 
-	var sock = websocket.Handler(func(c *websocket.Conn) {
-		//
-		go keepAlive(wsChan)
-		webSockTickHandler(c, wsChan)
-	})
-	http.Handle("/websocktick", sock)
+	// var sock = websocket.Handler(func(c *websocket.Conn) {
+	// 	//
+	// 	go keepAlive(wsChan)
+	// 	webSockTickHandler(c, wsChan)
+	// })
+	// http.Handle("/websocktick", sock)
+
+	http.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
 	//type LexUploadHandler struct {
 	//websocket *websocket.Conn
@@ -599,6 +706,8 @@ func main() {
 	//http.Handle("/line-by-line/", http.StripPrefix("/line-by-line/node_modules/", http.FileServer(http.Dir("./static/node_modules/line-by-line/"))))
 
 	//http.FileServer(http.Dir("./static/"))
+
+	go keepClientsAlive(webSocks.clients)
 
 	log.Print("lexserver: listening on port ", port)
 	log.Fatal(http.ListenAndServe(port, nil))

@@ -1,29 +1,53 @@
 var ADMLD = {};
 
-
 ADMLD.baseURL = window.location.origin;
 
+// From http://stackoverflow.com/a/8809472
+ADMLD.generateUUID = function() {
+    var d = new Date().getTime();
+    if(window.performance && typeof window.performance.now === "function"){
+        d += performance.now(); //use high-precision timer if available
+    }
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+};
 
 
 ADMLD.AdminLexDefModel = function () {
     var self = this; 
     
-    self.serverMessage = ko.observable();
+    
+    self.uuid = ADMLD.generateUUID();
+    
+
+
+    self.serverMessage = ko.observable("_");
     
     self.maxMessages = 10;
     self.serverMessages = ko.observableArray();
     
-    self.connectServerMessageWS = function() {
-	var zock = new WebSocket( ADMLD.baseURL.replace("http://", "ws://") + "/adminmessages" );
+    self.connectWebSock = function() {
+	var zock = new WebSocket(ADMLD.baseURL.replace("http://", "ws://") + "/websockreg" );
+	zock.onopen = function() {
+	    console.log("ADMLD.connectWebSock: sending uuid over zock: "+ self.uuid);
+	    zock.send("CLIENT_ID: "+ self.uuid);
+	};
 	zock.onmessage = function(e) {
-	    if (e.data === "WS_KEEPALIVE") {
-		// Dumdeedum
-	    } else {
+	    if(e.data === "WS_KEEPALIVE") {
+		var d = new Date();
+		var h = d.getHours();
+		var m = d.getMinutes();
+		var s = d.getSeconds();
+		var msg = "Websocket keepalive recieved "+ h +":"+ m +":"+ s;
+		self.serverMessage(msg);
+	    }
+	    else {
+		//console.log("Websocket got: "+ e.data)
 		self.serverMessage(e.data);
-		while (self.serverMessages().length >= self.maxMessages) {
-		    self.serverMessages().pop();
-		};
-		self.serverMessages().push(e.data);
 	    };
 	};
 	zock.onerror = function(e){
@@ -31,8 +55,31 @@ ADMLD.AdminLexDefModel = function () {
 	};
 	zock.onclose = function (e) {
 	    console.log("websocket got close event: "+ e.code)
-        };
+	};
     };
+    
+    
+    
+    // self.connectServerMessageWS = function() {
+    // 	var zock = new WebSocket( ADMLD.baseURL.replace("http://", "ws://") + "/adminmessages" );
+    // 	zock.onmessage = function(e) {
+    // 	    if (e.data === "WS_KEEPALIVE") {
+    // 		// Dumdeedum
+    // 	    } else {
+    // 		self.serverMessage(e.data);
+    // 		while (self.serverMessages().length >= self.maxMessages) {
+    // 		    self.serverMessages().pop();
+    // 		};
+    // 		self.serverMessages().push(e.data);
+    // 	    };
+    // 	};
+    // 	zock.onerror = function(e){
+    // 	    console.log("websocket error: " + e.data);
+    // 	};
+    // 	zock.onclose = function (e) {
+    // 	    console.log("websocket got close event: "+ e.code)
+    //     };
+    // };
     
 
     // TODO hard wired names. Fetch from somewhere?
@@ -56,6 +103,7 @@ ADMLD.AdminLexDefModel = function () {
  	//	console.log("uploadLexiconFile return status", xhr.statusText);
 	 //   };
 	};
+	fd.append("client_uuid", self.uuid);
 	fd.append("lexicon_id", self.selectedLexicon().id);
 	fd.append("lexicon_name", self.selectedLexicon().name);
 	fd.append("symbolset_name", self.selectedLexicon().symbolSetName);
@@ -225,10 +273,16 @@ ADMLD.AdminLexDefModel = function () {
     self.loadSymbolSet = function (lexicon) {
 	console.log("loadSymbolSet: "+ JSON.stringify(lexicon))
 	$.getJSON(ADMLD.baseURL +"/admin/listsymbolset", {lexiconid: lexicon.id}, function (data) {
-	    data.forEach(function(s) {
-		var sym = {'lexiconId': s.lexiconId, 'symbol': s.symbol, 'category': s.category, 'description': s.description, 'ipa': s.ipa};
-		self.addSymbolToSet(lexicon.symbolSetName, sym);
-	    });
+	    if(data) {
+		data.forEach(function(s) {
+		    var sym = {'lexiconId': s.lexiconId, 'symbol': s.symbol, 'category': s.category, 'description': s.description, 'ipa': s.ipa};
+		    self.addSymbolToSet(lexicon.symbolSetName, sym);
+		});
+		
+	    } else {
+		// Something fishy: this one gets called on pageload, _after_ first succeeding above
+		console.log("self.loadSymbolSet: call to /listsymbolset/ returned null for lexiconid: "+ lexicon.id);
+	    };
 	    //self.selectedLexicon(self.selectedLexicon());
 	})
 	    .fail(function (xhr, textStatus, errorThrown) {
@@ -626,13 +680,17 @@ ADMLD.AdminLexDefModel = function () {
 };
 
 
-var adm = new ADMLD.AdminLexDefModel();
-adm.loadIPASymbols();
-ko.applyBindings(adm);
-adm.loadLexiconNames();
-adm.connectWebSock();
-
 // For marking the selected row in a table
 $(document).on('click', '.selectable', (function(){
     $(this).addClass("selected").siblings().removeClass("selected");
 }));
+
+
+var adm = new ADMLD.AdminLexDefModel();
+adm.loadIPASymbols();
+ko.applyBindings(adm);
+adm.loadLexiconNames();
+//adm.connectWebSock();
+adm.connectWebSock();
+
+console.log("UUID: "+ adm.uuid);
