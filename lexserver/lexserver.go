@@ -409,7 +409,11 @@ func webSockRegHandler(ws *websocket.Conn) {
 			webSocks.Lock()
 			defer webSocks.Unlock()
 			webSocks.clients[id] = ws
+			webSocks.Unlock()
+			log.Printf("Processed id: %v", id)
 		}
+
+		log.Printf("id is now: %v", id)
 
 		var reply = "HI THERE! " + time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST")
 		err = websocket.Message.Send(ws, reply)
@@ -417,43 +421,28 @@ func webSockRegHandler(ws *websocket.Conn) {
 			log.Printf("webSockRegHandler error : %v\n", err)
 			deleteWebSocketClient(id)
 		}
-		//log.Printf("webSockHandler replied without error: %v", reply)
 	}
 }
 
-// TODO remove func arg, and replace with call to global mutex
-func keepClientsAlive(clients map[string]*websocket.Conn) {
+func keepClientsAlive() {
 	c := time.Tick(27 * time.Second)
 	for _ = range c {
-		log.Printf("keepClientsAlive: pinging number of clients: %v\n", len(clients))
-		for client, ws := range clients {
+
+		webSocks.Lock()
+		log.Printf("keepClientsAlive: pinging number of clients: %v\n", len(webSocks.clients))
+		defer webSocks.Unlock()
+		for client, ws := range webSocks.clients {
 
 			err := websocket.Message.Send(ws, "WS_KEEPALIVE") //+time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
 			if err != nil {
 				log.Printf("keepClientsAlive got error from websocket send : %v", err)
-				delete(clients, client)
+				delete(webSocks.clients, client)
 				log.Print("keepClientsAlive closed socket to client %s", client)
 			}
 		}
+		webSocks.Unlock()
 	}
 }
-
-// func webSockTickHandler(ws *websocket.Conn, msgChan chan string) {
-
-// 	fmt.Println("webSockTickHandler got called!")
-// 	//for range time.Tick(1 * time.Second) {
-// 	// Once a second, send a message (as a string) with the current time.
-// 	for msg := range msgChan {
-// 		//websocket.Message.Send(ws, time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
-// 		websocket.Message.Send(ws, msg)
-// 	}
-// 	//}
-// }
-
-// func timeToChanHandler(w http.ResponseWriter, r *http.Request) {
-// 	wsChan <- time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST")
-// 	fmt.Fprint(w, "Yeay!")
-// }
 
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
@@ -681,33 +670,14 @@ func main() {
 
 	http.HandleFunc("/websocktest", webSockTestHandler)
 
-	//http.HandleFunc("/timetochan", timeToChanHandler)
-
-	// var sock = websocket.Handler(func(c *websocket.Conn) {
-	// 	//
-	// 	go keepAlive(wsChan)
-	// 	webSockTickHandler(c, wsChan)
-	// })
-	// http.Handle("/websocktick", sock)
-
 	http.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
-	//type LexUploadHandler struct {
-	//websocket *websocket.Conn
-	//}
-
 	http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
-	//http.HandleFunc("/admin/lexiconfileupload", LexUploadHandler{websocket: sock})
 
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	//http.Handle("/line-navigator/", http.StripPrefix("/line-navigator/node_modules/", http.FileServer(http.Dir("./static/node_modules/line-navigator/"))))
 
-	//http.Handle("/line-by-line/", http.StripPrefix("/line-by-line/node_modules/", http.FileServer(http.Dir("./static/node_modules/line-by-line/"))))
-
-	//http.FileServer(http.Dir("./static/"))
-
-	go keepClientsAlive(webSocks.clients)
+	go keepClientsAlive()
 
 	log.Print("lexserver: listening on port ", port)
 	log.Fatal(http.ListenAndServe(port, nil))
