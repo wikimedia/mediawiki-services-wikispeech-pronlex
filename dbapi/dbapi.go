@@ -217,9 +217,20 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 	return nil
 }
 
-// TODO Doesn't work, since 'DELETE FROM entry WHERE lexiconid = ?' hangs in the http-server!
-// Exact same command in psqlite3 command line client works swiftly.
+// SuperDeleteLexicon deletes the lexicon name from the lexicon
+// table and also whipes all associated entries out of existence.
+// It also deletes all entries from the Symbolset table associated to the lexicon.
+func SuperDeleteLexicon0(db *sql.DB, id int64) error {
+	fmt.Printf("DeleteLexicon called with id %d\n", id)
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		return err
+	}
+	return SuperDeleteLexiconTx(tx, id)
+}
 
+// TODO Doesn't appear to work using transactions: takes too much time
 // SuperDeleteLexicon deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
 // It also deletes all entries from the Symbolset table associated to the lexicon.
@@ -263,7 +274,7 @@ func SuperDeleteLexicon(db *sql.DB, id int64) error {
 // SuperDeleteLexiconTx deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
 // It also deletes all entries from the Symbolset table associated to the lexicon.
-func SuperDeleteLexiconTx0(tx *sql.Tx, id int64) error {
+func SuperDeleteLexiconTx(tx *sql.Tx, id int64) error {
 	// var n int
 	// err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
 	// // must always return a row, no need to check for empty row
@@ -287,8 +298,6 @@ func SuperDeleteLexiconTx0(tx *sql.Tx, id int64) error {
 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete symbol set : %v", err)
 	}
 
-	tx.Commit()
-
 	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from symbol set")
 
 	_, err = tx.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
@@ -296,8 +305,6 @@ func SuperDeleteLexiconTx0(tx *sql.Tx, id int64) error {
 		tx.Rollback()
 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete entries : %v", err)
 	}
-
-	tx.Commit()
 
 	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
 
