@@ -22,6 +22,7 @@
 	  <td>SymbolSet Name</td>
 	  <td>Update names</td>
 	  <td>Delete lexicon</td>
+	  <td>Super delete lexicon</td>
 	</tr>
       </thead>
       <tfoot>
@@ -36,7 +37,8 @@
 	  <td>
 	    <button data-bind="click: $root.addLexicon">Add lexicon</button>
 	  </td>
-	  <td></td>
+	  <td></td> <!-- Delete from lexicon -->
+	  <td></td> <!-- Super delete from lexicon -->
 	</tr>
       </tfoot>
       <tbody data-bind="foreach: lexicons"> 
@@ -61,6 +63,13 @@
 	  <td>
 	    <button data-bind="click: $root.deleteLexicon">Delete from db</button>
 	  </td>
+	  
+	  
+	  <td>
+	    <button data-bind="click: $root.superDeleteLexicon">Super delete from db</button>
+	  </td>
+
+
 	</tr>
 	
       </tbody> 

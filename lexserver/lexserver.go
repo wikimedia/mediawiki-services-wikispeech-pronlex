@@ -113,13 +113,47 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 }
 
+// func GetParam(param string, r *http.Request) (string, error) {
+
+// 	meth := strings.TrimSpace(r.Method)
+// 	switch meth {
+// 	case "POST":
+// 		p := r.FormValue(strings.TrimSpace(param))
+// 		if p == "" {
+// 			return "", fmt.Errorf("GetParam: no value for form value parameter %s", param)
+// 		} else {
+// 			return p, nil
+// 		}
+// 		// case "GET":
+// 		// 	// XXX
+// 	}
+
+// 	return "", fmt.Errorf("unknown method %s", meth)
+// }
+
 func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
+
 	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
 
 	err := dbapi.DeleteLexicon(db, id)
 	if err != nil {
-
+		log.Printf("lexserver.deleteLexHandler got error : %v", err)
 		http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusExpectationFailed)
+		return
+	}
+}
+
+func superDeleteLexHandler(w http.ResponseWriter, r *http.Request) {
+	// Aha! Turns out that Go treats POST and GET the same way, as I understand it.
+	// No need for checking whether GO or POST, as far as I understand.
+	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+
+	log.Println("lexserver.superDeleteLexHandler was called")
+
+	err := dbapi.SuperDeleteLexicon(db, id)
+	if err != nil {
+
+		http.Error(w, fmt.Sprintf("failed super deleting lexicon : %v", err), http.StatusExpectationFailed)
 		return
 	}
 }
@@ -212,6 +246,8 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 }
 
 func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
+
+	// TODO check r.Method?
 
 	var err error
 	// TODO Felhantering?
@@ -356,9 +392,6 @@ func webSockTestHandler(w http.ResponseWriter, r *http.Request) {
 
 var wsChan = make(chan string)
 
-// TODO mutex? See https://blog.golang.org/go-maps-in-action "Concurrency"
-//var wsClientMap = make(map[string]*websocket.Conn)
-
 // See https://blog.golang.org/go-maps-in-action "Concurrency"
 var webSocks = struct {
 	sync.RWMutex
@@ -367,25 +400,18 @@ var webSocks = struct {
 
 func deleteWebSocketClient(id string) {
 	webSocks.Lock()
+	//defer webSocks.Unlock()
 	delete(webSocks.clients, id)
 	webSocks.Unlock()
 }
 
 func messageToClientWebSock(clientUUID string, msg string) {
+	webSocks.Lock()
 	if ws, ok := webSocks.clients[clientUUID]; ok {
 		websocket.Message.Send(ws, msg)
 	}
+	webSocks.Unlock()
 }
-
-// func msgToWSClient(uuid string, msg string, clients map[string]*websocket.Conn) error {
-
-// 	if zock, ok := clients[uuid]; ok {
-// 		websocket.Message.Send(zock, msg)
-// 		return nil
-// 	}
-
-// 	return fmt.Errorf("msgToWSClient: no such client uuid registered: %s", uuid)
-// }
 
 func webSockRegHandler(ws *websocket.Conn) {
 	var id string
@@ -396,9 +422,9 @@ func webSockRegHandler(ws *websocket.Conn) {
 			log.Printf("webSockRegHandler error : %v\n", err)
 			log.Printf("webSockRegHandler removing socket with id %s", id)
 			deleteWebSocketClient(id)
-
+			id = ""
+			break
 		}
-		//fmt.Fscan(ws, &msg)
 
 		log.Printf("webSockRegHandler: " + msg)
 
@@ -407,7 +433,7 @@ func webSockRegHandler(ws *websocket.Conn) {
 		if strings.HasPrefix(msg, pref) {
 			id = strings.TrimPrefix(strings.TrimSpace(msg), pref)
 			webSocks.Lock()
-			defer webSocks.Unlock()
+			//defer webSocks.Unlock()
 			webSocks.clients[id] = ws
 			webSocks.Unlock()
 			log.Printf("Processed id: %v", id)
@@ -420,6 +446,8 @@ func webSockRegHandler(ws *websocket.Conn) {
 		if err != nil {
 			log.Printf("webSockRegHandler error : %v\n", err)
 			deleteWebSocketClient(id)
+			id = ""
+			break
 		}
 	}
 }
@@ -430,7 +458,7 @@ func keepClientsAlive() {
 
 		webSocks.Lock()
 		log.Printf("keepClientsAlive: pinging number of clients: %v\n", len(webSocks.clients))
-		defer webSocks.Unlock()
+		//defer webSocks.Unlock()
 		for client, ws := range webSocks.clients {
 
 			err := websocket.Message.Send(ws, "WS_KEEPALIVE") //+time.Now().Format("Mon, 02 Jan 2006 15:04:05 PST"))
@@ -667,6 +695,7 @@ func main() {
 	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
+	http.HandleFunc("/admin/superdeletelexicon", superDeleteLexHandler)
 
 	http.HandleFunc("/websocktest", webSockTestHandler)
 

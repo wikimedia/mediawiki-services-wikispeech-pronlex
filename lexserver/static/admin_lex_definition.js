@@ -22,8 +22,6 @@ ADMLD.AdminLexDefModel = function () {
     
     
     self.uuid = ADMLD.generateUUID();
-    
-
 
     self.serverMessage = ko.observable("_");
     
@@ -164,8 +162,27 @@ ADMLD.AdminLexDefModel = function () {
     
     self.deleteLexicon = function (lexicon) {
 	
+	console.log("deleteLexicon lexicon was called: "+ JSON.stringify(lexicon));
+	
 	var params = {'id' : lexicon.id}
     	$.get(ADMLD.baseURL + "/admin/deletelexicon", params)
+    	    .done(function(data){
+    		console.log("deleteLexicon got response: "+ JSON.stringify(data));
+    		self.loadLexiconNames();
+    	    })
+    	    .fail(function (xhr, textStatus, errorThrown) {
+    		console.log("deleteLexicon fail");
+		alert(xhr.responseText);	    
+    	    });
+    };
+    
+    // TODO Might not be safe to keep. Mostly for develpoment.
+    // Whipes lexicon and matching symbolset totally from the DB 
+    self.superDeleteLexicon = function (lexicon) {
+	
+	console.log("superDeleteLexicon called : "+ JSON.stringify(lexicon));
+	var params = {'id' : lexicon.id}
+    	$.get(ADMLD.baseURL + "/admin/superdeletelexicon", params)
     	    .done(function(data){
     		// dumdelidum
     		self.loadLexiconNames();

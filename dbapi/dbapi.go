@@ -180,6 +180,7 @@ func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
 // table. Notice that it does not remove the associated entries.
 // It should be impossible to delete the Lexicon table entry if associated to any entries.
 func DeleteLexicon(db *sql.DB, id int64) error {
+	fmt.Printf("DeleteLexicon called with id %d\n", id)
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -212,6 +213,103 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 		tx.Rollback()
 		return fmt.Errorf("failed to delete lexicon : %v", err)
 	}
+
+	return nil
+}
+
+// TODO Doesn't work, since 'DELETE FROM entry WHERE lexiconid = ?' hangs in the http-server!
+// Exact same command in psqlite3 command line client works swiftly.
+
+// SuperDeleteLexicon deletes the lexicon name from the lexicon
+// table and also whipes all associated entries out of existence.
+// It also deletes all entries from the Symbolset table associated to the lexicon.
+func SuperDeleteLexicon(db *sql.DB, id int64) error {
+	fmt.Println("dbapi.superDeleteLexicon was called")
+
+	_, err := db.Exec("DELETE FROM symbolset WHERE lexiconid = ?", id)
+	if err != nil {
+		//tx.Rollback()
+		return fmt.Errorf("dbapi.SuperDeleteLexicon : failed to delete symbol set : %v", err)
+	}
+
+	fmt.Println("dbapi.superDeleteLexicon finished deleting from symbolset")
+
+	_, err = db.Exec("DELETE FROM transcription WHERE transcription.entryid IN (SELECT entry.id FROM lexicon, entry WHERE lexicon.id = ? AND lexicon.id = entry.lexiconid)", id)
+
+	fmt.Println("dbapi.superDeleteLexicon finished deleting from transcription")
+
+	_, err = db.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
+	if err != nil {
+		//tx.Rollback()
+		return fmt.Errorf("dbapi.SuperDeleteLexicon : failed to delete entries : %v", err)
+	}
+
+	fmt.Println("dbapi.superDeleteLexicon finished deleting from entry")
+
+	_, err = db.Exec("DELETE FROM lexicon WHERE id = ?", id)
+	if err != nil {
+		//tx.Rollback()
+		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete lexicon : %v", err)
+	}
+
+	fmt.Println("dbapi.superDeleteLexicon finished deleting from lexicon set")
+
+	fmt.Printf("Deleting lexicon %d\n", id)
+
+	return nil
+
+}
+
+// SuperDeleteLexiconTx deletes the lexicon name from the lexicon
+// table and also whipes all associated entries out of existence.
+// It also deletes all entries from the Symbolset table associated to the lexicon.
+func SuperDeleteLexiconTx0(tx *sql.Tx, id int64) error {
+	// var n int
+	// err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
+	// // must always return a row, no need to check for empty row
+	// if err != nil {
+	// 	if err == sql.ErrNoRows {
+	// 		fmt.Println("HEJ DIN FAN")
+	// 		return fmt.Errorf("The was no lexicon with id %d : %v", id, err)
+	// 	}
+	// 	return fmt.Errorf("dbapi.SuperDeleteLexiconTx got error : %v", err)
+	// }
+
+	// if n > 0 {
+	// 	return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: " + strconv.Itoa(n) + ")")
+	// }
+
+	fmt.Println("dbapi.superDeleteLexiconTX was called")
+
+	_, err := tx.Exec("DELETE FROM symbolset WHERE lexiconid = ?", id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete symbol set : %v", err)
+	}
+
+	tx.Commit()
+
+	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from symbol set")
+
+	_, err = tx.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete entries : %v", err)
+	}
+
+	tx.Commit()
+
+	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
+
+	_, err = tx.Exec("DELETE FROM lexicon WHERE id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete lexicon : %v", err)
+	}
+
+	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from lexicon set")
+
+	fmt.Printf("Deleting lexicon %d\n", id)
 
 	return nil
 }
