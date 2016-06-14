@@ -86,8 +86,8 @@ CREATE TABLE Lemma2Entry (
     entryId bigint not null,
     lemmaId bigint not null,
 unique(lemmaId,entryId),
-foreign key (entryId) references Entry(id), -- NL20160226
-foreign key (lemmaId) references Lemma(id)); -- NL20160226
+foreign key (entryId) references Entry(id) on delete cascade, -- NL20160226, 20160614
+foreign key (lemmaId) references Lemma(id) on delete cascade); -- NL20160226, 20160614
 CREATE INDEX l2eind on Lemma2Entry (lemmaId); -- NL20160309 (meaningless line?)
 CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId); -- NL20160309
 CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
