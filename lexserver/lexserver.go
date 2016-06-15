@@ -386,9 +386,9 @@ func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func webSockTestHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/websock_test.html")
-}
+// func webSockTestHandler(w http.ResponseWriter, r *http.Request) {
+// 	http.ServeFile(w, r, "./static/websock_test.html")
+// }
 
 var wsChan = make(chan string)
 
@@ -637,6 +637,29 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 	return nil
 }
 
+func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
+	lexiconID, err := strconv.ParseInt(r.FormValue("id"), 10, 64)
+	if err != nil {
+		msg := "lexiconStatsHandler got no lexicon id"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	stats, err := dbapi.LexiconStats(db, lexiconID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("lexiconStatsHandler: call to  dbapi.LexiconStats failed : %v", err), http.StatusInternalServerError)
+		return
+	}
+	res, err := json.Marshal(stats)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("lexiconStatsHandler: failed to marshal struct : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprint(w, string(res))
+}
+
 var db *sql.DB
 
 func keepAlive(wsC chan string) {
@@ -681,6 +704,7 @@ func main() {
 
 	// function calls
 	http.HandleFunc("/listlexicons", listLexsHandler)
+	http.HandleFunc("/lexiconstats", lexiconStatsHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
 	http.HandleFunc("/updateentry", updateEntryHandler)
 
@@ -697,7 +721,7 @@ func main() {
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 	http.HandleFunc("/admin/superdeletelexicon", superDeleteLexHandler)
 
-	http.HandleFunc("/websocktest", webSockTestHandler)
+	//http.HandleFunc("/websocktest", webSockTestHandler)
 
 	http.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
@@ -706,6 +730,7 @@ func main() {
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
+	// Pinging connected websocket clients
 	go keepClientsAlive()
 
 	log.Print("lexserver: listening on port ", port)

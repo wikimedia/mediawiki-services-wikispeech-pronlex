@@ -246,3 +246,9 @@ type Symbol struct {
 	Description string `json:"description"`
 	IPA         string `json:"ipa"`
 }
+
+// TODO add fields for additional stats
+type LexStats struct {
+	LexiconID int64 `json:lexiconId`
+	Entries   int64 `json:entries`
+}

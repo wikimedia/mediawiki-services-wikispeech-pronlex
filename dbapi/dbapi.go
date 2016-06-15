@@ -1196,3 +1196,26 @@ func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
 
 	return res, nil
 }
+
+func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
+	res := LexStats{LexiconID: lexiconID}
+
+	tx, err := db.Begin()
+	defer tx.Commit()
+
+	if err != nil {
+		return res, fmt.Errorf("dbapi.LexiconStats failed opening db transaction : %v", err)
+	}
+
+	var entries int64
+	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
+	if err != nil || err == sql.ErrNoRows {
+		return res, fmt.Errorf("dbapi.LexiconStats failed QueryRow : %v", err)
+	}
+
+	// TODO add queries for additional stats
+
+	res.Entries = entries
+
+	return res, nil
+}
