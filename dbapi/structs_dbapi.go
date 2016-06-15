@@ -250,5 +250,6 @@ type Symbol struct {
 // TODO add fields for additional stats
 type LexStats struct {
 	LexiconID int64 `json:lexiconId`
-	Entries   int64 `json:entries`
+	// The number of entries in the lexicon corresponding to database id LexiconID
+	Entries int64 `json:entries`
 }
