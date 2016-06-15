@@ -145,9 +145,13 @@ ADMLD.AdminLexDefModel = function () {
 	
     	var params = {'id' : self.selectedLexicon().id, 'name' : self.selectedLexicon().name, 'symbolsetname' : self.selectedLexicon().symbolSetName}
 	
-    	
+    	// var xhr = new XMLHTTPRequest();
+	// xhr.
+	
 	$.get(ADMLD.baseURL + "/admin/insertorupdatelexicon", params)
-    	    .done(function(data){
+    	    .done(function(data, status, xhr){
+		//console.log("status: "+ status);
+		//console.log("xhr: "+ JSON.stringify(xhr));
     		self.loadLexiconNames();
     		self.selectedLexicon(data); // ?
     	    })
