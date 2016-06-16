@@ -514,12 +514,29 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 	}
 
-	_, ok := webSocks.clients[clientUUID]
-	if clientUUID != "" && ok {
-		messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %v", lexicon))
-	}
+	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexicon.Name))
 
-	fmt.Fprint(w, fmt.Sprintf("One day, I will export %v to client with UUID '%s'", lexicon, clientUUID))
+	// local output file
+	fName := filepath.Join(downloadFileArea, lexicon.Name+".txt")
+	f, err := os.Create(fName)
+	bf := bufio.NewWriter(f)
+	defer bf.Flush()
+
+	// Query that returns all entries of lexicon
+	ls := []dbapi.Lexicon{dbapi.Lexicon{ID: lexicon.ID}}
+	q := dbapi.Query{Lexicons: ls}
+
+	nstFmt, err := line.NewNST()
+	if err != nil {
+		log.Fatal(err)
+		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
+	}
+	nstW := line.NSTFileWriter{nstFmt, bf}
+	dbapi.LookUp(db, q, nstW)
+
+	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %f", lexicon.Name, fName))
+
+	fmt.Fprint(w, fmt.Sprintf("Lexicon exported to '%s'", fName))
 }
 
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -784,6 +801,7 @@ func main() {
 
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.Handle("/download_area/", http.StripPrefix("/download_area/", http.FileServer(http.Dir("./download_area"))))
 
 	// Pinging connected websocket clients
 	go keepClientsAlive()
