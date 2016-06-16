@@ -185,7 +185,7 @@ ADMLD.AdminLexDefModel = function () {
     self.superDeleteLexicon = function (lexicon) {
 	
 	console.log("superDeleteLexicon called : "+ JSON.stringify(lexicon));
-	var params = {'id' : lexicon.id}
+	var params = {'id' : lexicon.id, 'client_uuid': self.uuid};
     	$.get(ADMLD.baseURL + "/admin/superdeletelexicon", params)
     	    .done(function(data){
     		// dumdelidum

@@ -33,6 +33,7 @@ func ff(f string, err error) {
 
 // TODO should go into config file
 var uploadFileArea = filepath.Join(".", "upload_area")
+var downloadFileArea = filepath.Join(".", "download_area")
 
 // TODO config stuff
 func init() {
@@ -49,6 +50,19 @@ func init() {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
 		}
 	} // else: already exists, hopefullly
+
+	// If the download area dir doesn't exist, create it
+	if _, err := os.Stat(downloadFileArea); err != nil {
+		if os.IsNotExist(err) {
+			err2 := os.Mkdir(downloadFileArea, 0755)
+			if err2 != nil {
+				fmt.Printf("lexserver.init: failed to create %s : %v", downloadFileArea, err2)
+			}
+		} else {
+			fmt.Printf("lexserver.init: peculiar error : %v", err)
+		}
+	} // else: already exists, hopefullly
+
 }
 
 // TODO remove pretty-print option, since you can use the JSONView plugin to Chrome instead
@@ -147,15 +161,17 @@ func superDeleteLexHandler(w http.ResponseWriter, r *http.Request) {
 	// Aha! Turns out that Go treats POST and GET the same way, as I understand it.
 	// No need for checking whether GO or POST, as far as I understand.
 	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
-
+	uuid := r.FormValue("client_uuid")
 	log.Println("lexserver.superDeleteLexHandler was called")
-
+	messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon id %d", id))
 	err := dbapi.SuperDeleteLexicon(db, id)
 	if err != nil {
 
 		http.Error(w, fmt.Sprintf("failed super deleting lexicon : %v", err), http.StatusExpectationFailed)
 		return
 	}
+
+	messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon with id %d", id))
 }
 
 // TODO report unused URL parameters
@@ -406,11 +422,17 @@ func deleteWebSocketClient(id string) {
 }
 
 func messageToClientWebSock(clientUUID string, msg string) {
-	webSocks.Lock()
-	if ws, ok := webSocks.clients[clientUUID]; ok {
-		websocket.Message.Send(ws, msg)
+	if strings.TrimSpace(clientUUID) != "" {
+		webSocks.Lock()
+		if ws, ok := webSocks.clients[clientUUID]; ok {
+			websocket.Message.Send(ws, msg)
+		} else {
+			log.Printf("messageToClientWebSock called with unknown UUID string %s", clientUUID)
+		}
+		webSocks.Unlock()
+	} else {
+		log.Printf("messageToClientWebSock called with empty UUID string and message %s", msg)
 	}
-	webSocks.Unlock()
 }
 
 func webSockRegHandler(ws *websocket.Conn) {
@@ -453,7 +475,7 @@ func webSockRegHandler(ws *websocket.Conn) {
 }
 
 func keepClientsAlive() {
-	c := time.Tick(27 * time.Second)
+	c := time.Tick(67 * time.Second)
 	for _ = range c {
 
 		webSocks.Lock()
@@ -470,6 +492,34 @@ func keepClientsAlive() {
 		}
 		webSocks.Unlock()
 	}
+}
+
+func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
+	lexiconID, err := strconv.ParseInt(r.FormValue("id"), 10, 64)
+	if err != nil {
+		msg := "exportLexiconHandler got no lexicon id"
+		fmt.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	// If client sends UUID, messages can be written to client socket
+	clientUUID := r.FormValue("client_uuid")
+	lexicon, err := dbapi.LexiconFromID(db, lexiconID)
+	if err != nil {
+		msg := fmt.Sprintf("exportLexiconHandler failed to get lexicon from id : %v", err)
+		log.Println(msg)
+		// TODO this might not be a proper error: the client could simply have asked for a lexicon id that doesn't exist.
+		// Handle more gracefully (but for now, let's crash).
+		http.Error(w, msg, http.StatusInternalServerError)
+	}
+
+	_, ok := webSocks.clients[clientUUID]
+	if clientUUID != "" && ok {
+		messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %v", lexicon))
+	}
+
+	fmt.Fprint(w, fmt.Sprintf("One day, I will export %v to client with UUID '%s'", lexicon, clientUUID))
 }
 
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -587,6 +637,10 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 	}
 	lex := dbapi.Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
 
+	msg := fmt.Sprintf("Trying to load file: %s", uploadFileName)
+	messageToClientWebSock(clientUUID, msg)
+	log.Print(msg)
+
 	n := 0
 	var eBuf []dbapi.Entry
 	for s.Scan() {
@@ -609,9 +663,9 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 			}
 			eBuf = make([]dbapi.Entry, 0)
 			//fmt.Printf("\rLines read: %d               \r", n)
-			var msg = fmt.Sprintf("Lines so far: %d", n)
-			messageToClientWebSock(clientUUID, msg)
-			fmt.Println(msg)
+			msg2 := fmt.Sprintf("Lines so far: %d", n)
+			messageToClientWebSock(clientUUID, msg2)
+			fmt.Println(msg2)
 		}
 	}
 	dbapi.InsertEntries(db, lex, eBuf) // flushing the buffer
@@ -621,16 +675,16 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 		log.Fatal(err)
 	}
 
-	var msg = fmt.Sprintf("Lines read:\t%d", n)
-	messageToClientWebSock(clientUUID, msg)
-	log.Println(msg)
+	msg3 := fmt.Sprintf("Lines read:\t%d", n)
+	messageToClientWebSock(clientUUID, msg3)
+	log.Println(msg3)
 	// TODO Copied from addNSTLexToDB
 	// <----------------------------
 
 	if err := s.Err(); err != nil {
-		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
-		messageToClientWebSock(clientUUID, msg)
-		return fmt.Errorf("loadLexiconFileIntoDB error while scanning file : %v", err)
+		msg4 := fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
+		messageToClientWebSock(clientUUID, msg4)
+		return fmt.Errorf(msg4)
 	}
 
 	// TODO
@@ -726,6 +780,7 @@ func main() {
 	http.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
 	http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
+	http.HandleFunc("/admin/exportlexicon", exportLexiconHandler)
 
 	//            (Why this http.StripPrefix?)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))

@@ -157,7 +157,19 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 
 // LexiconFromID returns a Lexicon struct corresponding to a row in
 // the lexicon table with the given id
-func LexiconFromID(tx *sql.Tx, id int64) (Lexicon, error) {
+func LexiconFromID(db *sql.DB, id int64) (Lexicon, error) {
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		return Lexicon{}, fmt.Errorf("LexiconFromID failed to start db transaction : %v", err)
+	}
+
+	return LexiconFromIDTx(tx, id)
+}
+
+// LexiconFromIDTx returns a Lexicon struct corresponding to a row in
+// the lexicon table with the given id
+func LexiconFromIDTx(tx *sql.Tx, id int64) (Lexicon, error) {
 	res := Lexicon{}
 	var dbID int64
 	var name, symbolSetName string
@@ -220,16 +232,17 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 // SuperDeleteLexicon deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
 // It also deletes all entries from the Symbolset table associated to the lexicon.
-func SuperDeleteLexicon0(db *sql.DB, id int64) error {
-	fmt.Printf("DeleteLexicon called with id %d\n", id)
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		return err
-	}
-	return SuperDeleteLexiconTx(tx, id)
-}
+// func SuperDeleteLexicon0(db *sql.DB, id int64) error {
+// 	fmt.Printf("DeleteLexicon called with id %d\n", id)
+// 	tx, err := db.Begin()
+// 	defer tx.Commit()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return SuperDeleteLexiconTx(tx, id)
+// }
 
+// TODO Too slow deleting many entries when Sqlite3 has foreign_keys = ON.
 // TODO Doesn't appear to work using transactions: takes too much time
 // SuperDeleteLexicon deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
@@ -245,9 +258,37 @@ func SuperDeleteLexicon(db *sql.DB, id int64) error {
 
 	fmt.Println("dbapi.superDeleteLexicon finished deleting from symbolset")
 
-	_, err = db.Exec("DELETE FROM transcription WHERE transcription.entryid IN (SELECT entry.id FROM lexicon, entry WHERE lexicon.id = ? AND lexicon.id = entry.lexiconid)", id)
+	// ////////////
 
-	fmt.Println("dbapi.superDeleteLexicon finished deleting from transcription")
+	// _, err = db.Exec("DELETE FROM transcription WHERE transcription.entryid IN (SELECT entry.id FROM entry WHERE entry.lexiconid = ?)", id)
+
+	// if err != nil {
+	// 	return fmt.Errorf("dbapi.SuperDeleteLexicon : failed to delete transcription : %v", err)
+	// }
+
+	// fmt.Println("dbapi.superDeleteLexicon finished deleting from transcription")
+
+	// ////////////
+
+	// _, err = db.Exec("DELETE FROM Lemma2Entry WHERE Lemma2Entry.entryid IN (SELECT entry.id FROM entry WHERE entry.lexiconid = ?)", id)
+
+	// if err != nil {
+	// 	return fmt.Errorf("dbapi.SuperDeleteLexicon : failed to delete Lemma2Entry : %v", err)
+	// }
+
+	// fmt.Println("dbapi.superDeleteLexicon finished deleting from Lemma2Entry")
+
+	// ////////////
+
+	// _, err = db.Exec("DELETE FROM Lemma WHERE Lemma.id IN (SELECT Lemma.id FROM entry, lemma2entry, lemma WHERE entry.lexiconid = ? AND lemma2entry.entryid = entry.id and lemma2entry.lemmaid = lemma.id)", id)
+
+	// if err != nil {
+	// 	return fmt.Errorf("dbapi.SuperDeleteLexicon : failed to delete Lemma : %v", err)
+	// }
+
+	// fmt.Println("dbapi.superDeleteLexicon finished deleting from Lemma")
+
+	// ////////////
 
 	_, err = db.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
 	if err != nil {
@@ -257,6 +298,8 @@ func SuperDeleteLexicon(db *sql.DB, id int64) error {
 
 	fmt.Println("dbapi.superDeleteLexicon finished deleting from entry")
 
+	// TODO Why on earth does this call take forever on a largish lexicon?
+	// It seems to be Sqlite3 that is slow when foreign_keys = ON.
 	_, err = db.Exec("DELETE FROM lexicon WHERE id = ?", id)
 	if err != nil {
 		//tx.Rollback()
@@ -340,7 +383,7 @@ func insertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 	}
 
 	// else if l.ID > 0
-	res, err := LexiconFromID(tx, l.ID)
+	res, err := LexiconFromIDTx(tx, l.ID)
 
 	if err != nil {
 		return res, fmt.Errorf("faild get lexicon : %v", err)
