@@ -749,7 +749,7 @@ func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(".", downloadFileArea, fName)
 	log.Printf("downloadFileHandler: file path: %s", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		msg := fmt.Sprintf("downloadFileHandler: no such file '%s'", fName)
+		msg := fmt.Sprintf("download: no such file '%s'", fName)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
