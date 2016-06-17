@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"compress/gzip"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -85,6 +86,7 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Serving index file for '%v'\n", r.URL.Path)
 	http.ServeFile(w, r, "./static/index.html")
 }
 
@@ -151,7 +153,7 @@ func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := dbapi.DeleteLexicon(db, id)
 	if err != nil {
-		log.Printf("lexserver.deleteLexHandler got error : %v", err)
+		log.Printf("lexserver.deleteLexHandler got error : %v\n", err)
 		http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusExpectationFailed)
 		return
 	}
@@ -427,11 +429,11 @@ func messageToClientWebSock(clientUUID string, msg string) {
 		if ws, ok := webSocks.clients[clientUUID]; ok {
 			websocket.Message.Send(ws, msg)
 		} else {
-			log.Printf("messageToClientWebSock called with unknown UUID string %s", clientUUID)
+			log.Printf("messageToClientWebSock called with unknown UUID string '%s'", clientUUID)
 		}
 		webSocks.Unlock()
 	} else {
-		log.Printf("messageToClientWebSock called with empty UUID string and message %s", msg)
+		log.Printf("messageToClientWebSock called with empty UUID string and message '%s'", msg)
 	}
 }
 
@@ -517,11 +519,12 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexicon.Name))
 
 	// local output file
-	fName := filepath.Join(downloadFileArea, lexicon.Name+".txt")
+	fName := filepath.Join(downloadFileArea, lexicon.Name+".txt.gz")
 	f, err := os.Create(fName)
-	bf := bufio.NewWriter(f)
-	defer bf.Flush()
-
+	//bf := bufio.NewWriter(f)
+	gz := gzip.NewWriter(f)
+	//defer gz.Flush()
+	defer gz.Close()
 	// Query that returns all entries of lexicon
 	ls := []dbapi.Lexicon{dbapi.Lexicon{ID: lexicon.ID}}
 	q := dbapi.Query{Lexicons: ls}
@@ -531,16 +534,18 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
 	}
-	nstW := line.NSTFileWriter{nstFmt, bf}
+	nstW := line.NSTFileWriter{nstFmt, gz}
 	dbapi.LookUp(db, q, nstW)
-
+	gz.Flush()
 	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %f", lexicon.Name, fName))
 
-	fmt.Fprint(w, fmt.Sprintf("Lexicon exported to '%s'", fName))
+	msg := fmt.Sprintf("Lexicon exported to '%s'", fName)
+	log.Print(msg)
+	fmt.Fprint(w, msg)
 }
 
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
+	//fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
 	if r.Method != "POST" {
 		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
 		return
@@ -556,26 +561,26 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lexiconName := r.FormValue("lexicon_name")
-	fmt.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", lexiconName)
+	log.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", lexiconName)
 	symbolSetName := r.FormValue("symbolset_name")
-	fmt.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", symbolSetName)
+	log.Printf("lexiconFileUploadHandler: incoming db symbol set name: %v\n", symbolSetName)
 
 	if "" == strings.TrimSpace(clientUUID) {
 		msg := "lexiconFileUploadHandler got no client uuid"
-		fmt.Println(msg)
+		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 
 	if "" == strings.TrimSpace(lexiconName) {
 		msg := "lexiconFileUploadHandler got no lexicon name"
-		fmt.Println(msg)
+		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 	if "" == strings.TrimSpace(symbolSetName) {
 		msg := "lexiconFileUploadHandler got no symbolset name"
-		fmt.Println(msg)
+		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
@@ -585,7 +590,7 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	file, handler, err := r.FormFile("upload_file")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed reading file : %v", err), http.StatusInternalServerError)
 		return
 	}
@@ -593,14 +598,16 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	fName := filepath.Join(uploadFileArea, handler.Filename)
 	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed opening local output file : %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer f.Close()
 	_, err = io.Copy(f, file)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed copying local output file : %v", err), http.StatusInternalServerError)
+		msg := fmt.Sprintf("lexiconFileUploadHandler failed copying local output file : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 
@@ -799,9 +806,9 @@ func main() {
 	http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
 	http.HandleFunc("/admin/exportlexicon", exportLexiconHandler)
 
-	//            (Why this http.StripPrefix?)
+	// TODO Why this http.StripPrefix? Looks odd.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	http.Handle("/download_area/", http.StripPrefix("/download_area/", http.FileServer(http.Dir("./download_area"))))
+	//http.Handle("/download_area/", http.StripPrefix("/download_area/", http.FileServer(http.Dir("./download_area"))))
 
 	// Pinging connected websocket clients
 	go keepClientsAlive()
