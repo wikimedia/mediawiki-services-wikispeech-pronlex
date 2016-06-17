@@ -541,7 +541,7 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 
 	msg := fmt.Sprintf("Lexicon exported to '%s'", fName)
 	log.Print(msg)
-	fmt.Fprint(w, msg)
+	fmt.Fprint(w, filepath.Base(fName))
 }
 
 func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -738,6 +738,28 @@ func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(res))
 }
 
+func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
+	fName := r.FormValue("file")
+	if fName == "" {
+		msg := fmt.Sprint("downloadFileHandler got empty 'file' param")
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	path := filepath.Join(".", downloadFileArea, fName)
+	log.Printf("downloadFileHandler: file path: %s", path)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		msg := fmt.Sprintf("downloadFileHandler: no such file '%s'", fName)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Disposition", "attachment; filename="+fName)
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	http.ServeFile(w, r, path)
+}
+
 var db *sql.DB
 
 func keepAlive(wsC chan string) {
@@ -785,6 +807,7 @@ func main() {
 	http.HandleFunc("/lexiconstats", lexiconStatsHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
 	http.HandleFunc("/updateentry", updateEntryHandler)
+	http.HandleFunc("/download", downloadFileHandler)
 
 	// admin pages/calls
 
