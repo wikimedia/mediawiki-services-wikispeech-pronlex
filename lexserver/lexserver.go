@@ -514,6 +514,7 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		// TODO this might not be a proper error: the client could simply have asked for a lexicon id that doesn't exist.
 		// Handle more gracefully (but for now, let's crash).
 		http.Error(w, msg, http.StatusInternalServerError)
+		return
 	}
 
 	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexicon.Name))
@@ -533,6 +534,7 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
+		return
 	}
 	nstW := line.NSTFileWriter{nstFmt, gz}
 	dbapi.LookUp(db, q, nstW)
