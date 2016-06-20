@@ -249,7 +249,11 @@ type Symbol struct {
 
 // TODO add fields for additional stats
 type LexStats struct {
-	LexiconID int64 `json:lexiconId`
+	LexiconID int64 `json:"lexiconId"`
 	// The number of entries in the lexicon corresponding to database id LexiconID
-	Entries int64 `json:entries`
+	Entries int64 `json:"entries"`
+
+	// Status frequencies, as strings: StatusName<TAB>Frequency
+	// TODO better structure for status/freq (string/int)
+	StatusFrequencies []string `json:"statusFrequencies"`
 }

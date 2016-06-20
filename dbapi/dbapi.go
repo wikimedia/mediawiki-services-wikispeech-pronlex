@@ -1250,15 +1250,39 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 		return res, fmt.Errorf("dbapi.LexiconStats failed opening db transaction : %v", err)
 	}
 
+	// number of entries in a lexicon
 	var entries int64
 	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.LexiconStats failed QueryRow : %v", err)
 	}
 
-	// TODO add queries for additional stats
-
 	res.Entries = entries
+
+	// number of each type of entry status
+
+	//select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = 3 and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name
+
+	rows, err := tx.Query("select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = ? and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name", lexiconID)
+	defer rows.Close()
+	if err != nil {
+		return res, fmt.Errorf("db query failed : %v", err)
+	}
+
+	for rows.Next() {
+		var status string
+		var freq string
+		err = rows.Scan(&status, &freq)
+		if err != nil {
+			return res, fmt.Errorf("scanning row failed : %v", err)
+		}
+
+		res.StatusFrequencies = append(res.StatusFrequencies, status+"\t"+freq)
+	}
+	err = rows.Err()
+	return res, err
+
+	// TODO add queries for additional stats
 
 	return res, nil
 }

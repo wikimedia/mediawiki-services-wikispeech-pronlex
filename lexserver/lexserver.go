@@ -735,6 +735,7 @@ func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res, err := json.Marshal(stats)
+
 	if err != nil {
 		http.Error(w, fmt.Sprintf("lexiconStatsHandler: failed to marshal struct : %v", err), http.StatusInternalServerError)
 		return
