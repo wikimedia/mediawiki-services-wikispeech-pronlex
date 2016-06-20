@@ -2,6 +2,8 @@ package dbapi
 
 // Schema is a string containing the SQL definition of the lexicon database
 var Schema = `
+-- Each lexical entry belongs to a lexicon.
+-- The Lexicon table defines a lexicon through a unique name, along with the name a of symbol set
 CREATE TABLE Lexicon (
     name varchar(128) not null,
     symbolSetName varchar(128) not null,
@@ -9,6 +11,7 @@ CREATE TABLE Lexicon (
   );
 CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);
 
+-- A symbol set is the definition of allowed symbols in a lexicons phonetical transcriptions
 CREATE TABLE Symbolset (
     description varchar(128),
     symbol varchar(128) not null,
@@ -20,6 +23,7 @@ CREATE TABLE Symbolset (
 CREATE INDEX idx37380686 on Symbolset (symbol);
 CREATE UNIQUE INDEX idx8bc90a52 on Symbolset (lexiconId,symbol);
 
+-- Lemma forms, or stems, are uninflected (theoretical, one might say) forms of words
 CREATE TABLE Lemma (
     reading varchar(128) not null,
     id integer not null primary key autoincrement,
@@ -36,6 +40,9 @@ CREATE UNIQUE INDEX idx407206e8 on Lemma (strn,reading);
 --  );
 --CREATE UNIQUE INDEX idx35390652 on SurfaceForm (strn);
 
+-- The actual lexical entries live in this table.
+-- Each entry is linked to a single lexicon, and may have one or more 
+-- phonetic transcriptions, found in their own table.
 CREATE TABLE Entry (
     wordParts varchar(128),
     label varchar(128),
@@ -50,6 +57,8 @@ CREATE INDEX idx15890407 on Entry (strn);
 CREATE INDEX entrylexid ON Entry (lexiconId);
 CREATE INDEX idx4a250778 on Entry (strn,language);
 
+
+-- Validiation results of entries
 CREATE TABLE EntryValidation (
     id integer not null primary key autoincrement,
     entryid integer not null,
@@ -62,6 +71,7 @@ CREATE INDEX evallev ON EntryValidation(level);
 CREATE INDEX evalnam ON EntryValidation(name);
 CREATE INDEX entvalEid ON EntryValidation(entryId); 
 
+-- Status of entries
 CREATE TABLE EntryStatus (
     name varchar(128) not null,
     source varchar(128) not null,
@@ -98,6 +108,7 @@ CREATE TABLE TranscriptionStatus (
 foreign key (transcriptionId) references Transcription(id) on delete cascade);
 CREATE INDEX nizze ON TranscriptionStatus (transcriptionId); 
 
+-- Linking table between a lemma form and its different surface forms 
 CREATE TABLE Lemma2Entry (
     entryId bigint not null,
     lemmaId bigint not null,
