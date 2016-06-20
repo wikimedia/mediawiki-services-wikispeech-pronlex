@@ -197,6 +197,25 @@ ADMLD.AdminLexDefModel = function () {
     };
     
 
+    self.exportSelectedLexicon = function() {
+	var lex = self.selectedLexicon();
+	lex.client_uuid = self.uuid;
+	$.get(ADMLD.baseURL + "/admin/exportlexicon", lex)
+	    .done(function(exportFName) {
+		// build download URL
+		var url = ADMLD.baseURL +"/download?file="+ exportFName;
+		//console.log("THIS: "+ url);
+		// add download URL to element
+		$("#export_download_link").append("<a href="+ url +">"+ exportFName +"<a>"); // TODO This is not the way to build up elements safely?
+
+	    })
+	    .fail(function (xhr, textStatus, errorThrown) {
+    		alert(xhr.responseText);	    
+    	    });
+    };
+ 
+
+
     
     // An object/hash with symbol set name as key and a list of symbol objects as value
     self.symbolSets = ko.observable({});

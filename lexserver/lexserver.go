@@ -505,8 +505,6 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If client sends UUID, messages can be written to client socket
-	clientUUID := r.FormValue("client_uuid")
 	lexicon, err := dbapi.LexiconFromID(db, lexiconID)
 	if err != nil {
 		msg := fmt.Sprintf("exportLexiconHandler failed to get lexicon from id : %v", err)
@@ -517,6 +515,8 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// If client sends UUID, messages can be written to client socket
+	clientUUID := r.FormValue("client_uuid")
 	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexicon.Name))
 
 	// local output file
@@ -530,6 +530,8 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 	ls := []dbapi.Lexicon{dbapi.Lexicon{ID: lexicon.ID}}
 	q := dbapi.Query{Lexicons: ls}
 
+	log.Printf("Query for exporting: %v", q)
+
 	nstFmt, err := line.NewNST()
 	if err != nil {
 		log.Fatal(err)
@@ -538,8 +540,9 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	nstW := line.NSTFileWriter{nstFmt, gz}
 	dbapi.LookUp(db, q, nstW)
+	defer gz.Close()
 	gz.Flush()
-	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %f", lexicon.Name, fName))
+	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %s", lexicon.Name, fName))
 
 	msg := fmt.Sprintf("Lexicon exported to '%s'", fName)
 	log.Print(msg)

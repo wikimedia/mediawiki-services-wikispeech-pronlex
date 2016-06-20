@@ -77,7 +77,12 @@
     
     <label>Message from server: </label><div data-bind="text: serverMessage"></div>
 
-    
+    <p>
+      <span data-bind="if: $root.selectedLexicon().id > 0">
+	Export <span data-bind="text: $root.selectedLexicon().name"></span> to file: <button data-bind="click: exportSelectedLexicon">Export</button> <span id="export_download_link"></span>
+      </span>
+    </p>
+       
     <p>
       <span data-bind="if: $root.selectedLexicon().id > 0">
       Upload lexicon file: <input type="file" data-bind="event: { change: function() { $root.uploadLexiconFile($element.files[0]) } }"></input>
