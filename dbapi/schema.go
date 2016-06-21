@@ -13,7 +13,8 @@ CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);
 
 -- A symbol set is the definition of allowed symbols in a lexicons phonetical transcriptions
 CREATE TABLE Symbolset (
-    description varchar(128),
+    -- description varchar(128),
+    description text,
     symbol varchar(128) not null,
     id integer not null primary key autoincrement,
     category varchar(128) not null,
@@ -28,7 +29,8 @@ CREATE TABLE Lemma (
     reading varchar(128) not null,
     id integer not null primary key autoincrement,
     paradigm varchar(128),
-    strn varchar(128) not null
+    -- strn varchar(128) not null
+    strn text not null
   );
 CREATE INDEX idx21d604f4 on Lemma (reading);
 CREATE INDEX idx273f055f on Lemma (paradigm);
@@ -44,11 +46,13 @@ CREATE UNIQUE INDEX idx407206e8 on Lemma (strn,reading);
 -- Each entry is linked to a single lexicon, and may have one or more 
 -- phonetic transcriptions, found in their own table.
 CREATE TABLE Entry (
-    wordParts varchar(128),
+    -- wordParts varchar(128),
+    wordParts text,
     label varchar(128),
     id integer not null primary key autoincrement,
     language varchar(128) not null,
-    strn varchar(128) not null,
+    -- strn varchar(128) not null,
+    strn text not null,
     lexiconId integer not null,
     partOfSpeech varchar(128),
 foreign key (lexiconId) references Lexicon(id));
@@ -64,7 +68,8 @@ CREATE TABLE EntryValidation (
     entryid integer not null,
     level varchar(128) not null,
     name varchar(128) not null,
-    message varchar(128) not null,
+    -- message varchar(128) not null,
+    message text not null,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
     foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX evallev ON EntryValidation(level);
@@ -94,7 +99,8 @@ CREATE TABLE Transcription (
     -- symbolSetCode varchar(128) not null,
     id integer not null primary key autoincrement,
     language varchar(128) not null,
-    strn varchar(128) not null,
+    -- strn varchar(128) not null,
+    strn text not null,
     sources TEXT not null,
 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX traeid ON Transcription (entryId);
