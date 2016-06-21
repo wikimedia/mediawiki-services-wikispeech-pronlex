@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 	"golang.org/x/net/websocket"
 	"io"
@@ -313,7 +314,7 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	entryJSON := r.FormValue("entry")
 	//body, err := ioutil.ReadAll(r.Body)
-	var e dbapi.Entry
+	var e lex.Entry
 	err := json.Unmarshal([]byte(entryJSON), &e)
 	if err != nil {
 		log.Printf("lexserver: Failed to unmarshal json: %v", err)
@@ -664,14 +665,14 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 		messageToClientWebSock(clientUUID, msg)
 		return fmt.Errorf("lexserver failed to instantiate lexicon line parser : %v", err)
 	}
-	lex := dbapi.Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
+	lexicon := dbapi.Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
 
 	msg := fmt.Sprintf("Trying to load file: %s", uploadFileName)
 	messageToClientWebSock(clientUUID, msg)
 	log.Print(msg)
 
 	n := 0
-	var eBuf []dbapi.Entry
+	var eBuf []lex.Entry
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			log.Fatal(err)
@@ -682,22 +683,22 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 			log.Fatal(err)
 		}
 		// TODO hard-wired initial status
-		e.EntryStatus = dbapi.EntryStatus{Name: "imported", Source: "nst"}
+		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {
-			_, err = dbapi.InsertEntries(db, lex, eBuf)
+			_, err = dbapi.InsertEntries(db, lexicon, eBuf)
 			if err != nil {
 				log.Fatal(err)
 			}
-			eBuf = make([]dbapi.Entry, 0)
+			eBuf = make([]lex.Entry, 0)
 			//fmt.Printf("\rLines read: %d               \r", n)
 			msg2 := fmt.Sprintf("Lines so far: %d", n)
 			messageToClientWebSock(clientUUID, msg2)
 			fmt.Println(msg2)
 		}
 	}
-	dbapi.InsertEntries(db, lex, eBuf) // flushing the buffer
+	dbapi.InsertEntries(db, lexicon, eBuf) // flushing the buffer
 
 	_, err = db.Exec("ANALYZE")
 	if err != nil {

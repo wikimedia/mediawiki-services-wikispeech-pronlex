@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 )
 
@@ -45,8 +46,8 @@ func main() {
 	}
 
 	// TODO hard coded symbol set name
-	lex := dbapi.Lexicon{Name: lexName, SymbolSetName: "nst-sv-SAMPA"}
-	lex, err = dbapi.InsertLexicon(db, lex)
+	lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: "nst-sv-SAMPA"}
+	lexicon, err = dbapi.InsertLexicon(db, lexicon)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +65,7 @@ func main() {
 
 	s := bufio.NewScanner(fh)
 	n := 0
-	var eBuf []dbapi.Entry
+	var eBuf []lex.Entry
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			log.Fatal(err)
@@ -75,19 +76,19 @@ func main() {
 			log.Fatal(err)
 		}
 		// initial status
-		e.EntryStatus = dbapi.EntryStatus{Name: "imported", Source: "nst"}
+		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {
-			_, err = dbapi.InsertEntries(db, lex, eBuf)
+			_, err = dbapi.InsertEntries(db, lexicon, eBuf)
 			if err != nil {
 				log.Fatal(err)
 			}
-			eBuf = make([]dbapi.Entry, 0)
+			eBuf = make([]lex.Entry, 0)
 			fmt.Printf("\rLines read: %d               \r", n)
 		}
 	}
-	dbapi.InsertEntries(db, lex, eBuf) // flushing the buffer
+	dbapi.InsertEntries(db, lexicon, eBuf) // flushing the buffer
 
 	_, err = db.Exec("ANALYZE")
 	if err != nil {

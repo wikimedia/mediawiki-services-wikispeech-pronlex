@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 )
 
 //var fsExpField = "For field %v, expected: '%v' got: '%v'"
@@ -16,7 +16,7 @@ func checkNSTResultField(t *testing.T, field string, x string, r string) {
 	}
 }
 
-func checkNSTResult(t *testing.T, x dbapi.Entry, r dbapi.Entry) {
+func checkNSTResult(t *testing.T, x lex.Entry, r lex.Entry) {
 	checkNSTResultField(t, Orth.String(), x.Strn, r.Strn)
 	checkNSTResultField(t, Pos.String(), x.PartOfSpeech, r.PartOfSpeech)
 	checkNSTResultField(t, WordParts.String(), x.WordParts, r.WordParts)
@@ -53,22 +53,22 @@ func Test_NSTParse_01(t *testing.T) {
 
 	input := "storstaden;NN;SIN|DEF|NOM|UTR;stor+staden;JJ+NN;LEX|INFL;SWE;;;;;\"\"stu:$%s`t`A:$den;1;STD;SWE;\"\"stu:$%s`t`A:n;;;SWE;;;;;;;;;;18174;enter_se|inflector;;INFLECTED;storstad|95522;s111n, a->ä, stad;s111;;;;;;;;;;;;;storstaden;;;88748"
 
-	expect := dbapi.Entry{
+	expect := lex.Entry{
 		Strn:         "storstaden",
 		PartOfSpeech: "NN SIN|DEF|NOM|UTR",
 		WordParts:    "stor+staden",
 		Language:     "SWE",
-		Lemma: dbapi.Lemma{
+		Lemma: lex.Lemma{
 			Strn:     "storstad",
 			Reading:  "95522",
 			Paradigm: "s111n, a->ä, stad",
 		},
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\"stu:$%s`t`A:$den",
 				Language: "SWE",
 			},
-			dbapi.Transcription{
+			lex.Transcription{
 				Strn:     "\"\"stu:$%s`t`A:n",
 				Language: "SWE",
 			},

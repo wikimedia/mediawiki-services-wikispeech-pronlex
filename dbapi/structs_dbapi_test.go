@@ -3,16 +3,18 @@ package dbapi
 import (
 	"sort"
 	"testing"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 // Test that TranscriptionSlice sorts on .Id
 func TestStruct_TranscriptionSliceSort(t *testing.T) {
-	t1 := Transcription{ID: 47}
-	t2 := Transcription{ID: 1047}
-	t3 := Transcription{ID: 11}
+	t1 := lex.Transcription{ID: 47}
+	t2 := lex.Transcription{ID: 1047}
+	t3 := lex.Transcription{ID: 11}
 
-	ts1 := []Transcription{t1, t2, t3}
-	sort.Sort(TranscriptionSlice(ts1))
+	ts1 := []lex.Transcription{t1, t2, t3}
+	sort.Sort(lex.TranscriptionSlice(ts1))
 	if ts1[0].ID != 11 {
 		t.Errorf(fs, 11, ts1[0].ID)
 	}

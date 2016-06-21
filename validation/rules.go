@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 )
 
@@ -14,7 +14,7 @@ type SymbolSetRule struct {
 	SymbolSet symbolset.SymbolSet
 }
 
-func (r SymbolSetRule) Validate(e dbapi.Entry) []Result {
+func (r SymbolSetRule) Validate(e lex.Entry) []Result {
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
 		splitted, err := r.SymbolSet.SplitTranscription(t.Strn)
@@ -50,7 +50,7 @@ type IllegalTransRe struct {
 	Re      *regexp.Regexp
 }
 
-func (r IllegalTransRe) Validate(e dbapi.Entry) []Result {
+func (r IllegalTransRe) Validate(e lex.Entry) []Result {
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
 		if r.Re.MatchString(strings.TrimSpace(t.Strn)) {
@@ -68,7 +68,7 @@ type RequiredTransRe struct {
 	Re      *regexp.Regexp
 }
 
-func (r RequiredTransRe) Validate(e dbapi.Entry) []Result {
+func (r RequiredTransRe) Validate(e lex.Entry) []Result {
 	var result = make([]Result, 0)
 	for _, t := range e.Transcriptions {
 		if !r.Re.MatchString(strings.TrimSpace(t.Strn)) {
@@ -82,7 +82,7 @@ func (r RequiredTransRe) Validate(e dbapi.Entry) []Result {
 type MustHaveTrans struct {
 }
 
-func (r MustHaveTrans) Validate(e dbapi.Entry) []Result {
+func (r MustHaveTrans) Validate(e lex.Entry) []Result {
 	name := "MustHaveTrans"
 	level := "Format"
 	var result = make([]Result, 0)
@@ -96,7 +96,7 @@ func (r MustHaveTrans) Validate(e dbapi.Entry) []Result {
 type NoEmptyTrans struct {
 }
 
-func (r NoEmptyTrans) Validate(e dbapi.Entry) []Result {
+func (r NoEmptyTrans) Validate(e lex.Entry) []Result {
 	name := "NoEmptyTrans"
 	level := "Format"
 	var result = make([]Result, 0)
@@ -114,7 +114,7 @@ type Decomp2Orth struct {
 	preFilterWordPartString func(string) (string, error)
 }
 
-func (r Decomp2Orth) Validate(e dbapi.Entry) []Result {
+func (r Decomp2Orth) Validate(e lex.Entry) []Result {
 	name := "Decomp2Orth"
 	level := "Fatal"
 	var result = make([]Result, 0)

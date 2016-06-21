@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/dlclark/regexp2"
-	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 )
 
 var fsExp = "Expected: '%v' got: '%v'"
@@ -15,7 +15,7 @@ var fsExp = "Expected: '%v' got: '%v'"
 type testMustHaveTrans struct {
 }
 
-func (r testMustHaveTrans) Validate(e dbapi.Entry) []Result {
+func (r testMustHaveTrans) Validate(e lex.Entry) []Result {
 	name := "MustHaveTrans"
 	level := "Format"
 	var result = make([]Result, 0)
@@ -28,7 +28,7 @@ func (r testMustHaveTrans) Validate(e dbapi.Entry) []Result {
 type testNoEmptyTrans struct {
 }
 
-func (r testNoEmptyTrans) Validate(e dbapi.Entry) []Result {
+func (r testNoEmptyTrans) Validate(e lex.Entry) []Result {
 	name := "NoEmptyTrans"
 	level := "Format"
 	var result = make([]Result, 0)
@@ -43,7 +43,7 @@ func (r testNoEmptyTrans) Validate(e dbapi.Entry) []Result {
 type testDecomp2Orth struct {
 }
 
-func (r testDecomp2Orth) Validate(e dbapi.Entry) []Result {
+func (r testDecomp2Orth) Validate(e lex.Entry) []Result {
 	name := "Decomp2Orth"
 	level := "Fatal"
 	var result = make([]Result, 0)
@@ -58,20 +58,20 @@ func Test1(t *testing.T) {
 	var vali = Validator{
 		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
-	var e = dbapi.Entry{
+	var e = lex.Entry{
 		Strn:         "anka",
 		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "anka",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\" a N . k a",
 				Language: "swe",
 			},
 		},
 	}
 
-	var result = vali.Validate([]dbapi.Entry{e})
+	var result = vali.Validate([]lex.Entry{e})
 
 	if len(result) != 0 {
 		t.Errorf(fsExp, make([]Result, 0), result)
@@ -82,15 +82,15 @@ func Test2(t *testing.T) {
 	var vali = Validator{
 		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
-	var e = dbapi.Entry{
+	var e = lex.Entry{
 		Strn:           "anka",
 		Language:       "swe",
 		PartOfSpeech:   "NN",
 		WordParts:      "anka",
-		Transcriptions: []dbapi.Transcription{},
+		Transcriptions: []lex.Transcription{},
 	}
 
-	var result = vali.Validate([]dbapi.Entry{e})
+	var result = vali.Validate([]lex.Entry{e})
 
 	var expect = []Result{
 		Result{
@@ -113,20 +113,20 @@ func Test3(t *testing.T) {
 	var vali = Validator{
 		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
-	var e = dbapi.Entry{
+	var e = lex.Entry{
 		Strn:         "ankstjärt",
 		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "ank+sjärt",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\" a N k + % x { rt",
 				Language: "swe",
 			},
 		},
 	}
 
-	var result = vali.Validate([]dbapi.Entry{e})
+	var result = vali.Validate([]lex.Entry{e})
 
 	var expect = []Result{
 		Result{
@@ -148,20 +148,20 @@ func Test4(t *testing.T) {
 	var vali = Validator{
 		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
-	var e = dbapi.Entry{
+	var e = lex.Entry{
 		Strn:         "ankstjärtsbad",
 		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "ank+stjärts+bad",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\" a N k + x { rt rs + % b A: d",
 				Language: "swe",
 			},
 		},
 	}
 
-	var result = vali.Validate([]dbapi.Entry{e})
+	var result = vali.Validate([]lex.Entry{e})
 
 	var expect = []Result{}
 	if len(result) != len(expect) {
@@ -176,20 +176,20 @@ func TestNst1(t *testing.T) {
 		return
 	}
 
-	var e = dbapi.Entry{
+	var e = lex.Entry{
 		Strn:         "banen",
 		Language:     "nor",
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\" b A: $ n @ n",
 				Language: "nor",
 			},
 		},
 	}
 
-	var result = vali.Validate([]dbapi.Entry{e})
+	var result = vali.Validate([]lex.Entry{e})
 
 	var expect = []Result{}
 	if len(result) != len(expect) {
@@ -198,20 +198,20 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = dbapi.Entry{
+	e = lex.Entry{
 		Strn:         "banen",
 		Language:     "nor",
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "b a $ \" n e: n",
 				Language: "nor",
 			},
 		},
 	}
 
-	result = vali.Validate([]dbapi.Entry{e})
+	result = vali.Validate([]lex.Entry{e})
 
 	expect = []Result{
 		Result{"final_nostress_nolong", "Warning", "[...]"},
@@ -223,20 +223,20 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = dbapi.Entry{
+	e = lex.Entry{
 		Strn:         "bantorget",
 		Language:     "nor",
 		PartOfSpeech: "NN",
 		WordParts:    "ban+torget",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\" b A: n - % t O r $ g @ t",
 				Language: "nor",
 			},
 		},
 	}
 
-	result = vali.Validate([]dbapi.Entry{e})
+	result = vali.Validate([]lex.Entry{e})
 
 	expect = []Result{}
 
@@ -246,20 +246,20 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = dbapi.Entry{
+	e = lex.Entry{
 		Strn:         "battorget",
 		Language:     "nor",
 		PartOfSpeech: "NN",
 		WordParts:    "bat+torget",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\" b A: t - % t O r $ g @ t",
 				Language: "nor",
 			},
 		},
 	}
 
-	result = vali.Validate([]dbapi.Entry{e})
+	result = vali.Validate([]lex.Entry{e})
 
 	expect = []Result{}
 
@@ -269,20 +269,20 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = dbapi.Entry{
+	e = lex.Entry{
 		Strn:         "battorget",
 		Language:     "nor",
 		PartOfSpeech: "NN",
 		WordParts:    "batt+torget",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\" b a t - % t O r $ g @ t",
 				Language: "nor",
 			},
 		},
 	}
 
-	result = vali.Validate([]dbapi.Entry{e})
+	result = vali.Validate([]lex.Entry{e})
 
 	expect = []Result{}
 
@@ -292,20 +292,20 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = dbapi.Entry{
+	e = lex.Entry{
 		Strn:         "batttorget",
 		Language:     "nor",
 		PartOfSpeech: "NN",
 		WordParts:    "batt+torget",
-		Transcriptions: []dbapi.Transcription{
-			dbapi.Transcription{
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
 				Strn:     "\"\" b a t - % t O r $ g @ t",
 				Language: "nor",
 			},
 		},
 	}
 
-	result = vali.Validate([]dbapi.Entry{e})
+	result = vali.Validate([]lex.Entry{e})
 
 	expect = []Result{
 		Result{"Decomp2Orth", "Fatal", "[...]"},

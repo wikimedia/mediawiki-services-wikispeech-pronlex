@@ -2,8 +2,7 @@ package validation
 
 import (
 	"fmt"
-
-	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 )
 
 /*
@@ -23,9 +22,9 @@ func (r Result) String() string {
 	return fmt.Sprintf("%s (%s): %s", r.RuleName, r.Level, r.Message)
 }
 
-// Rule interface. To create a validation.Rule, make a struct implementing Validate(dbapi.Entry) []Result
+// Rule interface. To create a validation.Rule, make a struct implementing Validate(lex.Entry) []Result
 type Rule interface {
-	Validate(dbapi.Entry) []Result
+	Validate(lex.Entry) []Result
 }
 
 // Validator is a struct containing a slice of rules
@@ -34,7 +33,7 @@ type Validator struct {
 }
 
 // ValidateEntry is used to validate single entries
-func (v Validator) ValidateEntry(e dbapi.Entry) []Result {
+func (v Validator) ValidateEntry(e lex.Entry) []Result {
 	var result []Result
 	for _, rule := range v.Rules {
 		for _, res := range rule.Validate(e) {
@@ -45,7 +44,7 @@ func (v Validator) ValidateEntry(e dbapi.Entry) []Result {
 }
 
 // Validate is used to validate a slice of entries
-func (v Validator) Validate(entries []dbapi.Entry) []Result {
+func (v Validator) Validate(entries []lex.Entry) []Result {
 	var result []Result
 	for _, e := range entries {
 		for _, res := range v.ValidateEntry(e) {

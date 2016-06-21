@@ -2,6 +2,8 @@ package dbapi
 
 import (
 	"database/sql"
+
+	"github.com/stts-se/pronlex/lex"
 	//"github.com/mattn/go-sqlite3"
 	"log"
 	"os"
@@ -58,24 +60,24 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, 1, len(lxs))
 	}
 
-	t1 := Transcription{Strn: "A: p a", Language: "Svetsko"}
-	t2 := Transcription{Strn: "a pp a", Language: "svinspråket"}
+	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
+	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}
 
-	e1 := Entry{Strn: "apa",
+	e1 := lex.Entry{Strn: "apa",
 		PartOfSpeech:   "NN",
 		WordParts:      "apa",
 		Language:       "XYZZ",
-		Transcriptions: []Transcription{t1, t2},
-		EntryStatus:    EntryStatus{Name: "old", Source: "tst"}}
+		Transcriptions: []lex.Transcription{t1, t2},
+		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
 
-	_, errx := InsertEntries(db, l, []Entry{e1})
+	_, errx := InsertEntries(db, l, []lex.Entry{e1})
 	if errx != nil {
 		t.Errorf(fs, "nil", errx)
 	}
 	// Check that there are things in db:
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
-	var entries map[string][]Entry
+	var entries map[string][]lex.Entry
 	entries, err = LookUpIntoMap(db, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
@@ -91,7 +93,7 @@ func Test_InsertEntries(t *testing.T) {
 		}
 	}
 
-	le := Lemma{Strn: "apa", Reading: "67t", Paradigm: "7(c)"}
+	le := lex.Lemma{Strn: "apa", Reading: "67t", Paradigm: "7(c)"}
 	tx0, err := db.Begin()
 	defer tx0.Commit()
 	ff("transaction failed : %v", err)
@@ -102,7 +104,7 @@ func Test_InsertEntries(t *testing.T) {
 	}
 
 	que := Query{TranscriptionLike: "%pp%"}
-	var queRez EntrySliceWriter
+	var queRez lex.EntrySliceWriter
 	err = LookUp(db, que, &queRez)
 	if err != nil {
 		t.Errorf("Wanted nil, got %v", err)
@@ -131,7 +133,7 @@ func Test_InsertEntries(t *testing.T) {
 	tx01.Commit()
 
 	//ess, err := GetEntries(db, q)
-	//var esw EntrySliceWriter
+	//var esw lex.EntrySliceWriter
 	ess, err := LookUpIntoMap(db, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
@@ -163,18 +165,18 @@ func Test_InsertEntries(t *testing.T) {
 
 	// Change transcriptions and update db
 	ees0 := ees["apa"][0]
-	t10 := Transcription{Strn: "A: p A:", Language: "Apo"}
+	t10 := lex.Transcription{Strn: "A: p A:", Language: "Apo"}
 	t10.AddSource("orangu1")
-	t20 := Transcription{Strn: "a p a", Language: "Sweinsprach"}
+	t20 := lex.Transcription{Strn: "a p a", Language: "Sweinsprach"}
 	t20.AddSource("orangu2")
-	t30 := Transcription{Strn: "a pp a", Language: "Mysko"}
+	t30 := lex.Transcription{Strn: "a pp a", Language: "Mysko"}
 	t30.AddSource("orangu3")
 	t30.AddSource("orangu4")
-	ees0.Transcriptions = []Transcription{t10, t20, t30}
-	// add new EntryStatus
-	ees0.EntryStatus = EntryStatus{Name: "new", Source: "tst"}
+	ees0.Transcriptions = []lex.Transcription{t10, t20, t30}
+	// add new lex.EntryStatus
+	ees0.EntryStatus = lex.EntryStatus{Name: "new", Source: "tst"}
 	// new validation
-	ees0.EntryValidations = []EntryValidation{EntryValidation{Level: "severe", Name: "barf", Message: "it hurts"}}
+	ees0.EntryValidations = []lex.EntryValidation{lex.EntryValidation{Level: "severe", Name: "barf", Message: "it hurts"}}
 
 	newE, updated, err := UpdateEntry(db, ees0)
 
@@ -229,7 +231,7 @@ func Test_InsertEntries(t *testing.T) {
 	eApa.Lemma.Strn = "tjubba"
 	eApa.WordParts = "fin+krog"
 	eApa.Language = "gummiapa"
-	eApa.EntryValidations = []EntryValidation{}
+	eApa.EntryValidations = []lex.EntryValidation{}
 	newE2, updated, err := UpdateEntry(db, eApa)
 	if err != nil {
 		t.Errorf(fs, "nil", err)

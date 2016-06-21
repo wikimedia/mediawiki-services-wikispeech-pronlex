@@ -14,6 +14,8 @@ import (
 	"fmt"
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
+	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/validation"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -242,11 +244,10 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 // 	return SuperDeleteLexiconTx(tx, id)
 // }
 
-// TODO Too slow deleting many entries when Sqlite3 has foreign_keys = ON.
-// TODO Doesn't appear to work using transactions: takes too much time
 // SuperDeleteLexicon deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
 // It also deletes all entries from the Symbolset table associated to the lexicon.
+// TODO Send progress message to client over websocket
 func SuperDeleteLexicon(db *sql.DB, id int64) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -255,41 +256,6 @@ func SuperDeleteLexicon(db *sql.DB, id int64) error {
 	}
 	return SuperDeleteLexiconTx(tx, id)
 }
-
-// func SuperDeleteLexicon(db *sql.DB, id int64) error {
-// 	fmt.Println("dbapi.superDeleteLexicon was called")
-
-// 	_, err := db.Exec("DELETE FROM symbolset WHERE lexiconid = ?", id)
-// 	if err != nil {
-// 		//tx.Rollback()
-// 		return fmt.Errorf("dbapi.SuperDeleteLexicon : failed to delete symbol set : %v", err)
-// 	}
-
-// 	fmt.Println("dbapi.superDeleteLexicon finished deleting from symbolset")
-
-// 	_, err = db.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
-// 	if err != nil {
-// 		//tx.Rollback()
-// 		return fmt.Errorf("dbapi.SuperDeleteLexicon : failed to delete entries : %v", err)
-// 	}
-
-// 	fmt.Println("dbapi.superDeleteLexicon finished deleting from entry")
-
-// 	// TODO Why on earth does this call take forever on a largish lexicon?
-// 	// It seems to be Sqlite3 that is slow when foreign_keys = ON.
-// 	_, err = db.Exec("DELETE FROM lexicon WHERE id = ?", id)
-// 	if err != nil {
-// 		//tx.Rollback()
-// 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete lexicon : %v", err)
-// 	}
-
-// 	fmt.Println("dbapi.superDeleteLexicon finished deleting from lexicon set")
-
-// 	fmt.Printf("Deleting lexicon %d\n", id)
-
-// 	return nil
-
-// }
 
 // SuperDeleteLexiconTx deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
@@ -401,7 +367,7 @@ var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
 // TODO change input arg to sql.Tx
-func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
+func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 
 	var ids []int64
 	// Transaction -->
@@ -437,7 +403,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 			tx.Rollback()
 			return ids, fmt.Errorf("failed last insert id : %v", err)
 		}
-		// We want the Entry to have the right id for inserting lemma assocs below
+		// We want thelex.Entry to have the right id for inserting lemma assocs below
 		e.ID = id
 
 		ids = append(ids, id)
@@ -472,7 +438,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 			// _, err := tx.Exec(statusSetCurrentFalse, e.ID)
 			// if err != nil {
 			// 	tx.Rollback()
-			// 	return ids, fmt.Errorf("updating EntryStatus.Current failed : %v", err)
+			// 	return ids, fmt.Errorf("updating lex.EntryStatus.Current failed : %v", err)
 			// }
 			_, err = tx.Exec(insertStatus, e.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source)) //, e.EntryStatus.Current) // TODO?
 			if err != nil {
@@ -494,9 +460,9 @@ func InsertEntries(db *sql.DB, l Lexicon, es []Entry) ([]int64, error) {
 	return ids, err
 }
 
-// InsertLemma saves a Lemma to the db, but does not associate it with an Entry
+// InsertLemma saves a lex.Lemma to the db, but does not associate it with anlex.Entry
 // TODO do we need both InsertLemma and SetOrGetLemma?
-func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
+func InsertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
 	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
 	if err != nil {
@@ -510,10 +476,10 @@ func InsertLemma(tx *sql.Tx, l Lemma) (Lemma, error) {
 	return l, err
 }
 
-// SetOrGetLemma saves a new Lemma to the db, or returns a matching already existing one
+// SetOrGetLemma saves a new lex.Lemma to the db, or returns a matching already existing one
 // TODO do we need both InsertLemma and SetOrGetLemma?
-func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Lemma, error) {
-	res := Lemma{}
+func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (lex.Lemma, error) {
+	res := lex.Lemma{}
 
 	var id int64
 	var strn0, reading0, paradigm0 string
@@ -521,7 +487,7 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	err := tx.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
 	switch {
 	case err == sql.ErrNoRows:
-		return InsertLemma(tx, Lemma{ID: id, Strn: strn, Reading: reading, Paradigm: paradigm})
+		return InsertLemma(tx, lex.Lemma{ID: id, Strn: strn, Reading: reading, Paradigm: paradigm})
 	case err != nil:
 		return res, fmt.Errorf("SetOrGetLemma failed querying db : %v", err)
 	}
@@ -534,8 +500,8 @@ func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (Le
 	return res, err
 }
 
-// AssociateLemma2Entry adds a Lemma to an Entry via a linking table
-func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
+// AssociateLemma2Entry adds a lex.Lemma to anlex.Entry via a linking table
+func AssociateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry) error {
 	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
 	_, err := db.Exec(sql, l.ID, e.ID)
 	if err != nil {
@@ -544,8 +510,8 @@ func AssociateLemma2Entry(db *sql.Tx, l Lemma, e Entry) error {
 	return err
 }
 
-func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (Lemma, error) {
-	res := Lemma{}
+func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (lex.Lemma, error) {
+	res := lex.Lemma{}
 	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
 		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
 	var lID int64
@@ -554,7 +520,7 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (Lemma, error) {
 	switch {
 	case err == sql.ErrNoRows:
 		// TODO No row:
-		// Silently return empty Lemma below
+		// Silently return empty lex.Lemma below
 	case err != nil:
 		//ff("getLemmaFromENtryId: %v", err)
 		return res, fmt.Errorf("QueryRow failure : %v", err)
@@ -570,8 +536,8 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (Lemma, error) {
 }
 
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
-// EntryWriter.
-func LookUp(db *sql.DB, q Query, out EntryWriter) error {
+//lex.EntryWriter.
+func LookUp(db *sql.DB, q Query, out lex.EntryWriter) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -584,7 +550,7 @@ func LookUp(db *sql.DB, q Query, out EntryWriter) error {
 // LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
 // EntryWriter.
 // TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
-func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
+func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 
 	//fmt.Printf("QUWRY %v\n\n", q)
 
@@ -624,7 +590,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 	// entry validation ids read so far, in order not to add same validation twice
 	valiIDs := make(map[int64]int)
 
-	var currE Entry
+	var currE lex.Entry
 	var lastE int64
 	lastE = -1
 	for rows.Next() {
@@ -669,7 +635,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			if lastE != -1 {
 				out.Write(currE)
 			}
-			currE = Entry{
+			currE = lex.Entry{
 				LexiconID:    lexiconID,
 				ID:           entryID,
 				Strn:         entryStrn,
@@ -679,7 +645,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 			}
 			// max one lemma per entry
 			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
-				l := Lemma{Strn: lemmaStrn.String}
+				l := lex.Lemma{Strn: lemmaStrn.String}
 				if lemmaID.Valid {
 					l.ID = lemmaID.Int64
 				}
@@ -692,11 +658,11 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				currE.Lemma = l
 			}
 
-			// TODO Only add once per Entry as long as single status?
+			// TODO Only add once per lex.Entry as long as single status?
 			// TODO probably should be a slice of statuses?
-			// TODO now checks for current = true before adding to Entry
+			// TODO now checks for current = true before adding to lex.Entry
 			if entryStatusID.Valid && entryStatusName.Valid && trm(entryStatusName.String) != "" {
-				es := EntryStatus{ID: entryStatusID.Int64, Name: entryStatusName.String}
+				es := lex.EntryStatus{ID: entryStatusID.Int64, Name: entryStatusName.String}
 				if entryStatusSource.Valid {
 					es.Source = entryStatusSource.String
 				}
@@ -706,19 +672,19 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				if entryStatusCurrent.Valid {
 					es.Current = entryStatusCurrent.Bool
 				}
-				// only update the Entry with status if current = true
+				// only update the lex.Entry with status if current = true
 				if entryStatusCurrent.Valid && entryStatusCurrent.Bool {
 					currE.EntryStatus = es
 				}
 			}
 		}
-		// Things that may appear in several rows of a single Entry below:
+		// Things that may appear in several rows of a single lex.Entry below:
 
 		// transcriptions ordered by id so they will be added
 		// in correct order
 		// Only add transcriptions that are !ok, i.e. not added already
 		if _, ok := transIDs[transcriptionID]; !ok {
-			currT := Transcription{
+			currT := lex.Transcription{
 				ID:       transcriptionID,
 				EntryID:  transcriptionEntryID,
 				Strn:     transcriptionStrn,
@@ -730,7 +696,7 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 				currT.Sources = make([]string, 0)
 			} else {
 				// strings.Split returns the empty string if input the empty string
-				currT.Sources = strings.Split(transcriptionSources, SourceDelimiter)
+				currT.Sources = strings.Split(transcriptionSources, lex.SourceDelimiter)
 			}
 
 			currE.Transcriptions = append(currE.Transcriptions, currT)
@@ -738,12 +704,12 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 		}
 
 		if currE.EntryValidations == nil {
-			currE.EntryValidations = []EntryValidation{}
+			currE.EntryValidations = []lex.EntryValidation{}
 		}
-		// zero or more EntryValidations
+		// zero or more lex.EntryValidations
 		if entryValidationID.Valid && entryValidationLevel.Valid && entryValidationName.Valid && entryValidationMessage.Valid && entryValidationTimestamp.Valid {
 			if _, ok := valiIDs[entryValidationID.Int64]; !ok {
-				currV := EntryValidation{
+				currV := lex.EntryValidation{
 					ID:        entryValidationID.Int64,
 					Level:     entryValidationLevel.String,
 					Name:      entryValidationName.String,
@@ -772,8 +738,8 @@ func LookUpTx(tx *sql.Tx, q Query, out EntryWriter) error {
 }
 
 // LookUpIntoSlice is a wrapper around LookUp, returning a slice of Entries
-func LookUpIntoSlice(db *sql.DB, q Query) ([]Entry, error) {
-	var esw EntrySliceWriter
+func LookUpIntoSlice(db *sql.DB, q Query) ([]lex.Entry, error) {
+	var esw lex.EntrySliceWriter
 	err := LookUp(db, q, &esw)
 	if err != nil {
 		return esw.Entries, fmt.Errorf("failed lookup : %v", err)
@@ -783,9 +749,9 @@ func LookUpIntoSlice(db *sql.DB, q Query) ([]Entry, error) {
 
 // LookUpIntoMap is a wrapper around LookUp, returning a map where the
 // keys are word forms and the values are slices of Entries. (There may be several entries with the same Strn value.)
-func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
-	res := make(map[string][]Entry)
-	var esw EntrySliceWriter
+func LookUpIntoMap(db *sql.DB, q Query) (map[string][]lex.Entry, error) {
+	res := make(map[string][]lex.Entry)
+	var esw lex.EntrySliceWriter
 	err := LookUp(db, q, &esw)
 	if err != nil {
 		return res, fmt.Errorf("failed lookup : %v", err)
@@ -798,11 +764,11 @@ func LookUpIntoMap(db *sql.DB, q Query) (map[string][]Entry, error) {
 	return res, err
 }
 
-// GetEntryFromID is a wrapper around LookUp and returns the Entry corresponding to the db id
-func GetEntryFromID(db *sql.DB, id int64) (Entry, error) {
-	res := Entry{}
+// GetEntryFromID is a wrapper around LookUp and returns the lex.Entry corresponding to the db id
+func GetEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
+	res := lex.Entry{}
 	q := Query{EntryIDs: []int64{id}}
-	esw := EntrySliceWriter{}
+	esw := lex.EntrySliceWriter{}
 	err := LookUp(db, q, &esw)
 	if err != nil {
 		return res, fmt.Errorf("LookUp failed : %v", err)
@@ -819,7 +785,7 @@ func GetEntryFromID(db *sql.DB, id int64) (Entry, error) {
 }
 
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
-func UpdateEntry(db *sql.DB, e Entry) (res Entry, updated bool, err error) {
+func UpdateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -842,12 +808,12 @@ func UpdateEntry(db *sql.DB, e Entry) (res Entry, updated bool, err error) {
 	return res, updated, err
 }
 
-// UpdateEntryTx updates the fields of an Entry that do not match the
+// UpdateEntryTx updates the fields of an lex.Entry that do not match the
 // corresponding values in the db
-func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO return the updated entry?
+func UpdateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO return the updated entry?
 	// updated == false
 	//dbEntryMap := //GetEntriesFromIDsTx(tx, []int64{(e.ID)})
-	var esw EntrySliceWriter
+	var esw lex.EntrySliceWriter
 	err = LookUpTx(tx, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
 	dbEntries := esw.Entries
 	if len(dbEntries) == 0 {
@@ -888,7 +854,7 @@ func UpdateEntryTx(tx *sql.Tx, e Entry) (updated bool, err error) { // TODO retu
 	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6, err
 }
 
-func getTIDs(ts []Transcription) []int64 {
+func getTIDs(ts []lex.Transcription) []int64 {
 	var res []int64
 	for _, t := range ts {
 		res = append(res, t.ID)
@@ -896,13 +862,13 @@ func getTIDs(ts []Transcription) []int64 {
 	return res
 }
 
-func equal(ts1 []Transcription, ts2 []Transcription) bool {
+func equal(ts1 []lex.Transcription, ts2 []lex.Transcription) bool {
 	if len(ts1) != len(ts2) {
 		return false
 	}
 	for i := range ts1 {
 		//if ts1[i] != ts2[i] {
-		// TODO? Define Equal(Transcription) on Transcription
+		// TODO? Define Equal(Transcription) on lex.Transcription
 		if !reflect.DeepEqual(ts1[i], ts2[i]) {
 			return false
 		}
@@ -911,7 +877,7 @@ func equal(ts1 []Transcription, ts2 []Transcription) bool {
 	return true
 }
 
-func updateLanguage(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
+func updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		tx.Rollback()
 		return false, fmt.Errorf("new and old entries have different ids")
@@ -927,7 +893,7 @@ func updateLanguage(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 	return true, nil
 }
 
-func updateWordParts(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
+func updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		tx.Rollback()
 		return false, fmt.Errorf("new and old entries have different ids")
@@ -943,7 +909,7 @@ func updateWordParts(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
 	return true, nil
 }
 
-func updateLemma(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if e.Lemma == dbE.Lemma {
 		return false, nil
 	}
@@ -968,7 +934,7 @@ func updateLemma(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
 // TODO move to function
 var transSTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
-func updateTranscriptions(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if e.ID != dbE.ID {
 		return false, fmt.Errorf("update and db entry id differ")
 	}
@@ -1010,7 +976,7 @@ var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = 
 //var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
 // TODO always insert new status, or only when name and source have changed. Or...?
-func updateEntryStatus(tx *sql.Tx, e Entry, dbE Entry) (updated bool, err error) {
+func updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if trm(e.EntryStatus.Name) != "" {
 		_, err := tx.Exec(statusSetCurrentFalse, dbE.ID)
 		if err != nil {
@@ -1038,9 +1004,9 @@ type vali struct {
 // TODO test me
 // returns the validations of e1 not found in e2 as fist return arg
 // returns the validations found only in e2, to be removed, as second arg
-func newValidations(e1 Entry, e2 Entry) ([]EntryValidation, []EntryValidation) {
-	var res1 []EntryValidation
-	var res2 []EntryValidation
+func newValidations(e1 lex.Entry, e2 lex.Entry) ([]lex.EntryValidation, []lex.EntryValidation) {
+	var res1 []lex.EntryValidation
+	var res2 []lex.EntryValidation
 	e1M := make(map[vali]int)
 	e2M := make(map[vali]int)
 	for _, v := range e1.EntryValidations {
@@ -1066,7 +1032,7 @@ func newValidations(e1 Entry, e2 Entry) ([]EntryValidation, []EntryValidation) {
 
 var insVali = "INSERT INTO entryvalidation (entryid, level, name, message) values (?, ?, ?, ?)"
 
-func insertEntryValidations(tx *sql.Tx, e Entry, eValis []EntryValidation) error {
+func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error {
 	for _, v := range eValis {
 		_, err := tx.Exec(insVali, e.ID, strings.ToLower(v.Level), v.Name, v.Message)
 		if err != nil {
@@ -1077,7 +1043,7 @@ func insertEntryValidations(tx *sql.Tx, e Entry, eValis []EntryValidation) error
 	return nil
 }
 
-func updateEntryValidation(tx *sql.Tx, e Entry, dbE Entry) (bool, error) {
+func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	newValidations, removeValidations := newValidations(e, dbE)
 	if len(newValidations) == 0 && len(removeValidations) == 0 {
 		return false, nil
@@ -1248,4 +1214,9 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 	// TODO add queries for additional stats
 
 	return res, nil
+
+}
+
+func ValidateEntries(db *sql.DB, validator validation.Validator, entryIDs []int64) error {
+	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"log"
 	"os"
 )
@@ -36,7 +37,7 @@ func main() {
 		PageLength: 100}
 
 	//res, err := dbapi.GetEntries(db, q)
-	var res dbapi.EntrySliceWriter
+	var res lex.EntrySliceWriter
 	err = dbapi.LookUp(db, q, &res)
 	ff("LookUp failed : %v", err)
 

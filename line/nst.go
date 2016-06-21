@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 )
 
 // NST contains the line format used for NST lexicon data.
@@ -26,13 +26,13 @@ func (nst NST) Parse(line string) (map[Field]string, error) {
 }
 
 // ParseToEntry is used for parsing input lines (calls underlying Format.Parse)
-func (nst NST) ParseToEntry(line string) (dbapi.Entry, error) {
+func (nst NST) ParseToEntry(line string) (lex.Entry, error) {
 	fs, err := nst.format.Parse(line)
 	if err != nil {
-		return dbapi.Entry{}, err
+		return lex.Entry{}, err
 	}
 
-	res := dbapi.Entry{
+	res := lex.Entry{
 		Strn:           strings.ToLower(fs[Orth]),
 		Language:       fs[Lang],
 		PartOfSpeech:   fs[Pos] + " " + fs[Morph],
@@ -50,7 +50,7 @@ func (nst NST) ParseToEntry(line string) (dbapi.Entry, error) {
 		lemma = lemmaReading[0]
 	}
 	paradigm := fs[Paradigm]
-	lemmaStruct := dbapi.Lemma{Strn: lemma, Reading: reading, Paradigm: paradigm}
+	lemmaStruct := lex.Lemma{Strn: lemma, Reading: reading, Paradigm: paradigm}
 
 	if "" != lemmaStruct.Strn {
 		res.Lemma = lemmaStruct
@@ -59,16 +59,16 @@ func (nst NST) ParseToEntry(line string) (dbapi.Entry, error) {
 	return res, nil
 }
 
-func appendTrans(ts []dbapi.Transcription, t string, l string) []dbapi.Transcription {
+func appendTrans(ts []lex.Transcription, t string, l string) []lex.Transcription {
 	if "" == strings.TrimSpace(t) {
 		return ts
 	}
-	ts = append(ts, dbapi.Transcription{Strn: t, Language: l})
+	ts = append(ts, lex.Transcription{Strn: t, Language: l})
 	return ts
 }
 
-func getTranses(fs map[Field]string) []dbapi.Transcription {
-	var res = make([]dbapi.Transcription, 0)
+func getTranses(fs map[Field]string) []lex.Transcription {
+	var res = make([]lex.Transcription, 0)
 	res = appendTrans(res, fs[Trans1], fs[Translang1])
 	res = appendTrans(res, fs[Trans2], fs[Translang2])
 	res = appendTrans(res, fs[Trans3], fs[Translang3])
@@ -81,8 +81,8 @@ func (nst NST) String(fields map[Field]string) (string, error) {
 	return nst.format.String(fields)
 }
 
-// Entry2String is used to generate an output line from a dbapi.Entry (calls underlying Format.Parse)
-func (nst NST) Entry2String(e dbapi.Entry) (string, error) {
+// Entry2String is used to generate an output line from a lex.Entry (calls underlying Format.Parse)
+func (nst NST) Entry2String(e lex.Entry) (string, error) {
 	fs, err := nst.fields(e)
 	if err != nil {
 		return "", err
@@ -94,7 +94,7 @@ func (nst NST) Entry2String(e dbapi.Entry) (string, error) {
 	return s, nil
 }
 
-func (nst NST) fields(e dbapi.Entry) (map[Field]string, error) {
+func (nst NST) fields(e lex.Entry) (map[Field]string, error) {
 
 	// Fields ID and LexiconID are database internal  and not processed here
 
@@ -203,13 +203,13 @@ func NewNST() (NST, error) {
 }
 
 // NSTFileWriter is used for printing entries line by line in NST lexicon format.
-// It can be used as type dbapi.EntryFileWriter in dbapi.Lookup. See export/main for example code.
+// It can be used as type lex.EntryFileWriter in dbapi.Lookup. See export/main for example code.
 type NSTFileWriter struct {
 	NST    NST
 	Writer io.Writer
 }
 
-func (w NSTFileWriter) Write(e dbapi.Entry) error {
+func (w NSTFileWriter) Write(e lex.Entry) error {
 	s, err := w.NST.Entry2String(e)
 	if err != nil {
 		return err
