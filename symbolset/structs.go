@@ -182,9 +182,8 @@ func (ss SymbolSet) filterAmbiguous(trans []string) ([]string, error) {
 		test := phn0 + phnDel + phn1
 		if contains(potentiallyAmbs, test) {
 			return nil, fmt.Errorf("symbol set %s contains ambiguous symbols: [%s] vs [%s] + [%s]", ss.Name, (phn0 + phn1), phn0, phn1)
-		} else {
-			res = append(res, phn0)
 		}
+		res = append(res, phn0)
 	}
 	res = append(res, trans[len(trans)-1])
 	return res, nil
