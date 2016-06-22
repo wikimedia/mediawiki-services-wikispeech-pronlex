@@ -482,7 +482,7 @@ func keepClientsAlive() {
 	for _ = range c {
 
 		webSocks.Lock()
-		log.Printf("keepClientsAlive: pinging number of clients: %v\n", len(webSocks.clients))
+		//log.Printf("keepClientsAlive: pinging number of clients: %v\n", len(webSocks.clients))
 		//defer webSocks.Unlock()
 		for client, ws := range webSocks.clients {
 
