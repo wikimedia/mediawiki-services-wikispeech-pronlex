@@ -1,32 +1,33 @@
-package validation
+package vrules
 
 import (
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/validation"
 )
 
 // NewNSTDemoValidator is used for testing
-func NewNSTDemoValidator() (Validator, error) {
+func NewNSTDemoValidator() (validation.Validator, error) {
 	symbolset, err := symbolset.NewNSTSymbolSet()
 	if err != nil {
-		return Validator{}, err
+		return validation.Validator{}, err
 	}
 	finalNostressNolongRe, err := ProcessTransRe(symbolset, "\\$ (nonsyllabic )*(@|A|E|I|O|U|u0|Y|{|9|n=|l=|n`=|l`=)( nonsyllabic)*$")
 	if err != nil {
-		return Validator{}, err
+		return validation.Validator{}, err
 	}
 	primaryStressRe, err := ProcessTransRe(symbolset, "\"")
 	if err != nil {
-		return Validator{}, err
+		return validation.Validator{}, err
 	}
 	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*( (\\$|-) (\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*)*$")
 	if err != nil {
-		return Validator{}, err
+		return validation.Validator{}, err
 	}
 
 	reFrom, err := regexp2.Compile("(.)\\1[+]\\1", regexp2.None)
 	if err != nil {
-		return Validator{}, err
+		return validation.Validator{}, err
 	}
 	decomp2Orth := Decomp2Orth{"+", func(s string) (string, error) {
 		res, err := reFrom.Replace(s, "$1+$1", 0, -1)
@@ -36,7 +37,7 @@ func NewNSTDemoValidator() (Validator, error) {
 		return res, nil
 	}}
 
-	var vali = Validator{[]Rule{
+	var vali = validation.Validator{[]validation.Rule{
 		MustHaveTrans{},
 		NoEmptyTrans{},
 		RequiredTransRe{

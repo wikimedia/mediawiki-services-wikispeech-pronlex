@@ -1,5 +1,4 @@
-// Package validation is used to validate entries (transcriptions, language labels, pos tags, etc)
-package validation
+package vrules
 
 import (
 	"fmt"
@@ -8,6 +7,7 @@ import (
 
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/validation"
 )
 
 var fsExp = "Expected: '%v' got: '%v'"
@@ -15,12 +15,12 @@ var fsExp = "Expected: '%v' got: '%v'"
 type testMustHaveTrans struct {
 }
 
-func (r testMustHaveTrans) Validate(e lex.Entry) []Result {
+func (r testMustHaveTrans) Validate(e lex.Entry) []validation.Result {
 	name := "MustHaveTrans"
 	level := "Format"
-	var result = make([]Result, 0)
+	var result = make([]validation.Result, 0)
 	if len(e.Transcriptions) == 0 {
-		result = append(result, Result{name, level, "At least one transcription is required"})
+		result = append(result, validation.Result{name, level, "At least one transcription is required"})
 	}
 	return result
 }
@@ -28,13 +28,13 @@ func (r testMustHaveTrans) Validate(e lex.Entry) []Result {
 type testNoEmptyTrans struct {
 }
 
-func (r testNoEmptyTrans) Validate(e lex.Entry) []Result {
+func (r testNoEmptyTrans) Validate(e lex.Entry) []validation.Result {
 	name := "NoEmptyTrans"
 	level := "Format"
-	var result = make([]Result, 0)
+	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
 		if len(strings.TrimSpace(t.Strn)) == 0 {
-			result = append(result, Result{name, level, "Empty transcriptions are not allowed"})
+			result = append(result, validation.Result{name, level, "Empty transcriptions are not allowed"})
 		}
 	}
 	return result
@@ -43,20 +43,20 @@ func (r testNoEmptyTrans) Validate(e lex.Entry) []Result {
 type testDecomp2Orth struct {
 }
 
-func (r testDecomp2Orth) Validate(e lex.Entry) []Result {
+func (r testDecomp2Orth) Validate(e lex.Entry) []validation.Result {
 	name := "Decomp2Orth"
 	level := "Fatal"
-	var result = make([]Result, 0)
+	var result = make([]validation.Result, 0)
 	expectOrth := strings.Replace(e.WordParts, "+", "", -1)
 	if expectOrth != e.Strn {
-		result = append(result, Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
+		result = append(result, validation.Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
 	}
 	return result
 }
 
 func Test1(t *testing.T) {
-	var vali = Validator{
-		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
+	var vali = validation.Validator{
+		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
 	var e = lex.Entry{
 		Strn:         "anka",
@@ -74,13 +74,13 @@ func Test1(t *testing.T) {
 	var result = vali.Validate([]lex.Entry{e})
 
 	if len(result) != 0 {
-		t.Errorf(fsExp, make([]Result, 0), result)
+		t.Errorf(fsExp, make([]validation.Result, 0), result)
 	}
 }
 
 func Test2(t *testing.T) {
-	var vali = Validator{
-		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
+	var vali = validation.Validator{
+		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
 	var e = lex.Entry{
 		Strn:           "anka",
@@ -92,8 +92,8 @@ func Test2(t *testing.T) {
 
 	var result = vali.Validate([]lex.Entry{e})
 
-	var expect = []Result{
-		Result{
+	var expect = []validation.Result{
+		validation.Result{
 			RuleName: "MustHaveTrans",
 			Level:    "Format",
 			Message:  "[...]",
@@ -110,8 +110,8 @@ func Test2(t *testing.T) {
 }
 
 func Test3(t *testing.T) {
-	var vali = Validator{
-		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
+	var vali = validation.Validator{
+		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = lex.Entry{
 		Strn:         "ankstjärt",
@@ -128,8 +128,8 @@ func Test3(t *testing.T) {
 
 	var result = vali.Validate([]lex.Entry{e})
 
-	var expect = []Result{
-		Result{
+	var expect = []validation.Result{
+		validation.Result{
 			RuleName: "Decomp2Orth",
 			Level:    "Fatal",
 			Message:  "[...]",
@@ -145,8 +145,8 @@ func Test3(t *testing.T) {
 }
 
 func Test4(t *testing.T) {
-	var vali = Validator{
-		[]Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
+	var vali = validation.Validator{
+		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = lex.Entry{
 		Strn:         "ankstjärtsbad",
@@ -163,7 +163,7 @@ func Test4(t *testing.T) {
 
 	var result = vali.Validate([]lex.Entry{e})
 
-	var expect = []Result{}
+	var expect = []validation.Result{}
 	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	}
@@ -191,7 +191,7 @@ func TestNst1(t *testing.T) {
 
 	var result = vali.Validate([]lex.Entry{e})
 
-	var expect = []Result{}
+	var expect = []validation.Result{}
 	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	}
@@ -213,8 +213,8 @@ func TestNst1(t *testing.T) {
 
 	result = vali.Validate([]lex.Entry{e})
 
-	expect = []Result{
-		Result{"final_nostress_nolong", "Warning", "[...]"},
+	expect = []validation.Result{
+		validation.Result{"final_nostress_nolong", "Warning", "[...]"},
 	}
 
 	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
@@ -238,7 +238,7 @@ func TestNst1(t *testing.T) {
 
 	result = vali.Validate([]lex.Entry{e})
 
-	expect = []Result{}
+	expect = []validation.Result{}
 
 	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
@@ -261,7 +261,7 @@ func TestNst1(t *testing.T) {
 
 	result = vali.Validate([]lex.Entry{e})
 
-	expect = []Result{}
+	expect = []validation.Result{}
 
 	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
@@ -284,7 +284,7 @@ func TestNst1(t *testing.T) {
 
 	result = vali.Validate([]lex.Entry{e})
 
-	expect = []Result{}
+	expect = []validation.Result{}
 
 	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
@@ -307,11 +307,11 @@ func TestNst1(t *testing.T) {
 
 	result = vali.Validate([]lex.Entry{e})
 
-	expect = []Result{
-		Result{"Decomp2Orth", "Fatal", "[...]"},
+	expect = []validation.Result{
+		validation.Result{"Decomp2Orth", "Fatal", "[...]"},
 	}
 
-	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName || result[0].RuleName != expect[0].RuleName {
+	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName {
 		t.Errorf(fsExp, expect, result)
 	}
 }

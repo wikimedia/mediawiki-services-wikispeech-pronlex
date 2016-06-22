@@ -7,6 +7,7 @@ import (
 
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/validation"
+	"github.com/stts-se/pronlex/vrules"
 )
 
 // JSON representation of a configuration used with a lexicon (string values only)
@@ -91,7 +92,7 @@ func lineParsersForNames(names []string) ([]line.Parser, error) {
 }
 
 func validators() (map[string]validation.Validator, error) {
-	nstDemo, err := validation.NewNSTDemoValidator()
+	nstDemo, err := vrules.NewNSTDemoValidator()
 	if err != nil {
 		return nil, err
 	}
