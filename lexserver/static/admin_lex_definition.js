@@ -35,13 +35,14 @@ ADMLD.AdminLexDefModel = function () {
 	    zock.send("CLIENT_ID: "+ self.uuid);
 	};
 	zock.onmessage = function(e) {
+	    // Just drop the keepalive message
 	    if(e.data === "WS_KEEPALIVE") {
-		var d = new Date();
-		var h = d.getHours();
-		var m = d.getMinutes();
-		var s = d.getSeconds();
-		var msg = "Websocket keepalive recieved "+ h +":"+ m +":"+ s;
-		self.serverMessage(msg);
+		// var d = new Date();
+		// var h = d.getHours();
+		// var m = d.getMinutes();
+		// var s = d.getSeconds();
+		// var msg = "Websocket keepalive recieved "+ h +":"+ m +":"+ s;
+		// self.serverMessage(msg);
 	    }
 	    else {
 		//console.log("Websocket got: "+ e.data)
