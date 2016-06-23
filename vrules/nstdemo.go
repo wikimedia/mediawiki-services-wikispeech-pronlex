@@ -1,14 +1,23 @@
 package vrules
 
 import (
+	"fmt"
+
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 )
 
+func ValidatorForLexicon(lexName string) (validation.Validator, error) {
+	if lexName == "sv.nst" {
+		return NewNSTDemoValidator()
+	}
+	return validation.Validator{}, fmt.Errorf("no validator is defined for lexicon: %v", lexName)
+}
+
 // NewNSTDemoValidator is used for testing
 func NewNSTDemoValidator() (validation.Validator, error) {
-	symbolset, err := symbolset.NewNSTSymbolSet()
+	symbolset, err := NewNSTSymbolSet()
 	if err != nil {
 		return validation.Validator{}, err
 	}
@@ -64,4 +73,93 @@ func NewNSTDemoValidator() (validation.Validator, error) {
 		},
 	}}
 	return vali, nil
+}
+
+// NewNSTSymbolSet is used for testing
+func NewNSTSymbolSet() (symbolset.SymbolSet, error) {
+	name := "NST nob sampa"
+	symbols := []symbolset.Symbol{
+		symbolset.Symbol{"@", symbolset.Syllabic, ""},
+		symbolset.Symbol{"A", symbolset.Syllabic, ""},
+		symbolset.Symbol{"E", symbolset.Syllabic, ""},
+		symbolset.Symbol{"I", symbolset.Syllabic, ""},
+		symbolset.Symbol{"O", symbolset.Syllabic, ""},
+		symbolset.Symbol{"U", symbolset.Syllabic, ""},
+		symbolset.Symbol{"u0", symbolset.Syllabic, ""},
+		symbolset.Symbol{"Y", symbolset.Syllabic, ""},
+		symbolset.Symbol{"{", symbolset.Syllabic, ""},
+		symbolset.Symbol{"9", symbolset.Syllabic, ""},
+		symbolset.Symbol{"A:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"e:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"i:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"o:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"u:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"}:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"y:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"{:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"2:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"9:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"{*I", symbolset.Syllabic, ""},
+		symbolset.Symbol{"9*Y", symbolset.Syllabic, ""},
+		symbolset.Symbol{"A*I", symbolset.Syllabic, ""},
+		symbolset.Symbol{"E*}", symbolset.Syllabic, ""},
+		symbolset.Symbol{"O*Y", symbolset.Syllabic, ""},
+		symbolset.Symbol{"o~", symbolset.Syllabic, ""},
+		symbolset.Symbol{"n=", symbolset.Syllabic, ""},
+		symbolset.Symbol{"l=", symbolset.Syllabic, ""},
+		symbolset.Symbol{"n`=", symbolset.Syllabic, ""},
+		symbolset.Symbol{"l`=", symbolset.Syllabic, ""},
+		symbolset.Symbol{"}*I", symbolset.Syllabic, ""},
+		symbolset.Symbol{"a*U", symbolset.Syllabic, ""},
+		symbolset.Symbol{"@*U", symbolset.Syllabic, ""},
+		symbolset.Symbol{"e~", symbolset.Syllabic, ""},
+		symbolset.Symbol{"3:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"a", symbolset.Syllabic, ""},
+		symbolset.Symbol{"a:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"U:", symbolset.Syllabic, ""},
+		symbolset.Symbol{"V", symbolset.Syllabic, ""},
+		symbolset.Symbol{"U4", symbolset.Syllabic, ""},
+		symbolset.Symbol{"I@", symbolset.Syllabic, ""},
+
+		symbolset.Symbol{"p", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"t", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"k", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"b", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"d", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"g", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"f", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"v", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"h", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"j", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"s", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"l", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"r", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"n", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"m", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"N", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"t`", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"d`", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"s`", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"n`", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"l`", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"S", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"C", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"tS", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"dZ", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"w", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"x", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"T", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"D", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"r3", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"Z", symbolset.NonSyllabic, ""},
+		symbolset.Symbol{"z", symbolset.NonSyllabic, ""},
+
+		symbolset.Symbol{"%", symbolset.Stress, ""},
+		symbolset.Symbol{"\"\"", symbolset.Stress, ""},
+		symbolset.Symbol{"\"", symbolset.Stress, ""},
+		symbolset.Symbol{" ", symbolset.PhonemeDelimiter, ""},
+		symbolset.Symbol{"$", symbolset.SyllableDelimiter, ""},
+		symbolset.Symbol{"-", symbolset.CompoundDelimiter, ""},
+	}
+	return symbolset.NewSymbolSet(name, symbols)
 }
