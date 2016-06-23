@@ -73,7 +73,7 @@ func Test1(t *testing.T) {
 
 	var result = vali.Validate([]*lex.Entry{e})
 
-	if len(result) != 0 {
+	if result != true {
 		t.Errorf(fsExp, make([]validation.Result, 0), result)
 	}
 }
@@ -90,10 +90,11 @@ func Test2(t *testing.T) {
 		Transcriptions: []lex.Transcription{},
 	}
 
-	var result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	var result = e.EntryValidations
 
-	var expect = []validation.Result{
-		validation.Result{
+	var expect = []lex.EntryValidation{
+		lex.EntryValidation{
 			RuleName: "MustHaveTrans",
 			Level:    "Format",
 			Message:  "[...]",
@@ -126,10 +127,11 @@ func Test3(t *testing.T) {
 		},
 	}
 
-	var result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	var result = e.EntryValidations
 
-	var expect = []validation.Result{
-		validation.Result{
+	var expect = []lex.EntryValidation{
+		lex.EntryValidation{
 			RuleName: "Decomp2Orth",
 			Level:    "Fatal",
 			Message:  "[...]",
@@ -161,9 +163,10 @@ func Test4(t *testing.T) {
 		},
 	}
 
-	var result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	var result = e.EntryValidations
 
-	var expect = []validation.Result{}
+	var expect = []lex.EntryValidation{}
 	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	}
@@ -189,9 +192,10 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	var result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	var result = e.EntryValidations
 
-	var expect = []validation.Result{}
+	var expect = []lex.EntryValidation{}
 	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
 	}
@@ -211,10 +215,14 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
 
-	expect = []validation.Result{
-		validation.Result{"final_nostress_nolong", "Warning", "[...]"},
+	expect = []lex.EntryValidation{
+		lex.EntryValidation{
+			RuleName: "final_nostress_nolong",
+			Level:    "Warning",
+			Message:  "[...]"},
 	}
 
 	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
@@ -236,9 +244,10 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
 
-	expect = []validation.Result{}
+	expect = []lex.EntryValidation{}
 
 	if len(result) != len(expect) {
 		t.Errorf(fsExp, expect, result)
@@ -259,9 +268,10 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
 
-	expect = []validation.Result{}
+	expect = []lex.EntryValidation{}
 
 	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
@@ -282,9 +292,10 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
 
-	expect = []validation.Result{}
+	expect = []lex.EntryValidation{}
 
 	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
 		t.Errorf(fsExp, expect, result)
@@ -305,10 +316,14 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	result = vali.Validate([]*lex.Entry{e})
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
 
-	expect = []validation.Result{
-		validation.Result{"Decomp2Orth", "Fatal", "[...]"},
+	expect = []lex.EntryValidation{
+		lex.EntryValidation{
+			RuleName: "Decomp2Orth",
+			Level:    "Fatal",
+			Message:  "[...]"},
 	}
 
 	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName {
