@@ -8,6 +8,7 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
+// ValidatorForLexicon Place holder function. This should be handeled via the database (T138479, T138480).
 func ValidatorForLexicon(lexName string) (validation.Validator, error) {
 	if lexName == "sv.se.nst" {
 		return NewNSTDemoValidator()

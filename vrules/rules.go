@@ -20,11 +20,17 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 	for _, t := range e.Transcriptions {
 		splitted, err := r.SymbolSet.SplitTranscription(t.Strn)
 		if err != nil {
-			result = append(result, validation.Result{"SymbolSet", "Fatal", fmt.Sprintf("Couldn't split transcription: /%s/", t.Strn)})
+			result = append(result, validation.Result{
+				RuleName: "SymbolSet",
+				Level:    "Fatal",
+				Message:  fmt.Sprintf("Couldn't split transcription: /%s/", t.Strn)})
 		} else {
 			for _, symbol := range splitted {
 				if !r.SymbolSet.ValidSymbol(symbol) {
-					result = append(result, validation.Result{"SymbolSet", "Fatal", fmt.Sprintf("Invalid transcription symbol: %s in /%s/", symbol, t.Strn)})
+					result = append(result, validation.Result{
+						RuleName: "SymbolSet",
+						Level:    "Fatal",
+						Message:  fmt.Sprintf("Invalid transcription symbol: %s in /%s/", symbol, t.Strn)})
 				}
 			}
 		}
@@ -55,7 +61,10 @@ func (r IllegalTransRe) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
 		if r.Re.MatchString(strings.TrimSpace(t.Strn)) {
-			result = append(result, validation.Result{r.Name, r.Level, fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
+			result = append(result, validation.Result{
+				RuleName: r.Name,
+				Level:    r.Level,
+				Message:  fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
 		}
 	}
 	return result
@@ -73,7 +82,10 @@ func (r RequiredTransRe) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
 		if !r.Re.MatchString(strings.TrimSpace(t.Strn)) {
-			result = append(result, validation.Result{r.Name, r.Level, fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
+			result = append(result, validation.Result{
+				RuleName: r.Name,
+				Level:    r.Level,
+				Message:  fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
 		}
 	}
 	return result
@@ -88,7 +100,10 @@ func (r MustHaveTrans) Validate(e lex.Entry) []validation.Result {
 	level := "Format"
 	var result = make([]validation.Result, 0)
 	if len(e.Transcriptions) == 0 {
-		result = append(result, validation.Result{name, level, "At least one transcription is required"})
+		result = append(result, validation.Result{
+			RuleName: name,
+			Level:    level,
+			Message:  "At least one transcription is required"})
 	}
 	return result
 }
@@ -103,7 +118,10 @@ func (r NoEmptyTrans) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
 		if len(strings.TrimSpace(t.Strn)) == 0 {
-			result = append(result, validation.Result{name, level, "Empty transcriptions are not allowed"})
+			result = append(result, validation.Result{
+				RuleName: name,
+				Level:    level,
+				Message:  "Empty transcriptions are not allowed"})
 		}
 	}
 	return result
@@ -121,11 +139,17 @@ func (r Decomp2Orth) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	filteredWordParts, err := r.preFilterWordPartString(e.WordParts)
 	if err != nil {
-		result = append(result, validation.Result{name, level, fmt.Sprintf("decomp/orth rule returned error on replace call: %v", err)})
+		result = append(result, validation.Result{
+			RuleName: name,
+			Level:    level,
+			Message:  fmt.Sprintf("decomp/orth rule returned error on replace call: %v", err)})
 	}
 	expectOrth := strings.Replace(filteredWordParts, r.compDelim, "", -1)
 	if expectOrth != e.Strn {
-		result = append(result, validation.Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
+		result = append(result, validation.Result{
+			RuleName: name,
+			Level:    level,
+			Message:  fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
 	}
 	return result
 }

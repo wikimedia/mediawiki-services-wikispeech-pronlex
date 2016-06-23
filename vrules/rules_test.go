@@ -20,7 +20,10 @@ func (r testMustHaveTrans) Validate(e lex.Entry) []validation.Result {
 	level := "Format"
 	var result = make([]validation.Result, 0)
 	if len(e.Transcriptions) == 0 {
-		result = append(result, validation.Result{name, level, "At least one transcription is required"})
+		result = append(result, validation.Result{
+			RuleName: name,
+			Level:    level,
+			Message:  "At least one transcription is required"})
 	}
 	return result
 }
@@ -34,7 +37,10 @@ func (r testNoEmptyTrans) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
 		if len(strings.TrimSpace(t.Strn)) == 0 {
-			result = append(result, validation.Result{name, level, "Empty transcriptions are not allowed"})
+			result = append(result, validation.Result{
+				RuleName: name,
+				Level:    level,
+				Message:  "Empty transcriptions are not allowed"})
 		}
 	}
 	return result
@@ -49,14 +55,17 @@ func (r testDecomp2Orth) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	expectOrth := strings.Replace(e.WordParts, "+", "", -1)
 	if expectOrth != e.Strn {
-		result = append(result, validation.Result{name, level, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
+		result = append(result, validation.Result{
+			RuleName: name,
+			Level:    level,
+			Message:  fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
 	}
 	return result
 }
 
 func Test1(t *testing.T) {
 	var vali = validation.Validator{
-		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
+		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
 	var e = &lex.Entry{
 		Strn:         "anka",
@@ -80,7 +89,7 @@ func Test1(t *testing.T) {
 
 func Test2(t *testing.T) {
 	var vali = validation.Validator{
-		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
+		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
 	var e = &lex.Entry{
 		Strn:           "anka",
@@ -112,7 +121,7 @@ func Test2(t *testing.T) {
 
 func Test3(t *testing.T) {
 	var vali = validation.Validator{
-		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
+		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = &lex.Entry{
 		Strn:         "ankstjärt",
@@ -148,7 +157,7 @@ func Test3(t *testing.T) {
 
 func Test4(t *testing.T) {
 	var vali = validation.Validator{
-		[]validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
+		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = &lex.Entry{
 		Strn:         "ankstjärtsbad",
