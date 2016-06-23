@@ -9,7 +9,7 @@ import (
 )
 
 func ValidatorForLexicon(lexName string) (validation.Validator, error) {
-	if lexName == "sv.nst" {
+	if lexName == "sv.se.nst" {
 		return NewNSTDemoValidator()
 	}
 	return validation.Validator{}, fmt.Errorf("no validator is defined for lexicon: %v", lexName)
