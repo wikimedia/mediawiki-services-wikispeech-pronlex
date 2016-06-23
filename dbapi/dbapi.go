@@ -15,7 +15,7 @@ import (
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/validation"
+	//"github.com/stts-se/pronlex/validation"
 	"reflect"
 	"regexp"
 	"strconv"

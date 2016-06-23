@@ -359,6 +359,7 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// 	http.Error(w, msg, http.StatusInternalServerError)
 	// 	return
 	// }
+	res := lex.Entry{}
 
 	res0, err3 := json.Marshal(res)
 	if err3 != nil {
