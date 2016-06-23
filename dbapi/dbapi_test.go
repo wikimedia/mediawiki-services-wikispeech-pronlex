@@ -176,7 +176,7 @@ func Test_InsertEntries(t *testing.T) {
 	// add new lex.EntryStatus
 	ees0.EntryStatus = lex.EntryStatus{Name: "new", Source: "tst"}
 	// new validation
-	ees0.EntryValidations = []lex.EntryValidation{lex.EntryValidation{Level: "severe", Name: "barf", Message: "it hurts"}}
+	ees0.EntryValidations = []lex.EntryValidation{lex.EntryValidation{Level: "severe", RuleName: "barf", Message: "it hurts"}}
 
 	newE, updated, err := UpdateEntry(db, ees0)
 
@@ -221,7 +221,7 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
-	if got, want := eApa.EntryValidations[0].Name, "barf"; got != want {
+	if got, want := eApa.EntryValidations[0].RuleName, "barf"; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 	if got, want := eApa.EntryValidations[0].Message, "it hurts"; got != want {
