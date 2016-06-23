@@ -340,6 +340,37 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, res0)
 }
 
+func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
+	entryJSON := r.FormValue("entry")
+	//body, err := ioutil.ReadAll(r.Body)
+	var e lex.Entry
+	err := json.Unmarshal([]byte(entryJSON), &e)
+	if err != nil {
+		log.Printf("lexserver: Failed to unmarshal json: %v", err)
+		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// TODO Validate entry
+
+	// if err2 != nil {
+	// 	msg := fmt.Sprintf("lexserver: Failed to validate entry : %v", err2)
+	// 	log.Println(msg)
+	// 	http.Error(w, msg, http.StatusInternalServerError)
+	// 	return
+	// }
+
+	res0, err3 := json.Marshal(res)
+	if err3 != nil {
+		msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, res0)
+}
+
 func adminAdminHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/admin.html")
 }
@@ -814,6 +845,7 @@ func main() {
 	http.HandleFunc("/lexiconstats", lexiconStatsHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
 	http.HandleFunc("/updateentry", updateEntryHandler)
+	http.HandleFunc("/validateentry", validateEntryHandler)
 	http.HandleFunc("/download", downloadFileHandler)
 
 	// admin pages/calls
