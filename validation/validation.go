@@ -33,10 +33,10 @@ type Validator struct {
 }
 
 // ValidateEntry is used to validate single entries
-func (v Validator) ValidateEntry(e lex.Entry) []Result {
+func (v Validator) ValidateEntry(e *lex.Entry) []Result {
 	var result []Result
 	for _, rule := range v.Rules {
-		for _, res := range rule.Validate(e) {
+		for _, res := range rule.Validate(*e) {
 			result = append(result, res)
 		}
 	}
@@ -44,7 +44,7 @@ func (v Validator) ValidateEntry(e lex.Entry) []Result {
 }
 
 // Validate is used to validate a slice of entries
-func (v Validator) Validate(entries []lex.Entry) []Result {
+func (v Validator) Validate(entries []*lex.Entry) []Result {
 	var result []Result
 	for _, e := range entries {
 		for _, res := range v.ValidateEntry(e) {

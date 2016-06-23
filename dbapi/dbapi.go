@@ -712,7 +712,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 				currV := lex.EntryValidation{
 					ID:        entryValidationID.Int64,
 					Level:     entryValidationLevel.String,
-					Name:      entryValidationName.String,
+					RuleName:  entryValidationName.String,
 					Message:   entryValidationMessage.String,
 					Timestamp: entryValidationTimestamp.String,
 				}
@@ -1010,19 +1010,19 @@ func newValidations(e1 lex.Entry, e2 lex.Entry) ([]lex.EntryValidation, []lex.En
 	e1M := make(map[vali]int)
 	e2M := make(map[vali]int)
 	for _, v := range e1.EntryValidations {
-		e1M[vali{level: v.Level, name: v.Name, msg: v.Message}]++
+		e1M[vali{level: v.Level, name: v.RuleName, msg: v.Message}]++
 	}
 	for _, v := range e2.EntryValidations {
-		e2M[vali{level: v.Level, name: v.Name, msg: v.Message}]++
+		e2M[vali{level: v.Level, name: v.RuleName, msg: v.Message}]++
 	}
 
 	for _, v := range e1.EntryValidations {
-		if _, ok := e2M[vali{level: v.Level, name: v.Name, msg: v.Message}]; !ok {
+		if _, ok := e2M[vali{level: v.Level, name: v.RuleName, msg: v.Message}]; !ok {
 			res1 = append(res1, v) // only in e1
 		}
 	}
 	for _, v := range e2.EntryValidations {
-		if _, ok := e1M[vali{level: v.Level, name: v.Name, msg: v.Message}]; !ok {
+		if _, ok := e1M[vali{level: v.Level, name: v.RuleName, msg: v.Message}]; !ok {
 			res2 = append(res2, v) // only in e2
 		}
 	}
@@ -1034,7 +1034,7 @@ var insValiSQL = "INSERT INTO entryvalidation (entryid, level, name, message) va
 
 func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error {
 	for _, v := range eValis {
-		_, err := tx.Exec(insValiSQL, e.ID, strings.ToLower(v.Level), v.Name, v.Message)
+		_, err := tx.Exec(insValiSQL, e.ID, strings.ToLower(v.Level), v.RuleName, v.Message)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed to insert EntryValidation : %v", err)

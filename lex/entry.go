@@ -23,7 +23,7 @@ type EntryValidation struct {
 
 	// Lower case name of level of severity
 	Level     string `json:"level"`
-	Name      string `json:"name"`
+	RuleName  string `json:"ruleName"`
 	Message   string `json:"Message"`
 	Timestamp string `json:"timestamp"`
 }
