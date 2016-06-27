@@ -9,6 +9,7 @@ import (
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
+	"github.com/stts-se/pronlex/vrules"
 	"golang.org/x/net/websocket"
 	"io"
 	"io/ioutil"
@@ -340,16 +341,39 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, res0)
 }
 
+// TODO accept a list of entries and a symbol set name
+
 func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	entryJSON := r.FormValue("entry")
+	symbolSetName := r.FormValue("symbolsetname")
 	//body, err := ioutil.ReadAll(r.Body)
 	var e lex.Entry
 	err := json.Unmarshal([]byte(entryJSON), &e)
 	if err != nil {
-		log.Printf("lexserver: Failed to unmarshal json: %v", err)
-		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
+		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entryJSON, err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
+
+	if symbolSetName == "" {
+		msg := "validateEntryHandler expected a symbol set name"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	// TODO Hardwired stuff below!!!!
+	vdator, err := vrules.ValidatorForSymbolSet(symbolSetName)
+	if err != nil {
+		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	ents := []*lex.Entry{&e}
+	_ = vdator.Validate(ents)
 
 	// TODO Validate entry
 
@@ -359,9 +383,8 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// 	http.Error(w, msg, http.StatusInternalServerError)
 	// 	return
 	// }
-	res := lex.Entry{}
 
-	res0, err3 := json.Marshal(res)
+	res0, err3 := json.Marshal(e)
 	if err3 != nil {
 		msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
 		log.Println(msg)
@@ -369,7 +392,7 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, res0)
+	fmt.Fprint(w, string(res0))
 }
 
 func adminAdminHandler(w http.ResponseWriter, r *http.Request) {

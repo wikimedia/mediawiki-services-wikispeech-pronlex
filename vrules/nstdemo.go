@@ -8,12 +8,25 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
-// ValidatorForLexicon Place holder function. This should be handeled via the database (T138479, T138480).
-func ValidatorForLexicon(lexName string) (validation.Validator, error) {
-	if lexName == "sv.se.nst" {
+// // ValidatorForLexicon Place holder function. This should be handeled via the database (T138479, T138480).
+// func ValidatorForLexicon(lexName string) (validation.Validator, error) {
+// 	if lexName == "sv.se.nst" {
+// 		return NewNSTDemoValidator()
+// 	}
+// 	return validation.Validator{}, fmt.Errorf("no validator is defined for lexicon: %v", lexName)
+// }
+
+// After some thinking, we decided that a validator should be linked to a SymbolSet rather than a Lexicon.
+// (Different lexica could have same symbol set.)
+
+// TODO add validation of legal transcription symbols
+
+// ValidatorForSymbolSet Place holder function. This should be handeled via the database (T138479, T138480).
+func ValidatorForSymbolSet(symbolSetName string) (validation.Validator, error) {
+	if symbolSetName == "sv.se.nst-SAMPA" {
 		return NewNSTDemoValidator()
 	}
-	return validation.Validator{}, fmt.Errorf("no validator is defined for lexicon: %v", lexName)
+	return validation.Validator{}, fmt.Errorf("no validator is defined for symbol set: %v", symbolSetName)
 }
 
 // NewNSTDemoValidator is used for testing
