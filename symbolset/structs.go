@@ -214,6 +214,7 @@ func (ss SymbolSet) HasSymbol(symbol string) bool {
 	return false
 }
 
+// TODO Check that this really works:
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	return ss.SymbolRe.MatchString(symbol)
