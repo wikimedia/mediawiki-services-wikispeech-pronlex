@@ -205,6 +205,10 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 }
 
 // TODO Temp function, since I don't get ValidSymbol to work
+// Would probably be a bit faster using a map instead of iteration
+// over a slice, but then we would need initialization of the map at
+// the creation of a SymbolSet instance.
+// HasSymbol returns true for strings that are symbols in the symbol set.
 func (ss SymbolSet) HasSymbol(symbol string) bool {
 	for _, s := range ss.Symbols {
 		if s.String == symbol {
