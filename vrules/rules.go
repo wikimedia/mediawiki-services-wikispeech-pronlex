@@ -32,7 +32,7 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 					result = append(result, validation.Result{
 						RuleName: "SymbolSet",
 						Level:    "Fatal",
-						Message:  fmt.Sprintf("Invalid transcription symbol: %s in /%s/", symbol, t.Strn)})
+						Message:  fmt.Sprintf("Invalid transcription symbol '%s' in /%s/", symbol, t.Strn)})
 				}
 			}
 		}

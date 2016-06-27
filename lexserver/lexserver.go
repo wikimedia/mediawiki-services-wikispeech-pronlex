@@ -341,12 +341,56 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, res0)
 }
 
-// TODO accept a list of entries and a symbol set name
+// TODO code duplication between validateEntriesHandler and validateEntryHandler
+
+func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
+	entriesJSON := r.FormValue("entries")
+	symbolSetName := r.FormValue("symbolsetname")
+
+	var es []*lex.Entry
+	err := json.Unmarshal([]byte(entriesJSON), &es)
+	if err != nil {
+		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entriesJSON, err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	if symbolSetName == "" {
+		msg := "validateEntryHandler expected a symbol set name"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	// TODO Hardwired stuff below!!!!
+	vdator, err := vrules.ValidatorForSymbolSet(symbolSetName)
+	if err != nil {
+		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	_ = vdator.Validate(es)
+
+	res0, err3 := json.Marshal(es)
+	if err3 != nil {
+		msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(res0))
+}
+
+// TODO code duplication between validateEntriesHandler and validateEntryHandler
 
 func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	entryJSON := r.FormValue("entry")
 	symbolSetName := r.FormValue("symbolsetname")
-	//body, err := ioutil.ReadAll(r.Body)
+
 	var e lex.Entry
 	err := json.Unmarshal([]byte(entryJSON), &e)
 	if err != nil {
@@ -374,15 +418,6 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 
 	ents := []*lex.Entry{&e}
 	_ = vdator.Validate(ents)
-
-	// TODO Validate entry
-
-	// if err2 != nil {
-	// 	msg := fmt.Sprintf("lexserver: Failed to validate entry : %v", err2)
-	// 	log.Println(msg)
-	// 	http.Error(w, msg, http.StatusInternalServerError)
-	// 	return
-	// }
 
 	res0, err3 := json.Marshal(e)
 	if err3 != nil {
@@ -870,6 +905,7 @@ func main() {
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
 	http.HandleFunc("/updateentry", updateEntryHandler)
 	http.HandleFunc("/validateentry", validateEntryHandler)
+	http.HandleFunc("/validateentries", validateEntriesHandler)
 	http.HandleFunc("/download", downloadFileHandler)
 
 	// admin pages/calls
