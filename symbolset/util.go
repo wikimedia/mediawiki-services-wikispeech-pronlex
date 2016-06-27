@@ -41,6 +41,7 @@ func buildRegexpWithGroup(symbols []Symbol, removeEmpty bool, anonGroup bool) (*
 		prefix = "("
 	}
 	s := prefix + strings.Join(acc, "|") + ")"
+	regexp.MustCompile(s)
 	re, err := regexp.Compile(s)
 	if err != nil {
 		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)

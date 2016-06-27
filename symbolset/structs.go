@@ -204,6 +204,16 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 	return err
 }
 
+// TODO Temp function, since I don't get ValidSymbol to work
+func (ss SymbolSet) HasSymbol(symbol string) bool {
+	for _, s := range ss.Symbols {
+		if s.String == symbol {
+			return true
+		}
+	}
+	return false
+}
+
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	return ss.SymbolRe.MatchString(symbol)

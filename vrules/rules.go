@@ -16,7 +16,7 @@ type SymbolSetRule struct {
 }
 
 func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
-	var result = make([]validation.Result, 0)
+	var result []validation.Result
 	for _, t := range e.Transcriptions {
 		splitted, err := r.SymbolSet.SplitTranscription(t.Strn)
 		if err != nil {
@@ -26,7 +26,9 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 				Message:  fmt.Sprintf("Couldn't split transcription: /%s/", t.Strn)})
 		} else {
 			for _, symbol := range splitted {
-				if !r.SymbolSet.ValidSymbol(symbol) {
+				// TODO fix the below call --- it doesn't work
+				//if !r.SymbolSet.ValidSymbol(symbol) {
+				if !r.SymbolSet.HasSymbol(symbol) {
 					result = append(result, validation.Result{
 						RuleName: "SymbolSet",
 						Level:    "Fatal",
