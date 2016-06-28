@@ -21,10 +21,9 @@ func (s ByLength) Less(i, j int) bool {
 
 func SplitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string) {
 
-	sort.Sort(ByLength(knownPhonemes))
-
 	known := make([]string, len(knownPhonemes))
 	copy(known, knownPhonemes)
+	sort.Sort(ByLength(known))
 	return splurt(&known, transcription, []string{}, []string{})
 }
 
