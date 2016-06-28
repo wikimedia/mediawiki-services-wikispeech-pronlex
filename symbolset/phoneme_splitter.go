@@ -66,11 +66,8 @@ func consume(srtd *[]string, trans string) (string, string, bool) {
 			resPref = ph
 			resSuffix = trans[len(ph):]
 			prefixFound = true
-			// This line can be removed: the only thing
-			// that should differ, is the number of
-			// iterations (depending on length of string,
-			// number of phonemes):
-			return resPref, resSuffix, true
+
+			break
 		}
 
 		if ind < 0 {
@@ -79,15 +76,17 @@ func consume(srtd *[]string, trans string) (string, string, bool) {
 	}
 
 	// Discard phonemes we know are not in trans
-	var tmp []string
-	for _, ph := range *srtd {
-		if !notInTrans[ph] {
-			tmp = append(tmp, ph)
+	if len(notInTrans) > 0 {
+		var tmp []string
+
+		for _, ph := range *srtd {
+			if !notInTrans[ph] {
+				tmp = append(tmp, ph)
+			}
 		}
+
+		*srtd = tmp
 	}
-
-	*srtd = tmp
-
 	// no known phoneme prefix, separate first rune
 	if prefixFound {
 		return resPref, resSuffix, prefixFound
