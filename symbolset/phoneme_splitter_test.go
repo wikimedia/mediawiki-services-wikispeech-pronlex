@@ -50,8 +50,18 @@ func Test_SplitIntoPhonemes(t *testing.T) {
 	if got, want := res[0], "_"; got != want {
 		t.Errorf("Got '%v' Wanted '%v'", got, want)
 	}
-	if got, want := len(unk), 3; got != want {
+	if got, want := res[3], "bb"; got != want {
 		t.Errorf("Got '%v' Wanted '%v'", got, want)
 	}
 
+	if got, want := res[5], "x"; got != want {
+		t.Errorf("Got '%v' Wanted '%v'", got, want)
+	}
+
+	if got, want := len(unk), 3; got != want {
+		t.Errorf("Got '%v' Wanted '%v'", got, want)
+	}
+	if got, want := len(res), 6; got != want {
+		t.Errorf("Got '%v' Wanted '%v'", got, want)
+	}
 }
