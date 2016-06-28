@@ -1,6 +1,7 @@
 package symbolset
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 )
@@ -46,32 +47,56 @@ func splurt(srted *[]string, trans string, phs []string, unk []string) ([]string
 }
 
 func consume(srtd *[]string, trans string) (string, string, bool) {
-	//fmt.Printf("consume trans '%v'\n", trans)
+	fmt.Printf("consume srtd '%v' trans '%v'\n", *srtd, trans)
 	var resPref string
 	var resSuffix string
 
-	var inTrans []string
+	var prefixFound bool
+
+	notInTrans := make(map[string]bool)
+
+	fmt.Printf("consume srtd '%v' trans '%v'\n", *srtd, trans)
 
 	for _, ph := range *srtd {
+
+		fmt.Println("+")
+
 		ind := strings.Index(trans, ph)
 		if ind == 0 { // bingo
 			resPref = ph
 			resSuffix = trans[len(ph):]
+			prefixFound = true
+			// This line can be removed: the only thing
+			// that should differ, is the number of
+			// iterations (depending on length of string,
+			// number of phonemes):
 			return resPref, resSuffix, true
-			break
 		}
 
-		// These are the phonemes that are _somewhere_ in the input string.
-		// Keep these, discard the rest
-		if ind > -1 {
-			inTrans = append(inTrans, ph)
+		if ind < 0 {
+			notInTrans[ph] = true
 		}
 	}
 
-	// Only keep substrings that we know are somewhere in trans
-	*srtd = inTrans
+	fmt.Printf("notintrans  '%v'\n", notInTrans)
+
+	// Discard phonemes we know are not in trans
+
+	var tmp []string
+	for _, ph := range *srtd {
+		if !notInTrans[ph] {
+			tmp = append(tmp, ph)
+		}
+	}
+
+	*srtd = tmp
 
 	// no known phoneme prefix, separate first rune
-	t := []rune(trans)
-	return string(t[0]), string(t[1:]), false
+	if prefixFound {
+		return resPref, resSuffix, prefixFound
+	} else {
+
+		t := []rune(trans)
+		return string(t[0]), string(t[1:]), false
+	}
 }
