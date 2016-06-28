@@ -115,6 +115,7 @@ type Symbol struct {
 	IPA         string `json:"ipa"`
 }
 
+// LexStats holds the result of a call to the dbapi.LexiconStats function.
 // TODO add fields for additional stats
 type LexStats struct {
 	LexiconID int64 `json:"lexiconId"`

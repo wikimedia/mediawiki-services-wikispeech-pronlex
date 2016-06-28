@@ -1169,6 +1169,7 @@ func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
 	return res, nil
 }
 
+// LexiconStats calls the database a number of times, gathering different numbers, e.g. on how many entries there are in a lexicon.
 func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 	res := LexStats{LexiconID: lexiconID}
 
@@ -1213,51 +1214,6 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 
 	// TODO add queries for additional stats
 
-	return res, nil
+	//return res, nil
 
 }
-
-// Hmmm.... the dbapi should probably not do any validation itself, only adding existing validation results to the DB (lex.Entry contains a field for validation result.)
-
-// func ValidateEntriesQ(db *sql.DB, validator validation.Validator, q Query) error {
-// 	var err error
-
-// 	entries, err := LookUpIntoSlice(db, q)
-// 	if err != nil {
-// 		return fmt.Errorf("dbapi.ValidateEntriesQ failed database look up : %v", err)
-// 	}
-
-// 	for _, e := range entries {
-// 		_ = e
-// 	}
-
-// 	return err
-// }
-
-// func ValidateEntriesI(db *sql.DB, validator validation.Validator, entryIDs []int64) error {
-
-// 	var err error
-
-// 	// GetEntryFromID
-
-// 	for _, id := range entryIDs {
-// 		e, err0 := GetEntryFromID(db, id)
-// 		if err0 != nil {
-// 			// build up error from all potential errors in loop
-// 			if err == nil {
-// 				err = fmt.Errorf("failed GetEntryFromID : %v", err0)
-// 			} else {
-// 				err = fmt.Errorf("%v : failed GetEntryFromID : %v", err, err0)
-// 			}
-// 		}
-// 		_ = e
-// 	}
-
-// 	return err
-// }
-
-// func ValidateEntry(db *sql.DB, validator validation.Validator) error {
-// 	var err error
-
-// 	return err
-// }
