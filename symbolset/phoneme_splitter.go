@@ -43,12 +43,10 @@ func splurt(srted *[]string, trans string, phs []string, unk []string) ([]string
 		} else { // unknown prefix, chopped off first rune
 			return splurt(srted, rest, append(phs, pre), append(unk, pre))
 		}
-	} else {
-		return phs, unk
-	}
+	} //else {
+	//	return phs, unk
+	//}
 
-	// just to make compiler happy
-	//fmt.Printf("SHOULD NEVER HAPPEN splurt: trans '%v' phs '%v' unk '%v'\n", trans, phs, unk)
 	return phs, unk
 }
 
