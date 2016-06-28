@@ -1,7 +1,7 @@
 package symbolset
 
 import (
-	"fmt"
+	//"fmt"
 	"sort"
 	"strings"
 )
@@ -47,19 +47,13 @@ func splurt(srted *[]string, trans string, phs []string, unk []string) ([]string
 }
 
 func consume(srtd *[]string, trans string) (string, string, bool) {
-	fmt.Printf("consume srtd '%v' trans '%v'\n", *srtd, trans)
 	var resPref string
 	var resSuffix string
 
 	var prefixFound bool
 
 	notInTrans := make(map[string]bool)
-
-	fmt.Printf("consume srtd '%v' trans '%v'\n", *srtd, trans)
-
 	for _, ph := range *srtd {
-
-		fmt.Println("+")
 
 		ind := strings.Index(trans, ph)
 		if ind == 0 { // bingo
@@ -78,10 +72,7 @@ func consume(srtd *[]string, trans string) (string, string, bool) {
 		}
 	}
 
-	fmt.Printf("notintrans  '%v'\n", notInTrans)
-
 	// Discard phonemes we know are not in trans
-
 	var tmp []string
 	for _, ph := range *srtd {
 		if !notInTrans[ph] {
