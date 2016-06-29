@@ -21,6 +21,8 @@ import (
 
 // TODO add validation of legal transcription symbols
 
+//TODO NL: A bit confusing that this lives in package vrules, when it returns a validation.Validator...?
+
 // ValidatorForSymbolSet Place holder function. This should be handeled via the database (T138479, T138480).
 func ValidatorForSymbolSet(symbolSetName string) (validation.Validator, error) {
 	if symbolSetName == "sv.se.nst-SAMPA" {
@@ -91,7 +93,7 @@ func NewNSTDemoValidator() (validation.Validator, error) {
 
 // NewNSTSymbolSet is used for testing
 func NewNSTSymbolSet() (symbolset.SymbolSet, error) {
-	name := "NST nob sampa"
+	name := "NST nob sampa" // TODO NL: Why nob here, but sv.se.nst-SAMPA above...? Did I change something somewhere?
 	symbols := []symbolset.Symbol{
 		symbolset.Symbol{"@", symbolset.Syllabic, ""},
 		symbolset.Symbol{"A", symbolset.Syllabic, ""},

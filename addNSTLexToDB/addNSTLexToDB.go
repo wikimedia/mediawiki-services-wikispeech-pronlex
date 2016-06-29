@@ -6,31 +6,68 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
+	"github.com/stts-se/pronlex/symbolset"
 )
 
-func splitTrans(e *lex.Entry) {
+func getSyms(ss []symbolset.Symbol) []string {
+	var res []string
+	for _, s := range ss {
+		res = append(res, s.String)
+	}
+	return res
+}
 
+func getSymbolSet(name string) ([]string, error) {
+	switch name {
+	case "sv.se.nst-SAMPA":
+		return getSyms(symbolset.SvNSTHardWired().Symbols), nil
+
+	default:
+		return nil, fmt.Errorf("failed to obtain symbol set for '%s'", name)
+	}
+
+}
+
+func splitTrans(e *lex.Entry, symbols []string) {
+	var newTs []lex.Transcription
+	for _, t := range e.Transcriptions {
+		t2, u2 := symbolset.SplitIntoPhonemes(symbols, t.Strn)
+		newT := strings.Join(t2, " ")
+		if len(u2) > 0 {
+			fmt.Printf("%s > %v --> %v\n", t.Strn, t2, u2)
+		}
+		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
+	}
+
+	e.Transcriptions = newTs
 }
 
 func main() {
 
-	sampleInvocation := `go run addNSTLexToDB.go sv.se.nst pronlex.db swe030224NST.pron_utf8.txt`
+	sampleInvocation := `go run addNSTLexToDB.go sv.se.nst sv.se.nst-SAMPA pronlex.db swe030224NST.pron_utf8.txt`
 
-	if len(os.Args) != 4 {
-		log.Fatal("Expected <DB LEXICON NAME> <DB FILE> <NST INPUT FILE>", "\n\tSample invocation: ", sampleInvocation)
+	if len(os.Args) != 5 {
+		log.Fatal("Expected <DB LEXICON NAME> <SYMBOLSET NAME> <DB FILE> <NST INPUT FILE>", "\n\tSample invocation: ", sampleInvocation)
 	}
 
 	lexName := os.Args[1]
-	dbFile := os.Args[2]
-	inFile := os.Args[3]
+	symbolSetName := os.Args[2]
+	dbFile := os.Args[3]
+	inFile := os.Args[4]
 
 	_, err := os.Stat(dbFile)
 	if err != nil {
 		log.Fatalf("Cannot find db file. %v", err)
+	}
+
+	zymbolz, err := getSymbolSet(symbolSetName)
+	if err != nil {
+		log.Fatalf("failed creating symbol set : %v", err)
 	}
 
 	db, err := sql.Open("sqlite3", dbFile)
@@ -49,8 +86,7 @@ func main() {
 		log.Fatalf("Nothing will be added. Lexicon already exists in database: %s", lexName)
 	}
 
-	// TODO hard coded symbol set name
-	lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: "nst-sv-SAMPA"}
+	lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
 	lexicon, err = dbapi.InsertLexicon(db, lexicon)
 	if err != nil {
 		log.Fatal(err)
@@ -81,7 +117,7 @@ func main() {
 		}
 
 		// if no space in transcription, add these using symbolset.SplitIntoPhonemes utility
-		splitTrans(&e)
+		splitTrans(&e, zymbolz)
 		// initial status
 		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
