@@ -12,6 +12,10 @@ import (
 	"github.com/stts-se/pronlex/line"
 )
 
+func splitTrans(e *lex.Entry) {
+
+}
+
 func main() {
 
 	sampleInvocation := `go run addNSTLexToDB.go sv.se.nst pronlex.db swe030224NST.pron_utf8.txt`
@@ -75,6 +79,9 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		// if no space in transcription, add these using symbolset.SplitIntoPhonemes utility
+		splitTrans(&e)
 		// initial status
 		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
