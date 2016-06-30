@@ -13,6 +13,8 @@ type Field int
 
 //go:generate stringer -type=Field
 
+//TODO add field for status(es)? source(es)?
+
 const (
 	// Orth orthography
 	Orth Field = iota
