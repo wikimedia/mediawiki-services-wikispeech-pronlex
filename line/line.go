@@ -13,7 +13,9 @@ type Field int
 
 //go:generate stringer -type=Field
 
-//TODO add field for status(es)? source(es)?
+// TODO add field for status(es)?
+// TODO add field for source(es)?
+// TODO add field for Reading(s)?
 
 const (
 	// Orth orthography
