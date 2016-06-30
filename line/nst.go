@@ -68,7 +68,7 @@ func appendTrans(ts []lex.Transcription, t string, l string) []lex.Transcription
 }
 
 func getTranses(fs map[Field]string) []lex.Transcription {
-	var res = make([]lex.Transcription, 0)
+	var res []lex.Transcription
 	res = appendTrans(res, fs[Trans1], fs[Translang1])
 	res = appendTrans(res, fs[Trans2], fs[Translang2])
 	res = appendTrans(res, fs[Trans3], fs[Translang3])
