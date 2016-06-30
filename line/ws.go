@@ -2,6 +2,7 @@ package line
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/stts-se/pronlex/lex"
 )
@@ -30,8 +31,14 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 	res.Language = fs[Lang]
 	res.PartOfSpeech = fs[Pos]
 	res.WordParts = fs[WordParts]
-	res.Lemma = lex.Lemma{Strn: fs[Lemma], Paradigm: fs[Paradigm]} // TODO Reading : fs[Reading]?
-	res.Transcriptions = getTranses(fs)                            // <-- func getTranses declared in nst.go
+	if strings.TrimSpace(fs[Lemma]) != "" {
+		res.Lemma = lex.Lemma{Strn: fs[Lemma], Paradigm: fs[Paradigm]} // TODO Reading : fs[Reading]?
+	}
+	res.Transcriptions = getTranses(fs) // <-- func getTranses declared in nst.go
 
 	return res, nil
+}
+
+func (ws WS) String(fields map[Field]string) (string, error) {
+	return ws.format.String(fields)
 }
