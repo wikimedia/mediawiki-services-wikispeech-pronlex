@@ -42,6 +42,9 @@ func main() {
 			fmt.Fprintf(os.Stderr, "failed reading line %v : %v\n", n, err)
 		}
 		line := nst.Text()
+
+		// TODO SplitIntoPhonemes on Transcription, based on symbol set for the specific language
+
 		e, err := nstFmt.ParseToEntry(line)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to conver line %v to entry : %v\n", n, err)
