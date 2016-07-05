@@ -1,10 +1,14 @@
 package line
 
+// NB: Copy-paste + edit of line/nst.go
+// TODO Review by original author of line/nst.go
+// TODO Better definition of general line format (Reading field? Any number of transcriptions?)
+
 import (
 	"fmt"
-	"strings"
-
 	"github.com/stts-se/pronlex/lex"
+	"io"
+	"strings"
 )
 
 type WS struct {
@@ -150,4 +154,18 @@ func NewWS() (WS, error) {
 		return WS{}, err
 	}
 	return WS{f}, nil
+}
+
+type WSFileWriter struct {
+	WS     WS
+	Writer io.Writer
+}
+
+func (w WSFileWriter) Write(e lex.Entry) error {
+	s, err := w.WS.Entry2String(e)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintf(w.Writer, "%s\n", s)
+	return err
 }
