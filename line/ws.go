@@ -63,7 +63,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 
 	// Fields ID and LexiconID are database internal  and not processed here
 
-	var fs map[Field]string
+	var fs = make(map[Field]string)
 	fs[Orth] = e.Strn
 	fs[Lang] = e.Language
 	fs[WordParts] = e.WordParts
