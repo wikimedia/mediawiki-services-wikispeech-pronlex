@@ -623,14 +623,15 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Query for exporting: %v", q)
 
-	nstFmt, err := line.NewNST()
+	//nstFmt, err := line.NewNST()
+	wsFmt, err := line.NewWS()
 	if err != nil {
 		log.Fatal(err)
 		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
 		return
 	}
-	nstW := line.NSTFileWriter{nstFmt, gz}
-	dbapi.LookUp(db, q, nstW)
+	wsW := line.WSFileWriter{wsFmt, gz}
+	dbapi.LookUp(db, q, wsW)
 	defer gz.Close()
 	gz.Flush()
 	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %s", lexicon.Name, fName))
@@ -721,11 +722,10 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO temporary test thingy
-// TODO hard wired to NST file format. There should be a standard lexicon import text format.
-// TODO This guy should somehow report back what it's doing to the client. (Goroutine + Websocket?)
+// TODO This guy should somehow report back what it's doing to the client.
 // TODO Return some sort of result? Stats?
 // TODO Set 'status' value for imported entries (now hard-wired to 'import' below)
-// TODO Set 'source' value for imported entries (now hard-wired to 'nst' below)
+// TODO Set 'source' value for imported entries (now hard-wired to 'unknown' below)
 func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
 	fmt.Printf("clientUUID: %s\n", clientUUID)
 	fmt.Printf("lexid: %v\n", lexiconID)
