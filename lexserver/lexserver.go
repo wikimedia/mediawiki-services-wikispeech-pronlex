@@ -747,8 +747,9 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 	// }
 
 	// ---------------------------->
-	// TODO Copied from addNSTLexToDB
-	nstFmt, err := line.NewNST()
+
+	//nstFmt, err := line.NewNST()
+	wsFmt, err := line.NewWS()
 	if err != nil {
 		//log.Fatal(err)
 		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
@@ -768,12 +769,12 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 			log.Fatal(err)
 		}
 		l := s.Text()
-		e, err := nstFmt.ParseToEntry(l)
+		e, err := wsFmt.ParseToEntry(l)
 		if err != nil {
 			log.Fatal(err)
 		}
 		// TODO hard-wired initial status
-		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
+		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "unknown"}
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {
