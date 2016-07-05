@@ -42,7 +42,6 @@ func main() {
 
 	var variant = regexp.MustCompile("\\([0-9]\\)")
 	lastEntry := lex.Entry{}
-	//_ = lastEntry
 
 	s := bufio.NewScanner(cmuFile)
 	for s.Scan() {
@@ -51,7 +50,7 @@ func main() {
 		}
 		l := s.Text()
 		fs := strings.Split(l, "  ")
-		if len(fs) != 2 {
+		if len(fs) != 2 || strings.HasPrefix(l, ";;") {
 			fmt.Fprintf(os.Stderr, "skipping line: %v\n", l)
 			continue
 		} //else {
@@ -70,7 +69,8 @@ func main() {
 				//fmt.Printf("%v\n", lastEntry)
 			}
 			ts := []lex.Transcription{lex.Transcription{Strn: t}}
-			lastEntry = lex.Entry{Strn: w, Transcriptions: ts}
+			// TODO Hard-wired language name
+			lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "EN"}
 		}
 		// }
 	}
