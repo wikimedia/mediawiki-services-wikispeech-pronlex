@@ -52,7 +52,7 @@ func main() {
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to convert entry to string : %v\n", err)
 		} else {
-			fmt.Printf("%v\n\n", res)
+			fmt.Printf("%v\n", res)
 		}
 	}
 	//_ = nstFile
