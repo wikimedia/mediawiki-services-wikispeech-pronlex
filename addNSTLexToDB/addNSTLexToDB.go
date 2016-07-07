@@ -33,20 +33,6 @@ func getSymbolSet(name string) ([]string, error) {
 
 }
 
-func splitTrans(e *lex.Entry, symbols []string) {
-	var newTs []lex.Transcription
-	for _, t := range e.Transcriptions {
-		t2, u2 := symbolset.SplitIntoPhonemes(symbols, t.Strn)
-		newT := strings.Join(t2, " ")
-		if len(u2) > 0 {
-			fmt.Printf("%s > %v --> %v\n", t.Strn, t2, u2)
-		}
-		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
-	}
-
-	e.Transcriptions = newTs
-}
-
 func main() {
 
 	sampleInvocation := `go run addNSTLexToDB.go sv.se.nst sv.se.nst-SAMPA pronlex.db swe030224NST.pron_utf8.txt`
