@@ -1,9 +1,12 @@
 package symbolset
 
 import (
-	//"fmt"
+	"fmt"
+	"os"
 	"sort"
 	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 // Sort slice of strings according to len, longest string first
@@ -93,4 +96,19 @@ func consume(srtd *[]string, trans string) (string, string, bool) {
 		t := []rune(trans)
 		return string(t[0]), string(t[1:]), false
 	}
+}
+
+// SplitTrans applies SplitIntoPhonemes to the transcription strings of a lex.Entry
+func SplitTrans(e *lex.Entry, symbols []string) {
+	var newTs []lex.Transcription
+	for _, t := range e.Transcriptions {
+		t2, u2 := SplitIntoPhonemes(symbols, t.Strn)
+		newT := strings.Join(t2, " ")
+		if len(u2) > 0 {
+			fmt.Fprintf(os.Stderr, "%s > %v --> %v\n", t.Strn, t2, u2)
+		}
+		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
+	}
+
+	e.Transcriptions = newTs
 }
