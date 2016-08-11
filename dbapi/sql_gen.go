@@ -228,7 +228,8 @@ LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id
 LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid 
 LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1
 LEFT JOIN entryvalidation ON entryvalidation.entryid = entry.id 
-WHERE entry.id = transcription.entryid ` // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+WHERE entry.id = transcription.entryid AND entry.lexiconid = lexicon.id` // entry.lexiconid = lexicon.id needed when no single input lexicon ID is given
+// AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
 
 // SelectEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
