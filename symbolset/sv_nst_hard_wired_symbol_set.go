@@ -1,6 +1,6 @@
 package symbolset
 
-func SvNSTHardWired() SymbolSet {
+func SvNSTHardWired() (SymbolSet, error) {
 
 	syms := []Symbol{
 
@@ -56,6 +56,7 @@ func SvNSTHardWired() SymbolSet {
 		Symbol{Desc: "phoneme delimiter", String: " ", Cat: PhonemeDelimiter},
 	}
 
-	return SymbolSet{Name: "sv.se.nst-SAMPA", Symbols: syms}
+	//return SymbolSet{Name: "sv.se.nst-SAMPA", Symbols: syms}, nil
+	return NewSymbolSet("sv.se.nst-SAMPA", syms)
 
 }

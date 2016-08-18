@@ -222,7 +222,11 @@ func (ss SymbolSet) HasSymbol(symbol string) bool {
 // TODO Check that this really works:
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
-	//log.Println(os.Stderr, "ss.SymbolRe = ", ss.SymbolRe)
+	// if ss.SymbolRe == nil {
+	// 	log.Println(os.Stderr, "ss.SymbolRe is nil")
+	// }
+	// log.Println(os.Stderr, "ss.SymbolRe = ", ss.SymbolRe)
+	// log.Println(os.Stderr, "symbol = ", symbol)
 	return ss.SymbolRe.MatchString(symbol)
 }
 

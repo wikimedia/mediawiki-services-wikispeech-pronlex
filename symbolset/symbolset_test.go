@@ -157,3 +157,28 @@ func Test_ValidSymbol1(t *testing.T) {
 	}
 
 }
+
+func Test_ValidSymbol2(t *testing.T) {
+	ss, err := SvNSTHardWired()
+	if err != nil {
+		t.Errorf("didn't expect error here : %v", err)
+	}
+
+	var phn = ""
+
+	phn = "a"
+	if !ss.ValidSymbol(phn) {
+		t.Errorf("expected phoneme %v to be valid", phn)
+	}
+
+	// phn = "."
+	// if !ss.ValidSymbol(phn) {
+	// 	t.Errorf("expected phoneme %v to be valid", phn)
+	// }
+
+	// phn = "x"
+	// if ss.ValidSymbol(phn) {
+	// 	t.Errorf("expected phoneme %v to be invalid", phn)
+	// }
+
+}
