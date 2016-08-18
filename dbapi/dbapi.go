@@ -734,6 +734,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return rows.Err()
 	}
+
 	return nil
 }
 
