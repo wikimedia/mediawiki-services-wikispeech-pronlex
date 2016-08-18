@@ -1,5 +1,6 @@
 package symbolset
 
+// SvNSTHardWired is a temporary function that should not be used in production
 func SvNSTHardWired() (SymbolSet, error) {
 
 	syms := []Symbol{
