@@ -122,3 +122,38 @@ func Test_SplitTranscription_NoFailWithUnknownSymbols_NonEmptyDelim(t *testing.T
 	}
 	testEqStrings(t, expect, result)
 }
+
+func Test_ValidSymbol1(t *testing.T) {
+	name := "sampa"
+	symbols := []Symbol{
+		Symbol{"a", Syllabic, ""},
+		Symbol{"b", NonSyllabic, ""},
+		Symbol{"N", NonSyllabic, ""},
+		Symbol{" ", PhonemeDelimiter, ""},
+		Symbol{".", SyllableDelimiter, ""},
+		Symbol{"\"", Stress, ""},
+		Symbol{"\"\"", Stress, ""},
+	}
+	ss, err := NewSymbolSet(name, symbols)
+	if err != nil {
+		t.Errorf("didn't expect error here : %v", err)
+	}
+
+	var phn = ""
+
+	phn = "a"
+	if !ss.ValidSymbol(phn) {
+		t.Errorf("expected phoneme %v to be valid", phn)
+	}
+
+	phn = "."
+	if !ss.ValidSymbol(phn) {
+		t.Errorf("expected phoneme %v to be valid", phn)
+	}
+
+	phn = "x"
+	if ss.ValidSymbol(phn) {
+		t.Errorf("expected phoneme %v to be invalid", phn)
+	}
+
+}

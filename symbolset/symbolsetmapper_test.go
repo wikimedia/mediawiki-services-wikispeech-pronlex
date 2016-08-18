@@ -78,7 +78,7 @@ func Test_NewMapper_FailWithAmbiguousPhonemes(t *testing.T) {
 	}
 }
 
-func Test_mapTranscription_WithAmbiguousSymbols(t *testing.T) {
+func Test_MapTranscription_WithAmbiguousSymbols(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -90,20 +90,20 @@ func Test_mapTranscription_WithAmbiguousSymbols(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "a rt r t"
 	expect := "A RT R T"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_WithNonEmptyDelimiters(t *testing.T) {
+func Test_MapTranscription_WithNonEmptyDelimiters(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -115,20 +115,20 @@ func Test_mapTranscription_WithNonEmptyDelimiters(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "a t s t_s"
 	expect := "A T S T_S"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_EmptyDelimiterInInput1(t *testing.T) {
+func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -140,20 +140,20 @@ func Test_mapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "ar*ttr"
 	expect := "A RT T R"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_EmptyDelimiterInInput2(t *testing.T) {
+func Test_MapTranscription_EmptyDelimiterInInput2(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -165,20 +165,20 @@ func Test_mapTranscription_EmptyDelimiterInInput2(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "ar*ttrrt"
 	expect := "A RT T R R T"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_EmptyDelimiterInOutput(t *testing.T) {
+func Test_MapTranscription_EmptyDelimiterInOutput(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssUC"
 	symbols := []SymbolPair{
@@ -190,20 +190,20 @@ func Test_mapTranscription_EmptyDelimiterInOutput(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "a rt r t"
 	expect := "AR*TRT"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_Sampa2Ipa_Simple(t *testing.T) {
+func Test_MapTranscription_Sampa2Ipa_Simple(t *testing.T) {
 	fromName := "sampa"
 	toName := "ipa"
 	symbols := []SymbolPair{
@@ -214,20 +214,20 @@ func Test_mapTranscription_Sampa2Ipa_Simple(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "pa$pa"
 	expect := "pa.pa"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_1(t *testing.T) {
+func Test_MapTranscription_Sampa2Ipa_WithSwedishStress_1(t *testing.T) {
 	fromName := "sampa"
 	toName := "ipa"
 	symbols := []SymbolPair{
@@ -240,20 +240,20 @@ func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_1(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\"pa$pa"
 	expect := "\u02C8pa\u0300.pa"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_2(t *testing.T) {
+func Test_MapTranscription_Sampa2Ipa_WithSwedishStress_2(t *testing.T) {
 	fromName := "sampa"
 	toName := "ipa"
 	symbols := []SymbolPair{
@@ -269,20 +269,20 @@ func Test_mapTranscription_Sampa2Ipa_WithSwedishStress_2(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\"brA:$ka"
 	expect := "\u02C8brɑː\u0300.ka"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_FailWithUnknownSymbols_EmptyDelim(t *testing.T) {
+func Test_MapTranscription_FailWithUnknownSymbols_EmptyDelim(t *testing.T) {
 	fromName := "sampa1"
 	toName := "sampa2 "
 	symbols := []SymbolPair{
@@ -296,16 +296,16 @@ func Test_mapTranscription_FailWithUnknownSymbols_EmptyDelim(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\"baŋ.ka"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err == nil {
 		t.Errorf("NewMapper() expected error here, but got %s", result)
 	}
 }
 
-func Test_mapTranscription_FailWithUnknownSymbols_NonEmptyDelim(t *testing.T) {
+func Test_MapTranscription_FailWithUnknownSymbols_NonEmptyDelim(t *testing.T) {
 	fromName := "sampa1"
 	toName := "sampa2 "
 	symbols := []SymbolPair{
@@ -319,16 +319,16 @@ func Test_mapTranscription_FailWithUnknownSymbols_NonEmptyDelim(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\" b a ŋ . k a"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err == nil {
 		t.Errorf("NewMapper() expected error here, but got %s", result)
 	}
 }
 
-func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_1(t *testing.T) {
+func Test_MapTranscription_Ipa2Sampa_WithSwedishStress_1(t *testing.T) {
 	fromName := "ipa"
 	toName := "sampa"
 	symbols := []SymbolPair{
@@ -343,20 +343,20 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_1(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\u02C8ba\u0300ŋ.ka" // => ˈ`baŋ.ka before mapping
 	expect := "\"\"baN$ka"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_2(t *testing.T) {
+func Test_MapTranscription_Ipa2Sampa_WithSwedishStress_2(t *testing.T) {
 	fromName := "ipa"
 	toName := "sampa"
 	symbols := []SymbolPair{
@@ -371,20 +371,20 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_2(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\u02C8a\u0300ŋ.ka"
 	expect := "\"\"aN$ka"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_3(t *testing.T) {
+func Test_MapTranscription_Ipa2Sampa_WithSwedishStress_3(t *testing.T) {
 	fromName := "ipa"
 	toName := "sampa"
 	symbols := []SymbolPair{
@@ -400,20 +400,20 @@ func Test_mapTranscription_Ipa2Sampa_WithSwedishStress_3(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\u02C8bra\u0300ŋ.ka"
 	expect := "\"\"braN$ka"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
+func Test_MapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 	fromName := "NST-XSAMPA"
 	toName := "WS-SAMPA"
 	symbols := []SymbolPair{
@@ -429,20 +429,20 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\" b r a N $ k a"
 	expect := "\"\" b r a N . k a"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
 }
 
-func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
+func Test_MapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	fromName := "NST-XSAMPA"
 	toName := "WS-SAMPA"
 	symbols := []SymbolPair{
@@ -460,13 +460,13 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	}
 	ssm, err := NewMapper(fromName, toName, symbols)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\" b r a $ rs a r s"
 	expect := "\"\" b r a . rs a r s"
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
@@ -474,9 +474,9 @@ func Test_mapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 }
 
 func testMapTranscription1(t *testing.T, ssm Mapper, input string, expect string) {
-	result, err := ssm.mapTranscription(input)
+	result, err := ssm.MapTranscription(input)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here; input=%s, expect=%s : %v", input, expect, err)
+		t.Errorf("MapTranscription() didn't expect error here; input=%s, expect=%s : %v", input, expect, err)
 	} else if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
 	}
@@ -485,10 +485,10 @@ func testMapTranscription1(t *testing.T, ssm Mapper, input string, expect string
 func testMapTranscriptionX(t *testing.T, ssms []Mapper, input string, expect string) {
 	result := input
 	for _, m := range ssms {
-		r, err := m.mapTranscription(result)
+		r, err := m.MapTranscription(result)
 		result = r
 		if err != nil {
-			t.Errorf("mapTranscription() didn't expect error here : %v", err)
+			t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		}
 	}
 	if result != expect {
@@ -503,7 +503,7 @@ func Test_LoadMapper_NST2IPA(t *testing.T) {
 	fName := "static/sv_nst-xsampa_maptable.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	testMapTranscription1(t, ssm, "\" b O t`", "\u02C8bɔʈ")
 	testMapTranscription1(t, ssm, "\" k u0 r d s", "\u02C8kɵrds")
@@ -516,7 +516,7 @@ func Test_LoadMapper_WS2IPA(t *testing.T) {
 	fName := "static/sv_ws-sampa_maptable.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	testMapTranscription1(t, ssm, "\" b O rt", "\u02C8bɔʈ")
 	testMapTranscription1(t, ssm, "\" k u0 r d s", "\u02C8kɵrds")
@@ -529,7 +529,7 @@ func Test_LoadMapper_IPA2WS(t *testing.T) {
 	fName := "static/sv_ws-sampa_maptable.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	testMapTranscription1(t, ssm, "\u02C8bɔʈ", "\" b O rt")
 	testMapTranscription1(t, ssm, "\u02C8kɵrds", "\" k u0 r d s")
@@ -542,7 +542,7 @@ func Test_LoadMapper_NST2WS(t *testing.T) {
 	fName := "static/sv_nst-xsampa_maptable.csv"
 	ssmNST, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 
 	name = "WS-SAMPA"
@@ -551,7 +551,7 @@ func Test_LoadMapper_NST2WS(t *testing.T) {
 	fName = "static/sv_ws-sampa_maptable.csv"
 	ssmWS, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
-		t.Errorf("mapTranscription() didn't expect error here : %v", err)
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 
 	mappers := []Mapper{ssmNST, ssmWS}

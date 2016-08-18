@@ -68,7 +68,8 @@ func (m Mapper) postFilter(trans string, ss SymbolSet) (string, error) {
 	}
 }
 
-func (m Mapper) mapTranscription(input string) (string, error) {
+// MapTranscription maps one input transcription string into the new symbol set.
+func (m Mapper) MapTranscription(input string) (string, error) {
 	res, err := m.preFilter(input, m.from)
 	if err != nil {
 		return "", err
@@ -221,6 +222,7 @@ func (ss SymbolSet) HasSymbol(symbol string) bool {
 // TODO Check that this really works:
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
+	//log.Println(os.Stderr, "ss.SymbolRe = ", ss.SymbolRe)
 	return ss.SymbolRe.MatchString(symbol)
 }
 
