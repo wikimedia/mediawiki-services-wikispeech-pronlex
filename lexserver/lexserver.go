@@ -92,6 +92,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
+func listKnownHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/listknown.html")
+}
+
 func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 
 	lexs, err := dbapi.ListLexicons(db) // TODO error handling
@@ -176,6 +180,19 @@ func superDeleteLexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon with id %d", id))
+}
+
+func sqlite3AnalyzeHandler(w http.ResponseWriter, r *http.Request) {
+	log.Print("lexserver: running the Sqlite3 ANALYZE command...")
+	_, err := db.Exec("ANALYZE")
+
+	if err != nil {
+		log.Printf("Failed to exec ANALYZE %v", err)
+		http.Error(w, fmt.Sprintf("/admin/sqlite3_analyze failed : %v", err), http.StatusInternalServerError)
+		return
+	}
+	log.Print("... done!\n")
+	w.Write([]byte("OK"))
 }
 
 // TODO report unused URL parameters
@@ -888,17 +905,14 @@ func main() {
 	ff("Failed to exec PRAGMA call %v", err)
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
-	log.Print("lexserver: running the Sqlite3 ANALYZE command...")
-	_, err = db.Exec("ANALYZE")
-	ff("Failed to exec ANALYZE %v", err)
-	if err == nil {
-		log.Print("... done")
-	}
 
 	// static
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/favicon.ico", faviconHandler)
 	http.HandleFunc("/ipa_table.txt", ipaTableHandler)
+
+	// Temp, testing
+	http.HandleFunc("/lexicon/listknown", listKnownHandler)
 
 	// function calls
 	http.HandleFunc("/listlexicons", listLexsHandler)
@@ -921,6 +935,10 @@ func main() {
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 	http.HandleFunc("/admin/superdeletelexicon", superDeleteLexHandler)
+
+	// Sqlite3 ANALYZE command in some instances make search quicker,
+	// but it takes a while to perform
+	http.HandleFunc("/admin/sqlite3_analyze", sqlite3AnalyzeHandler)
 
 	//http.HandleFunc("/websocktest", webSockTestHandler)
 
