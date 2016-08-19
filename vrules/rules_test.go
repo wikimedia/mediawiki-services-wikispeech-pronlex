@@ -190,13 +190,13 @@ func TestNst1(t *testing.T) {
 
 	var e = &lex.Entry{
 		Strn:         "banen",
-		Language:     "nor",
+		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
 			lex.Transcription{
-				Strn:     "\" b A: $ n @ n",
-				Language: "nor",
+				Strn:     "\" b A: . n @ n",
+				Language: "swe",
 			},
 		},
 	}
@@ -212,43 +212,14 @@ func TestNst1(t *testing.T) {
 	//
 
 	e = &lex.Entry{
-		Strn:         "banen",
-		Language:     "nor",
-		PartOfSpeech: "NN",
-		WordParts:    "banen",
-		Transcriptions: []lex.Transcription{
-			lex.Transcription{
-				Strn:     "b a $ \" n e: n",
-				Language: "nor",
-			},
-		},
-	}
-
-	vali.Validate([]*lex.Entry{e})
-	result = e.EntryValidations
-
-	expect = []lex.EntryValidation{
-		lex.EntryValidation{
-			RuleName: "final_nostress_nolong",
-			Level:    "Warning",
-			Message:  "[...]"},
-	}
-
-	if len(result) != len(expect) || (len(expect) > 0 && result[0].RuleName != expect[0].RuleName) {
-		t.Errorf(fsExp, expect, result)
-	}
-
-	//
-
-	e = &lex.Entry{
 		Strn:         "bantorget",
-		Language:     "nor",
+		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "ban+torget",
 		Transcriptions: []lex.Transcription{
 			lex.Transcription{
-				Strn:     "\"\" b A: n - % t O r $ g @ t",
-				Language: "nor",
+				Strn:     "\"\" b A: n + % t O r . j @ t",
+				Language: "swe",
 			},
 		},
 	}
@@ -266,13 +237,13 @@ func TestNst1(t *testing.T) {
 
 	e = &lex.Entry{
 		Strn:         "battorget",
-		Language:     "nor",
+		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "bat+torget",
 		Transcriptions: []lex.Transcription{
 			lex.Transcription{
-				Strn:     "\"\" b A: t - % t O r $ g @ t",
-				Language: "nor",
+				Strn:     "\"\" b A: t + % t O r . j @ t",
+				Language: "swe",
 			},
 		},
 	}
@@ -290,13 +261,13 @@ func TestNst1(t *testing.T) {
 
 	e = &lex.Entry{
 		Strn:         "battorget",
-		Language:     "nor",
+		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "batt+torget",
 		Transcriptions: []lex.Transcription{
 			lex.Transcription{
-				Strn:     "\"\" b a t - % t O r $ g @ t",
-				Language: "nor",
+				Strn:     "\"\" b a t + % t O r . j @ t",
+				Language: "swe",
 			},
 		},
 	}
@@ -314,13 +285,13 @@ func TestNst1(t *testing.T) {
 
 	e = &lex.Entry{
 		Strn:         "batttorget",
-		Language:     "nor",
+		Language:     "swe",
 		PartOfSpeech: "NN",
 		WordParts:    "batt+torget",
 		Transcriptions: []lex.Transcription{
 			lex.Transcription{
-				Strn:     "\"\" b a t - % t O r $ g @ t",
-				Language: "nor",
+				Strn:     "\"\" b a t + % t O r . j @ t",
+				Language: "swe",
 			},
 		},
 	}
@@ -336,6 +307,43 @@ func TestNst1(t *testing.T) {
 	}
 
 	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = &lex.Entry{
+		Strn:         "apnos",
+		Language:     "swe",
+		PartOfSpeech: "NN",
+		WordParts:    "ap+nos",
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
+				Strn:     "Aa: p n u: s",
+				Language: "swe",
+			},
+		},
+	}
+
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
+
+	expect = []lex.EntryValidation{
+		lex.EntryValidation{
+			RuleName: "primary_stress",
+			Level:    "Fatal",
+			Message:  "[...]"},
+		lex.EntryValidation{
+			RuleName: "syllabic",
+			Level:    "Format",
+			Message:  "[...]"},
+		lex.EntryValidation{
+			RuleName: "symbolset",
+			Level:    "Format",
+			Message:  "[...]"},
+	}
+
+	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName || result[1].RuleName != expect[1].RuleName {
 		t.Errorf(fsExp, expect, result)
 	}
 }

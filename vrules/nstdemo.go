@@ -33,11 +33,7 @@ func ValidatorForSymbolSet(symbolSetName string) (validation.Validator, error) {
 
 // NewNSTDemoValidator is used for testing
 func NewNSTDemoValidator() (validation.Validator, error) {
-	symbolset, err := NewNSTSymbolSet()
-	if err != nil {
-		return validation.Validator{}, err
-	}
-	finalNostressNolongRe, err := ProcessTransRe(symbolset, "\\$ (nonsyllabic )*(@|A|E|I|O|U|u0|Y|{|9|n=|l=|n`=|l`=)( nonsyllabic)*$")
+	symbolset, err := NewNSTSvHardWired()
 	if err != nil {
 		return validation.Validator{}, err
 	}
@@ -45,7 +41,7 @@ func NewNSTDemoValidator() (validation.Validator, error) {
 	if err != nil {
 		return validation.Validator{}, err
 	}
-	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*( (\\$|-) (\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*)*$")
+	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*)*$")
 	if err != nil {
 		return validation.Validator{}, err
 	}
@@ -66,12 +62,6 @@ func NewNSTDemoValidator() (validation.Validator, error) {
 		MustHaveTrans{},
 		NoEmptyTrans{},
 		RequiredTransRe{
-			Name:    "final_nostress_nolong",
-			Level:   "Warning",
-			Message: "final syllable should normally be unstressed with short vowel",
-			Re:      finalNostressNolongRe,
-		},
-		RequiredTransRe{
 			Name:    "primary_stress",
 			Level:   "Fatal",
 			Message: "Primary stress required",
@@ -91,9 +81,69 @@ func NewNSTDemoValidator() (validation.Validator, error) {
 	return vali, nil
 }
 
-// NewNSTSymbolSet is used for testing
-func NewNSTSymbolSet() (symbolset.SymbolSet, error) {
-	name := "NST nob sampa" // TODO NL: Why nob here, but sv.se.nst-SAMPA above...? Did I change something somewhere?
+// SvNSTHardWired is a temporary function that should not be used in production
+func NewNSTSvHardWired() (symbolset.SymbolSet, error) {
+	name := "sv.se.nst-SAMPA"
+
+	syms := []symbolset.Symbol{
+		symbolset.Symbol{Desc: "sil", String: "i:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "sill", String: "I", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "full", String: "u0", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "ful", String: "}:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "matt", String: "a", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "mat", String: "A:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "bot", String: "u:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "bott", String: "U", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "häl", String: "E:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "häll", String: "E", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "aula", String: "au", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "syl", String: "y:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "syll", String: "Y", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "hel", String: "e:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "herr,hett", String: "e", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "nöt", String: "2:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "mött,förra", String: "9", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "mål", String: "o:", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "moll,håll", String: "O", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "bättre", String: "@", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "europa", String: "eu", Cat: symbolset.Syllabic},
+		symbolset.Symbol{Desc: "pol", String: "p", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "bok", String: "b", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "tok", String: "t", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "bort", String: "rt", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "mod", String: "m", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "nod", String: "n", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "dop", String: "d", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "bord", String: "rd", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "fot", String: "k", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "våt", String: "g", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "lång", String: "N", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "forna", String: "rn", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "fot", String: "f", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "våt", String: "v", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "kjol", String: "C", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "fors", String: "rs", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "rov", String: "r", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "lov", String: "l", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "sot", String: "s", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "sjok", String: "x", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "hot", String: "h", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "porla", String: "rl", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "jord", String: "j", Cat: symbolset.NonSyllabic},
+		symbolset.Symbol{Desc: "syllable delimiter", String: ".", Cat: symbolset.SyllableDelimiter},
+		symbolset.Symbol{Desc: "accent I", String: `"`, Cat: symbolset.Stress},
+		symbolset.Symbol{Desc: "accent II", String: `""`, Cat: symbolset.Stress},
+		symbolset.Symbol{Desc: "secondary stress", String: "%", Cat: symbolset.Stress},
+		symbolset.Symbol{Desc: "phoneme delimiter", String: " ", Cat: symbolset.PhonemeDelimiter},
+		symbolset.Symbol{"+", symbolset.CompoundDelimiter, ""},
+	}
+
+	return symbolset.NewSymbolSet(name, syms)
+
+}
+
+func NewNSTNbvHardWired() (symbolset.SymbolSet, error) {
+	name := "NST nob sampa"
 	symbols := []symbolset.Symbol{
 		symbolset.Symbol{"@", symbolset.Syllabic, ""},
 		symbolset.Symbol{"A", symbolset.Syllabic, ""},

@@ -22,17 +22,11 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 		if err != nil {
 			result = append(result, validation.Result{
 				RuleName: "SymbolSet",
-				Level:    "Fatal",
+				Level:    "Format",
 				Message:  fmt.Sprintf("Couldn't split transcription: /%s/", t.Strn)})
 		} else {
 			for _, symbol := range splitted {
-				//fmt.Println("SymbolSetRule.Validate symbol=", symbol)
-				// TODO fix the below call --- it doesn't work
-				validSymbol := r.SymbolSet.ValidSymbol(symbol)
-				//fmt.Println("SymbolSetRule.validSymbol?", validSymbol)
-
-				if !validSymbol {
-					//if !r.SymbolSet.HasSymbol(symbol) {
+				if !r.SymbolSet.ValidSymbol(symbol) {
 					result = append(result, validation.Result{
 						RuleName: "SymbolSet",
 						Level:    "Fatal",

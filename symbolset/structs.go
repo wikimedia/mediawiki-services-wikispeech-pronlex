@@ -234,7 +234,7 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 // over a slice, but then we would need initialization of the map at
 // the creation of a SymbolSet instance.
 // HasSymbol returns true for strings that are symbols in the symbol set.
-func (ss SymbolSet) HasSymbol(symbol string) bool {
+func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	for _, s := range ss.Symbols {
 		if s.String == symbol {
 			return true
@@ -245,13 +245,10 @@ func (ss SymbolSet) HasSymbol(symbol string) bool {
 
 // TODO Check that this really works:
 // ValidSymbol checks if a string is a valid symbol or not
-func (ss SymbolSet) ValidSymbol(symbol string) bool {
-	// fmt.Println("SymbolSet.ValidSymbol symbol=", symbol)
-	// fmt.Println("SymbolSet.ValidSymbol re=", ss.SymbolRe)
+func (ss SymbolSet) ValidSymbolFromRe(symbol string) bool {
 	if !ss.isInit {
 		panic("SymbolSet not initialized properly!")
 	}
-	// fmt.Println("SymbolSet.MatchString", ss.SymbolRe.MatchString(symbol))
 	return ss.SymbolRe.MatchString(symbol)
 }
 
