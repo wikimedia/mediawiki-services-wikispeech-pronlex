@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
+	//	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
@@ -25,7 +25,12 @@ func getSyms(ss []symbolset.Symbol) []string {
 func getSymbolSet(name string) ([]string, error) {
 	switch name {
 	case "sv.se.nst-SAMPA":
-		return getSyms(symbolset.SvNSTHardWired().Symbols), nil
+		ss0, err := symbolset.SvNSTHardWired()
+		if err != nil {
+			return nil, fmt.Errorf("failed to obtain symbol set for '%s'", name)
+		}
+		ss := ss0.Symbols
+		return getSyms(ss), nil
 
 	default:
 		return nil, fmt.Errorf("failed to obtain symbol set for '%s'", name)
@@ -103,7 +108,7 @@ func main() {
 		}
 
 		// if no space in transcription, add these using symbolset.SplitIntoPhonemes utility
-		splitTrans(&e, zymbolz)
+		symbolset.SplitTrans(&e, zymbolz)
 		// initial status
 		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
