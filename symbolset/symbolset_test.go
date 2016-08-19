@@ -169,4 +169,9 @@ func Test_ValidSymbol2(t *testing.T) {
 		t.Errorf("expected phoneme %v to be valid", phn)
 	}
 
+	phn = "AA:"
+	if !ss.ValidSymbol(phn) {
+		t.Errorf("expected phoneme %v to be valid", phn)
+	}
+
 }

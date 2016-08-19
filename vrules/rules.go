@@ -28,7 +28,10 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 			for _, symbol := range splitted {
 				fmt.Println("SymbolSetRule.Validate symbol=", symbol)
 				// TODO fix the below call --- it doesn't work
-				if !r.SymbolSet.ValidSymbol(symbol) {
+				validSymbol := r.SymbolSet.ValidSymbol(symbol)
+				fmt.Println("SymbolSetRule.validSymbol?", validSymbol)
+
+				if !validSymbol {
 					//if !r.SymbolSet.HasSymbol(symbol) {
 					result = append(result, validation.Result{
 						RuleName: "SymbolSet",

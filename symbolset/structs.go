@@ -230,6 +230,7 @@ func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	if !ss.isInit {
 		panic("SymbolSet not initialized properly!")
 	}
+	fmt.Println("SymbolSet.MatchString", ss.SymbolRe.MatchString(symbol))
 	return ss.SymbolRe.MatchString(symbol)
 }
 
