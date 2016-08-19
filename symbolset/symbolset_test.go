@@ -1,8 +1,6 @@
 package symbolset
 
-import (
-	"testing"
-)
+import "testing"
 
 func Test_NewSymbolSet_WithoutPhonemeDelimiter(t *testing.T) {
 	name := "ss"
@@ -170,15 +168,5 @@ func Test_ValidSymbol2(t *testing.T) {
 	if !ss.ValidSymbol(phn) {
 		t.Errorf("expected phoneme %v to be valid", phn)
 	}
-
-	// phn = "."
-	// if !ss.ValidSymbol(phn) {
-	// 	t.Errorf("expected phoneme %v to be valid", phn)
-	// }
-
-	// phn = "x"
-	// if ss.ValidSymbol(phn) {
-	// 	t.Errorf("expected phoneme %v to be invalid", phn)
-	// }
 
 }

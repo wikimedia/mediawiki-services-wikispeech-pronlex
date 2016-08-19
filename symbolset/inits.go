@@ -83,6 +83,8 @@ func newSymbolSet(name string, symbols []Symbol, checkForDups bool) (SymbolSet, 
 		Name:    name,
 		Symbols: symbols,
 
+		isInit: true,
+
 		phonemes:        phonemes,
 		phoneticSymbols: phoneticSymbols,
 		stressSymbols:   stressSymbols,

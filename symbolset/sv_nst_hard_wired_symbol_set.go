@@ -57,7 +57,7 @@ func SvNSTHardWired() (SymbolSet, error) {
 		Symbol{Desc: "phoneme delimiter", String: " ", Cat: PhonemeDelimiter},
 	}
 
-	//return SymbolSet{Name: "sv.se.nst-SAMPA", Symbols: syms}, nil
-	return NewSymbolSet("sv.se.nst-SAMPA", syms)
+	return SymbolSet{Name: "sv.se.nst-SAMPA", Symbols: syms}, nil
+	//return NewSymbolSet("sv.se.nst-SAMPA", syms)
 
 }
