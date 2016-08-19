@@ -155,8 +155,8 @@ func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper,
 		Symbols:                   symbolList,
 		fromIsIPA:                 fromIsIPA,
 		toIsIPA:                   toIsIPA,
-		from:                      from,
-		to:                        to,
+		From:                      from,
+		To:                        to,
 		ipa:                       ipa,
 		symbolMap:                 symbolMap,
 		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
@@ -175,7 +175,10 @@ func LoadMapper(name string, fName string, fromColumn string, toColumn string) (
 	}
 	s := bufio.NewScanner(fh)
 	n := 0
-	var descIndex, fromIndex, toIndex, typeIndex int
+	var descIndex = -1
+	var fromIndex = -1
+	var toIndex = -1
+	var typeIndex = -1
 	var maptable = make([]SymbolPair, 0)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
@@ -192,6 +195,18 @@ func LoadMapper(name string, fName string, fromColumn string, toColumn string) (
 				typeIndex = indexOf(fs, "CATEGORY")
 
 			} else {
+				if descIndex == -1 {
+					return nilRes, fmt.Errorf("%v", "description index unset")
+				}
+				if fromIndex == -1 {
+					return nilRes, fmt.Errorf("%v", "from index unset")
+				}
+				if toIndex == -1 {
+					return nilRes, fmt.Errorf("%v", "to index unset")
+				}
+				if typeIndex == -1 {
+					return nilRes, fmt.Errorf("%v", "type index unset")
+				}
 				from := fs[fromIndex]
 				to := fs[toIndex]
 				desc := fs[descIndex]

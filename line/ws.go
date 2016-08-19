@@ -6,9 +6,10 @@ package line
 
 import (
 	"fmt"
-	"github.com/stts-se/pronlex/lex"
 	"io"
 	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 type WS struct {
@@ -70,7 +71,10 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 
 	fs[Pos] = e.PartOfSpeech
 
-	//TODO Missing field for Reading
+	fs[StatusName] = e.EntryStatus.Name
+	fs[StatusSource] = e.EntryStatus.Source
+
+	//TODO Missing field for Reading?
 	// Lemma
 	// if e.Lemma.Reading != "" {
 	// 	fs[Lemma] = e.Lemma.Strn + "|" + e.Lemma.Reading
@@ -107,24 +111,26 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 
 func NewWS() (WS, error) {
 	tests := []FormatTest{
-		FormatTest{"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE						",
+		FormatTest{"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE								",
 			map[Field]string{
-				Orth:       "storstaden",
-				Pos:        "NN SIN|DEF|NOM|UTR",
-				WordParts:  "stor+staden",
-				Lemma:      "storstad|95522",
-				Paradigm:   "s111n, a->ä, stad",
-				Lang:       "SWE",
-				Trans1:     "\"\"stu:$%s`t`A:$den",
-				Translang1: "SWE",
-				Trans2:     "",
-				Translang2: "",
-				Trans3:     "",
-				Translang3: "",
-				Trans4:     "",
-				Translang4: "",
+				Orth:         "storstaden",
+				Pos:          "NN SIN|DEF|NOM|UTR",
+				WordParts:    "stor+staden",
+				Lemma:        "storstad|95522",
+				Paradigm:     "s111n, a->ä, stad",
+				Lang:         "SWE",
+				Trans1:       "\"\"stu:$%s`t`A:$den",
+				Translang1:   "SWE",
+				Trans2:       "",
+				Translang2:   "",
+				Trans3:       "",
+				Translang3:   "",
+				Trans4:       "",
+				Translang4:   "",
+				StatusName:   "",
+				StatusSource: "",
 			},
-			"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE						",
+			"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE								",
 		},
 	}
 	f, err := NewFormat(
@@ -134,20 +140,22 @@ func NewWS() (WS, error) {
 			Orth: 0,
 			Pos:  1,
 			//Morph:      2,
-			WordParts:  2,
-			Lemma:      3,
-			Paradigm:   4,
-			Lang:       5,
-			Trans1:     6,
-			Translang1: 7,
-			Trans2:     8,
-			Translang2: 9,
-			Trans3:     10,
-			Translang3: 11,
-			Trans4:     12,
-			Translang4: 13,
+			WordParts:    2,
+			Lemma:        3,
+			Paradigm:     4,
+			Lang:         5,
+			Trans1:       6,
+			Translang1:   7,
+			Trans2:       8,
+			Translang2:   9,
+			Trans3:       10,
+			Translang3:   11,
+			Trans4:       12,
+			Translang4:   13,
+			StatusName:   14,
+			StatusSource: 15,
 		},
-		14,
+		16,
 		tests,
 	)
 	if err != nil {

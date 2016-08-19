@@ -13,8 +13,6 @@ type Field int
 
 //go:generate stringer -type=Field
 
-// TODO add field for status(es)?
-// TODO add field for source(es)?
 // TODO add field for Reading(s)?
 
 const (
@@ -74,6 +72,12 @@ const (
 
 	// Paradigm rule reference (id) for generating inflected forms from lemma
 	Paradigm
+
+	// StatusName refers to a status category of the entry, such as 'ok', 'skip' or similar
+	StatusName
+
+	// StatusSource refers to the source of a status (user id, reference data id, etc)
+	StatusSource
 )
 
 // FormatTest defines a test to run upon initialization of Format (using NewFormat)

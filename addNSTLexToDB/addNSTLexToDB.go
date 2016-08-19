@@ -12,54 +12,30 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/vrules"
 )
-
-func getSyms(ss []symbolset.Symbol) []string {
-	var res []string
-	for _, s := range ss {
-		res = append(res, s.String)
-	}
-	return res
-}
-
-func getSymbolSet(name string) ([]string, error) {
-	switch name {
-	case "sv.se.nst-SAMPA":
-		ss0, err := symbolset.SvNSTHardWired()
-		if err != nil {
-			return nil, fmt.Errorf("failed to obtain symbol set for '%s'", name)
-		}
-		ss := ss0.Symbols
-		return getSyms(ss), nil
-
-	default:
-		return nil, fmt.Errorf("failed to obtain symbol set for '%s'", name)
-	}
-
-}
 
 func main() {
 
-	sampleInvocation := `go run addNSTLexToDB.go sv.se.nst sv.se.nst-SAMPA pronlex.db swe030224NST.pron_utf8.txt`
+	sampleInvocation := `go run addNSTLexToDB.go sv.se.nst sv.se.nst-SAMPA symbolset/static/sv_ws-sampa_maptable.csv pronlex.db swe030224NST.pron_utf8.txt`
 
-	if len(os.Args) != 5 {
-		log.Fatal("Expected <DB LEXICON NAME> <SYMBOLSET NAME> <DB FILE> <NST INPUT FILE>", "\n\tSample invocation: ", sampleInvocation)
+	if len(os.Args) != 6 {
+		log.Fatal("Expected <DB LEXICON NAME> <SYMBOLSET NAME> <SYMBOLSET FILE> <DB FILE> <NST INPUT FILE>", "\n\tSample invocation: ", sampleInvocation)
 	}
 
 	lexName := os.Args[1]
 	symbolSetName := os.Args[2]
-	dbFile := os.Args[3]
-	inFile := os.Args[4]
+	ssFileName := os.Args[3]
+	dbFile := os.Args[4]
+	inFile := os.Args[5]
 
 	_, err := os.Stat(dbFile)
 	if err != nil {
 		log.Fatalf("Cannot find db file. %v", err)
 	}
 
-	zymbolz, err := getSymbolSet(symbolSetName)
-	if err != nil {
-		log.Fatalf("failed creating symbol set : %v", err)
-	}
+	ssMapper, err := symbolset.LoadMapper(symbolSetName, ssFileName, "SYMBOL", "IPA")
+	ssRule := vrules.SymbolSetRule{ssMapper.From}
 
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
@@ -108,8 +84,11 @@ func main() {
 		}
 
 		// if no space in transcription, add these using symbolset.SplitIntoPhonemes utility
-		symbolset.SplitTrans(&e, zymbolz)
-		// initial status
+
+		for _, r := range ssRule.Validate(e) {
+			panic(r) // shouldn't happen
+		}
+
 		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
 		n++

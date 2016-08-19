@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 // structs in package symbolset
@@ -46,8 +48,8 @@ type Mapper struct {
 	fromIsIPA bool
 	toIsIPA   bool
 
-	from      SymbolSet
-	to        SymbolSet
+	From      SymbolSet
+	To        SymbolSet
 	symbolMap map[Symbol]Symbol
 
 	repeatedPhonemeDelimiters *regexp.Regexp
@@ -71,19 +73,38 @@ func (m Mapper) postFilter(trans string, ss SymbolSet) (string, error) {
 	}
 }
 
+// MapTranscriptions maps the input entry's transcriptions (in-place)
+func (m Mapper) MapTranscriptions(e *lex.Entry) error {
+	var newTs []lex.Transcription
+	var errs []string
+	for _, t := range e.Transcriptions {
+		newT, err := m.MapTranscription(t.Strn)
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
+	}
+	e.Transcriptions = newTs
+	if len(errs) > 0 {
+		return fmt.Errorf("%v", strings.Join(errs, "; "))
+	} else {
+		return nil
+	}
+}
+
 // MapTranscription maps one input transcription string into the new symbol set.
 func (m Mapper) MapTranscription(input string) (string, error) {
-	res, err := m.preFilter(input, m.from)
+	res, err := m.preFilter(input, m.From)
 	if err != nil {
 		return "", err
 	}
-	splitted, err := m.from.SplitTranscription(res)
+	splitted, err := m.From.SplitTranscription(res)
 	if err != nil {
 		return "", err
 	}
 	var mapped = make([]string, 0)
 	for _, fromS := range splitted {
-		from, err := m.from.Get(fromS)
+		from, err := m.From.Get(fromS)
 		if err != nil {
 			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
 		}
@@ -99,11 +120,11 @@ func (m Mapper) MapTranscription(input string) (string, error) {
 	//if err != nil {
 	//	return "", err
 	//}
-	res = strings.Join(mapped, m.to.phonemeDelimiter.String)
+	res = strings.Join(mapped, m.To.phonemeDelimiter.String)
 
 	// remove repeated phoneme delimiters
-	res = m.repeatedPhonemeDelimiters.ReplaceAllString(res, m.to.phonemeDelimiter.String)
-	return m.postFilter(res, m.to)
+	res = m.repeatedPhonemeDelimiters.ReplaceAllString(res, m.To.phonemeDelimiter.String)
+	return m.postFilter(res, m.To)
 }
 
 // SymbolPair is a tuple inside the Mapper used to store the symbol mappings in a list in preserved order
@@ -225,12 +246,12 @@ func (ss SymbolSet) HasSymbol(symbol string) bool {
 // TODO Check that this really works:
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
-	fmt.Println("SymbolSet.ValidSymbol symbol=", symbol)
-	fmt.Println("SymbolSet.ValidSymbol re=", ss.SymbolRe)
+	// fmt.Println("SymbolSet.ValidSymbol symbol=", symbol)
+	// fmt.Println("SymbolSet.ValidSymbol re=", ss.SymbolRe)
 	if !ss.isInit {
 		panic("SymbolSet not initialized properly!")
 	}
-	fmt.Println("SymbolSet.MatchString", ss.SymbolRe.MatchString(symbol))
+	// fmt.Println("SymbolSet.MatchString", ss.SymbolRe.MatchString(symbol))
 	return ss.SymbolRe.MatchString(symbol)
 }
 
