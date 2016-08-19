@@ -419,7 +419,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 		}
 
 		//log.Printf("%v", e)
-		if "" != e.Lemma.Strn && "" != e.Lemma.Reading {
+		if "" != e.Lemma.Strn { // && "" != e.Lemma.Reading {
 			lemma, err := SetOrGetLemma(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
 			if err != nil {
 				tx.Rollback()

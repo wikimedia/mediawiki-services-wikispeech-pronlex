@@ -65,7 +65,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	nstFmt, err := line.NewNST()
+	wsFmt, err := line.NewWS()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,18 +78,15 @@ func main() {
 			log.Fatal(err)
 		}
 		l := s.Text()
-		e, err := nstFmt.ParseToEntry(l)
+		e, err := wsFmt.ParseToEntry(l)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		// if no space in transcription, add these using symbolset.SplitIntoPhonemes utility
 
 		for _, r := range ssRule.Validate(e) {
 			panic(r) // shouldn't happen
 		}
 
-		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "nst"}
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {

@@ -41,6 +41,9 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 	}
 	res.Transcriptions = getTranses(fs) // <-- func getTranses declared in nst.go
 
+	res.EntryStatus.Name = fs[StatusName]
+	res.EntryStatus.Source = fs[StatusSource]
+
 	return res, nil
 }
 
@@ -111,7 +114,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 
 func NewWS() (WS, error) {
 	tests := []FormatTest{
-		FormatTest{"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE								",
+		FormatTest{"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 			map[Field]string{
 				Orth:         "storstaden",
 				Pos:          "NN SIN|DEF|NOM|UTR",
@@ -127,10 +130,10 @@ func NewWS() (WS, error) {
 				Translang3:   "",
 				Trans4:       "",
 				Translang4:   "",
-				StatusName:   "",
-				StatusSource: "",
+				StatusName:   "imported",
+				StatusSource: "nst",
 			},
-			"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE								",
+			"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 		},
 	}
 	f, err := NewFormat(
