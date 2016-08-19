@@ -225,6 +225,8 @@ func (ss SymbolSet) HasSymbol(symbol string) bool {
 // TODO Check that this really works:
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
+	fmt.Println("SymbolSet.ValidSymbol symbol=", symbol)
+	fmt.Println("SymbolSet.ValidSymbol re=", ss.SymbolRe)
 	if !ss.isInit {
 		panic("SymbolSet not initialized properly!")
 	}

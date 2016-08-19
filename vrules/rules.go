@@ -26,6 +26,7 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 				Message:  fmt.Sprintf("Couldn't split transcription: /%s/", t.Strn)})
 		} else {
 			for _, symbol := range splitted {
+				fmt.Println("SymbolSetRule.Validate symbol=", symbol)
 				// TODO fix the below call --- it doesn't work
 				if !r.SymbolSet.ValidSymbol(symbol) {
 					//if !r.SymbolSet.HasSymbol(symbol) {
