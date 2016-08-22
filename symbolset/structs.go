@@ -87,9 +87,8 @@ func (m Mapper) MapTranscriptions(e *lex.Entry) error {
 	e.Transcriptions = newTs
 	if len(errs) > 0 {
 		return fmt.Errorf("%v", strings.Join(errs, "; "))
-	} else {
-		return nil
 	}
+	return nil
 }
 
 // MapTranscription maps one input transcription string into the new symbol set.
@@ -229,11 +228,7 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 	return err
 }
 
-// TODO Temp function, since I don't get ValidSymbol to work
-// Would probably be a bit faster using a map instead of iteration
-// over a slice, but then we would need initialization of the map at
-// the creation of a SymbolSet instance.
-// HasSymbol returns true for strings that are symbols in the symbol set.
+// ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	for _, s := range ss.Symbols {
 		if s.String == symbol {
@@ -243,17 +238,11 @@ func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	return false
 }
 
-// TODO Check that this really works:
-// ValidSymbol checks if a string is a valid symbol or not
-func (ss SymbolSet) ValidSymbolFromRe(symbol string) bool {
+// SplitTranscription splits the input transcription into separate symbols
+func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 	if !ss.isInit {
 		panic("SymbolSet not initialized properly!")
 	}
-	return ss.SymbolRe.MatchString(symbol)
-}
-
-// SplitTranscription splits the input transcription into separate symbols
-func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 	delim := ss.phonemeDelimiterRe
 	if delim.FindStringIndex("") != nil {
 		rest := input
