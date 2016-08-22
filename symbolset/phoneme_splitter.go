@@ -1,5 +1,7 @@
 package symbolset
 
+// For testing or standalone use only! In production use symbolset.SymbolSet.SplitTranscription
+
 import (
 	"fmt"
 	"os"
@@ -11,19 +13,19 @@ import (
 
 // Sort slice of strings according to len, longest string first
 // TODO Should this live in a util lib?
-type ByLength []string
+type byLength []string
 
-func (s ByLength) Len() int {
+func (s byLength) Len() int {
 	return len(s)
 }
-func (s ByLength) Swap(i, j int) {
+func (s byLength) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
-func (s ByLength) Less(i, j int) bool {
+func (s byLength) Less(i, j int) bool {
 	return len(s[i]) > len(s[j])
 }
 
-func SplitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string) {
+func splitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string) {
 
 	var known []string
 	// start by discarding any phoneme strings not substrings of transcription
@@ -33,7 +35,7 @@ func SplitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes [
 		}
 	}
 
-	sort.Sort(ByLength(known))
+	sort.Sort(byLength(known))
 	return splurt(&known, transcription, []string{}, []string{})
 }
 
@@ -98,11 +100,11 @@ func consume(srtd *[]string, trans string) (string, string, bool) {
 	}
 }
 
-// SplitTrans applies SplitIntoPhonemes to the transcription strings of a lex.Entry
-func SplitTrans(e *lex.Entry, symbols []string) {
+// splitTrans applies splitIntoPhonemes to the transcription strings of a lex.Entry
+func splitTrans(e *lex.Entry, symbols []string) {
 	var newTs []lex.Transcription
 	for _, t := range e.Transcriptions {
-		t2, u2 := SplitIntoPhonemes(symbols, t.Strn)
+		t2, u2 := splitIntoPhonemes(symbols, t.Strn)
 		newT := strings.Join(t2, " ")
 		if len(u2) > 0 {
 			fmt.Fprintf(os.Stderr, "%s > %v --> %v\n", t.Strn, t2, u2)

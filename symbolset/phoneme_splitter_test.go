@@ -12,7 +12,7 @@ func Test_LenSort(t *testing.T) {
 	s2 := "looong"
 	ss := []string{s0, s1, s2}
 
-	sort.Sort(ByLength(ss))
+	sort.Sort(byLength(ss))
 	if got, want := ss[0], s2; got != want {
 		t.Errorf("Got '%v' Wanted '%v'", got, want)
 	}
@@ -24,10 +24,10 @@ func Test_LenSort(t *testing.T) {
 	}
 }
 
-func Test_SplitIntoPhonemes(t *testing.T) {
+func Test_splitIntoPhonemes(t *testing.T) {
 	phs := []string{"aa", "a", "bb", "b", "ddddd", "f33"}
 	s1 := "c"
-	res, unk := SplitIntoPhonemes(phs, s1)
+	res, unk := splitIntoPhonemes(phs, s1)
 	//fmt.Printf("res: '%v' unk: '%v'\n", res, unk)
 	if got, want := res[0], s1; got != want {
 		t.Errorf("Got '%v' Wanted '%v'", got, want)
@@ -37,7 +37,7 @@ func Test_SplitIntoPhonemes(t *testing.T) {
 	}
 
 	s2 := "a"
-	res, unk = SplitIntoPhonemes(phs, s2)
+	res, unk = splitIntoPhonemes(phs, s2)
 	if got, want := res[0], s2; got != want {
 		t.Errorf("Got '%v' Wanted '%v'", got, want)
 	}
@@ -46,7 +46,7 @@ func Test_SplitIntoPhonemes(t *testing.T) {
 	}
 
 	s3 := "_azbbax"
-	res, unk = SplitIntoPhonemes(phs, s3)
+	res, unk = splitIntoPhonemes(phs, s3)
 	if got, want := res[0], "_"; got != want {
 		t.Errorf("Got '%v' Wanted '%v'", got, want)
 	}
