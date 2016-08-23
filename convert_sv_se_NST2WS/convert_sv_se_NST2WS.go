@@ -17,34 +17,28 @@ func main() {
 
 	if len(os.Args) != 3 {
 		fmt.Fprintln(os.Stderr, "<INPUT NST LEX FILE> <SYMBOL SET FILE>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go swe030224NST.pron_utf8.txt sv_nst2ws-sampa_maptable.csv")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go swe030224NST.pron_utf8.txt sv-se_nst2ws-sampa_maptable.csv")
 		return
 	}
 
-	// Lexicon file
 	nstFileName := os.Args[1]
-
 	ssFileName := os.Args[2]
 
 	reFrom, err := regexp2.Compile("[.][^.]+$", regexp2.None)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Grandmaster Fail and the Furious File: %v\n", err)
+		fmt.Fprintf(os.Stderr, "regexp compile failed: %v\n", err)
 	}
 	ssName, err := reFrom.Replace(ssFileName, "", 0, -1)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Grandmaster Fail and the Furious File: %v\n", err)
+		fmt.Fprintf(os.Stderr, "couldn't load symbolset file name: %v\n", err)
 	}
 	ssMapper, err := symbolset.LoadMapper(ssName, ssFileName, "NST-XSAMPA", "WS-SAMPA")
 	ssRuleTo := vrules.SymbolSetRule{ssMapper.To}
 
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Grandmaster Fail and the Furious File: %v\n", err)
-	}
-
 	nstFile, err := os.Open(nstFileName)
 	defer nstFile.Close()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Grandmaster Fail and the Furious File: %v\n", err)
+		fmt.Fprintf(os.Stderr, "couldn't open lexicon file: %v\n", err)
 	}
 
 	nstFmt, err := line.NewNST()
@@ -91,9 +85,6 @@ func main() {
 			}
 		}
 	}
-	// }
-	//_ = nstFile
 
 	_ = lex.Entry{}
-	//_ = line.NST{}
 }
