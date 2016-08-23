@@ -22,11 +22,10 @@ func out(e lex.Entry) {
 
 	s, err := ws.Entry2String(e)
 	if err != nil {
-		log.Fatalf("How is this misery possible? : %v", err)
+		log.Fatalf("entry2string failed : %v", err)
 	}
 
 	fmt.Printf("%s\n", s)
-
 }
 
 func main() {
@@ -37,7 +36,7 @@ func main() {
 	defer cmuFile.Close()
 	if err != nil {
 
-		log.Fatal("Auch! : %v", err)
+		log.Fatal("couldn't open input file : %v", err)
 	}
 
 	var variant = regexp.MustCompile("\\([0-9]\\)")
@@ -46,37 +45,35 @@ func main() {
 	s := bufio.NewScanner(cmuFile)
 	for s.Scan() {
 		if err = s.Err(); err != nil {
-			log.Fatal("Funk! : %v", err)
+			log.Fatal("scanner failure : %v", err)
 		}
 		l := s.Text()
+
 		fs := strings.Split(l, "  ")
 		if len(fs) != 2 || strings.HasPrefix(l, ";;") {
-			fmt.Fprintf(os.Stderr, "skipping line: %v\n", l)
+			//Print non-entries (prefix and license) as comments
+			l = "# " + l
+			fmt.Println(l)
 			continue
-		} //else {
+		}
 		w := strings.ToLower(fs[0])
 		t := fs[1]
 
 		// Variant transcription, not a new entry
 		if variant.MatchString(w) {
-			//fmt.Println(l)
 			t0 := lex.Transcription{Strn: t}
 			lastEntry.Transcriptions = append(lastEntry.Transcriptions, t0)
 		} else {
-			//fmt.Println("EN APA")
 			if lastEntry.Strn != "" {
 				out(lastEntry)
-				//fmt.Printf("%v\n", lastEntry)
 			}
 			ts := []lex.Transcription{lex.Transcription{Strn: t}}
-			// TODO Hard-wired language name
-			lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "EN"}
+			// Hard-wired (ISO 639-1 language name + ISO 3166-1 alpha 2 country)
+			lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "en-us"}
 		}
-		// }
 	}
 	// Flush
 	if lastEntry.Strn != "" {
-		//fmt.Printf("%v\n", lastEntry)
 		out(lastEntry)
 	}
 
