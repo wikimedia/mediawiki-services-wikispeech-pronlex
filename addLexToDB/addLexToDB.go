@@ -17,7 +17,7 @@ import (
 
 func main() {
 
-	sampleInvocation := `go run addNSTLexToDB.go sv.se.nst sv.se.nst-SAMPA symbolset/static/sv_ws-sampa_maptable.csv pronlex.db swe030224NST.pron_utf8.txt`
+	sampleInvocation := `go run addLexToDB.go sv-se.nst sv-se.nst-SAMPA symbolset/static/sv-se_ws-sampa_maptable.csv pronlex.db swe030224NST.pron_utf8.txt`
 
 	if len(os.Args) != 6 {
 		log.Fatal("Expected <DB LEXICON NAME> <SYMBOLSET NAME> <SYMBOLSET FILE> <DB FILE> <NST INPUT FILE>", "\n\tSample invocation: ", sampleInvocation)
