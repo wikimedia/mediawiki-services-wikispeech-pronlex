@@ -1,0 +1,44 @@
+DESCRIPTION	SYMBOL	IPA	CATEGORY
+vowel	AA	ɑː	vowel
+vowel	AE		vowel
+vowel	A		vowel
+vowel	AO		vowel
+vowel	AW		vowel
+vowel	AY		vowel
+stop	B	b	consonant
+affricate	CH	tʃ	consonant
+stop	D	d	consonant
+fricative	DH	ð	consonant
+vowel	EH		vowel
+vowel	ER		vowel
+vowel	EY		vowel
+fricative	F	f	consonant
+stop	G	g	stop
+aspirate	HH	h	consonant
+vowel	IH		vowel
+vowel	IY		vowel
+affricate	JH	dʒ	consonant
+stop	K	k	consonant
+liquid	L	l	consonant
+nasal	M	m	consonant
+nasal	N	n	consonant
+nasal	NG	ŋ	consonant
+vowel	OW	oʊ	vowel
+vowel	OY	ɔɪ	vowel
+stop	P	p	consonant
+liquid	R		consonant
+fricative	S	s	consonant
+fricative	SH	ʃ	consonant
+stop	T	t	consonant
+fricative	TH	θ	consonant
+vowel	UH		vowel
+vowel	UW		vowel
+fricative	V	v	consonant
+semivowel	W	w	consonant
+semivowel	Y	j	consonant
+fricative	Z	z	consonant
+fricative	ZH	ʒ	consonant
+syllable delimiter	$	.	syllable delimiter
+primary stress	1	ˈ	stress
+secondary stress	2	ˌ	stress
+phoneme delimiter	 		phoneme delimiter
