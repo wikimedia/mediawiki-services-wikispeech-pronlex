@@ -111,7 +111,7 @@ func newSymbolSet(name string, symbols []Symbol, checkForDups bool) (SymbolSet, 
 }
 
 // NewMapper is a public constructor for Mapper with built-in error checks
-func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper, error) {
+func NewMapper(name string, fromName string, toName string, symbolList []SymbolPair) (Mapper, error) {
 	var nilRes Mapper
 
 	ipa := newIPA()
@@ -160,6 +160,7 @@ func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper,
 	}
 
 	m := Mapper{
+		Name:                      name,
 		FromName:                  fromName,
 		ToName:                    toName,
 		Symbols:                   symbolList,
@@ -203,7 +204,13 @@ func LoadMapper(name string, fName string, fromColumn string, toColumn string) (
 			if n == 1 { // header
 				descIndex = indexOf(fs, "DESCRIPTION")
 				fromIndex = indexOf(fs, fromColumn)
+				if fromIndex == -1 {
+					return nilRes, fmt.Errorf("from index %v undefined", fromColumn)
+				}
 				toIndex = indexOf(fs, toColumn)
+				if toIndex == -1 {
+					return nilRes, fmt.Errorf("to index %v undefined", toColumn)
+				}
 				typeIndex = indexOf(fs, "CATEGORY")
 
 			} else {
@@ -262,7 +269,7 @@ func LoadMapper(name string, fName string, fromColumn string, toColumn string) (
 	} else {
 		toName = toColumn
 	}
-	m, err := NewMapper(fromName, toName, maptable)
+	m, err := NewMapper(name, fromName, toName, maptable)
 	if err != nil {
 		return nilRes, err
 	}

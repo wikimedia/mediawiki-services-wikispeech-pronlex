@@ -1,8 +1,9 @@
-DESCRIPTION	SYMBOL	IPA	CATEGORY
+DESCRIPTION	CMU	IPA	CATEGORY
 pot	AA	ɒ	syllabic
 pat	AE	æ	syllabic
 cut	AH	ʌ	syllabic
-allow	AH0	ə	syllabic
+#but: schwa is transcribed AH0 in CMU!!
+allow	AX	ə	syllabic
 cause	AO	ɔ	syllabic
 rouse	AW	a⁀ʊ	syllabic
 rise	AY	a⁀ɪ	syllabic
@@ -42,5 +43,5 @@ measure	ZH	ʒ	non syllabic
 syllable delimiter	$	.	syllable delimiter
 primary stress	1	ˈ	stress
 secondary stress	2	ˌ	stress
-no stress	0		stress
+#no stress	0		stress
 phoneme delimiter	 		phoneme delimiter

@@ -38,6 +38,7 @@ type SymbolSet struct {
 // Mapper is a struct for package private usage.
 // To create a new Mapper, use NewMapper.
 type Mapper struct {
+	Name     string
 	FromName string
 	ToName   string
 	Symbols  []SymbolPair
@@ -71,7 +72,7 @@ func (m Mapper) postFilter(trans string, ss SymbolSet) (string, error) {
 	if m.toIsIPA {
 		return m.ipa.filterAfterMappingToIpa(trans, ss)
 	} else if m.toIsCMU {
-		return m.cmu.filterAfterMappingToCMU(trans, ss), nil
+		return m.cmu.filterAfterMappingToCMU(trans, ss)
 	}
 	return trans, nil
 }
@@ -328,13 +329,19 @@ func (cmu cmu) filterBeforeMappingFromCMU(trans string, ss SymbolSet) string {
 	trans = strings.Replace(trans, "1", " 1", -1)
 	trans = strings.Replace(trans, "2", " 2", -1)
 	trans = strings.Replace(trans, "0", " 0", -1)
-	trans = strings.Replace(trans, "AH 0", "AH0", -1)
 	return trans
 }
 
-func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) string {
+func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) (string, error) {
+	s := "([012]) ((?:" + ss.NonSyllabicRe.String() + " )*)(" + ss.SyllabicRe.String() + ")"
+	repl, err := regexp.Compile(s)
+	if err != nil {
+		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
+	}
+	trans = repl.ReplaceAllString(trans, "$2$3$1")
+
 	trans = strings.Replace(trans, " 1", "1", -1)
 	trans = strings.Replace(trans, " 2", "2", -1)
 	trans = strings.Replace(trans, " 0", "0", -1)
-	return trans
+	return trans, nil
 }
