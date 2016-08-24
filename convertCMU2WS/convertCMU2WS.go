@@ -11,6 +11,8 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
+	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/vrules"
 )
 
 var ws, errrr = line.NewWS()
@@ -30,7 +32,25 @@ func out(e lex.Entry) {
 
 func main() {
 
+	if len(os.Args) != 4 {
+		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU2IPA MAPPER> <IPA2SAMPA MAPPER>")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go swe030224NST.pron_utf8.txt en-us_cmu.csv en_us_sampa_mary.csv")
+		return
+	}
+
 	cmuFileName := os.Args[1]
+	ssFileName1 := os.Args[2]
+	ssFileName2 := os.Args[3]
+
+	ssMapper1, err := symbolset.LoadMapper("CMU2IPA", ssFileName1, "CMU", "IPA")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+	}
+	ssMapper2, err := symbolset.LoadMapper("IPA2SAMPA", ssFileName2, "IPA", "SAMPA")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+	}
+	ssRuleTo := vrules.SymbolSetRule{ssMapper2.To}
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()
@@ -57,7 +77,16 @@ func main() {
 			continue
 		}
 		w := strings.ToLower(fs[0])
-		t := fs[1]
+		t0 := strings.Replace(fs[1], "AH0", "AX", -1)
+
+		t, err := ssMapper1.MapTranscription(t0)
+		if err != nil {
+			log.Fatal("CMU2IPA failure : %v", err)
+		}
+		t, err = ssMapper2.MapTranscription(t)
+		if err != nil {
+			log.Fatal("IPA2SAMPA failure : %v", err)
+		}
 
 		// Variant transcription, not a new entry
 		if variant.MatchString(w) {
@@ -65,6 +94,9 @@ func main() {
 			lastEntry.Transcriptions = append(lastEntry.Transcriptions, t0)
 		} else {
 			if lastEntry.Strn != "" {
+				for _, r := range ssRuleTo.Validate(lastEntry) {
+					panic(r) // shouldn't happen
+				}
 				out(lastEntry)
 			}
 			ts := []lex.Transcription{lex.Transcription{Strn: t}}
@@ -74,6 +106,10 @@ func main() {
 	}
 	// Flush
 	if lastEntry.Strn != "" {
+		for _, r := range ssRuleTo.Validate(lastEntry) {
+			panic(r) // shouldn't happen
+		}
+
 		out(lastEntry)
 	}
 
