@@ -43,10 +43,13 @@ type Mapper struct {
 	Symbols  []SymbolPair
 
 	ipa ipa
+	cmu cmu
 
 	// derived values computed upon initialization
 	fromIsIPA bool
 	toIsIPA   bool
+	fromIsCMU bool
+	toIsCMU   bool
 
 	From      SymbolSet
 	To        SymbolSet
@@ -56,21 +59,21 @@ type Mapper struct {
 }
 
 func (m Mapper) preFilter(trans string, ss SymbolSet) (string, error) {
-	switch m.fromIsIPA {
-	case true:
+	if m.fromIsIPA {
 		return m.ipa.filterBeforeMappingFromIpa(trans, ss)
-	default:
-		return trans, nil
+	} else if m.fromIsCMU {
+		return m.cmu.filterBeforeMappingFromCMU(trans, ss), nil
 	}
+	return trans, nil
 }
 
 func (m Mapper) postFilter(trans string, ss SymbolSet) (string, error) {
-	switch m.toIsIPA {
-	case true:
+	if m.toIsIPA {
 		return m.ipa.filterAfterMappingToIpa(trans, ss)
-	default:
-		return trans, nil
+	} else if m.toIsCMU {
+		return m.cmu.filterAfterMappingToCMU(trans, ss), nil
 	}
+	return trans, nil
 }
 
 // MapTranscriptions maps the input entry's transcriptions (in-place)
@@ -241,7 +244,7 @@ func (ss SymbolSet) ValidSymbol(symbol string) bool {
 // SplitTranscription splits the input transcription into separate symbols
 func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 	if !ss.isInit {
-		panic("SymbolSet not initialized properly!")
+		panic("symbolSet " + ss.Name + " has not been initialized properly!")
 	}
 	delim := ss.phonemeDelimiterRe
 	if delim.FindStringIndex("") != nil {
@@ -267,7 +270,6 @@ func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 }
 
 // ipa utilility functions with struct for package private usage.
-// To create a new SymbolSet, use NewSymbolSet.
 // Symbols and codes: http://www.phon.ucl.ac.uk/home/wells/ipa-unicode.htm#numbers
 type ipa struct {
 	ipa      string
@@ -279,42 +281,60 @@ func (ipa ipa) isIPA(symbolSetName string) bool {
 	return strings.Contains(strings.ToLower(symbolSetName), ipa.ipa)
 }
 
-func (ipa ipa) checkFilterRequirements(ss SymbolSet) error {
-	if !ss.Contains(ipa.accentI) {
-		return fmt.Errorf("no IPA stress symbol in stress symbol list? IPA stress =/%v/, stress symbols=%v", ipa.accentI, ss.stressSymbols)
-	} else if !ss.Contains(ipa.accentI + ipa.accentII) {
-		return fmt.Errorf("no IPA tone II symbol in stress symbol list? IPA stress =/%s/, stress symbols=%v", ipa.accentI, ss.stressSymbols)
-	} else {
-		return nil
-	}
-}
-
 func (ipa ipa) filterBeforeMappingFromIpa(trans string, ss SymbolSet) (string, error) {
 	// IPA: ˈba`ŋ.ka => ˈ`baŋ.ka"
-	err := ipa.checkFilterRequirements(ss)
-	if err != nil {
-		return "", err
-	}
 	s := ipa.accentI + "(" + ss.PhonemeRe.String() + "+)" + ipa.accentII
 	repl, err := regexp.Compile(s)
 	if err != nil {
-		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
+		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
 	}
 	res := repl.ReplaceAllString(trans, ipa.accentI+ipa.accentII+"$1")
 	return res, nil
 }
 
 func (ipa ipa) filterAfterMappingToIpa(trans string, ss SymbolSet) (string, error) {
-	conditionForAfterMapping := ipa.accentI + ipa.accentII
+	// IPA: /ə.ba⁀ʊˈt/ => /ə.ˈba⁀ʊt/
+	s := "(" + ss.NonSyllabicRe.String() + "*)(" + ss.SyllabicRe.String() + ")" + ipa.accentI
+	repl, err := regexp.Compile(s)
+	if err != nil {
+		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
+	}
+	trans = repl.ReplaceAllString(trans, ipa.accentI+"$1$2")
+
 	// IPA: /'`pa.pa/ => /'pa`.pa/
-	if strings.Contains(trans, conditionForAfterMapping) {
-		err := ipa.checkFilterRequirements(ss)
+	accentIIConditionForAfterMapping := ipa.accentI + ipa.accentII
+	if strings.Contains(trans, accentIIConditionForAfterMapping) {
+		s := ipa.accentI + ipa.accentII + "(" + ss.NonSyllabicRe.String() + "*)(" + ss.SyllabicRe.String() + ")"
+		repl, err := regexp.Compile(s)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
 		}
-		repl, err := regexp.Compile(ipa.accentI + ipa.accentII + "(" + ss.NonSyllabicRe.String() + "*)(" + ss.SyllabicRe.String() + ")")
 		res := repl.ReplaceAllString(trans, ipa.accentI+"$1$2"+ipa.accentII)
 		return res, nil
 	}
 	return trans, nil
+}
+
+// cmu utilility functions with struct for package private usage.
+type cmu struct {
+	cmu string
+}
+
+func (cmu cmu) isCMU(symbolSetName string) bool {
+	return strings.Contains(strings.ToLower(symbolSetName), cmu.cmu)
+}
+
+func (cmu cmu) filterBeforeMappingFromCMU(trans string, ss SymbolSet) string {
+	trans = strings.Replace(trans, "1", " 1", -1)
+	trans = strings.Replace(trans, "2", " 2", -1)
+	trans = strings.Replace(trans, "0", " 0", -1)
+	trans = strings.Replace(trans, "AH 0", "AH0", -1)
+	return trans
+}
+
+func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) string {
+	trans = strings.Replace(trans, " 1", "1", -1)
+	trans = strings.Replace(trans, " 2", "2", -1)
+	trans = strings.Replace(trans, " 0", "0", -1)
+	return trans
 }

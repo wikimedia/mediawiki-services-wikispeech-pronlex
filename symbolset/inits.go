@@ -10,12 +10,19 @@ import (
 
 // inits.go Initialization functions for structs in package symbolset
 
-// NewIPA is a package private contructor for the ipa struct with fixed-value fields
+// newIPA is a package private contructor for the ipa struct with fixed-value fields
 func newIPA() ipa {
 	return ipa{
 		ipa:      "ipa",
 		accentI:  "\u02C8",
 		accentII: "\u0300",
+	}
+}
+
+// newCMU is a package private contructor for the ipa struct with fixed-value fields
+func newCMU() cmu {
+	return cmu{
+		cmu: "cmu",
 	}
 }
 
@@ -59,8 +66,8 @@ func newSymbolSet(name string, symbols []Symbol, checkForDups bool) (SymbolSet, 
 	if err != nil {
 		return nilRes, err
 	}
-
 	symbolRe, err := buildRegexpWithGroup(symbols, true, false)
+
 	if err != nil {
 		return nilRes, err
 	}
@@ -108,9 +115,12 @@ func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper,
 	var nilRes Mapper
 
 	ipa := newIPA()
+	cmu := newCMU()
 
 	toIsIPA := ipa.isIPA(toName)
 	fromIsIPA := ipa.isIPA(fromName)
+	toIsCMU := cmu.isCMU(toName)
+	fromIsCMU := cmu.isCMU(fromName)
 
 	var fromSymbols = make([]Symbol, 0)
 	var toSymbols = make([]Symbol, 0)
@@ -155,6 +165,8 @@ func NewMapper(fromName string, toName string, symbolList []SymbolPair) (Mapper,
 		Symbols:                   symbolList,
 		fromIsIPA:                 fromIsIPA,
 		toIsIPA:                   toIsIPA,
+		fromIsCMU:                 fromIsCMU,
+		toIsCMU:                   toIsCMU,
 		From:                      from,
 		To:                        to,
 		ipa:                       ipa,

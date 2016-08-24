@@ -500,7 +500,7 @@ func Test_LoadMapper_NST2IPA(t *testing.T) {
 	name := "NST-XSAMPA"
 	fromColumn := "SYMBOL"
 	toColumn := "IPA"
-	fName := "static/sv_nst-xsampa_maptable.csv"
+	fName := "static/sv-se_nst-xsampa_maptable.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -513,7 +513,7 @@ func Test_LoadMapper_WS2IPA(t *testing.T) {
 	name := "WS-SAMPA"
 	fromColumn := "SYMBOL"
 	toColumn := "IPA"
-	fName := "static/sv_ws-sampa_maptable.csv"
+	fName := "static/sv-se_ws-sampa_maptable.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -526,7 +526,7 @@ func Test_LoadMapper_IPA2WS(t *testing.T) {
 	name := "WS-SAMPA"
 	fromColumn := "IPA"
 	toColumn := "SYMBOL"
-	fName := "static/sv_ws-sampa_maptable.csv"
+	fName := "static/sv-se_ws-sampa_maptable.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -539,7 +539,7 @@ func Test_LoadMapper_NST2WS(t *testing.T) {
 	name := "NST-XSAMPA"
 	fromColumn := "SYMBOL"
 	toColumn := "IPA"
-	fName := "static/sv_nst-xsampa_maptable.csv"
+	fName := "static/sv-se_nst-xsampa_maptable.csv"
 	ssmNST, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -548,7 +548,7 @@ func Test_LoadMapper_NST2WS(t *testing.T) {
 	name = "WS-SAMPA"
 	fromColumn = "IPA"
 	toColumn = "SYMBOL"
-	fName = "static/sv_ws-sampa_maptable.csv"
+	fName = "static/sv-se_ws-sampa_maptable.csv"
 	ssmWS, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -589,3 +589,128 @@ func Test_NewMapper_DontFailIfInputContainsDuplicates(t *testing.T) {
 		t.Errorf("NewMapper() didn't expect error when output phoneme set contains duplicates")
 	}
 }
+
+func Test_LoadMapper_CMU2IPA(t *testing.T) {
+	name := "CMU"
+	fromColumn := "SYMBOL"
+	toColumn := "IPA"
+	fName := "static/en-us_cmu.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+	}
+
+	testMapTranscription1(t, ssm, "AH0 $ B AW1 T", "ə.ˈba⁀ʊt")
+}
+func Test_LoadMapper_MARYSAMPAIPA(t *testing.T) {
+	name := "MARYSAMPA"
+	fromColumn := "SYMBOL"
+	toColumn := "IPA"
+	fName := "static/en-us_sampa_mary.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+	}
+
+	testMapTranscription1(t, ssm, "@ - \" b aU t", "ə.ˈba⁀ʊt")
+}
+
+func Test_LoadMapper_IPA2MARYSAMPA(t *testing.T) {
+	name := "MARYSAMPA"
+	fromColumn := "IPA"
+	toColumn := "SYMBOL"
+	fName := "static/en-us_sampa_mary.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+	}
+
+	testMapTranscription1(t, ssm, "ə.ˈba⁀ʊt", "@ - \" b aU t")
+}
+
+func Test_LoadMapper_CMU2MARYSAMPA(t *testing.T) {
+	name := "CMU"
+	fromColumn := "SYMBOL"
+	toColumn := "IPA"
+	fName := "static/en-us_cmu.csv"
+	ssmCMU, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+	}
+
+	name = "MARYSAMPA"
+	fromColumn = "IPA"
+	toColumn = "SYMBOL"
+	fName = "static/en-us_sampa_mary.csv"
+	ssmMARY, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+	}
+
+	mappers := []Mapper{ssmCMU, ssmMARY}
+
+	testMapTranscriptionX(t, mappers, "AH0 $ B AW1 T", "@ - \" b aU t")
+}
+
+// func Test_LoadMapper_SAMPA2MARY(t *testing.T) {
+// 	name := "SAMPA2MARY"
+// 	fromColumn := "SAMPA"
+// 	toColumn := "MARY"
+// 	fName := "static/sv-se_sampa_mary.csv"
+// 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+// 	if err != nil {
+// 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+// 	}
+
+// 	testMapTranscription1(t, ssm, "ə.ˈba⁀ʊt", "AH0 $ B AW1 T")
+// }
+
+// func Test_LoadMapper_NST2MARY(t *testing.T) {
+// 	name := "NST2MARY"
+// 	fromColumn := "NST-XSAMPA"
+// 	toColumn := "MARY"
+// 	fName := "static/sv-se_nst-xsampa_mary.csv"
+// 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+// 	if err != nil {
+// 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+// 	}
+
+// 	testMapTranscription1(t, ssm, "ə.ˈba⁀ʊt", "AH0 $ B AW1 T")
+// }
+
+// func Test_LoadMapper_IPA2CMU(t *testing.T) {
+// 	name := "CMU"
+// 	fromColumn := "IPA"
+// 	toColumn := "SYMBOl"
+// 	fName := "static/en-us_cmu.csv"
+// 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+// 	if err != nil {
+// 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+// 	}
+
+// 	testMapTranscription1(t, ssm, "ə.ˈba⁀ʊt", "AH0 $ B AW1 T")
+// }
+
+// func Test_LoadMapper_MARYSAMPA2CMU(t *testing.T) {
+// 	name := "MARYSAMPA"
+// 	fromColumn := "SYMBOL"
+// 	toColumn := "IPA"
+// 	fName := "static/en-us_sampa_mary.csv"
+// 	ssmMARY, err := LoadMapper(name, fName, fromColumn, toColumn)
+// 	if err != nil {
+// 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+// 	}
+
+// 	name = "CMU"
+// 	fromColumn = "IPA"
+// 	toColumn = "SYMBOL"
+// 	fName = "static/en-us_cmu.csv"
+// 	ssmCMU, err := LoadMapper(name, fName, fromColumn, toColumn)
+// 	if err != nil {
+// 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+// 	}
+
+// 	mappers := []Mapper{ssmMARY, ssmCMU}
+
+// 	testMapTranscriptionX(t, mappers, "AH0 $ B AW1 T", "@ - \" b aU t")
+// }
