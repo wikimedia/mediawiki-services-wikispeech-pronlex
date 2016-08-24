@@ -178,6 +178,57 @@ func NewMapper(name string, fromName string, toName string, symbolList []SymbolP
 
 }
 
+// LoadMappers loads two Mappers from files.
+func LoadMappers(fromName string, toName string, fName1 string, fName2 string) (Mappers, error) {
+	name := fromName + "2" + toName
+	mapper1, err := LoadMapper(fromName+"2IPA", fName1, fromName, "IPA")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+	}
+	mapper2, err := LoadMapper("IPA2"+toName, fName2, "IPA", toName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+	}
+	mappers := Mappers{name, mapper1, mapper2}
+
+	// for testing:
+	mapper1rev, err := LoadMapper(fromName+"2IPA", fName1, "IPA", fromName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+	}
+	mapper2rev, err := LoadMapper("IPA2"+toName, fName2, toName, "IPA")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+	}
+	mappersrev := Mappers{toName + "2" + fromName, mapper2rev, mapper1rev}
+
+	var errs []string
+
+	for _, symbol := range mapper1.From.Symbols {
+		if len(symbol.String) > 0 {
+			mapped, err := mappers.MapTranscription(symbol.String)
+			if len(mapped) > 0 {
+				if err != nil {
+					return mappers, fmt.Errorf("couldn't test mapper: %v\n", err)
+				}
+				mapped, err = mappersrev.MapTranscription(mapped)
+				if err != nil {
+					return mappers, fmt.Errorf("couldn't test mapper: %v\n", err)
+				}
+				if mapped != symbol.String {
+					errs = append(errs, "couldn't map /"+symbol.String+"/ back and forth -- got /"+mapped+"/")
+				}
+			}
+		}
+	}
+	if len(errs) > 0 {
+		return mappers, fmt.Errorf("Mappers initialization tests failed %v", strings.Join(errs, "; "))
+	}
+
+	return mappers, nil
+
+}
+
 // LoadMapper loads a Mapper from file
 func LoadMapper(name string, fName string, fromColumn string, toColumn string) (Mapper, error) {
 	var nilRes Mapper

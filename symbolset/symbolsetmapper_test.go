@@ -15,6 +15,16 @@ func testMapTranscription1(t *testing.T, ssm Mapper, input string, expect string
 	}
 }
 
+func testMapTranscriptionY(t *testing.T, ms Mappers, input string, expect string) {
+	result, err := ms.MapTranscription(input)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here; input=%s, expect=%s : %v", input, expect, err)
+		return
+	} else if result != expect {
+		t.Errorf(fsExpTrans, expect, result)
+	}
+}
+
 func testMapTranscriptionX(t *testing.T, ssms []Mapper, input string, expect string) {
 	result := input
 	for _, m := range ssms {
@@ -705,6 +715,21 @@ func Test_LoadMapper_NST2MARY(t *testing.T) {
 	testMapTranscriptionX(t, mappers, "E*U$r\"u:t`a", "E*U - r ' u: rt a")
 }
 
+func Test_LoadMapper_IPA2SAMPA(t *testing.T) {
+	name := "IPA2SAMPA"
+	fromColumn := "IPA"
+	toColumn := "SAMPA"
+	fName := "static/sv-se_ws-sampa.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+		return
+	}
+
+	testMapTranscription1(t, ssm, "ˈkaj.rʊ", "\" k a j . r U")
+	testMapTranscription1(t, ssm, "be.ˈliːn", "b e . \" l i: n")
+}
+
 func Test_LoadMapper_NST2SAMPA(t *testing.T) {
 	name := "NST2IPA"
 	fromColumn := "SAMPA"
@@ -716,7 +741,7 @@ func Test_LoadMapper_NST2SAMPA(t *testing.T) {
 		return
 	}
 
-	name = "SAMPA"
+	name = "IPA2SAMPA"
 	fromColumn = "IPA"
 	toColumn = "SAMPA"
 	fName = "static/sv-se_ws-sampa.csv"
@@ -727,6 +752,7 @@ func Test_LoadMapper_NST2SAMPA(t *testing.T) {
 	}
 
 	mappers := []Mapper{ssm1, ssm2}
+	testMapTranscriptionX(t, mappers, "\"kaj$rU", "\" k a j . r U")
 	testMapTranscriptionX(t, mappers, "E*U$r\"u:t`a", "eu . r \" u: rt a")
 }
 
@@ -770,4 +796,15 @@ func Test_LoadMapper_MARY2CMU(t *testing.T) {
 
 	testMapTranscriptionX(t, mappers, "@ - \" b aU t", "AX $ B AW1 T")
 	testMapTranscriptionX(t, mappers, "V - \" b aU t", "AH $ B AW1 T")
+}
+
+func Test_LoadMappers_MARY2CMU(t *testing.T) {
+	mappers, err := LoadMappers("SAMPA", "CMU", "static/en-us_sampa_mary.csv", "static/en-us_cmu.csv")
+	if err != nil {
+		t.Errorf("Test_LoadMappers() didn't expect error here : %v", err)
+		return
+	}
+
+	testMapTranscriptionY(t, mappers, "@ - \" b aU t", "AX $ B AW1 T")
+	testMapTranscriptionY(t, mappers, "V - \" b aU t", "AH $ B AW1 T")
 }

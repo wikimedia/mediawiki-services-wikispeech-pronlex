@@ -34,7 +34,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU2IPA MAPPER> <IPA2SAMPA MAPPER>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go swe030224NST.pron_utf8.txt en-us_cmu.csv en_us_sampa_mary.csv")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go cmudict-0.7b.utf8 en-us_cmu.csv en_us_sampa_mary.csv")
 		return
 	}
 
@@ -78,7 +78,9 @@ func main() {
 		}
 		w := strings.ToLower(fs[0])
 		t0 := strings.Replace(fs[1], "AH0", "AX", -1)
+		t0 = strings.Replace(t0, "0", "", -1)
 
+		// todo: multimapper call direct
 		t, err := ssMapper1.MapTranscription(t0)
 		if err != nil {
 			log.Fatal("CMU2IPA failure : %v", err)

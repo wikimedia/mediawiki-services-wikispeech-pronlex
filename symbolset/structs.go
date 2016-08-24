@@ -35,6 +35,13 @@ type SymbolSet struct {
 	phonemeDelimiterRe *regexp.Regexp
 }
 
+// Mappers is a struct for package private usage. To create a new instance of Mappers, use LoadMapperes.
+type Mappers struct {
+	Name    string
+	Mapper1 Mapper
+	Mapper2 Mapper
+}
+
 // Mapper is a struct for package private usage.
 // To create a new Mapper, use NewMapper.
 type Mapper struct {
@@ -63,7 +70,7 @@ func (m Mapper) preFilter(trans string, ss SymbolSet) (string, error) {
 	if m.fromIsIPA {
 		return m.ipa.filterBeforeMappingFromIpa(trans, ss)
 	} else if m.fromIsCMU {
-		return m.cmu.filterBeforeMappingFromCMU(trans, ss), nil
+		return m.cmu.filterBeforeMappingFromCMU(trans, ss)
 	}
 	return trans, nil
 }
@@ -325,11 +332,13 @@ func (cmu cmu) isCMU(symbolSetName string) bool {
 	return strings.Contains(strings.ToLower(symbolSetName), cmu.cmu)
 }
 
-func (cmu cmu) filterBeforeMappingFromCMU(trans string, ss SymbolSet) string {
-	trans = strings.Replace(trans, "1", " 1", -1)
-	trans = strings.Replace(trans, "2", " 2", -1)
-	trans = strings.Replace(trans, "0", " 0", -1)
-	return trans
+func (cmu cmu) filterBeforeMappingFromCMU(trans string, ss SymbolSet) (string, error) {
+	re, err := regexp.Compile("(.)([012])")
+	if err != nil {
+		return "", err
+	}
+	trans = re.ReplaceAllString(trans, "$1 $2")
+	return trans, nil
 }
 
 func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) (string, error) {
@@ -344,4 +353,30 @@ func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) (string, erro
 	trans = strings.Replace(trans, " 2", "2", -1)
 	trans = strings.Replace(trans, " 0", "0", -1)
 	return trans, nil
+}
+
+// MapTranscriptions maps one input transcription string into the new symbol set.
+func (m Mappers) MapTranscription(input string) (string, error) {
+	res, err := m.Mapper1.MapTranscription(input)
+	if err != nil {
+		return "", fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	res, err = m.Mapper2.MapTranscription(res)
+	if err != nil {
+		return "", fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	return res, nil
+}
+
+// MapTranscriptions maps the input entry's transcriptions (in-place)
+func (m Mappers) MapTranscriptions(e *lex.Entry) error {
+	err := m.Mapper1.MapTranscriptions(e)
+	if err != nil {
+		return fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	err = m.Mapper2.MapTranscriptions(e)
+	if err != nil {
+		return fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	return nil
 }
