@@ -1,5 +1,5 @@
 # pronlex
-pronlex is a sketch of/place holder for a pronunciation lexicon database behind a simple http API. It is NOT ready for proper use.
+pronlex is a pronunciation lexicon database behind a http API.
 
 You need [Go](https://golang.org/) (1.7)
 
