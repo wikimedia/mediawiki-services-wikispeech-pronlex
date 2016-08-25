@@ -6,11 +6,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/stts-se/pronlex/dbapi"
-	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/vrules"
-	"golang.org/x/net/websocket"
 	"io"
 	"io/ioutil"
 	"log"
@@ -23,6 +18,12 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/line"
+	"github.com/stts-se/pronlex/vrules"
+	"golang.org/x/net/websocket"
 )
 
 // TODO Split this file into packages + main?
@@ -886,9 +887,17 @@ func keepAlive(wsC chan string) {
 
 func main() {
 
-	port := ":8787"
+	if len(os.Args) != 3 {
+		log.Println("usage: <SQLITE DB FILE> <PORT>")
+		log.Println("sample invokation: $ go run lexserver.go pronlex.db 8787")
+		os.Exit(1)
+	}
 
-	dbFile := "./pronlex.db"
+	dbFile := os.Args[1] // "./pronlex.db"
+	port := os.Args[2]   //":8787"
+	if !strings.HasPrefix(port, ":") {
+		port = ":" + port
+	}
 
 	var err error // återanvänds för alla fel
 
