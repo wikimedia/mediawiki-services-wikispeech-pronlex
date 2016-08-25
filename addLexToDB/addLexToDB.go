@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	//	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
@@ -35,6 +36,10 @@ func main() {
 	}
 
 	ssMapper, err := symbolset.LoadMapper(symbolSetName, ssFileName, "SYMBOL", "IPA")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	ssRule := vrules.SymbolSetRule{ssMapper.From}
 
 	db, err := sql.Open("sqlite3", dbFile)
@@ -78,6 +83,14 @@ func main() {
 			log.Fatal(err)
 		}
 		l := s.Text()
+
+		if strings.HasPrefix(l, "#") {
+			continue
+		}
+		if l == "" {
+			continue
+		}
+
 		e, err := wsFmt.ParseToEntry(l)
 		if err != nil {
 			log.Fatal(err)

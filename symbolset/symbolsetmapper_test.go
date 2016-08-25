@@ -538,7 +538,7 @@ func Test_LoadMapper_NST2IPA_SV(t *testing.T) {
 
 func Test_LoadMapper_WS2IPA(t *testing.T) {
 	name := "WS-SAMPA"
-	fromColumn := "SAMPA"
+	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/sv-se_ws-sampa.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
@@ -552,7 +552,7 @@ func Test_LoadMapper_WS2IPA(t *testing.T) {
 func Test_LoadMapper_IPA2WS(t *testing.T) {
 	name := "WS-SAMPA"
 	fromColumn := "IPA"
-	toColumn := "SAMPA"
+	toColumn := "SYMBOL"
 	fName := "static/sv-se_ws-sampa.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
@@ -574,7 +574,7 @@ func Test_LoadMapper_NST2WS(t *testing.T) {
 
 	name = "WS-SAMPA"
 	fromColumn = "IPA"
-	toColumn = "SAMPA"
+	toColumn = "SYMBOL"
 	fName = "static/sv-se_ws-sampa.csv"
 	ssmWS, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
@@ -631,7 +631,7 @@ func Test_LoadMapper_CMU2IPA(t *testing.T) {
 }
 func Test_LoadMapper_MARY2IPA(t *testing.T) {
 	name := "MARY2IPA"
-	fromColumn := "SAMPA"
+	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/en-us_sampa_mary.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
@@ -645,7 +645,7 @@ func Test_LoadMapper_MARY2IPA(t *testing.T) {
 func Test_LoadMapper_IPA2MARY(t *testing.T) {
 	name := "IPA2MARY"
 	fromColumn := "IPA"
-	toColumn := "SAMPA"
+	toColumn := "SYMBOL"
 	fName := "static/en-us_sampa_mary.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
@@ -669,7 +669,7 @@ func Test_LoadMapper_CMU2MARY(t *testing.T) {
 
 	name = "IPA2MARY"
 	fromColumn = "IPA"
-	toColumn = "SAMPA"
+	toColumn = "SYMBOL"
 	fName = "static/en-us_sampa_mary.csv"
 	ssmMARY, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
@@ -684,7 +684,7 @@ func Test_LoadMapper_CMU2MARY(t *testing.T) {
 
 func Test_LoadMapper_SAMPA2MARY(t *testing.T) {
 	name := "SAMPA2IPA"
-	fromColumn := "SAMPA"
+	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/sv-se_ws-sampa.csv"
 	ssm1, err := LoadMapper(name, fName, fromColumn, toColumn)
@@ -733,7 +733,7 @@ func Test_LoadMapper_NST2MARY(t *testing.T) {
 func Test_LoadMapper_IPA2SAMPA(t *testing.T) {
 	name := "IPA2SAMPA"
 	fromColumn := "IPA"
-	toColumn := "SAMPA"
+	toColumn := "SYMBOL"
 	fName := "static/sv-se_ws-sampa.csv"
 	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
@@ -758,7 +758,7 @@ func Test_LoadMapper_NST2SAMPA(t *testing.T) {
 
 	name = "IPA2SAMPA"
 	fromColumn = "IPA"
-	toColumn = "SAMPA"
+	toColumn = "SYMBOL"
 	fName = "static/sv-se_ws-sampa.csv"
 	ssm2, err := LoadMapper(name, fName, fromColumn, toColumn)
 	if err != nil {
@@ -788,7 +788,7 @@ func Test_LoadMapper_IPA2CMU(t *testing.T) {
 
 func Test_LoadMapper_MARY2CMU(t *testing.T) {
 	name := "MARY2IPA"
-	fromColumn := "SAMPA"
+	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/en-us_sampa_mary.csv"
 	ssmMARY, err := LoadMapper(name, fName, fromColumn, toColumn)
@@ -814,7 +814,7 @@ func Test_LoadMapper_MARY2CMU(t *testing.T) {
 }
 
 func Test_LoadMappers_MARY2CMU(t *testing.T) {
-	mappers, err := LoadMappers("SAMPA", "CMU", "static/en-us_sampa_mary.csv", "static/en-us_cmu.csv")
+	mappers, err := LoadMappers("SYMBOL", "CMU", "static/en-us_sampa_mary.csv", "static/en-us_cmu.csv")
 	if err != nil {
 		t.Errorf("Test_LoadMappers() didn't expect error here : %v", err)
 		return
@@ -855,7 +855,7 @@ func Test_LoadMapper_IPA2NST_NB(t *testing.T) {
 }
 
 func Test_LoadMappers_NST2WS(t *testing.T) {
-	mappers, err := LoadMappers("SAMPA", "SAMPA", "static/nb-no_nst-xsampa.csv", "static/nb-no_ws-sampa.csv")
+	mappers, err := LoadMappers("SAMPA", "SYMBOL", "static/nb-no_nst-xsampa.csv", "static/nb-no_ws-sampa.csv")
 	if err != nil {
 		t.Errorf("Test_LoadMappers() didn't expect error here : %v", err)
 		return
