@@ -18,6 +18,9 @@ import (
 var ws, errrr = line.NewWS()
 
 func out(e lex.Entry) {
+	e.EntryStatus.Name = "imported"
+	e.EntryStatus.Source = "cmu"
+
 	if errrr != nil {
 		log.Fatalf("instantiation failure : %v", errrr)
 	}
@@ -34,7 +37,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU2IPA MAPPER> <IPA2SAMPA MAPPER>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go cmudict-0.7b.utf8 en-us_cmu.csv en_us_sampa_mary.csv")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertCMU2WS.go cmudict-0.7b.utf8 en-us_cmu.csv en_us_sampa_mary.csv")
 		return
 	}
 
@@ -42,7 +45,7 @@ func main() {
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
 
-	mapper, err := symbolset.LoadMappers("CMU", "SAMPA", ssFileName1, ssFileName2)
+	mapper, err := symbolset.LoadMappers("CMU", "SYMBOL", ssFileName1, ssFileName2)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
