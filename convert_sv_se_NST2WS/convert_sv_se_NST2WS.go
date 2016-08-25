@@ -24,20 +24,18 @@ func main() {
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
 
-	ssMapper1, err := symbolset.LoadMapper("LEX2IPA", ssFileName1, "SAMPA", "IPA")
+	mapper, err := symbolset.LoadMappers("SAMPA", "SAMPA", ssFileName1, ssFileName2)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
+		return
 	}
-	ssMapper2, err := symbolset.LoadMapper("IPA2SAMPA", ssFileName2, "IPA", "SAMPA")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-	}
-	ssRuleTo := vrules.SymbolSetRule{ssMapper2.To}
+	ssRuleTo := vrules.SymbolSetRule{mapper.Mapper2.To}
 
 	nstFile, err := os.Open(nstFileName)
 	defer nstFile.Close()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't open lexicon file: %v\n", err)
+		return
 	}
 
 	nstFmt, err := line.NewNST()
@@ -67,27 +65,19 @@ func main() {
 		e.EntryStatus.Name = "imported"
 		e.EntryStatus.Source = "nst"
 
-		// todo: multimapper call direct
-		err = ssMapper1.MapTranscriptions(&e)
+		err = mapper.MapTranscriptions(&e)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to convert entry to IPA : %v\n", err)
+			fmt.Fprintf(os.Stderr, "failed to map transcription symbols : %v\n", err)
 		} else {
-			//fmt.Fprintf(os.Stderr, "%v\n", e.Transcriptions)
-			err = ssMapper2.MapTranscriptions(&e)
+			for _, r := range ssRuleTo.Validate(e) {
+				panic(r) // shouldn't happen
+			}
+
+			res, err := wsFmt.Entry2String(e)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to convert entry from IPA to SAMPA : %v\n", err)
+				fmt.Fprintf(os.Stderr, "failed to convert entry to string : %v\n", err)
 			} else {
-
-				for _, r := range ssRuleTo.Validate(e) {
-					panic(r) // shouldn't happen
-				}
-
-				res, err := wsFmt.Entry2String(e)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "failed to convert entry to string : %v\n", err)
-				} else {
-					fmt.Printf("%v\n", res)
-				}
+				fmt.Printf("%v\n", res)
 			}
 		}
 	}

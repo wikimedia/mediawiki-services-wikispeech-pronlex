@@ -42,15 +42,12 @@ func main() {
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
 
-	ssMapper1, err := symbolset.LoadMapper("CMU2IPA", ssFileName1, "CMU", "IPA")
+	mapper, err := symbolset.LoadMappers("CMU", "SAMPA", ssFileName1, ssFileName2)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
+		return
 	}
-	ssMapper2, err := symbolset.LoadMapper("IPA2SAMPA", ssFileName2, "IPA", "SAMPA")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-	}
-	ssRuleTo := vrules.SymbolSetRule{ssMapper2.To}
+	ssRuleTo := vrules.SymbolSetRule{mapper.Mapper2.To}
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()
@@ -80,30 +77,26 @@ func main() {
 		t0 := strings.Replace(fs[1], "AH0", "AX", -1)
 		t0 = strings.Replace(t0, "0", "", -1)
 
-		// todo: multimapper call direct
-		t, err := ssMapper1.MapTranscription(t0)
+		t, err := mapper.MapTranscription(t0)
 		if err != nil {
-			log.Fatal("CMU2IPA failure : %v", err)
-		}
-		t, err = ssMapper2.MapTranscription(t)
-		if err != nil {
-			log.Fatal("IPA2SAMPA failure : %v", err)
-		}
-
-		// Variant transcription, not a new entry
-		if variant.MatchString(w) {
-			t0 := lex.Transcription{Strn: t}
-			lastEntry.Transcriptions = append(lastEntry.Transcriptions, t0)
+			fmt.Fprintf(os.Stderr, "failed to map transcription symbols : %v\n", err)
 		} else {
-			if lastEntry.Strn != "" {
-				for _, r := range ssRuleTo.Validate(lastEntry) {
-					panic(r) // shouldn't happen
+
+			// Variant transcription, not a new entry
+			if variant.MatchString(w) {
+				t0 := lex.Transcription{Strn: t}
+				lastEntry.Transcriptions = append(lastEntry.Transcriptions, t0)
+			} else {
+				if lastEntry.Strn != "" {
+					for _, r := range ssRuleTo.Validate(lastEntry) {
+						panic(r) // shouldn't happen
+					}
+					out(lastEntry)
 				}
-				out(lastEntry)
+				ts := []lex.Transcription{lex.Transcription{Strn: t}}
+				// Hard-wired (ISO 639-1 language name + ISO 3166-1 alpha 2 country)
+				lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "en-us"}
 			}
-			ts := []lex.Transcription{lex.Transcription{Strn: t}}
-			// Hard-wired (ISO 639-1 language name + ISO 3166-1 alpha 2 country)
-			lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "en-us"}
 		}
 	}
 	// Flush

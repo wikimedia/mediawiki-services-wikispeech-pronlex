@@ -322,7 +322,7 @@ func LoadMapper(name string, fName string, fromColumn string, toColumn string) (
 	}
 	m, err := NewMapper(name, fromName, toName, maptable)
 	if err != nil {
-		return nilRes, err
+		return nilRes, fmt.Errorf("couldn't load mapper from file %v : %v", fName, err)
 	}
 	return m, nil
 }
