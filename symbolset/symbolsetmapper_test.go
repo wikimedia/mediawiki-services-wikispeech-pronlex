@@ -55,6 +55,20 @@ func Test_NewMapper_WithCorrectInput1(t *testing.T) {
 	}
 }
 
+func Test_NewMapper_WithoutIPA(t *testing.T) {
+	fromName := "ssLC"
+	toName := "ssUC"
+	symbols := []SymbolPair{
+		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
+		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
+		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
+	}
+	_, err := NewMapper("test", fromName, toName, symbols)
+	if err == nil {
+		t.Errorf("NewMapper() should always fail if input mapper lacks IPA column")
+	}
+}
+
 func Test_NewMapper_FailIfInputLacksPhonemeDelimiter(t *testing.T) {
 	fromName := "ssLC"
 	toName := "ssIPA"
