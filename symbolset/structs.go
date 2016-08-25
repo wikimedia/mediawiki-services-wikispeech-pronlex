@@ -193,11 +193,6 @@ type Symbol struct {
 	Desc   string
 }
 
-// Contains checks if the SymbolSet contains a certain symbol string
-func (ss SymbolSet) Contains(symbol string) bool {
-	return contains(ss.Symbols, symbol)
-}
-
 // Get searches the SymbolSet for a symbol with the given string
 func (ss SymbolSet) Get(symbol string) (Symbol, error) {
 	for _, s := range ss.Symbols {
@@ -241,12 +236,7 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 
 // ValidSymbol checks if a string is a valid symbol or not
 func (ss SymbolSet) ValidSymbol(symbol string) bool {
-	for _, s := range ss.Symbols {
-		if s.String == symbol {
-			return true
-		}
-	}
-	return false
+	return contains(ss.Symbols, symbol)
 }
 
 // SplitTranscription splits the input transcription into separate symbols
