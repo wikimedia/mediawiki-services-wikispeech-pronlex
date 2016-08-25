@@ -51,5 +51,5 @@ jord	j	j	non syllabic
 syllable delimiter	-	.	syllable delimiter
 phoneme delimiter	 		phoneme delimiter
 accent I	'	ˈ	stress
-accent II	"	ˈ̀̀	stress
+accent II	"	ˈ̀	stress
 secondary stress	%	ˌ	stress

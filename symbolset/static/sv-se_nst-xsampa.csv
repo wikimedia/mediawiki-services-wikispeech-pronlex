@@ -39,7 +39,7 @@ forna	n`	ɳ	non syllabic
 fot	f	f	non syllabic
 våt	v	v	non syllabic
 #kjol (in NST specs)	s’	ɕ	non syllabic
-kjol (in NST actual transcriptions)	s'	ɕ	non syllabic
+kjol (in NST lex)	s'	ɕ	non syllabic
 fors	s`	ʂ	non syllabic
 rov	r	r	non syllabic
 lov	l	l	non syllabic
@@ -51,6 +51,6 @@ jord	j	j	non syllabic
 #schlager	n/a	ʃ	non syllabic
 syllable delimiter	$	.	syllable delimiter
 accent I	"	ˈ	stress
-accent II	""	ˈ̀̀	stress
+accent II	""	ˈ̀	stress
 secondary stress	%	ˌ	stress
 phoneme delimiter			phoneme delimiter

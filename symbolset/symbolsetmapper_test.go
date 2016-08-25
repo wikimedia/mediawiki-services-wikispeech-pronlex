@@ -43,7 +43,7 @@ func testMapTranscriptionX(t *testing.T, ssms []Mapper, input string, expect str
 
 func Test_NewMapper_WithCorrectInput1(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
@@ -57,7 +57,7 @@ func Test_NewMapper_WithCorrectInput1(t *testing.T) {
 
 func Test_NewMapper_FailIfInputLacksPhonemeDelimiter(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
@@ -71,7 +71,7 @@ func Test_NewMapper_FailIfInputLacksPhonemeDelimiter(t *testing.T) {
 
 func Test_NewMapper_FailIfOutputLacksPhonemeDelimiter(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
@@ -84,8 +84,8 @@ func Test_NewMapper_FailIfOutputLacksPhonemeDelimiter(t *testing.T) {
 }
 
 func Test_NewMapper_FailIfBothSymbolSetsHaveTheSameName(t *testing.T) {
-	fromName := "ssLC"
-	toName := "ssLC"
+	fromName := "ssIPA"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
@@ -99,7 +99,7 @@ func Test_NewMapper_FailIfBothSymbolSetsHaveTheSameName(t *testing.T) {
 
 func Test_NewMapper_FailWithAmbiguousPhonemes(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
@@ -115,7 +115,7 @@ func Test_NewMapper_FailWithAmbiguousPhonemes(t *testing.T) {
 
 func Test_MapTranscription_WithAmbiguousSymbols(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
@@ -140,7 +140,7 @@ func Test_MapTranscription_WithAmbiguousSymbols(t *testing.T) {
 
 func Test_MapTranscription_WithNonEmptyDelimiters(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"t", NonSyllabic, ""}, Symbol{"T", NonSyllabic, ""}},
@@ -165,7 +165,7 @@ func Test_MapTranscription_WithNonEmptyDelimiters(t *testing.T) {
 
 func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
@@ -190,7 +190,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 
 func Test_MapTranscription_EmptyDelimiterInInput2(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
@@ -215,7 +215,7 @@ func Test_MapTranscription_EmptyDelimiterInInput2(t *testing.T) {
 
 func Test_MapTranscription_EmptyDelimiterInOutput(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"r", NonSyllabic, ""}, Symbol{"R", NonSyllabic, ""}},
@@ -319,7 +319,7 @@ func Test_MapTranscription_Sampa2Ipa_WithSwedishStress_2(t *testing.T) {
 
 func Test_MapTranscription_FailWithUnknownSymbols_EmptyDelim(t *testing.T) {
 	fromName := "sampa1"
-	toName := "sampa2 "
+	toName := "ipa2"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
 		SymbolPair{Symbol{"b", NonSyllabic, ""}, Symbol{"b", NonSyllabic, ""}},
@@ -342,7 +342,7 @@ func Test_MapTranscription_FailWithUnknownSymbols_EmptyDelim(t *testing.T) {
 
 func Test_MapTranscription_FailWithUnknownSymbols_NonEmptyDelim(t *testing.T) {
 	fromName := "sampa1"
-	toName := "sampa2 "
+	toName := "ipa2"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"a", Syllabic, ""}},
 		SymbolPair{Symbol{"b", NonSyllabic, ""}, Symbol{"b", NonSyllabic, ""}},
@@ -450,7 +450,7 @@ func Test_MapTranscription_Ipa2Sampa_WithSwedishStress_3(t *testing.T) {
 
 func Test_MapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 	fromName := "NST-XSAMPA"
-	toName := "WS-SAMPA"
+	toName := "WS-SAMPA_IPADUMMY"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"a", Syllabic, ""}},
 		SymbolPair{Symbol{"b", NonSyllabic, ""}, Symbol{"b", NonSyllabic, ""}},
@@ -479,7 +479,7 @@ func Test_MapTranscription_NstXSAMPA_To_WsSAMPA_1(t *testing.T) {
 
 func Test_MapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	fromName := "NST-XSAMPA"
-	toName := "WS-SAMPA"
+	toName := "WS-SAMPA_IPADUMMY"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"a", Syllabic, ""}},
 		SymbolPair{Symbol{"b", NonSyllabic, ""}, Symbol{"b", NonSyllabic, ""}},
@@ -508,7 +508,7 @@ func Test_MapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	}
 }
 
-func Test_LoadMapper_NST2IPA(t *testing.T) {
+func Test_LoadMapper_NST2IPA_SV(t *testing.T) {
 	name := "NST-XSAMPA"
 	fromColumn := "SAMPA"
 	toColumn := "IPA"
@@ -519,6 +519,7 @@ func Test_LoadMapper_NST2IPA(t *testing.T) {
 	}
 	testMapTranscription1(t, ssm, "\"bOt`", "\u02C8bɔʈ")
 	testMapTranscription1(t, ssm, "\"ku0rds", "\u02C8kɵrds")
+	testMapTranscription1(t, ssm, "\"\"ku0$d@", "\u02C8kɵ\u0300.də")
 }
 
 func Test_LoadMapper_WS2IPA(t *testing.T) {
@@ -589,7 +590,7 @@ func Test_NewMapper_FailIfInputContainsDuplicates(t *testing.T) {
 
 func Test_NewMapper_DontFailIfInputContainsDuplicates(t *testing.T) {
 	fromName := "ssLC"
-	toName := "ssUC"
+	toName := "ssIPA"
 	symbols := []SymbolPair{
 		SymbolPair{Symbol{"a", NonSyllabic, ""}, Symbol{"A", NonSyllabic, ""}},
 		SymbolPair{Symbol{"A", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
@@ -612,7 +613,7 @@ func Test_LoadMapper_CMU2IPA(t *testing.T) {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 
-	testMapTranscription1(t, ssm, "AX $ B AW1 T", "ə.ˈba⁀ʊt")
+	testMapTranscription1(t, ssm, "AX $ B AW1 T", "ə.\u02C8ba⁀ʊt")
 }
 func Test_LoadMapper_MARY2IPA(t *testing.T) {
 	name := "MARY2IPA"
@@ -624,7 +625,7 @@ func Test_LoadMapper_MARY2IPA(t *testing.T) {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 
-	testMapTranscription1(t, ssm, "@ - \" b aU t", "ə.ˈba⁀ʊt")
+	testMapTranscription1(t, ssm, "@ - \" b aU t", "ə.\u02C8ba⁀ʊt")
 }
 
 func Test_LoadMapper_IPA2MARY(t *testing.T) {
@@ -638,7 +639,7 @@ func Test_LoadMapper_IPA2MARY(t *testing.T) {
 		return
 	}
 
-	testMapTranscription1(t, ssm, "ə.ˈba⁀ʊt", "@ - \" b aU t")
+	testMapTranscription1(t, ssm, "ə.\u02C8ba⁀ʊt", "@ - \" b aU t")
 }
 
 func Test_LoadMapper_CMU2MARY(t *testing.T) {
@@ -726,8 +727,8 @@ func Test_LoadMapper_IPA2SAMPA(t *testing.T) {
 		return
 	}
 
-	testMapTranscription1(t, ssm, "ˈkaj.rʊ", "\" k a j . r U")
-	testMapTranscription1(t, ssm, "be.ˈliːn", "b e . \" l i: n")
+	testMapTranscription1(t, ssm, "\u02C8kaj.rʊ", "\" k a j . r U")
+	testMapTranscription1(t, ssm, "be.\u02C8liːn", "b e . \" l i: n")
 }
 
 func Test_LoadMapper_NST2SAMPA(t *testing.T) {
@@ -767,8 +768,8 @@ func Test_LoadMapper_IPA2CMU(t *testing.T) {
 		return
 	}
 
-	testMapTranscription1(t, ssm, "ə.ˈba⁀ʊt", "AX $ B AW1 T")
-	testMapTranscription1(t, ssm, "ʌ.ˈba⁀ʊt", "AH $ B AW1 T")
+	testMapTranscription1(t, ssm, "ə.\u02C8ba⁀ʊt", "AX $ B AW1 T")
+	testMapTranscription1(t, ssm, "ʌ.\u02C8ba⁀ʊt", "AH $ B AW1 T")
 }
 
 func Test_LoadMapper_MARY2CMU(t *testing.T) {
@@ -807,4 +808,47 @@ func Test_LoadMappers_MARY2CMU(t *testing.T) {
 
 	testMapTranscriptionY(t, mappers, "@ - \" b aU t", "AX $ B AW1 T")
 	testMapTranscriptionY(t, mappers, "V - \" b aU t", "AH $ B AW1 T")
+}
+
+func Test_LoadMapper_NST2IPA_NB(t *testing.T) {
+	name := "NST-XSAMPA"
+	fromColumn := "SAMPA"
+	toColumn := "IPA"
+	fName := "static/nb-no_nst-xsampa.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+	}
+	testMapTranscription1(t, ssm, "\"A:$bl@s", "\u02C8ɑː.bləs")
+	testMapTranscription1(t, ssm, "\"tSE$kIsk", "\u02C8tʃɛ.kɪsk")
+	testMapTranscription1(t, ssm, "\"\"b9$n@r", "\u02C8bœ\u0300.nər")
+	testMapTranscription1(t, ssm, "\"b9$n@r", "\u02C8bœ.nər")
+}
+
+func Test_LoadMapper_IPA2NST_NB(t *testing.T) {
+	name := "NST-XSAMPA"
+	fromColumn := "IPA"
+	toColumn := "SAMPA"
+	fName := "static/nb-no_nst-xsampa.csv"
+	ssm, err := LoadMapper(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+	}
+	testMapTranscription1(t, ssm, "\u02C8ɑː.bləs", "\"A:$bl@s")
+	testMapTranscription1(t, ssm, "\u02C8tʃɛ.kɪsk", "\"tSE$kIsk")
+	testMapTranscription1(t, ssm, "\u02C8bœ\u0300.nər", "\"\"b9$n@r")
+	testMapTranscription1(t, ssm, "\u02C8bœ.nər", "\"b9$n@r")
+}
+
+func Test_LoadMappers_NST2WS(t *testing.T) {
+	mappers, err := LoadMappers("SAMPA", "SAMPA", "static/nb-no_nst-xsampa.csv", "static/nb-no_ws-sampa.csv")
+	if err != nil {
+		t.Errorf("Test_LoadMappers() didn't expect error here : %v", err)
+		return
+	}
+
+	testMapTranscriptionY(t, mappers, "\"A:$bl@s", "\" A: . b l @ s")
+	testMapTranscriptionY(t, mappers, "\"tSE$kIsk", "\" t S e . k i s k")
+	testMapTranscriptionY(t, mappers, "\"\"b9$n@r", "\"\" b 2 . n @ r")
+	testMapTranscriptionY(t, mappers, "\"b9$n@r", "\" b 2 . n @ r")
 }

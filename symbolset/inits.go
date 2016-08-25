@@ -122,6 +122,10 @@ func NewMapper(name string, fromName string, toName string, symbolList []SymbolP
 	toIsCMU := cmu.isCMU(toName)
 	fromIsCMU := cmu.isCMU(fromName)
 
+	if !(fromIsIPA || toIsIPA) {
+		return nilRes, fmt.Errorf("one of the defined symbol sets must always be IPA -- found %v - %v", fromName, toName)
+	}
+
 	var fromSymbols = make([]Symbol, 0)
 	var toSymbols = make([]Symbol, 0)
 	var symbolMap = make(map[Symbol]Symbol)
