@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/stts-se/pronlex/dbapi"
-	"github.com/stts-se/pronlex/lex"
 	"log"
 	"os"
+
+	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 )
 
 // TODO replace calls to ff() with proper error handling
@@ -20,20 +21,20 @@ func ff(f string, err error) {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Println("<SQLITE DB FILE> <WORDS ...>")
+	if len(os.Args) < 3 {
+		log.Println("<SQLITE DB FILE> <LEX NAME> <WORDS ...>")
 		os.Exit(1)
 	}
 
 	db, err := sql.Open("sqlite3", os.Args[1])
 	ff("failed to open db : %v", err)
 
-	l, err := dbapi.GetLexicon(db, "sv.se.nst")
+	l, err := dbapi.GetLexicon(db, os.Args[2])
 	ff("Failed to get lexicon from db: %v", err)
 	ls := []dbapi.Lexicon{l}
 
 	q := dbapi.Query{Lexicons: ls,
-		Words:      dbapi.ToLower(os.Args[2:]),
+		Words:      dbapi.ToLower(os.Args[3:]),
 		PageLength: 100}
 
 	//res, err := dbapi.GetEntries(db, q)
