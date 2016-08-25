@@ -21,29 +21,40 @@ func ff(f string, err error) {
 }
 
 func main() {
-	if len(os.Args) < 3 {
+	if len(os.Args) == 1 {
 		log.Println("<SQLITE DB FILE> <LEX NAME> <WORDS ...>")
+		log.Println("<SQLITE DB FILE> to list available lexicons")
 		os.Exit(1)
 	}
-
 	db, err := sql.Open("sqlite3", os.Args[1])
 	ff("failed to open db : %v", err)
 
-	l, err := dbapi.GetLexicon(db, os.Args[2])
-	ff("Failed to get lexicon from db: %v", err)
-	ls := []dbapi.Lexicon{l}
+	if len(os.Args) == 2 {
+		// LIST LEXICONS
+		ls, err := dbapi.ListLexicons(db)
+		ff("Failed to list lexicons in db: %v", err)
+		for _, lex := range ls {
+			fmt.Println(lex.Name)
+		}
 
-	q := dbapi.Query{Lexicons: ls,
-		Words:      dbapi.ToLower(os.Args[3:]),
-		PageLength: 100}
+	} else {
+		// LOOKUP
+		l, err := dbapi.GetLexicon(db, os.Args[2])
+		ff("Failed to get lexicon from db: %v", err)
+		ls := []dbapi.Lexicon{l}
 
-	//res, err := dbapi.GetEntries(db, q)
-	var res lex.EntrySliceWriter
-	err = dbapi.LookUp(db, q, &res)
-	ff("LookUp failed : %v", err)
+		q := dbapi.Query{Lexicons: ls,
+			Words:      dbapi.ToLower(os.Args[3:]),
+			PageLength: 100}
 
-	res0, err := json.MarshalIndent(res.Entries, "", "  ")
-	ff("json conversion failed : %v", err)
+		//res, err := dbapi.GetEntries(db, q)
+		var res lex.EntrySliceWriter
+		err = dbapi.LookUp(db, q, &res)
+		ff("LookUp failed : %v", err)
 
-	fmt.Printf("%s\n", res0)
+		res0, err := json.MarshalIndent(res.Entries, "", "  ")
+		ff("json conversion failed : %v", err)
+
+		fmt.Printf("%s\n", res0)
+	}
 }
