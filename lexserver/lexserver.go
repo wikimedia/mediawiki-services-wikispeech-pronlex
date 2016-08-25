@@ -887,14 +887,20 @@ func keepAlive(wsC chan string) {
 
 func main() {
 
-	if len(os.Args) != 3 {
-		log.Println("usage: <SQLITE DB FILE> <PORT>")
-		log.Println("sample invokation: $ go run lexserver.go pronlex.db 8787")
+	dbFile := "./pronlex.db"
+	port := ":8787"
+
+	if len(os.Args) > 3 || len(os.Args) == 2 {
+		log.Println("Usages:")
+		log.Println("$ go run lexserver.go <SQLITE DB FILE> <PORT>")
+		log.Println("$ go run lexserver.go")
+		log.Println("  - defaults to db file " + dbFile + ", port " + port)
 		os.Exit(1)
+	} else if len(os.Args) == 3 {
+		dbFile = os.Args[1] // "./pronlex.db"
+		port = os.Args[2]   //":8787"
 	}
 
-	dbFile := os.Args[1] // "./pronlex.db"
-	port := os.Args[2]   //":8787"
 	if !strings.HasPrefix(port, ":") {
 		port = ":" + port
 	}
