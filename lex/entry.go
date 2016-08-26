@@ -100,7 +100,7 @@ type Entry struct {
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.
-// See EntrySliceWriter, for returning i sice of Entry, and EntryFileWriter, for writing Entries to file.
+// See EntrySliceWriter, for returning a slice of Entry, and EntryFileWriter, for writing Entries to file.
 type EntryWriter interface {
 	Write(Entry) error
 }

@@ -726,7 +726,7 @@ func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO temporarely try to directly load the uploaded file
+	// TODO temporarily try to directly load the uploaded file
 	// into the database.  However, this should be a step of its
 	// own: first upload file, validate it, etc, and then make it
 	// possible to load into the db, not blindely just adding
@@ -791,8 +791,6 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 		if err != nil {
 			log.Fatal(err)
 		}
-		// TODO hard-wired initial status
-		e.EntryStatus = lex.EntryStatus{Name: "imported", Source: "unknown"}
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {

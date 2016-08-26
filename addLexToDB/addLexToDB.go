@@ -16,6 +16,10 @@ import (
 	"github.com/stts-se/pronlex/vrules"
 )
 
+//func LoadLexiconFile
+
+//func LoadSymbolSet
+
 func main() {
 
 	sampleInvocation := `go run addLexToDB.go sv-se.nst sv-se.nst-SAMPA symbolset/static/sv-se_ws-sampa_maptable.csv pronlex.db swe030224NST.pron_utf8.txt`
