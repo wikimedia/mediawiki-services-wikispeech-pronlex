@@ -24,6 +24,8 @@ func LoadLexiconFile(db *sql.DB, logger Logger, lexiconName string, symbolSetNam
 	// 	logger.Write(msg)
 	// 	return fmt.Errorf("lexserver failed to instantiate lexicon line parser : %v", err)
 	// }
+
+	// TODO: Här är vi! Hur får vi fram lexiconID? /HL 20160826
 	// lexicon := Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
 
 	// msg := fmt.Sprintf("Trying to load file: %s", lexiconFileName)
