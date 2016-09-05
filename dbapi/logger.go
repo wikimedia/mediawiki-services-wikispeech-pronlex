@@ -1,8 +1,9 @@
 package dbapi
 
 import (
-	"golang.org/x/net/websocket"
 	"log"
+
+	"golang.org/x/net/websocket"
 )
 
 // Logger is an interface for logging progress and other messages
@@ -15,7 +16,7 @@ type StderrLogger struct {
 }
 
 func (l StderrLogger) Write(s string) {
-	log.Printf(s)
+	log.Println(s)
 }
 
 // WebSockLogger is a logger for printing messages to a web socket

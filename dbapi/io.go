@@ -10,6 +10,8 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
+	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/vrules"
 )
 
 // Olika scenarion:
@@ -22,16 +24,23 @@ import (
 // }
 
 // ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on.
-func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, symbolSetName, lexiconFileName string) error {
-	logger.Write(fmt.Sprintf("lexiconName: %v\n", lexiconName))
-	logger.Write(fmt.Sprintf("symbolSetName: %v\n", symbolSetName))
-	logger.Write(fmt.Sprintf("lexiconFileName: %v\n", lexiconFileName))
+func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, symbolSet symbolset.SymbolSet) []error {
+	var errs []error
+
+	ssRule := vrules.SymbolSetRule{symbolSet}
+	ssName := symbolSet.Name
+
+	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))
+	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
+	logger.Write(fmt.Sprintf("symbolSetName: %v", ssName))
 
 	fh, err := os.Open(lexiconFileName)
+	defer fh.Close()
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexionFile failed to open file : %v", err)
 		logger.Write(msg)
-		return fmt.Errorf("ImportLexionFile failed to open file : %v", err)
+		errs = append(errs, fmt.Errorf("%v", msg))
+		return errs
 	}
 
 	var s *bufio.Scanner
@@ -40,7 +49,8 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, symbolSetName, le
 		if err != nil {
 			var msg = fmt.Sprintf("ImportLexionFile failed to open gz reader : %v", err)
 			logger.Write(msg)
-			return fmt.Errorf("%v", msg)
+			errs = append(errs, fmt.Errorf("%v", msg))
+			return errs
 		}
 		s = bufio.NewScanner(gz)
 	} else {
@@ -51,14 +61,16 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, symbolSetName, le
 	if err != nil {
 		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
 		logger.Write(msg)
-		return fmt.Errorf("lexserver failed to instantiate lexicon line parser : %v", err)
+		errs = append(errs, fmt.Errorf("%v", msg))
+		return errs
 	}
 
 	lexicon, err := GetLexicon(db, lexiconName)
 	if err != nil {
-		err = fmt.Errorf("lexserver failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
-		logger.Write(err.Error())
-		return err
+		var msg = fmt.Sprintf("lexserver failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
+		logger.Write(msg)
+		errs = append(errs, fmt.Errorf("%v", msg))
+		return errs
 	}
 
 	msg := fmt.Sprintf("Trying to load file: %s", lexiconFileName)
@@ -68,22 +80,44 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, symbolSetName, le
 	var eBuf []lex.Entry
 	for s.Scan() {
 		if err := s.Err(); err != nil {
-			logger.Write(err.Error())
-			return fmt.Errorf("error when reading lines from lexicon file : %v", err)
+			var msg = fmt.Sprintf("error when reading lines from lexicon file : %v", err)
+			logger.Write(msg)
+			errs = append(errs, fmt.Errorf("%v", msg))
+			return errs
 		}
 		l := s.Text()
+
+		if strings.HasPrefix(l, "#") {
+			continue
+		}
+		if l == "" {
+			continue
+		}
+
 		e, err := wsFmt.ParseToEntry(l)
 		if err != nil {
-			logger.Write(err.Error())
-			return fmt.Errorf("error when parsing entry : %v", err)
+			var msg = fmt.Sprintf("couldn't parse line to entry : %v", err)
+			logger.Write(msg)
+			errs = append(errs, fmt.Errorf("%v", msg))
+			return errs
 		}
+
+		for _, r := range ssRule.Validate(e) {
+			logger.Write(r.String())
+			errs = append(errs, fmt.Errorf("%v", r.String()))
+			//return fmt.Errorf("%v", r)
+			//panic(r) // shouldn't happen
+		}
+
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {
 			_, err = InsertEntries(db, lexicon, eBuf)
 			if err != nil {
-				logger.Write(err.Error())
-				return fmt.Errorf("lexserver failed to insert entries : %v", err)
+				var msg = fmt.Sprintf("lexserver failed to insert entries : %v", err)
+				logger.Write(msg)
+				errs = append(errs, fmt.Errorf("%v", msg))
+				return errs
 			}
 			eBuf = make([]lex.Entry, 0)
 			msg2 := fmt.Sprintf("Lines so far: %d", n)
@@ -94,8 +128,10 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, symbolSetName, le
 
 	_, err = db.Exec("ANALYZE")
 	if err != nil {
-		logger.Write(err.Error())
-		return fmt.Errorf("failed to exec analyze cmd to db : %v", err)
+		var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
+		logger.Write(msg)
+		errs = append(errs, fmt.Errorf("%v", msg))
+		return errs
 	}
 
 	msg3 := fmt.Sprintf("Lines read:\t%d", n)
@@ -104,9 +140,9 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, symbolSetName, le
 	if err := s.Err(); err != nil {
 		msg4 := fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
 		logger.Write(msg4)
-		return fmt.Errorf(msg4)
+		errs = append(errs, fmt.Errorf("%v", msg4))
+		return errs
 	}
 
-	// TODO
-	return nil
+	return errs
 }
