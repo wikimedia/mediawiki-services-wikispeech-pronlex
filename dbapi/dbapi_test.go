@@ -2,6 +2,7 @@ package dbapi
 
 import (
 	"database/sql"
+	"flag"
 
 	"github.com/stts-se/pronlex/lex"
 	//"github.com/mattn/go-sqlite3"
@@ -18,12 +19,18 @@ func ff(f string, err error) {
 	}
 }
 
+func TestMain(m *testing.M) {
+	flag.Parse() // should be here
+	Sqlite3WithRegex()
+	os.Exit(m.Run()) // should be here
+}
+
 func Test_InsertEntries(t *testing.T) {
 
 	err := os.Remove("./testlex.db")
 	ff("failed to remove testlex.db : %v", err)
 
-	Sqlite3WithRegex()
+	//Sqlite3WithRegex()
 
 	db, err := sql.Open("sqlite3_with_regexp", "./testlex.db")
 	if err != nil {
@@ -289,4 +296,124 @@ func Test_unique(t *testing.T) {
 	if res[0] != 3 {
 		t.Errorf(fs, 3, res[0])
 	}
+}
+
+func Test_ImportLexiconFile(t *testing.T) {
+
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	defer db.Close()
+
+	_, err = db.Exec(Schema) // Creates new lexicon database
+	ff("Failed to create lexicon db: %v", err)
+
+	symbolSetName := "ZZ"
+	logger := StderrLogger{}
+	l := Lexicon{Name: "test", SymbolSetName: symbolSetName}
+
+	l, err = InsertLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	// actual tests start here
+	err = ImportLexiconFile(db, logger, l.Name, symbolSetName, "./sv-lextest.txt")
+
+	q := Query{Words: []string{"sprängstoff"}}
+
+	res, err := LookUpIntoSlice(db, q)
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o := res[0].Strn
+	if o != "sprängstoff" {
+		t.Errorf(fs, "sprängstoff", o)
+	}
+
+	q = Query{Words: []string{"arbetsbelastads"}}
+	res, err = LookUpIntoSlice(db, q)
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o = res[0].Strn
+	if o != "arbetsbelastads" {
+		t.Errorf(fs, "arbetsbelastads", o)
+	}
+
+}
+
+func Test_ImportLexiconFileGz(t *testing.T) {
+
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	defer db.Close()
+
+	_, err = db.Exec(Schema) // Creates new lexicon database
+	ff("Failed to create lexicon db: %v", err)
+
+	symbolSetName := "ZZ"
+	logger := StderrLogger{}
+	l := Lexicon{Name: "test", SymbolSetName: symbolSetName}
+
+	l, err = InsertLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	// actual tests start here
+	err = ImportLexiconFile(db, logger, l.Name, symbolSetName, "./sv-lextest.txt.gz")
+
+	q := Query{Words: []string{"sprängstoffs"}}
+
+	res, err := LookUpIntoSlice(db, q)
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o := res[0].Strn
+	if o != "sprängstoffs" {
+		t.Errorf(fs, "sprängstoffs", o)
+	}
+
+	q = Query{Words: []string{"arbetsbelastad"}}
+	res, err = LookUpIntoSlice(db, q)
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o = res[0].Strn
+	if o != "arbetsbelastad" {
+		t.Errorf(fs, "arbetsbelastad", o)
+	}
+
 }
