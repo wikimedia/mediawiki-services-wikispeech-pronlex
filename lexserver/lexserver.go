@@ -315,6 +315,7 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 }
 
+// TODO add tests
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO error check parameters
 	lexiconName := r.FormValue("lexicon")
