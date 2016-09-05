@@ -23,7 +23,7 @@ import (
 
 // }
 
-// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on.
+// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does check the symbol set
 func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, symbolSet symbolset.SymbolSet) []error {
 	var errs []error
 

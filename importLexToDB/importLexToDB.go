@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	sampleInvocation := `go run importLexToDB.go pronlex.db sv-se.nst swe030224NST.pron-ws.utf8 sv-se_ws-sampa symbolset/static/sv-se_ws-sampa.csv`
+	sampleInvocation := `go run importLexToDB.go pronlex.db sv-se.nst swe030224NST.pron-ws.utf8 sv-se_ws-sampa sv-se_ws-sampa.csv`
 
 	if len(os.Args) != 6 {
 		log.Fatal("Expected <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FILE>", "\n\tSample invocation: ", sampleInvocation)
