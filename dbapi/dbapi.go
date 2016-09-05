@@ -799,7 +799,7 @@ func UpdateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 		tx.Rollback()
 		return res, updated, fmt.Errorf("failed updating entry : %v", err)
 	}
-
+	tx.Commit()
 	res, err = GetEntryFromID(db, e.ID)
 	if err != nil {
 		tx.Rollback()
