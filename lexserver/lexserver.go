@@ -315,6 +315,36 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 }
 
+// TODO add tests
+func addEntryHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO error check parameters
+	lexiconName := r.FormValue("lexicon")
+	lexicon, err := dbapi.GetLexicon(db, lexiconName)
+	if err != nil {
+		msg := fmt.Sprintf("failed to find lexicon %s in database : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	entryJSON := r.FormValue("entry")
+	var e lex.Entry
+	err = json.Unmarshal([]byte(entryJSON), &e)
+	if err != nil {
+		log.Printf("lexserver: Failed to unmarshal json: %v", err)
+		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	ids, err := dbapi.InsertEntries(db, lexicon, []lex.Entry{e})
+	if err != nil {
+		msg := fmt.Sprintf("lexserver failed to update entry : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprint(w, ids)
+}
+
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	entryJSON := r.FormValue("entry")
 	//body, err := ioutil.ReadAll(r.Body)
@@ -916,6 +946,7 @@ func main() {
 	http.HandleFunc("/listlexicons", listLexsHandler)
 	http.HandleFunc("/lexiconstats", lexiconStatsHandler)
 	http.HandleFunc("/lexlookup", lexLookUpHandler)
+	http.HandleFunc("/addentry", addEntryHandler)
 	http.HandleFunc("/updateentry", updateEntryHandler)
 	http.HandleFunc("/validateentry", validateEntryHandler)
 	http.HandleFunc("/validateentries", validateEntriesHandler)
