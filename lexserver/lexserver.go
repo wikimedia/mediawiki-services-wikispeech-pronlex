@@ -514,6 +514,25 @@ func deleteWebSocketClient(id string) {
 	webSocks.Unlock()
 }
 
+// NL 20160905
+// Interface Logger imported from dbapi/io.go
+// defines the Write(string) function, see below.
+
+// Maybe it should live in the dbapi package, but since it currently
+// needs access to lexserver mutex, webSocks, that doesn't work very
+// well. You could add the mutex to the WebSockLogger, I guess.
+type WebSockLogger struct {
+	clientUUID string
+}
+
+func NewWebSockLogger(uuid string) WebSockLogger {
+	return WebSockLogger{clientUUID: uuid}
+}
+
+func (wsl WebSockLogger) Write(msg string) {
+	messageToClientWebSock(wsl.clientUUID, msg)
+}
+
 func messageToClientWebSock(clientUUID string, msg string) {
 	if strings.TrimSpace(clientUUID) != "" {
 		webSocks.Lock()
