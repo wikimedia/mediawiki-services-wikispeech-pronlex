@@ -18,6 +18,7 @@ func (l StderrLogger) Write(s string) {
 	log.Printf(s)
 }
 
+// WebSockLogger is a logger for printing messages to a web socket
 type WebSockLogger struct {
 	websock *websocket.Conn
 }
