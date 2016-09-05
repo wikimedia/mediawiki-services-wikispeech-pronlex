@@ -136,24 +136,6 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 }
 
-// func GetParam(param string, r *http.Request) (string, error) {
-
-// 	meth := strings.TrimSpace(r.Method)
-// 	switch meth {
-// 	case "POST":
-// 		p := r.FormValue(strings.TrimSpace(param))
-// 		if p == "" {
-// 			return "", fmt.Errorf("GetParam: no value for form value parameter %s", param)
-// 		} else {
-// 			return p, nil
-// 		}
-// 		// case "GET":
-// 		// 	// XXX
-// 	}
-
-// 	return "", fmt.Errorf("unknown method %s", meth)
-// }
-
 func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
@@ -168,7 +150,7 @@ func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 
 func superDeleteLexHandler(w http.ResponseWriter, r *http.Request) {
 	// Aha! Turns out that Go treats POST and GET the same way, as I understand it.
-	// No need for checking whether GO or POST, as far as I understand.
+	// No need for checking whether GET or POST, as far as I understand.
 	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
 	uuid := r.FormValue("client_uuid")
 	log.Println("lexserver.superDeleteLexHandler was called")
