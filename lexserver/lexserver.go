@@ -116,7 +116,9 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
 
 	if name == "" || symbolSetName == "" {
-		http.Error(w, fmt.Sprint("missing parameter value, expecting value for 'name' and 'symbolsetname'"), http.StatusExpectationFailed)
+		msg := fmt.Sprint("missing parameter value, expecting value for 'name' and 'symbolsetname'")
+		log.Printf("%s", msg)
+		http.Error(w, msg, http.StatusExpectationFailed)
 		return
 	}
 
@@ -134,6 +136,7 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, string(jsn))
+	//fmt.Fprint(w, jsn)
 }
 
 func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
@@ -338,7 +341,7 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, res0)
+	fmt.Fprint(w, string(res0))
 }
 
 // TODO code duplication between validateEntriesHandler and validateEntryHandler
