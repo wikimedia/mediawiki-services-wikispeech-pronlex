@@ -14,7 +14,7 @@ Clone pronlex under src/github.com/stts-se/ in your [GOPATH](https://golang.org/
 cd pronlex/createEmptyDB/
 go get
 go install
-cd ../addNSTLexToDB
+cd ../importLexToDB
 go install
 cd ../lexserver
 go install
@@ -28,7 +28,7 @@ Create a pronlex.db and place it in the lexserver directory.
 
 ```
 github.com/stts-se/pronlex/lexserver$ createEmptyDB pronlex.db
-github.com/stts-se/pronlex/lexserver$ addNSTLexToDB sv.se.nst pronlex.db [PATH TO NST LEX]/swe030224NST.pron_utf8.txt 
+github.com/stts-se/pronlex/lexserver$ importLexToDB pronlex.db sv-se.nst swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa sv-se_ws-sampa.csv
 github.com/stts-se/pronlex/lexserver$ go run lexserver.go
 ```
 (Or `CompileDaemon -command lexserver` if you use [Compile Daemon](https://github.com/githubnemo/CompileDaemon))
