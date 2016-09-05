@@ -7,22 +7,21 @@ import (
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/symbolset"
-	"github.com/stts-se/pronlex/vrules"
 )
 
 func main() {
 
-	sampleInvocation := `go run importLexToDB.go sv-se.nst sv-se.nst-SAMPA symbolset/static/sv-se_ws-sampa_maptable.csv pronlex.db swe030224NST.pron_utf8.txt`
+	sampleInvocation := `go run importLexToDB.go pronlex.db sv-se.nst swe030224NST.pron-ws.utf8 sv-se_ws-sampa symbolset/static/sv-se_ws-sampa.csv`
 
 	if len(os.Args) != 6 {
-		log.Fatal("Expected <DB LEXICON NAME> <SYMBOLSET NAME> <SYMBOLSET FILE> <DB FILE> <NST INPUT FILE>", "\n\tSample invocation: ", sampleInvocation)
+		log.Fatal("Expected <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FILE>", "\n\tSample invocation: ", sampleInvocation)
 	}
 
-	lexName := os.Args[1]
-	symbolSetName := os.Args[2]
-	ssFileName := os.Args[3]
-	dbFile := os.Args[4]
-	inFile := os.Args[5]
+	dbFile := os.Args[1]
+	lexName := os.Args[2]
+	inFile := os.Args[3]
+	symbolSetName := os.Args[4]
+	ssFileName := os.Args[5]
 
 	_, err := os.Stat(dbFile)
 	if err != nil {
@@ -33,8 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	ssRule := vrules.SymbolSetRule{ssMapper.From}
+	symbolSet := ssMapper.From
 
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
@@ -60,6 +58,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	logger := StderrLogger{}
-	dbapi.ImportLexiconFile(dn, logger, lexName, inFile, symbolSet)
+	logger := dbapi.StderrLogger{}
+	dbapi.ImportLexiconFile(db, logger, lexName, inFile, symbolSet)
 }
