@@ -59,5 +59,6 @@ func main() {
 	}
 
 	logger := dbapi.StderrLogger{}
+	// TODO handle errors!
 	dbapi.ImportLexiconFile(db, logger, lexName, inFile, symbolSet)
 }
