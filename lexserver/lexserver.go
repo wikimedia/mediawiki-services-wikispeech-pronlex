@@ -663,7 +663,7 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
 		return
 	}
-	wsW := line.WSFileWriter{wsFmt, gz}
+	wsW := line.FileWriter{wsFmt, gz}
 	dbapi.LookUp(db, q, wsW)
 	defer gz.Close()
 	gz.Flush()
