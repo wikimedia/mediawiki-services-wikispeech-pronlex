@@ -11,7 +11,7 @@ type Logger interface {
 	Write(string)
 }
 
-// StderrLogger is a logger for printing messages to standard error
+// StderrLogger is a logger for printing messages to standard error. Implements the dbapi.Logger interface.
 type StderrLogger struct {
 }
 
@@ -19,7 +19,7 @@ func (l StderrLogger) Write(s string) {
 	log.Println(s)
 }
 
-// WebSockLogger is a logger for printing messages to a web socket
+// WebSockLogger is a logger for printing messages to a web socket. Implements the dbapi.Logger interface.
 type WebSockLogger struct {
 	websock *websocket.Conn
 }
