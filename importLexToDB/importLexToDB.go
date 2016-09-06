@@ -7,6 +7,8 @@ import (
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/symbolset"
+
+	"fmt"
 )
 
 func main() {
@@ -59,6 +61,40 @@ func main() {
 	}
 
 	logger := dbapi.StderrLogger{}
-	// TODO handle errors!
-	dbapi.ImportLexiconFile(db, logger, lexName, inFile, symbolSet)
+	// TODO handle errors! Does it make sent to return array of error...?
+	var errs []error
+	errs = dbapi.ImportLexiconFile(db, logger, lexName, inFile, symbolSet)
+
+	if len(errs) == 0 {
+		logger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")
+		_, err = db.Exec("ANALYZE")
+		if err != nil {
+			logger.Write(fmt.Sprintf("failed to run ANALYZE command : %v", err))
+			return
+		}
+	}
+
+	//fmt.Printf("HEJ DIN JÄVEL-FAEN: %d\n", lexicon.ID)
+	var dbSymSet []dbapi.Symbol
+	for _, sym := range symbolSet.Symbols {
+		s := sym.String
+		cat := sym.Cat.String()
+		desc := sym.Desc
+		//TODO Add function to obtain map for single symbol...?
+		ipa, err := ssMapper.MapTranscription(s)
+		if err != nil {
+			logger.Write(fmt.Sprintf("failed to obtain IPA carachter for '%v' : %v", s, err))
+			//return
+		}
+		dbSym := dbapi.Symbol{LexiconID: lexicon.ID, Symbol: s, Category: cat, Description: desc, IPA: ipa}
+
+		dbSymSet = append(dbSymSet, dbSym)
+	}
+
+	err = dbapi.SaveSymbolSet(db, dbSymSet)
+	if err != nil {
+		msg := fmt.Sprintf("dbapi.SaveSymbolSet returned error : %v", err)
+		logger.Write(msg)
+		//log.Println(msg)
+	}
 }
