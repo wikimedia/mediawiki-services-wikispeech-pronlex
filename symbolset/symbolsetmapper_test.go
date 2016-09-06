@@ -866,3 +866,61 @@ func Test_LoadMappers_NST2WS(t *testing.T) {
 	testMapTranscriptionY(t, mappers, "\"\"b9$n@r", "\"\" b 2 . n @ r")
 	testMapTranscriptionY(t, mappers, "\"b9$n@r", "\" b 2 . n @ r")
 }
+
+func Test_MapSymbol(t *testing.T) {
+	fromName := "SYMBOL"
+	toName := "IPA"
+	symbols := []SymbolPair{
+		SymbolPair{Symbol{"a", Syllabic, ""}, Symbol{"A", Syllabic, ""}},
+		SymbolPair{Symbol{"P", NonSyllabic, ""}, Symbol{"p", NonSyllabic, ""}},
+		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
+	}
+	m, err := NewMapper("test", fromName, toName, symbols)
+	if err != nil {
+		t.Errorf("test didn't expect error here : %v", err)
+		return
+	}
+
+	// TEST1
+	{
+		res, err := m.MapSymbol(Symbol{"a", Syllabic, ""})
+		if err != nil {
+			t.Errorf("test didn't expect error here : %v", err)
+			return
+		}
+		if res.String != "A" {
+			t.Errorf(fsExpTrans, "A", res.String)
+		}
+	}
+
+	// TEST2
+	{
+		res, err := m.MapSymbolString("P")
+		if err != nil {
+			t.Errorf("test didn't expect error here : %v", err)
+			return
+		}
+		if res != "p" {
+			t.Errorf(fsExpTrans, "p", res)
+		}
+	}
+
+	// TEST3
+	{
+		_, err := m.MapSymbolString("A")
+		if err == nil {
+			t.Errorf("expected error here for unknown input symbol : %v", "A")
+			return
+		}
+	}
+
+	// TEST3
+	{
+		_, err := m.MapSymbol(Symbol{"A", Syllabic, ""})
+		if err == nil {
+			t.Errorf("expected error here for unknown input symbol : %v", "A")
+			return
+		}
+	}
+
+}

@@ -102,6 +102,25 @@ func (m Mapper) MapTranscriptions(e *lex.Entry) error {
 	return nil
 }
 
+// MapSymbol maps one symbol into the corresponding symbol in the new symbol set
+func (m Mapper) MapSymbol(symbol Symbol) (Symbol, error) {
+	res, ok := m.symbolMap[symbol]
+	if !ok {
+		return symbol, fmt.Errorf("unknown input symbol %v", symbol)
+	}
+	return res, nil
+}
+
+// MapSymbolString maps one symbol into the corresponding symbol in the new symbol set
+func (m Mapper) MapSymbolString(symbol string) (string, error) {
+	sym, err := m.From.Get(symbol)
+	if err != nil {
+		return symbol, err
+	}
+	res, err := m.MapSymbol(sym)
+	return res.String, nil
+}
+
 // MapTranscription maps one input transcription string into the new symbol set.
 func (m Mapper) MapTranscription(input string) (string, error) {
 	res, err := m.preFilter(input, m.From)
@@ -347,7 +366,7 @@ func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) (string, erro
 	return trans, nil
 }
 
-// MapTranscriptions maps one input transcription string into the new symbol set.
+// MapTranscription maps one input transcription string into the new symbol set.
 func (m Mappers) MapTranscription(input string) (string, error) {
 	res, err := m.Mapper1.MapTranscription(input)
 	if err != nil {
