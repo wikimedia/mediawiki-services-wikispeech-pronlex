@@ -2,7 +2,6 @@ package line
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/stts-se/pronlex/lex"
@@ -200,20 +199,4 @@ func NewNST() (NST, error) {
 		return NST{}, err
 	}
 	return NST{f}, nil
-}
-
-// NSTFileWriter is used for printing entries line by line in NST lexicon format.
-// It can be used as type lex.EntryFileWriter in dbapi.Lookup. See export/main for example code.
-type NSTFileWriter struct {
-	NST    NST
-	Writer io.Writer
-}
-
-func (w NSTFileWriter) Write(e lex.Entry) error {
-	s, err := w.NST.Entry2String(e)
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprintf(w.Writer, "%s\n", s)
-	return err
 }

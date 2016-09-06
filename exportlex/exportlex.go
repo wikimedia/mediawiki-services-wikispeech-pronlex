@@ -17,7 +17,6 @@ func main() {
 	// + db look up
 
 	if len(os.Args) != 4 {
-		//fmt.Fprintln(os.Stderr, "exportlex <DB_FILE> <LEXICON_DB_ID> <OUTPUT_FILE_NAME>")
 		log.Println("exportlex <DB_FILE> <LEXICON_DB_ID> <OUTPUT_FILE_NAME>")
 		return
 	}
@@ -42,23 +41,12 @@ func main() {
 
 	bf := bufio.NewWriter(f)
 	defer bf.Flush()
-	// bfx := dbapi.EntryFileWriter{bf}
-	// dbapi.LookUp(db, q, bfx)
 
-	//fmt.Println()
-
-	// ew := &dbapi.EntriesSliceWriter{}
-	// dbapi.LookUp(db, q, ew)
-	// for _, v := range ew.Entries {
-	// 	fmt.Printf("%v\n", v)
-	// }
-
-	// HL 20160318 : TEMPLATE CODE TO GENERATE NST OUTPUT:
 	wsFmt, err := line.NewWS()
 	if err != nil {
 		log.Fatal(err)
 	}
-	wsW := line.WSFileWriter{wsFmt, bf}
-	dbapi.LookUp(db, q, wsW)
+	writer := line.FileWriter{wsFmt, bf}
+	dbapi.LookUp(db, q, writer)
 
 }

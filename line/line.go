@@ -2,7 +2,10 @@ package line
 
 import (
 	"fmt"
+	"io"
 	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 // BUG(hanna) Add field property to indicate whether a field is required or optional (or just use two maps: RequiredFields and OptionalFields).
@@ -98,6 +101,9 @@ type Parser interface {
 
 	// String is used to generate an output line from a set of fields
 	String(map[Field]string) (string, error)
+
+	// Entry2String is used to generate an output line from an input entry
+	Entry2String(e lex.Entry) (string, error)
 }
 
 // Format is used to define a lexicon's line.
@@ -163,4 +169,18 @@ func (f Format) String(fields map[Field]string) (string, error) {
 		}
 	}
 	return strings.Join(res, f.FieldSep), nil
+}
+
+type FileWriter struct {
+	Parser Parser
+	Writer io.Writer
+}
+
+func (w FileWriter) Write(e lex.Entry) error {
+	s, err := w.Parser.Entry2String(e)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintf(w.Writer, "%s\n", s)
+	return err
 }
