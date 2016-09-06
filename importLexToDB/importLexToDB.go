@@ -74,6 +74,8 @@ func main() {
 		}
 	}
 
+	logger.Write("finished importing lexicon file")
+
 	// Loop over the symbols of the symbolset file given as a command line argument.
 	// For each such symbol, convert it to a dbapi.Symbol, and finally add all symbols to the db in one go.
 	var dbSymSet []dbapi.Symbol
@@ -81,13 +83,11 @@ func main() {
 		s := sym.String
 		cat := sym.Cat.String()
 		desc := sym.Desc
-		//TODO Add function to obtain map for single symbol...?
-		ipa, err := ssMapper.MapTranscription(s)
+		ipa, err := ssMapper.MapSymbol(sym)
 		if err != nil {
-			logger.Write(fmt.Sprintf("failed to obtain IPA carachter for '%v' : %v", s, err))
-			//return
+			logger.Write(fmt.Sprintf("failed to obtain IPA character for '%v' : %v", s, err))
 		}
-		dbSym := dbapi.Symbol{LexiconID: lexicon.ID, Symbol: s, Category: cat, Description: desc, IPA: ipa}
+		dbSym := dbapi.Symbol{LexiconID: lexicon.ID, Symbol: s, Category: cat, Description: desc, IPA: ipa.String}
 
 		dbSymSet = append(dbSymSet, dbSym)
 	}
@@ -98,4 +98,5 @@ func main() {
 		logger.Write(msg)
 		//log.Println(msg)
 	}
+	logger.Write("finished loading symbol set")
 }
