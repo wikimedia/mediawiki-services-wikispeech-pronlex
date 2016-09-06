@@ -74,7 +74,8 @@ func main() {
 		}
 	}
 
-	//fmt.Printf("HEJ DIN JÄVEL-FAEN: %d\n", lexicon.ID)
+	// Loop over the symbols of the symbolset file given as a command line argument.
+	// For each such symbol, convert it to a dbapi.Symbol, and finally add all symbols to the db in one go.
 	var dbSymSet []dbapi.Symbol
 	for _, sym := range symbolSet.Symbols {
 		s := sym.String
