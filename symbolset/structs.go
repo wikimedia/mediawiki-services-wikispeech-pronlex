@@ -155,6 +155,8 @@ func (a symbolSlice) Less(i, j int) bool {
 	return a[i].String < a[j].String
 }
 
+//go:generate stringer -type=SymbolCat
+
 // SymbolCat is used to categorize transcription symbols.
 type SymbolCat int
 
