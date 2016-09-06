@@ -8,6 +8,8 @@ You need [Sqlite3](https://www.sqlite.org/)
 ----
 
 
+Obtain lexicon data files from the [lexdata](https://github.com/stts-se/lexdata) repository
+
 Clone pronlex under src/github.com/stts-se/ in your [GOPATH](https://golang.org/doc/code.html#GOPATH) root.
 
 ```
