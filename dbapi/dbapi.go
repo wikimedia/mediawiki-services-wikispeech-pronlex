@@ -1121,14 +1121,14 @@ func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
 
 	for _, s := range symbolSet {
 		// TODO prepared statement?
-		if trm(s.Symbol) != "" {
-			_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, description, ipa) values (?, ?, ?, ?, ?)",
-				s.LexiconID, s.Symbol, s.Category, s.Description, s.IPA)
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("failed inserting symbol : %v", err)
-			}
+		//if trm(s.Symbol) != "" { // cannot trim spaces ...
+		_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, description, ipa) values (?, ?, ?, ?, ?)",
+			s.LexiconID, s.Symbol, s.Category, s.Description, s.IPA)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed inserting symbol : %v", err)
 		}
+		//}
 	}
 	return nil
 }
