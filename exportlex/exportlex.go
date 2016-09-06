@@ -54,11 +54,11 @@ func main() {
 	// }
 
 	// HL 20160318 : TEMPLATE CODE TO GENERATE NST OUTPUT:
-	nstFmt, err := line.NewNST()
+	wsFmt, err := line.NewWS()
 	if err != nil {
 		log.Fatal(err)
 	}
-	nstW := line.NSTFileWriter{nstFmt, bf}
-	dbapi.LookUp(db, q, nstW)
+	wsW := line.WSFileWriter{wsFmt, bf}
+	dbapi.LookUp(db, q, wsW)
 
 }
