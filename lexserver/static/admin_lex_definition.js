@@ -81,7 +81,7 @@ ADMLD.AdminLexDefModel = function () {
     // };
     
 
-    // TODO hard wired names. Fetch from somewhere?
+    // TODO hard wired names. Fetch from somewhere? See also pronlex/symbolset/inits.go: LoadMapper
     self.symbolCategories = 
 	["syllabic", "non syllabic", "stress", "phoneme delimiter", "syllable delimiter", "morpheme delimiter", "word delimiter"];
     
