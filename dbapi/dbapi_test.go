@@ -301,7 +301,7 @@ func Test_unique(t *testing.T) {
 
 func Test_ImportLexiconFile(t *testing.T) {
 
-	ssMapper, err := symbolset.LoadMapper("sv.se.ws.sampa", "./../symbolset/static/sv-se_ws-sampa.csv", "SYMBOL", "IPA")
+	ssMapper, err := symbolset.LoadMapper("sv.se.ws.sampa", "./../symbolset/static/sv-se_ws-sampa.tab", "SYMBOL", "IPA")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -370,7 +370,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 func Test_ImportLexiconFileInvalid(t *testing.T) {
 
-	ssMapper, err := symbolset.LoadMapper("sv.se.ws.sampa", "./../symbolset/static/sv-se_ws-sampa.csv", "SYMBOL", "IPA")
+	ssMapper, err := symbolset.LoadMapper("sv.se.ws.sampa", "./../symbolset/static/sv-se_ws-sampa.tab", "SYMBOL", "IPA")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -439,7 +439,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 
 func Test_ImportLexiconFileGz(t *testing.T) {
 
-	ssMapper, err := symbolset.LoadMapper("sv.se.ws.sampa", "./../symbolset/static/sv-se_ws-sampa.csv", "SYMBOL", "IPA")
+	ssMapper, err := symbolset.LoadMapper("sv.se.ws.sampa", "./../symbolset/static/sv-se_ws-sampa.tab", "SYMBOL", "IPA")
 	if err != nil {
 		log.Fatal(err)
 	}

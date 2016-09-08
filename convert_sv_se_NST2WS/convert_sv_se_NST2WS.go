@@ -24,7 +24,7 @@ func main() {
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
 
-	mapper, err := symbolset.LoadMappers("SAMPA", "SAMPA", ssFileName1, ssFileName2)
+	mapper, err := symbolset.LoadMappersFromFile("SAMPA", "SAMPA", ssFileName1, ssFileName2)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return

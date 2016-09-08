@@ -45,7 +45,7 @@ func main() {
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
 
-	mapper, err := symbolset.LoadMappers("CMU", "SYMBOL", ssFileName1, ssFileName2)
+	mapper, err := symbolset.LoadMappersFromFile("CMU", "SYMBOL", ssFileName1, ssFileName2)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
