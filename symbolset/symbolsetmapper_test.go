@@ -522,12 +522,12 @@ func Test_MapTranscription_NstXSAMPA_To_WsSAMPA_2(t *testing.T) {
 	}
 }
 
-func Test_LoadSymbolSet_NST2IPA_SV(t *testing.T) {
+func Test_loadSymbolSet_NST2IPA_SV(t *testing.T) {
 	name := "NST-XSAMPA"
 	fromColumn := "SAMPA"
 	toColumn := "IPA"
 	fName := "static/sv-se_nst-xsampa.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
@@ -536,12 +536,12 @@ func Test_LoadSymbolSet_NST2IPA_SV(t *testing.T) {
 	testMapTranscription1(t, ssm, "\"\"ku0$d@", "\u02C8kɵ\u0300.də")
 }
 
-func Test_LoadSymbolSet_WS2IPA(t *testing.T) {
+func Test_loadSymbolSet_WS2IPA(t *testing.T) {
 	name := "WS-SAMPA"
 	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/sv-se_ws-sampa.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
@@ -549,12 +549,12 @@ func Test_LoadSymbolSet_WS2IPA(t *testing.T) {
 	testMapTranscription1(t, ssm, "\" k u0 r d s", "\u02C8kɵrds")
 }
 
-func Test_LoadSymbolSet_IPA2WS(t *testing.T) {
+func Test_loadSymbolSet_IPA2WS(t *testing.T) {
 	name := "WS-SAMPA"
 	fromColumn := "IPA"
 	toColumn := "SYMBOL"
 	fName := "static/sv-se_ws-sampa.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
@@ -562,12 +562,12 @@ func Test_LoadSymbolSet_IPA2WS(t *testing.T) {
 	testMapTranscription1(t, ssm, "\u02C8kɵrds", "\" k u0 r d s")
 }
 
-func Test_LoadSymbolSet_NST2WS(t *testing.T) {
+func Test_loadSymbolSet_NST2WS(t *testing.T) {
 	name := "NST-XSAMPA"
 	fromColumn := "SAMPA"
 	toColumn := "IPA"
 	fName := "static/sv-se_nst-xsampa.tab"
-	ssmNST, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssmNST, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
@@ -576,7 +576,7 @@ func Test_LoadSymbolSet_NST2WS(t *testing.T) {
 	fromColumn = "IPA"
 	toColumn = "SYMBOL"
 	fName = "static/sv-se_ws-sampa.tab"
-	ssmWS, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssmWS, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
@@ -617,24 +617,24 @@ func Test_NewSymbolSet_DontFailIfInputContainsDuplicates(t *testing.T) {
 	}
 }
 
-func Test_LoadSymbolSet_CMU2IPA(t *testing.T) {
+func Test_loadSymbolSet_CMU2IPA(t *testing.T) {
 	name := "CMU"
 	fromColumn := "CMU"
 	toColumn := "IPA"
 	fName := "static/en-us_cmu.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 
 	testMapTranscription1(t, ssm, "AX $ B AW1 T", "ə.\u02C8ba⁀ʊt")
 }
-func Test_LoadSymbolSet_MARY2IPA(t *testing.T) {
+func Test_loadSymbolSet_MARY2IPA(t *testing.T) {
 	name := "MARY2IPA"
 	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/en-us_sampa_mary.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
@@ -642,12 +642,12 @@ func Test_LoadSymbolSet_MARY2IPA(t *testing.T) {
 	testMapTranscription1(t, ssm, "@ - \" b aU t", "ə.\u02C8ba⁀ʊt")
 }
 
-func Test_LoadSymbolSet_IPA2MARY(t *testing.T) {
+func Test_loadSymbolSet_IPA2MARY(t *testing.T) {
 	name := "IPA2MARY"
 	fromColumn := "IPA"
 	toColumn := "SYMBOL"
 	fName := "static/en-us_sampa_mary.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -656,12 +656,12 @@ func Test_LoadSymbolSet_IPA2MARY(t *testing.T) {
 	testMapTranscription1(t, ssm, "ə.\u02C8ba⁀ʊt", "@ - \" b aU t")
 }
 
-func Test_LoadSymbolSet_CMU2MARY(t *testing.T) {
+func Test_loadSymbolSet_CMU2MARY(t *testing.T) {
 	name := "CMU2IPA"
 	fromColumn := "CMU"
 	toColumn := "IPA"
 	fName := "static/en-us_cmu.tab"
-	ssmCMU, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssmCMU, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -671,7 +671,7 @@ func Test_LoadSymbolSet_CMU2MARY(t *testing.T) {
 	fromColumn = "IPA"
 	toColumn = "SYMBOL"
 	fName = "static/en-us_sampa_mary.tab"
-	ssmMARY, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssmMARY, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -682,12 +682,12 @@ func Test_LoadSymbolSet_CMU2MARY(t *testing.T) {
 	testMapTranscriptionX(t, mappers, "AX $ B AW1 T", "@ - \" b aU t")
 }
 
-func Test_LoadSymbolSet_SAMPA2MARY(t *testing.T) {
+func Test_loadSymbolSet_SAMPA2MARY(t *testing.T) {
 	name := "SAMPA2IPA"
 	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/sv-se_ws-sampa.tab"
-	ssm1, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -697,7 +697,7 @@ func Test_LoadSymbolSet_SAMPA2MARY(t *testing.T) {
 	fromColumn = "IPA"
 	toColumn = "SAMPA"
 	fName = "static/sv-se_sampa_mary.tab"
-	ssm2, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -706,12 +706,12 @@ func Test_LoadSymbolSet_SAMPA2MARY(t *testing.T) {
 	testMapTranscriptionX(t, mappers, "eu . r \" u: p a", "E*U - r ' u: p a")
 }
 
-func Test_LoadSymbolSet_NST2MARY(t *testing.T) {
+func Test_loadSymbolSet_NST2MARY(t *testing.T) {
 	name := "NST2IPA"
 	fromColumn := "SAMPA"
 	toColumn := "IPA"
 	fName := "static/sv-se_nst-xsampa.tab"
-	ssm1, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -721,7 +721,7 @@ func Test_LoadSymbolSet_NST2MARY(t *testing.T) {
 	fromColumn = "IPA"
 	toColumn = "SAMPA"
 	fName = "static/sv-se_sampa_mary.tab"
-	ssm2, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -730,12 +730,12 @@ func Test_LoadSymbolSet_NST2MARY(t *testing.T) {
 	testMapTranscriptionX(t, mappers, "E*U$r\"u:t`a", "E*U - r ' u: rt a")
 }
 
-func Test_LoadSymbolSet_IPA2SAMPA(t *testing.T) {
+func Test_loadSymbolSet_IPA2SAMPA(t *testing.T) {
 	name := "IPA2SAMPA"
 	fromColumn := "IPA"
 	toColumn := "SYMBOL"
 	fName := "static/sv-se_ws-sampa.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -745,12 +745,12 @@ func Test_LoadSymbolSet_IPA2SAMPA(t *testing.T) {
 	testMapTranscription1(t, ssm, "be.\u02C8liːn", "b e . \" l i: n")
 }
 
-func Test_LoadSymbolSet_NST2SAMPA(t *testing.T) {
+func Test_loadSymbolSet_NST2SAMPA(t *testing.T) {
 	name := "NST2IPA"
 	fromColumn := "SAMPA"
 	toColumn := "IPA"
 	fName := "static/sv-se_nst-xsampa.tab"
-	ssm1, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -760,7 +760,7 @@ func Test_LoadSymbolSet_NST2SAMPA(t *testing.T) {
 	fromColumn = "IPA"
 	toColumn = "SYMBOL"
 	fName = "static/sv-se_ws-sampa.tab"
-	ssm2, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -771,12 +771,12 @@ func Test_LoadSymbolSet_NST2SAMPA(t *testing.T) {
 	testMapTranscriptionX(t, mappers, "E*U$r\"u:t`a", "eu . r \" u: rt a")
 }
 
-func Test_LoadSymbolSet_IPA2CMU(t *testing.T) {
+func Test_loadSymbolSet_IPA2CMU(t *testing.T) {
 	name := "IPA2CMU"
 	fromColumn := "IPA"
 	toColumn := "CMU"
 	fName := "static/en-us_cmu.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -786,12 +786,12 @@ func Test_LoadSymbolSet_IPA2CMU(t *testing.T) {
 	testMapTranscription1(t, ssm, "ʌ.\u02C8ba⁀ʊt", "AH $ B AW1 T")
 }
 
-func Test_LoadSymbolSet_MARY2CMU(t *testing.T) {
+func Test_loadSymbolSet_MARY2CMU(t *testing.T) {
 	name := "MARY2IPA"
 	fromColumn := "SYMBOL"
 	toColumn := "IPA"
 	fName := "static/en-us_sampa_mary.tab"
-	ssmMARY, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssmMARY, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -801,7 +801,7 @@ func Test_LoadSymbolSet_MARY2CMU(t *testing.T) {
 	fromColumn = "IPA"
 	toColumn = "CMU"
 	fName = "static/en-us_cmu.tab"
-	ssmCMU, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssmCMU, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
@@ -824,12 +824,12 @@ func Test_LoadMapperFromFile_MARY2CMU(t *testing.T) {
 	testMapTranscriptionY(t, mappers, "V - \" b aU t", "AH $ B AW1 T")
 }
 
-func Test_LoadSymbolSet_NST2IPA_NB(t *testing.T) {
+func Test_loadSymbolSet_NST2IPA_NB(t *testing.T) {
 	name := "NST-XSAMPA"
 	fromColumn := "SAMPA"
 	toColumn := "IPA"
 	fName := "static/nb-no_nst-xsampa.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
@@ -839,12 +839,12 @@ func Test_LoadSymbolSet_NST2IPA_NB(t *testing.T) {
 	testMapTranscription1(t, ssm, "\"b9$n@r", "\u02C8bœ.nər")
 }
 
-func Test_LoadSymbolSet_IPA2NST_NB(t *testing.T) {
+func Test_loadSymbolSet_IPA2NST_NB(t *testing.T) {
 	name := "NST-XSAMPA"
 	fromColumn := "IPA"
 	toColumn := "SAMPA"
 	fName := "static/nb-no_nst-xsampa.tab"
-	ssm, err := LoadSymbolSet(name, fName, fromColumn, toColumn)
+	ssm, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}

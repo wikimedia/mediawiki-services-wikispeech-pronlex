@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -228,12 +229,12 @@ func LoadMapper(m1 SymbolSet, m2 SymbolSet) (Mapper, error) {
 
 // LoadMapperFromFile loads two SymbolSet instances from files.
 func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 string) (Mapper, error) {
-	m1, err := LoadSymbolSet(fromName+"2IPA", fName1, fromName, "IPA")
+	m1, err := loadSymbolSet_(fromName+"2IPA", fName1, fromName, "IPA")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
 	}
-	m2, err := LoadSymbolSet("IPA2"+toName, fName2, "IPA", toName)
+	m2, err := loadSymbolSet_("IPA2"+toName, fName2, "IPA", toName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
@@ -242,7 +243,13 @@ func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 st
 }
 
 // LoadSymbolSet loads a SymbolSet from file
-func LoadSymbolSet(name string, fName string, fromColumn string, toColumn string) (SymbolSet, error) {
+func LoadSymbolSet(fName string) (SymbolSet, error) {
+	name := filepath.Base(fName)
+	return loadSymbolSet_(name, fName, "", "")
+}
+
+// loadSymbolSet_ loads a SymbolSet from file
+func loadSymbolSet_(name string, fName string, fromColumn string, toColumn string) (SymbolSet, error) {
 	var nilRes SymbolSet
 	fh, err := os.Open(fName)
 	defer fh.Close()
@@ -255,6 +262,14 @@ func LoadSymbolSet(name string, fName string, fromColumn string, toColumn string
 	var fromIndex = -1
 	var toIndex = -1
 	var typeIndex = -1
+	if fromColumn == "" {
+		fromIndex = 1
+		fromColumn = "SYMBOL"
+	}
+	if toColumn == "" {
+		toIndex = 2
+		fromColumn = "IPA"
+	}
 	var maptable = make([]SymbolPair, 0)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
@@ -266,13 +281,17 @@ func LoadSymbolSet(name string, fName string, fromColumn string, toColumn string
 			fs := strings.Split(l, "\t")
 			if n == 1 { // header
 				descIndex = indexOf(fs, "DESCRIPTION")
-				fromIndex = indexOf(fs, fromColumn)
 				if fromIndex == -1 {
-					return nilRes, fmt.Errorf("from index %v undefined", fromColumn)
+					fromIndex = indexOf(fs, fromColumn)
+					if fromIndex == -1 {
+						return nilRes, fmt.Errorf("from index %v undefined", fromColumn)
+					}
 				}
-				toIndex = indexOf(fs, toColumn)
 				if toIndex == -1 {
-					return nilRes, fmt.Errorf("to index %v undefined", toColumn)
+					toIndex = indexOf(fs, toColumn)
+					if toIndex == -1 {
+						return nilRes, fmt.Errorf("to index %v undefined", toColumn)
+					}
 				}
 				typeIndex = indexOf(fs, "CATEGORY")
 

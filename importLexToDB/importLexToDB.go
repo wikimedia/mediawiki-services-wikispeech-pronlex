@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("Cannot find db file. %v", err)
 	}
 
-	ss, err := symbolset.LoadSymbolSet(symbolSetName, ssFileName, "SYMBOL", "IPA")
+	ss, err := symbolset.LoadSymbolSet(ssFileName) // symbolSetName, ssFileName, "SYMBOL", "IPA")
 	if err != nil {
 		log.Fatal(err)
 	}
