@@ -391,6 +391,32 @@ func (m Mapper) MapTranscription(input string) (string, error) {
 	return res, nil
 }
 
+// MapSymbol maps one input transcription symbol into the new symbol set.
+func (m Mapper) MapSymbol(input Symbol) (Symbol, error) {
+	res, err := m.SymbolSet1.MapSymbol(input)
+	if err != nil {
+		return Symbol{}, fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	res, err = m.SymbolSet2.MapSymbol(res)
+	if err != nil {
+		return Symbol{}, fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	return res, nil
+}
+
+// MapSymbolString maps one input transcription symbol into the new symbol set.
+func (m Mapper) MapSymbolString(input string) (string, error) {
+	res, err := m.SymbolSet1.MapSymbolString(input)
+	if err != nil {
+		return "", fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	res, err = m.SymbolSet2.MapSymbolString(res)
+	if err != nil {
+		return "", fmt.Errorf("couldn't map transcription : %v", err)
+	}
+	return res, nil
+}
+
 // MapTranscriptions maps the input entry's transcriptions (in-place)
 func (m Mapper) MapTranscriptions(e *lex.Entry) error {
 	err := m.SymbolSet1.MapTranscriptions(e)

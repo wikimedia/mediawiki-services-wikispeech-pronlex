@@ -30,6 +30,20 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, result)
 }
 
+func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
+	fromName := r.FormValue("from")
+	toName := r.FormValue("to")
+	result, err := mapperService.GetMapTable(fromName, toName)
+	if err != nil {
+		msg := fmt.Sprintf("failed getting map table : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, result)
+}
+
 func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 	// list files in symbol set dir
 	fileInfos, err := ioutil.ReadDir(symbolSetFileArea)

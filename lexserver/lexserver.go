@@ -993,6 +993,7 @@ func main() {
 	http.HandleFunc("/mapper/load", loadMapperHandler)
 	http.HandleFunc("/mapper/list", listMapperHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
+	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)
 
 	// TODO Why this http.StripPrefix? Looks odd.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))

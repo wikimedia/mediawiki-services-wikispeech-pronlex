@@ -42,10 +42,25 @@ func (m MapperService) Map(fromName string, toName string, trans string) (string
 }
 
 // GetMapTable is used by the server to show/get a mapping table between two symbol sets
-func (m MapperService) GetMapTable(fromName string, toName string) (Mapper, error) {
+func (m MapperService) GetMapTable(fromName string, toName string) ([][]string, error) {
+	symbols := make([][]string, 0)
 	mapper, err := m.getOrCreateMapper(fromName, toName)
 	if err != nil {
-		return Mapper{}, fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
+		return make([][]string, 0), fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
 	}
-	return mapper, nil
+	for _, pair := range mapper.SymbolSet1.Symbols {
+		s1 := pair.Sym1
+		s2, err := mapper.MapSymbolString(s1.String)
+		if err != nil {
+			return make([][]string, 0), fmt.Errorf("couldn't map symbol /%s/ : %v", s1, err)
+		}
+		line := make([]string, 0)
+		line = append(line, s1.String)
+		line = append(line, s2)
+		line = append(line, s1.Cat.String())
+		line = append(line, s1.Desc)
+		symbols = append(symbols, line)
+	}
+
+	return symbols, nil
 }
