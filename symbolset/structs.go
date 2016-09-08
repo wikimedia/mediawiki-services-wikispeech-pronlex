@@ -10,9 +10,9 @@ import (
 
 // structs in package symbolset
 
-// SymbolSet is a struct for package private usage.
-// To create a new SymbolSet, use NewSymbolSet
-type SymbolSet struct {
+// Symbols is a struct for package private usage.
+// To create a new 'Symbols' instance, use NewSymbols
+type Symbols struct {
 	Name    string
 	Symbols []Symbol
 
@@ -35,16 +35,16 @@ type SymbolSet struct {
 	phonemeDelimiterRe *regexp.Regexp
 }
 
-// Mappers is a struct for package private usage. To create a new instance of Mappers, use LoadMapperes.
-type Mappers struct {
-	Name    string
-	Mapper1 Mapper
-	Mapper2 Mapper
+// Mapper is a struct for package private usage. To create a new instance of Mapper, use LoadMapper.
+type Mapper struct {
+	Name       string
+	SymbolSet1 SymbolSet
+	SymbolSet2 SymbolSet
 }
 
-// Mapper is a struct for package private usage.
-// To create a new Mapper, use NewMapper.
-type Mapper struct {
+// SymbolSet is a struct for package private usage.
+// To create a new SymbolSet, use NewSymbolSet.
+type SymbolSet struct {
 	Name     string
 	FromName string
 	ToName   string
@@ -59,14 +59,14 @@ type Mapper struct {
 	fromIsCMU bool
 	toIsCMU   bool
 
-	From      SymbolSet
-	To        SymbolSet
+	From      Symbols
+	To        Symbols
 	symbolMap map[Symbol]Symbol
 
 	repeatedPhonemeDelimiters *regexp.Regexp
 }
 
-func (m Mapper) reverse(newName string) (Mapper, error) {
+func (m SymbolSet) reverse(newName string) (SymbolSet, error) {
 	var symbols = make([]SymbolPair, 0)
 
 	for _, pair := range m.Symbols {
@@ -74,10 +74,10 @@ func (m Mapper) reverse(newName string) (Mapper, error) {
 		s2 := pair.Sym2
 		symbols = append(symbols, SymbolPair{s2, s1})
 	}
-	return NewMapper(newName, m.ToName, m.FromName, symbols)
+	return NewSymbolSet(newName, m.ToName, m.FromName, symbols)
 }
 
-func (m Mapper) preFilter(trans string, ss SymbolSet) (string, error) {
+func (m SymbolSet) preFilter(trans string, ss Symbols) (string, error) {
 	if m.fromIsIPA {
 		return m.ipa.filterBeforeMappingFromIpa(trans, ss)
 	} else if m.fromIsCMU {
@@ -86,7 +86,7 @@ func (m Mapper) preFilter(trans string, ss SymbolSet) (string, error) {
 	return trans, nil
 }
 
-func (m Mapper) postFilter(trans string, ss SymbolSet) (string, error) {
+func (m SymbolSet) postFilter(trans string, ss Symbols) (string, error) {
 	if m.toIsIPA {
 		return m.ipa.filterAfterMappingToIpa(trans, ss)
 	} else if m.toIsCMU {
@@ -96,7 +96,7 @@ func (m Mapper) postFilter(trans string, ss SymbolSet) (string, error) {
 }
 
 // MapTranscriptions maps the input entry's transcriptions (in-place)
-func (m Mapper) MapTranscriptions(e *lex.Entry) error {
+func (m SymbolSet) MapTranscriptions(e *lex.Entry) error {
 	var newTs []lex.Transcription
 	var errs []string
 	for _, t := range e.Transcriptions {
@@ -114,7 +114,7 @@ func (m Mapper) MapTranscriptions(e *lex.Entry) error {
 }
 
 // MapSymbol maps one symbol into the corresponding symbol in the new symbol set
-func (m Mapper) MapSymbol(symbol Symbol) (Symbol, error) {
+func (m SymbolSet) MapSymbol(symbol Symbol) (Symbol, error) {
 	res, ok := m.symbolMap[symbol]
 	if !ok {
 		return symbol, fmt.Errorf("unknown input symbol %v", symbol)
@@ -123,7 +123,7 @@ func (m Mapper) MapSymbol(symbol Symbol) (Symbol, error) {
 }
 
 // MapSymbolString maps one symbol into the corresponding symbol in the new symbol set
-func (m Mapper) MapSymbolString(symbol string) (string, error) {
+func (m SymbolSet) MapSymbolString(symbol string) (string, error) {
 	sym, err := m.From.Get(symbol)
 	if err != nil {
 		return symbol, err
@@ -133,7 +133,7 @@ func (m Mapper) MapSymbolString(symbol string) (string, error) {
 }
 
 // MapTranscription maps one input transcription string into the new symbol set.
-func (m Mapper) MapTranscription(input string) (string, error) {
+func (m SymbolSet) MapTranscription(input string) (string, error) {
 	res, err := m.preFilter(input, m.From)
 	if err != nil {
 		return "", err
@@ -167,7 +167,7 @@ func (m Mapper) MapTranscription(input string) (string, error) {
 	return m.postFilter(res, m.To)
 }
 
-// SymbolPair is a tuple inside the Mapper used to store the symbol mappings in a list in preserved order
+// SymbolPair is a tuple inside the SymbolSet used to store the symbol mappings in a list in preserved order
 type SymbolPair struct {
 	Sym1 Symbol
 	Sym2 Symbol
@@ -221,12 +221,13 @@ const (
 // Symbol represent a phoneme, stress or delimiter symbol used in transcriptions
 type Symbol struct {
 	String string
-	Cat    SymbolCat
-	Desc   string
+	//IPA    string // ! TODO: should be like this
+	Cat  SymbolCat
+	Desc string
 }
 
-// Get searches the SymbolSet for a symbol with the given string
-func (ss SymbolSet) Get(symbol string) (Symbol, error) {
+// Get searches the Symbols for a symbol with the given string
+func (ss Symbols) Get(symbol string) (Symbol, error) {
 	for _, s := range ss.Symbols {
 		if s.String == symbol {
 			return s, nil
@@ -235,7 +236,7 @@ func (ss SymbolSet) Get(symbol string) (Symbol, error) {
 	return Symbol{}, fmt.Errorf("no symbol /%s/ in symbol set", symbol)
 }
 
-func (ss SymbolSet) filterAmbiguous(trans []string) ([]string, error) {
+func (ss Symbols) filterAmbiguous(trans []string) ([]string, error) {
 	potentiallyAmbs := ss.phoneticSymbols
 	phnDel := ss.phonemeDelimiter.String
 	var res = make([]string, 0)
@@ -251,7 +252,7 @@ func (ss SymbolSet) filterAmbiguous(trans []string) ([]string, error) {
 	return res, nil
 }
 
-func (ss SymbolSet) preCheckAmbiguous() error {
+func (ss Symbols) preCheckAmbiguous() error {
 	allSymbols := ss.phonemes
 	var res = make([]string, 0)
 	for _, a := range allSymbols {
@@ -267,12 +268,12 @@ func (ss SymbolSet) preCheckAmbiguous() error {
 }
 
 // ValidSymbol checks if a string is a valid symbol or not
-func (ss SymbolSet) ValidSymbol(symbol string) bool {
+func (ss Symbols) ValidSymbol(symbol string) bool {
 	return contains(ss.Symbols, symbol)
 }
 
 // SplitTranscription splits the input transcription into separate symbols
-func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
+func (ss Symbols) SplitTranscription(input string) ([]string, error) {
 	if !ss.isInit {
 		panic("symbolSet " + ss.Name + " has not been initialized properly!")
 	}
@@ -311,7 +312,7 @@ func (ipa ipa) isIPA(symbolSetName string) bool {
 	return strings.Contains(strings.ToLower(symbolSetName), ipa.ipa)
 }
 
-func (ipa ipa) filterBeforeMappingFromIpa(trans string, ss SymbolSet) (string, error) {
+func (ipa ipa) filterBeforeMappingFromIpa(trans string, ss Symbols) (string, error) {
 	// IPA: ˈba`ŋ.ka => ˈ`baŋ.ka"
 	s := ipa.accentI + "(" + ss.PhonemeRe.String() + "+)" + ipa.accentII
 	repl, err := regexp.Compile(s)
@@ -322,7 +323,7 @@ func (ipa ipa) filterBeforeMappingFromIpa(trans string, ss SymbolSet) (string, e
 	return res, nil
 }
 
-func (ipa ipa) filterAfterMappingToIpa(trans string, ss SymbolSet) (string, error) {
+func (ipa ipa) filterAfterMappingToIpa(trans string, ss Symbols) (string, error) {
 	// IPA: /ə.ba⁀ʊˈt/ => /ə.ˈba⁀ʊt/
 	s := "(" + ss.NonSyllabicRe.String() + "*)(" + ss.SyllabicRe.String() + ")" + ipa.accentI
 	repl, err := regexp.Compile(s)
@@ -354,7 +355,7 @@ func (cmu cmu) isCMU(symbolSetName string) bool {
 	return strings.Contains(strings.ToLower(symbolSetName), cmu.cmu)
 }
 
-func (cmu cmu) filterBeforeMappingFromCMU(trans string, ss SymbolSet) (string, error) {
+func (cmu cmu) filterBeforeMappingFromCMU(trans string, ss Symbols) (string, error) {
 	re, err := regexp.Compile("(.)([012])")
 	if err != nil {
 		return "", err
@@ -363,7 +364,7 @@ func (cmu cmu) filterBeforeMappingFromCMU(trans string, ss SymbolSet) (string, e
 	return trans, nil
 }
 
-func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) (string, error) {
+func (cmu cmu) filterAfterMappingToCMU(trans string, ss Symbols) (string, error) {
 	s := "([012]) ((?:" + ss.NonSyllabicRe.String() + " )*)(" + ss.SyllabicRe.String() + ")"
 	repl, err := regexp.Compile(s)
 	if err != nil {
@@ -378,12 +379,12 @@ func (cmu cmu) filterAfterMappingToCMU(trans string, ss SymbolSet) (string, erro
 }
 
 // MapTranscription maps one input transcription string into the new symbol set.
-func (m Mappers) MapTranscription(input string) (string, error) {
-	res, err := m.Mapper1.MapTranscription(input)
+func (m Mapper) MapTranscription(input string) (string, error) {
+	res, err := m.SymbolSet1.MapTranscription(input)
 	if err != nil {
 		return "", fmt.Errorf("couldn't map transcription : %v", err)
 	}
-	res, err = m.Mapper2.MapTranscription(res)
+	res, err = m.SymbolSet2.MapTranscription(res)
 	if err != nil {
 		return "", fmt.Errorf("couldn't map transcription : %v", err)
 	}
@@ -391,12 +392,12 @@ func (m Mappers) MapTranscription(input string) (string, error) {
 }
 
 // MapTranscriptions maps the input entry's transcriptions (in-place)
-func (m Mappers) MapTranscriptions(e *lex.Entry) error {
-	err := m.Mapper1.MapTranscriptions(e)
+func (m Mapper) MapTranscriptions(e *lex.Entry) error {
+	err := m.SymbolSet1.MapTranscriptions(e)
 	if err != nil {
 		return fmt.Errorf("couldn't map transcription : %v", err)
 	}
-	err = m.Mapper2.MapTranscriptions(e)
+	err = m.SymbolSet2.MapTranscriptions(e)
 	if err != nil {
 		return fmt.Errorf("couldn't map transcription : %v", err)
 	}

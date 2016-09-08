@@ -2,19 +2,19 @@ package symbolset
 
 import "testing"
 
-func Test_NewSymbolSet_WithoutPhonemeDelimiter(t *testing.T) {
+func Test_NewSymbols_WithoutPhonemeDelimiter(t *testing.T) {
 	name := "ss"
 	symbols := []Symbol{
 		Symbol{"a", Syllabic, ""},
 		Symbol{"t", NonSyllabic, ""},
 	}
-	_, err := NewSymbolSet(name, symbols)
+	_, err := NewSymbols(name, symbols)
 	if err == nil {
-		t.Errorf("NewSymbolSet() should fail if no phoneme delimiter is defined")
+		t.Errorf("NewSymbols() should fail if no phoneme delimiter is defined")
 	}
 }
 
-func Test_NewSymbolSet_FailIfInputContainsDuplicates(t *testing.T) {
+func Test_NewSymbols_FailIfInputContainsDuplicates(t *testing.T) {
 	name := "ss"
 	symbols := []Symbol{
 		Symbol{"a", Syllabic, ""},
@@ -22,9 +22,9 @@ func Test_NewSymbolSet_FailIfInputContainsDuplicates(t *testing.T) {
 		Symbol{"t", NonSyllabic, ""},
 		Symbol{" ", PhonemeDelimiter, "phn delim"},
 	}
-	_, err := NewSymbolSet(name, symbols)
+	_, err := NewSymbols(name, symbols)
 	if err == nil {
-		t.Errorf("NewSymbolSet() expected error here")
+		t.Errorf("NewSymbols() expected error here")
 	}
 }
 
@@ -37,7 +37,7 @@ func Test_SplitTranscription_Normal1(t *testing.T) {
 		Symbol{"t_s", NonSyllabic, ""},
 		Symbol{" ", PhonemeDelimiter, "phn delim"},
 	}
-	ss, err := NewSymbolSet(name, symbols)
+	ss, err := NewSymbols(name, symbols)
 	if err != nil {
 		t.Errorf("SplitTranscription() didn't expect error here : %v", err)
 	}
@@ -60,7 +60,7 @@ func Test_SplitTranscription_EmptyPhonemeDelmiter1(t *testing.T) {
 		Symbol{"t_s", NonSyllabic, ""},
 		Symbol{"", PhonemeDelimiter, ""},
 	}
-	ss, err := NewSymbolSet(name, symbols)
+	ss, err := NewSymbols(name, symbols)
 	if err != nil {
 		t.Errorf("SplitTranscription() didn't expect error here")
 	}
@@ -85,7 +85,7 @@ func Test_SplitTranscription_FailWithUnknownSymbols_EmptyDelim(t *testing.T) {
 		Symbol{"\"", Stress, ""},
 		Symbol{"\"\"", Stress, ""},
 	}
-	ss, err := NewSymbolSet(name, symbols)
+	ss, err := NewSymbols(name, symbols)
 	if err != nil {
 		t.Errorf("SplitTranscription() didn't expect error here : %v", err)
 	}
@@ -108,7 +108,7 @@ func Test_SplitTranscription_NoFailWithUnknownSymbols_NonEmptyDelim(t *testing.T
 		Symbol{"\"", Stress, ""},
 		Symbol{"\"\"", Stress, ""},
 	}
-	ss, err := NewSymbolSet(name, symbols)
+	ss, err := NewSymbols(name, symbols)
 	if err != nil {
 		t.Errorf("SplitTranscription() didn't expect error here : %v", err)
 	}
@@ -132,7 +132,7 @@ func Test_ValidSymbol1(t *testing.T) {
 		Symbol{"\"", Stress, ""},
 		Symbol{"\"\"", Stress, ""},
 	}
-	ss, err := NewSymbolSet(name, symbols)
+	ss, err := NewSymbols(name, symbols)
 	if err != nil {
 		t.Errorf("didn't expect error here : %v", err)
 	}

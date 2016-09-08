@@ -82,7 +82,7 @@ func NewNSTDemoValidator() (validation.Validator, error) {
 }
 
 // SvNSTHardWired is a temporary function that should not be used in production
-func NewNSTSvHardWired() (symbolset.SymbolSet, error) {
+func NewNSTSvHardWired() (symbolset.Symbols, error) {
 	name := "sv.se.nst-SAMPA"
 
 	syms := []symbolset.Symbol{
@@ -138,11 +138,11 @@ func NewNSTSvHardWired() (symbolset.SymbolSet, error) {
 		symbolset.Symbol{"+", symbolset.CompoundDelimiter, ""},
 	}
 
-	return symbolset.NewSymbolSet(name, syms)
+	return symbolset.NewSymbols(name, syms)
 
 }
 
-func NewNSTNbvHardWired() (symbolset.SymbolSet, error) {
+func NewNSTNbvHardWired() (symbolset.Symbols, error) {
 	name := "NST nob sampa"
 	symbols := []symbolset.Symbol{
 		symbolset.Symbol{"@", symbolset.Syllabic, ""},
@@ -227,5 +227,5 @@ func NewNSTNbvHardWired() (symbolset.SymbolSet, error) {
 		symbolset.Symbol{"$", symbolset.SyllableDelimiter, ""},
 		symbolset.Symbol{"-", symbolset.CompoundDelimiter, ""},
 	}
-	return symbolset.NewSymbolSet(name, symbols)
+	return symbolset.NewSymbols(name, symbols)
 }

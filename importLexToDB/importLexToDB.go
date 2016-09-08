@@ -30,11 +30,11 @@ func main() {
 		log.Fatalf("Cannot find db file. %v", err)
 	}
 
-	ssMapper, err := symbolset.LoadMapper(symbolSetName, ssFileName, "SYMBOL", "IPA")
+	ss, err := symbolset.LoadSymbolSet(symbolSetName, ssFileName, "SYMBOL", "IPA")
 	if err != nil {
 		log.Fatal(err)
 	}
-	symbolSet := ssMapper.From
+	symbolSet := ss.From
 
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
@@ -83,7 +83,7 @@ func main() {
 		s := sym.String
 		cat := sym.Cat.String()
 		desc := sym.Desc
-		ipa, err := ssMapper.MapSymbol(sym)
+		ipa, err := ss.MapSymbol(sym)
 		if err != nil {
 			logger.Write(fmt.Sprintf("failed to obtain IPA character for '%v' : %v", s, err))
 		}

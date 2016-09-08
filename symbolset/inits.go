@@ -26,14 +26,14 @@ func newCMU() cmu {
 	}
 }
 
-// NewSymbolSet is a public constructor for SymbolSet with built-in error checks
-func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
-	return newSymbolSet(name, symbols, true)
+// NewSymbols is a constructor for 'symbols' with built-in error checks
+func NewSymbols(name string, symbols []Symbol) (Symbols, error) {
+	return NewSymbolsWithTests(name, symbols, true)
 }
 
-// NewSymbolSet is a public constructor for SymbolSet with built-in error checks
-func newSymbolSet(name string, symbols []Symbol, checkForDups bool) (SymbolSet, error) {
-	var nilRes SymbolSet
+// NewsymbolsWithTests is a constructor for 'symbols' with built-in error checks
+func NewSymbolsWithTests(name string, symbols []Symbol, checkForDups bool) (Symbols, error) {
+	var nilRes Symbols
 
 	// filtered lists
 	phonemes := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic, Stress})
@@ -86,7 +86,7 @@ func newSymbolSet(name string, symbols []Symbol, checkForDups bool) (SymbolSet, 
 		}
 	}
 
-	res := SymbolSet{
+	res := Symbols{
 		Name:    name,
 		Symbols: symbols,
 
@@ -110,9 +110,9 @@ func newSymbolSet(name string, symbols []Symbol, checkForDups bool) (SymbolSet, 
 
 }
 
-// NewMapper is a public constructor for Mapper with built-in error checks
-func NewMapper(name string, fromName string, toName string, symbolList []SymbolPair) (Mapper, error) {
-	var nilRes Mapper
+// NewSymbolSet is a public constructor for SymbolSet with built-in error checks
+func NewSymbolSet(name string, fromName string, toName string, symbolList []SymbolPair) (SymbolSet, error) {
+	var nilRes SymbolSet
 
 	ipa := newIPA()
 	cmu := newCMU()
@@ -137,11 +137,11 @@ func NewMapper(name string, fromName string, toName string, symbolList []SymbolP
 		toSymbols = append(toSymbols, s2)
 	}
 
-	from, err := newSymbolSet(fromName, fromSymbols, true) // check for duplicates in input symbol set
+	from, err := NewSymbolsWithTests(fromName, fromSymbols, true) // check for duplicates in input symbol set
 	if err != nil {
 		return nilRes, err
 	}
-	to, err := newSymbolSet(toName, toSymbols, false) // do not check for duplicates in output phoneme set
+	to, err := NewSymbolsWithTests(toName, toSymbols, false) // do not check for duplicates in output phoneme set
 	if err != nil {
 		return nilRes, err
 	}
@@ -162,7 +162,7 @@ func NewMapper(name string, fromName string, toName string, symbolList []SymbolP
 		return nilRes, err
 	}
 
-	m := Mapper{
+	m := SymbolSet{
 		Name:                      name,
 		FromName:                  fromName,
 		ToName:                    toName,
@@ -181,12 +181,12 @@ func NewMapper(name string, fromName string, toName string, symbolList []SymbolP
 
 }
 
-// LoadMappers loads a 'mapper pair' from two Mapper instances
-func LoadMappers(m1 Mapper, m2 Mapper) (Mappers, error) {
+// LoadMapper loads a 'mapper pair' from two SymbolSet instances
+func LoadMapper(m1 SymbolSet, m2 SymbolSet) (Mapper, error) {
 	fromName := m1.Name
 	toName := m2.Name
 	name := fromName + "2" + toName
-	mappers := Mappers{name, m1, m2}
+	mappers := Mapper{name, m1, m2}
 
 	// for testing:
 	m1rev, err := m1.reverse(fromName + "2IPA")
@@ -198,7 +198,7 @@ func LoadMappers(m1 Mapper, m2 Mapper) (Mappers, error) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 	}
-	mappersrev := Mappers{toName + "2" + fromName, m2rev, m1rev}
+	mappersrev := Mapper{toName + "2" + fromName, m2rev, m1rev}
 
 	var errs []string
 
@@ -220,30 +220,30 @@ func LoadMappers(m1 Mapper, m2 Mapper) (Mappers, error) {
 		}
 	}
 	if len(errs) > 0 {
-		return mappers, fmt.Errorf("Mappers initialization tests failed %v", strings.Join(errs, "; "))
+		return mappers, fmt.Errorf("Mapper initialization tests failed %v", strings.Join(errs, "; "))
 	}
 
 	return mappers, nil
 }
 
-// LoadMappersFromFile loads two Mapper instances from files.
-func LoadMappersFromFile(fromName string, toName string, fName1 string, fName2 string) (Mappers, error) {
-	m1, err := LoadMapper(fromName+"2IPA", fName1, fromName, "IPA")
+// LoadMapperFromFile loads two SymbolSet instances from files.
+func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 string) (Mapper, error) {
+	m1, err := LoadSymbolSet(fromName+"2IPA", fName1, fromName, "IPA")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-		return Mappers{"", Mapper{}, Mapper{}}, err
+		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
 	}
-	m2, err := LoadMapper("IPA2"+toName, fName2, "IPA", toName)
+	m2, err := LoadSymbolSet("IPA2"+toName, fName2, "IPA", toName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-		return Mappers{"", Mapper{}, Mapper{}}, err
+		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
 	}
-	return LoadMappers(m1, m2)
+	return LoadMapper(m1, m2)
 }
 
-// LoadMapper loads a Mapper from file
-func LoadMapper(name string, fName string, fromColumn string, toColumn string) (Mapper, error) {
-	var nilRes Mapper
+// LoadSymbolSet loads a SymbolSet from file
+func LoadSymbolSet(name string, fName string, fromColumn string, toColumn string) (SymbolSet, error) {
+	var nilRes SymbolSet
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
@@ -332,7 +332,7 @@ func LoadMapper(name string, fName string, fromColumn string, toColumn string) (
 	} else {
 		toName = toColumn
 	}
-	m, err := NewMapper(name, fromName, toName, maptable)
+	m, err := NewSymbolSet(name, fromName, toName, maptable)
 	if err != nil {
 		return nilRes, fmt.Errorf("couldn't load mapper from file %v : %v", fName, err)
 	}

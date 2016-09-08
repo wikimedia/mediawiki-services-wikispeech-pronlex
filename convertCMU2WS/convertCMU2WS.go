@@ -45,12 +45,12 @@ func main() {
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
 
-	mapper, err := symbolset.LoadMappersFromFile("CMU", "SYMBOL", ssFileName1, ssFileName2)
+	mapper, err := symbolset.LoadMapperFromFile("CMU", "SYMBOL", ssFileName1, ssFileName2)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
 	}
-	ssRuleTo := vrules.SymbolSetRule{mapper.Mapper2.To}
+	ssRuleTo := vrules.SymbolSetRule{mapper.SymbolSet2.To}
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()

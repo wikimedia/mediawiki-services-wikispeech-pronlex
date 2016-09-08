@@ -24,7 +24,7 @@ import (
 // }
 
 // ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does check the symbol set. symbolSet is only used for logging invalid symbols in transcriptions.
-func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, symbolSet symbolset.SymbolSet) []error {
+func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, symbolSet symbolset.Symbols) []error {
 	var errs []error
 
 	ssRule := vrules.SymbolSetRule{symbolSet}
