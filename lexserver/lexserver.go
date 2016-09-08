@@ -992,6 +992,7 @@ func main() {
 	// TODO Split this main func into several files
 	http.HandleFunc("/mapper/load", loadMapperHandler)
 	http.HandleFunc("/mapper/list", listMapperHandler)
+	http.HandleFunc("/mapper/symbolset", symbolSetMapperHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
 	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)
 

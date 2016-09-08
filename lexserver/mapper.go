@@ -30,6 +30,18 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, result)
 }
 
+func symbolSetMapperHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	result, ok := mapperService.SymbolSets[name]
+	if !ok {
+		msg := fmt.Sprintf("failed getting symbol set : %v", name)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprint(w, result)
+}
+
 func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fromName := r.FormValue("from")
 	toName := r.FormValue("to")
