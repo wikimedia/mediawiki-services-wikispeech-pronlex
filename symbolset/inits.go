@@ -181,33 +181,28 @@ func NewMapper(name string, fromName string, toName string, symbolList []SymbolP
 
 }
 
-// LoadMappers loads two Mappers from files.
-func LoadMappers(fromName string, toName string, fName1 string, fName2 string) (Mappers, error) {
+// LoadMappers loads a 'mapper pair' from two Mapper instances
+func LoadMappers(m1 Mapper, m2 Mapper) (Mappers, error) {
+	fromName := m1.Name
+	toName := m2.Name
 	name := fromName + "2" + toName
-	mapper1, err := LoadMapper(fromName+"2IPA", fName1, fromName, "IPA")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-	}
-	mapper2, err := LoadMapper("IPA2"+toName, fName2, "IPA", toName)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-	}
-	mappers := Mappers{name, mapper1, mapper2}
+	mappers := Mappers{name, m1, m2}
 
 	// for testing:
-	mapper1rev, err := LoadMapper(fromName+"2IPA", fName1, "IPA", fromName)
+	m1rev, err := m1.reverse(fromName + "2IPA")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 	}
-	mapper2rev, err := LoadMapper("IPA2"+toName, fName2, toName, "IPA")
+
+	m2rev, err := m2.reverse("IPA2" + toName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 	}
-	mappersrev := Mappers{toName + "2" + fromName, mapper2rev, mapper1rev}
+	mappersrev := Mappers{toName + "2" + fromName, m2rev, m1rev}
 
 	var errs []string
 
-	for _, symbol := range mapper1.From.Symbols {
+	for _, symbol := range m1.From.Symbols {
 		if len(symbol.String) > 0 {
 			mapped, err := mappers.MapTranscription(symbol.String)
 			if len(mapped) > 0 {
@@ -229,7 +224,21 @@ func LoadMappers(fromName string, toName string, fName1 string, fName2 string) (
 	}
 
 	return mappers, nil
+}
 
+// LoadMappersFromFile loads two Mapper instances from files.
+func LoadMappersFromFile(fromName string, toName string, fName1 string, fName2 string) (Mappers, error) {
+	m1, err := LoadMapper(fromName+"2IPA", fName1, fromName, "IPA")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		return Mappers{"", Mapper{}, Mapper{}}, err
+	}
+	m2, err := LoadMapper("IPA2"+toName, fName2, "IPA", toName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		return Mappers{"", Mapper{}, Mapper{}}, err
+	}
+	return LoadMappers(m1, m2)
 }
 
 // LoadMapper loads a Mapper from file

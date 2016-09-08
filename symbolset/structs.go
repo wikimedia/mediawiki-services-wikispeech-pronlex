@@ -66,6 +66,17 @@ type Mapper struct {
 	repeatedPhonemeDelimiters *regexp.Regexp
 }
 
+func (m Mapper) reverse(newName string) (Mapper, error) {
+	var symbols = make([]SymbolPair, 0)
+
+	for _, pair := range m.Symbols {
+		s1 := pair.Sym1
+		s2 := pair.Sym2
+		symbols = append(symbols, SymbolPair{s2, s1})
+	}
+	return NewMapper(newName, m.ToName, m.FromName, symbols)
+}
+
 func (m Mapper) preFilter(trans string, ss SymbolSet) (string, error) {
 	if m.fromIsIPA {
 		return m.ipa.filterBeforeMappingFromIpa(trans, ss)
