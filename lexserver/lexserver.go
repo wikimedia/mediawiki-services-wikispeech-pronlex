@@ -38,6 +38,7 @@ func ff(f string, err error) {
 // TODO should go into config file
 var uploadFileArea = filepath.Join(".", "upload_area")
 var downloadFileArea = filepath.Join(".", "download_area")
+var symbolSetFileArea = filepath.Join(".", "symbol_set_file_area")
 
 // TODO config stuff
 func init() {
@@ -61,6 +62,18 @@ func init() {
 			err2 := os.Mkdir(downloadFileArea, 0755)
 			if err2 != nil {
 				fmt.Printf("lexserver.init: failed to create %s : %v", downloadFileArea, err2)
+			}
+		} else {
+			fmt.Printf("lexserver.init: peculiar error : %v", err)
+		}
+	} // else: already exists, hopefullly
+
+	// If the symbol set dir doesn't exist, create it
+	if _, err := os.Stat(symbolSetFileArea); err != nil {
+		if os.IsNotExist(err) {
+			err2 := os.Mkdir(symbolSetFileArea, 0755)
+			if err2 != nil {
+				fmt.Printf("lexserver.init: failed to create %s : %v", symbolSetFileArea, err2)
 			}
 		} else {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
@@ -975,6 +988,10 @@ func main() {
 
 	http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
 	http.HandleFunc("/admin/exportlexicon", exportLexiconHandler)
+
+	// TODO Split this main func into several files
+	http.HandleFunc("/mapper/load", loadMapperHandler)
+	http.HandleFunc("/mapper/list", listMapperHandler)
 
 	// TODO Why this http.StripPrefix? Looks odd.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
