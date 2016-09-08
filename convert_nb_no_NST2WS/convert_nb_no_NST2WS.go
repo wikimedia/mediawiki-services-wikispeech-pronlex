@@ -16,7 +16,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT NST LEX FILE> <LEX2IPA MAPPER> <IPA2SAMPA MAPPER>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go nor030224NST.pron.utf8 nb-no_nst-xsampa.csv nb-no_ws-sampa.csv ")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go nor030224NST.pron.utf8 nb-no_nst-xsampa.tab nb-no_ws-sampa.tab ")
 		return
 	}
 

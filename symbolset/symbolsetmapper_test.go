@@ -924,3 +924,20 @@ func Test_MapSymbol(t *testing.T) {
 	}
 
 }
+
+func Test_NewMapper_WithDupsOnLeftSide(t *testing.T) {
+	fromName := "ssTest"
+	toName := "ssIPA"
+	symbols := []SymbolPair{
+		SymbolPair{Symbol{"i", Syllabic, ""}, Symbol{"I", Syllabic, ""}},
+		SymbolPair{Symbol{"i3", Syllabic, ""}, Symbol{"I", Syllabic, ""}},
+		SymbolPair{Symbol{"p", NonSyllabic, ""}, Symbol{"P", NonSyllabic, ""}},
+		SymbolPair{Symbol{" ", PhonemeDelimiter, ""}, Symbol{" ", PhonemeDelimiter, ""}},
+	}
+	m, err := NewMapper("test", fromName, toName, symbols)
+	if err != nil {
+		t.Errorf("NewMapper() didn't expect error here : %v", err)
+	}
+	testMapTranscription1(t, m, "i3 p", "I P")
+	testMapTranscription1(t, m, "i p", "I P")
+}

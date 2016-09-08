@@ -37,7 +37,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU2IPA MAPPER> <IPA2SAMPA MAPPER>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertCMU2WS.go cmudict-0.7b.utf8 en-us_cmu.csv en_us_sampa_mary.csv")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertCMU2WS.go cmudict-0.7b.utf8 en-us_cmu.tab en_us_sampa_mary.tab")
 		return
 	}
 
