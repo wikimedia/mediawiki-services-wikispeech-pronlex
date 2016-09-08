@@ -13,8 +13,8 @@ import (
 	"github.com/stts-se/pronlex/symbolset"
 )
 
-// TODO Mutex this variable (?)
-var symbolSets []symbolset.SymbolSet
+// TODO Mutex this variable
+var symbolSetsMap = make(map[string]symbolset.SymbolSet)
 
 func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 	// list files in symbol set dir
@@ -54,9 +54,14 @@ func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	symbolSets = symSets
+	// TODO nuke symbolSets and replace by symbolSetsMap
+	//symbolSets = symSets
+	for _, z := range symSets {
+		// TODO check that x.Name doesn't already exist
+		symbolSetsMap[z.Name] = z
+	}
 
-	j, err := json.Marshal(symbolSetNames(symSets))
+	j, err := json.Marshal(symbolSetNames(symbolSetsMap))
 	if err != nil {
 		msg := fmt.Sprintf("json marshalling error : %v", err)
 		log.Println(msg)
@@ -68,7 +73,7 @@ func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listMapperHandler(w http.ResponseWriter, r *http.Request) {
-	ss := symbolSetNames(symbolSets)
+	ss := symbolSetNames(symbolSetsMap)
 	j, err := json.Marshal(ss)
 	if err != nil {
 		msg := fmt.Sprintf("failed to marshal struct : %v", err)
@@ -84,10 +89,18 @@ type SymbolSetNames struct {
 	SymbolSetNames []string `json:symbol_set_names`
 }
 
-func symbolSetNames(sss []symbolset.SymbolSet) SymbolSetNames {
+func symbolSetNames(sss map[string]symbolset.SymbolSet) SymbolSetNames {
 	var ssNames []string
-	for _, ss := range sss {
-		ssNames = append(ssNames, ss.Name)
+	for ss, _ := range sss {
+		ssNames = append(ssNames, ss)
 	}
 	return SymbolSetNames{SymbolSetNames: ssNames}
 }
+
+// func symbolSetNames(sss []symbolset.SymbolSet) SymbolSetNames {
+// 	var ssNames []string
+// 	for _, ss := range sss {
+// 		ssNames = append(ssNames, ss.Name)
+// 	}
+// 	return SymbolSetNames{SymbolSetNames: ssNames}
+// }
