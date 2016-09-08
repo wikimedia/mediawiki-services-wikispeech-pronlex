@@ -33,10 +33,10 @@ func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper
 }
 
 // Map is used by the server to map a transcription from one symbol set to another
-func (m MapperService) Map(fromName string, trans string, toName string) (string, error) {
+func (m MapperService) Map(fromName string, toName string, trans string) (string, error) {
 	mapper, err := m.getOrCreateMapper(fromName, toName)
 	if err != nil {
-		return "", fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
+		return "", fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
 	}
 	return mapper.MapTranscription(trans)
 }
@@ -45,7 +45,7 @@ func (m MapperService) Map(fromName string, trans string, toName string) (string
 func (m MapperService) GetMapTable(fromName string, toName string) (Mapper, error) {
 	mapper, err := m.getOrCreateMapper(fromName, toName)
 	if err != nil {
-		return Mapper{}, fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
+		return Mapper{}, fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
 	}
 	return mapper, nil
 }

@@ -14,7 +14,21 @@ import (
 )
 
 // TODO Mutex this variable
-var symbolSetsMap = make(map[string]symbolset.SymbolSet)
+var mapperService = symbolset.MapperService{}
+
+func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
+	fromName := r.FormValue("from")
+	toName := r.FormValue("to")
+	trans := r.FormValue("trans")
+	result, err := mapperService.Map(fromName, toName, trans)
+	if err != nil {
+		msg := fmt.Sprintf("failed mapping transcription : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprint(w, result)
+}
 
 func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 	// list files in symbol set dir
@@ -56,10 +70,12 @@ func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO nuke symbolSets and replace by symbolSetsMap
 	//symbolSets = symSets
+	var symbolSetsMap = make(map[string]symbolset.SymbolSet)
 	for _, z := range symSets {
 		// TODO check that x.Name doesn't already exist
 		symbolSetsMap[z.Name] = z
 	}
+	mapperService.SymbolSets = symbolSetsMap
 
 	j, err := json.Marshal(symbolSetNames(symbolSetsMap))
 	if err != nil {
@@ -73,7 +89,7 @@ func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listMapperHandler(w http.ResponseWriter, r *http.Request) {
-	ss := symbolSetNames(symbolSetsMap)
+	ss := symbolSetNames(mapperService.SymbolSets)
 	j, err := json.Marshal(ss)
 	if err != nil {
 		msg := fmt.Sprintf("failed to marshal struct : %v", err)

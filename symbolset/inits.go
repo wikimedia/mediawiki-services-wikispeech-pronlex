@@ -188,19 +188,21 @@ func LoadMapper(m1 SymbolSet, m2 SymbolSet) (Mapper, error) {
 	fromName := m1.Name
 	toName := m2.Name
 	name := fromName + "2" + toName
-	mappers := Mapper{name, m1, m2}
-
-	// for testing:
-	m1rev, err := m1.reverse(fromName + "2IPA")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-	}
 
 	m2rev, err := m2.reverse("IPA2" + toName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 	}
-	mappersrev := Mapper{toName + "2" + fromName, m2rev, m1rev}
+
+	mappers := Mapper{name, m1, m2rev}
+
+	// for testing:
+	// m1rev, err := m1.reverse(fromName + "2IPA")
+	// if err != nil {
+	// 	fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+	// }
+
+	//mappersrev := Mapper{toName + "2" + fromName, m2, m1rev}
 
 	var errs []string
 
@@ -211,18 +213,18 @@ func LoadMapper(m1 SymbolSet, m2 SymbolSet) (Mapper, error) {
 				if err != nil {
 					return mappers, fmt.Errorf("couldn't test mapper: %v\n", err)
 				}
-				mapped, err = mappersrev.MapTranscription(mapped)
-				if err != nil {
-					return mappers, fmt.Errorf("couldn't test mapper: %v\n", err)
-				}
-				if mapped != symbol.String {
-					errs = append(errs, "couldn't map /"+symbol.String+"/ back and forth -- got /"+mapped+"/")
-				}
+				// mapped, err = mappersrev.MapTranscription(mapped)
+				// if err != nil {
+				// 	return mappers, fmt.Errorf("couldn't test mapper: %v\n", err)
+				// }
+				// if mapped != symbol.String {
+				// 	errs = append(errs, "couldn't map /"+symbol.String+"/ back and forth -- got /"+mapped+"/")
+				// }
 			}
 		}
 	}
 	if len(errs) > 0 {
-		return mappers, fmt.Errorf("Mapper initialization tests failed %v", strings.Join(errs, "; "))
+		return mappers, fmt.Errorf("Mapper initialization tests failed : %v", strings.Join(errs, "; "))
 	}
 
 	return mappers, nil
@@ -235,7 +237,7 @@ func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 st
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
 	}
-	m2, err := loadSymbolSet_("IPA2"+toName, fName2, "IPA", toName)
+	m2, err := loadSymbolSet_(toName+"2IPA", fName2, toName, "IPA")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
 		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
@@ -246,6 +248,9 @@ func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 st
 // LoadSymbolSet loads a SymbolSet from file
 func LoadSymbolSet(fName string) (SymbolSet, error) {
 	name := filepath.Base(fName)
+	var extension = filepath.Ext(name)
+	name = name[0 : len(name)-len(extension)]
+
 	return loadSymbolSet_(name, fName, "", "")
 }
 
