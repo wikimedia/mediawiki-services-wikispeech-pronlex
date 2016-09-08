@@ -115,6 +115,13 @@ func NewSymbolsWithTests(name string, symbols []Symbol, checkForDups bool) (Symb
 func NewSymbolSet(name string, fromName string, toName string, symbolList []SymbolPair) (SymbolSet, error) {
 	var nilRes SymbolSet
 
+	if fromName == "" {
+		return nilRes, fmt.Errorf("cannot create symbol set with empty fromName!")
+	}
+	if toName == "" {
+		return nilRes, fmt.Errorf("cannot create symbol set with empty toName!")
+	}
+
 	ipa := newIPA()
 	cmu := newCMU()
 
@@ -274,7 +281,7 @@ func loadSymbolSet_(name string, fName string, fromColumn string, toColumn strin
 	}
 	if toColumn == "" { // TODO: Clean up
 		toIndex = 2
-		fromColumn = "IPA"
+		toColumn = "IPA"
 	}
 	var maptable = make([]SymbolPair, 0)
 	for s.Scan() {
@@ -345,6 +352,7 @@ func loadSymbolSet_(name string, fName string, fromColumn string, toColumn strin
 			}
 		}
 	}
+
 	fromName := ""
 	toName := ""
 	if fromColumn == "SYMBOL" {
