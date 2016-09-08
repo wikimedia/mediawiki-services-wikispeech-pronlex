@@ -262,11 +262,11 @@ func loadSymbolSet_(name string, fName string, fromColumn string, toColumn strin
 	var fromIndex = -1
 	var toIndex = -1
 	var typeIndex = -1
-	if fromColumn == "" {
+	if fromColumn == "" { // TODO: Clean up
 		fromIndex = 1
 		fromColumn = "SYMBOL"
 	}
-	if toColumn == "" {
+	if toColumn == "" { // TODO: Clean up
 		toIndex = 2
 		fromColumn = "IPA"
 	}
