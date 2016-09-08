@@ -138,7 +138,8 @@ func NewSymbolSet(name string, fromName string, toName string, symbolList []Symb
 		toSymbols = append(toSymbols, s2)
 	}
 
-	from, err := NewSymbolsWithTests(fromName, fromSymbols, true) // check for duplicates in input symbol set
+	//from, err := NewSymbolsWithTests(fromName, fromSymbols, true) // check for duplicates in input symbol set
+	from, err := NewSymbolsWithTests(fromName, fromSymbols, false) // do not check for duplicates in input symbol set here, will be done at a later stage
 	if err != nil {
 		return nilRes, err
 	}
