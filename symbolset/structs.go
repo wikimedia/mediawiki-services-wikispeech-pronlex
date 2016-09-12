@@ -164,7 +164,8 @@ func (m SymbolSet) MapTranscription(input string) (string, error) {
 
 	// remove repeated phoneme delimiters
 	res = m.repeatedPhonemeDelimiters.ReplaceAllString(res, m.To.phonemeDelimiter.String)
-	return m.postFilter(res, m.To)
+	res, err = m.postFilter(res, m.To)
+	return res, err
 }
 
 // SymbolPair is a tuple inside the SymbolSet used to store the symbol mappings in a list in preserved order
@@ -332,6 +333,7 @@ func (ipa ipa) filterAfterMappingToIpa(trans string, ss Symbols) (string, error)
 	}
 	trans = repl.ReplaceAllString(trans, ipa.accentI+"$1$2")
 
+	// IPA: əs.ˈ̀̀e ...
 	// IPA: /'`pa.pa/ => /'pa`.pa/
 	accentIIConditionForAfterMapping := ipa.accentI + ipa.accentII
 	if strings.Contains(trans, accentIIConditionForAfterMapping) {

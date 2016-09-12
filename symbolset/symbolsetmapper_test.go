@@ -704,6 +704,7 @@ func Test_loadSymbolSet_SAMPA2MARY(t *testing.T) {
 	}
 	mappers := []SymbolSet{ssm1, ssm2}
 	testMapTranscriptionX(t, mappers, "eu . r \" u: p a", "E*U - r ' u: p a")
+	testMapTranscriptionX(t, mappers, "@ s . \"\" e", "e s - \" e")
 }
 
 func Test_loadSymbolSet_NST2MARY(t *testing.T) {
