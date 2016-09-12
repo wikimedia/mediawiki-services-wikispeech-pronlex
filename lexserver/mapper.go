@@ -52,7 +52,6 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, result)
 }
 
