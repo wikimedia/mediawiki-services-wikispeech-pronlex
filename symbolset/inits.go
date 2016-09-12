@@ -11,6 +11,14 @@ import (
 
 // inits.go Initialization functions for structs in package symbolset
 
+func trimIfNeeded(s string) string {
+	trimmed := strings.TrimSpace(s)
+	if len(trimmed) > 0 {
+		return trimmed
+	}
+	return s
+}
+
 // newIPA is a package private contructor for the ipa struct with fixed-value fields
 func newIPA() ipa {
 	return ipa{
@@ -321,8 +329,8 @@ func loadSymbolSet_(name string, fName string, fromColumn string, toColumn strin
 				if typeIndex == -1 {
 					return nilRes, fmt.Errorf("%v", "type index unset")
 				}
-				from := fs[fromIndex]
-				to := fs[toIndex]
+				from := trimIfNeeded(fs[fromIndex])
+				to := trimIfNeeded(fs[toIndex])
 				desc := fs[descIndex]
 				typeS := fs[typeIndex]
 				var symCat SymbolCat
