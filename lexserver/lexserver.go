@@ -1000,7 +1000,9 @@ func main() {
 	http.HandleFunc("/mapper/symbolset", symbolSetMapperHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
 	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)
-	http.HandleFunc("/mapper/upload", uploadMapperHandler)
+	http.HandleFunc("/mapper_upload", uploadMapperHandler)
+	http.HandleFunc("/mapper_do_upload", doUploadMapperHandler)
+
 	// TODO Why this http.StripPrefix? Looks odd.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	//http.Handle("/download_area/", http.StripPrefix("/download_area/", http.FileServer(http.Dir("./download_area"))))

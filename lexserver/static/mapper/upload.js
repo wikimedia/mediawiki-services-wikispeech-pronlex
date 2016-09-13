@@ -57,11 +57,20 @@ MAPPER.UploadFileModel = function () {
 	};
     };
     
+    self.message = ko.observable("");
     
+    self.selectedFile = ko.observable(null);
+    self.hasSelectedFile = ko.observable(false);   
     
-    self.uploadFile = function(symbolsetFile) {
-	Console.log(symbolsetFile)
-	var url = MAPPER.baseURL + "/mapper/upload" ;//'server/index.php';
+    self.setSelectedFile = function(symbolsetFile) {
+	self.selectedFile(symbolsetFile);
+	console.log("selected file: ", self.selectedFile())
+	self.hasSelectedFile(true);
+    }
+
+    self.uploadFile = function() {
+	console.log("uploading file: ", self.selectedFile())
+	var url = MAPPER.baseURL + "/mapper_do_upload"
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);
@@ -76,8 +85,9 @@ MAPPER.UploadFileModel = function () {
 	 //   };
 	};
 	fd.append("client_uuid", self.uuid);
-	fd.append("upload_file", lexiconFile);
+	fd.append("upload_file", self.selectedFile());
 	xhr.send(fd);
+	self.message("File sent!");
     };
     
 };

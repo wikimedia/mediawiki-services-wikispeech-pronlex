@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"sort"
 	//"os"
 	"encoding/json"
@@ -259,15 +261,62 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 
 <h2>maptable</h2> Lists content of a maptable given two symbolset names. Example invocation:
 <pre><a href="/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary">/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary</a></pre>
-		
+
 <h2>upload</h2> Upload symbol set file
-<pre><a href="/mapper/upload">/mapper/upload</a></pre> (not implemented)
+<pre><a href="/mapper_upload">/mapper_upload</a></pre>		
 		`
+
 	fmt.Fprint(w, html)
 }
 
 func uploadMapperHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/mapper/upload.html")
+	http.ServeFile(w, r, "./static/mapper_upload.html")
+}
+
+func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+		return
+	}
+
+	clientUUID := r.FormValue("client_uuid")
+
+	if "" == strings.TrimSpace(clientUUID) {
+		msg := "doUploadMapperHandler got no client uuid"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	// Lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
+
+	r.ParseMultipartForm(32 << 20)
+	file, handler, err := r.FormFile("upload_file")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("doUploadMapperHandler failed reading file : %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+	fName := filepath.Join(symbolSetFileArea, handler.Filename)
+	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0755)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("doUploadMapperHandler failed opening local output file : %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+	_, err = io.Copy(f, file)
+	if err != nil {
+		msg := fmt.Sprintf("doUploadMapperHandler failed copying local output file : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	f.Close()
+
+	fmt.Fprintf(w, "%v", handler.Header)
 }
 
 type SymbolSetNames struct {
