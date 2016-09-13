@@ -244,8 +244,15 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 
 <h2>maptable</h2> Lists content of a maptable given two symbolset names. Example invocation:
 <pre><a href="/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary">/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary</a></pre>
+		
+<h2>upload</h2> Upload file
+<pre><a href="/mapper/upload">/mapper/upload</a></pre> (not implemented)
 		`
 	fmt.Fprint(w, html)
+}
+
+func uploadMapperHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/mapper/upload.html")
 }
 
 type SymbolSetNames struct {

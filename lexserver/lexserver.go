@@ -939,7 +939,7 @@ func main() {
 
 	dbapi.Sqlite3WithRegex()
 
-	log.Print("lexserver: connecting to Sqlite3 db", dbFile)
+	log.Print("lexserver: connecting to Sqlite3 db ", dbFile)
 	db, err = sql.Open("sqlite3_with_regexp", dbFile)
 	ff("Failed to open dbfile %v", err)
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
@@ -1000,7 +1000,7 @@ func main() {
 	http.HandleFunc("/mapper/symbolset", symbolSetMapperHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
 	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)
-
+	http.HandleFunc("/mapper/upload", uploadMapperHandler)
 	// TODO Why this http.StripPrefix? Looks odd.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	//http.Handle("/download_area/", http.StripPrefix("/download_area/", http.FileServer(http.Dir("./download_area"))))

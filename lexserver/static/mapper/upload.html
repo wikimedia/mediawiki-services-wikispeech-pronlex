@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>Upload symbol set</title>    
+    <style>
+      tr.selected {
+      background-color: #FFCF8B
+      }      
+      .hovable:hover  {
+      background: #c7d4dd
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Upload symbol set</h1>
+    
+    <p>
+      <span>
+	Upload symbol set file: <input type="file" data-bind="event: { change: function() { $root.uploadFile($element.files[0]) } }"/>
+      </span>
+</p>
+
+    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
+    
+ <!--   <script type="text/javascript" src="static/mapper/upload_file.js"></script>-->
+    
+
+<!--    <script type="text/javascript" src="static/linereader.js"></script>-->
+  </body>
+</html>
