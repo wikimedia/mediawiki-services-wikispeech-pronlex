@@ -236,11 +236,11 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 <h2>list</h2> Lists available mappers. Example invocation:
 <pre><a href="/mapper/list">/mapper/list</a></pre>
 
-<h2>symbolset</h2> Lists content of a named symbolset. Example invocation:
-<pre><a href="/mapper/symbolset?name=sv-se_ws-sampa">/mapper/symbolset?name=sv-se_ws-sampa</a></pre>
-
 <h2>map</h2> Maps a transcription from one symbolset to another. Example invocation:
 <pre><a href="/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@">/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@</a></pre>
+
+<h2>symbolset</h2> Lists content of a named symbolset. Example invocation:
+<pre><a href="/mapper/symbolset?name=sv-se_ws-sampa">/mapper/symbolset?name=sv-se_ws-sampa</a></pre>
 
 <h2>maptable</h2> Lists content of a maptable given two symbolset names. Example invocation:
 <pre><a href="/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary">/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary</a></pre>
