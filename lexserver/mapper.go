@@ -17,6 +17,13 @@ import (
 // TODO Mutex this variable
 var mapperService = symbolset.MapperService{}
 
+type JsonMapped struct {
+	From   string
+	To     string
+	Input  string
+	Result string
+}
+
 func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fromName := r.FormValue("from")
 	toName := r.FormValue("to")
@@ -39,14 +46,22 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	result, err := mapperService.Map(fromName, toName, trans)
+	result0, err := mapperService.Map(fromName, toName, trans)
 	if err != nil {
 		msg := fmt.Sprintf("failed mapping transcription : %v", err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprint(w, result)
+	result := JsonMapped{Input: trans, Result: result0, From: fromName, To: toName}
+	j, err := json.Marshal(result)
+	if err != nil {
+		msg := fmt.Sprintf("json marshalling error : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprint(w, string(j))
 }
 
 type JsonSymbolSet struct {
@@ -245,7 +260,7 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 <h2>maptable</h2> Lists content of a maptable given two symbolset names. Example invocation:
 <pre><a href="/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary">/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary</a></pre>
 		
-<h2>upload</h2> Upload file
+<h2>upload</h2> Upload symbol set file
 <pre><a href="/mapper/upload">/mapper/upload</a></pre> (not implemented)
 		`
 	fmt.Fprint(w, html)
