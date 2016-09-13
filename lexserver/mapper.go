@@ -49,20 +49,6 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, result)
 }
 
-type JsonMapper struct {
-	From    string
-	To      string
-	Symbols []JsonMSymbol
-}
-
-type JsonMSymbol struct {
-	From string
-	To   string
-	IPA  string
-	Desc string
-	Cat  string
-}
-
 type JsonSymbolSet struct {
 	Name    string
 	Symbols []JsonSymbol
@@ -106,6 +92,20 @@ func symbolSetMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
+type JsonMapper struct {
+	From    string
+	To      string
+	Symbols []JsonMSymbol
+}
+
+type JsonMSymbol struct {
+	From string
+	To   string
+	IPA  string
+	Desc string
+	Cat  string
+}
+
 func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fromName := r.FormValue("from")
 	toName := r.FormValue("to")
@@ -121,14 +121,28 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	result, err := mapperService.GetMapTable(fromName, toName)
+	mapper0, err := mapperService.GetMapTable(fromName, toName)
 	if err != nil {
 		msg := fmt.Sprintf("failed getting map table : %v", err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	j, err := json.Marshal(result)
+	mapper := JsonMapper{From: mapper0.SymbolSet1.FromName, To: mapper0.SymbolSet2.ToName}
+	mapper.Symbols = make([]JsonMSymbol, 0)
+	for _, sym := range mapper0.SymbolSet1.Symbols {
+		from := sym.Sym1
+		to, err := mapper0.MapSymbol(from)
+		if err != nil {
+			msg := fmt.Sprintf("failed getting map table : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		mapper.Symbols = append(mapper.Symbols, JsonMSymbol{From: from.String, To: to.String, IPA: sym.Sym2.String, Desc: sym.Sym1.Desc, Cat: sym.Sym1.Cat.String()})
+	}
+
+	j, err := json.Marshal(mapper)
 	if err != nil {
 		msg := fmt.Sprintf("json marshalling error : %v", err)
 		log.Println(msg)
