@@ -9,6 +9,12 @@ type MapperService struct {
 	mappers    map[string]Mapper
 }
 
+func (m MapperService) Clear() {
+	// TODO: MapperService need to be used as mutex, see lexserver/mapper.go
+	m.SymbolSets = make(map[string]SymbolSet)
+	m.mappers = make(map[string]Mapper)
+}
+
 func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper, error) {
 	if m.mappers == nil {
 		m.mappers = make(map[string]Mapper)

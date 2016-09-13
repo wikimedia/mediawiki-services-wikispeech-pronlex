@@ -947,6 +947,10 @@ func main() {
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
+	// load symbol set mappers
+	loadMappersFromDir(symbolSetFileArea)
+	log.Println(fmt.Sprintf("Loaded symbol set mappers from dir %s", symbolSetFileArea))
+
 	// static
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/favicon.ico", faviconHandler)
@@ -990,6 +994,7 @@ func main() {
 	http.HandleFunc("/admin/exportlexicon", exportLexiconHandler)
 
 	// TODO Split this main func into several files
+	http.HandleFunc("/mapper", mapperHelpHandler)
 	http.HandleFunc("/mapper/load", loadMapperHandler)
 	http.HandleFunc("/mapper/list", listMapperHandler)
 	http.HandleFunc("/mapper/symbolset", symbolSetMapperHandler)
