@@ -7,10 +7,19 @@
 
 <h1>Create db and start server</h1>
 
+Fetch lexicon files and symbol sets from <a href="https://github.com/stts-se/lexdata">github.com/stts-se/lexdata</a>
+
 <pre>
+
 github.com/stts-se/pronlex$ go run createEmptyDB/createEmptyDB.go pronlex.db
-github.com/stts-se/pronlex/$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa ~/gitrepos/lexdata/sv-se/nst/sv-se_ws-sampa.tab 
+github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa ~/gitrepos/lexdata/sv-se/nst/sv-se_ws-sampa.tab 
 github.com/stts-se/pronlex$ mv pronlex.db lexserver/
+
+github.com/stts-se/pronlex$ cd lexserver
+
+github.com/stts-se/pronlex/lexserver$ mkdir symbol_set_file_area
+github.com/stts-se/pronlex/lexserver$ cp ~/gitrepos/lexdata/*/*/*.tab symbol_set_file_area
+
 github.com/stts-se/pronlex/lexserver$ go run lexserver.go mapper.go
 </pre>
 
@@ -25,26 +34,26 @@ github.com/stts-se/pronlex/lexserver$ go run lexserver.go mapper.go
 
 <a href="/lexlookup">/lexlookup</a>
 
+<h2>Add entry:</h2>
+<p>
+  <code>/addentry?lexicon=<LEX_NAME>&entry={...}</code>
+  
+</p>
+where <code>{...}</code> is a JSON entry.
+
+<h2>Update entry:</h2>
+
+<p>
+  
+  <code> 
+    /updateentry?entry={...}
+  </code>
+</p>
+where <code>{...}</code> is a JSON entry.
+
 <h2>Mapper:</h2>
 
 <a href="/mapper">/mapper</a>
-
-      <h2>Add entry</h2>
-    <p>
-      <code>/addentry?lexicon=<LEX_NAME>&entry={...}</code>
-      
-    </p>
-    where <code>{...}</code> is a JSON entry.
-
-    <h2>Update entry</h2>
-
-    <p>
-
-      <code> 
-	/updateentry?entry={...}
-      </code>
-    </p>
-    where <code>{...}</code> is a JSON entry.
 
 
 <!-- <h1>Admin</h1> -->

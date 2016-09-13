@@ -230,7 +230,7 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	html := `<h1>Mapper</h1>
-<h2>load</h2> Loads mappers from a pre-defined folder on the server: <code>` + symbolSetFileArea + `</code>). Example invocation:
+<h2>load</h2> Loads mappers from a pre-defined folder on the server: <code>` + symbolSetFileArea + `</code>. Example invocation:
 <pre><a href="/mapper/load">/mapper/load</a></pre>
 
 <h2>list</h2> Lists available mappers. Example invocation:
