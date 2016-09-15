@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -106,51 +105,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
-func listKnownHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/listknown.html")
-}
-
-func listLexsHandler(w http.ResponseWriter, r *http.Request) {
-
-	lexs, err := dbapi.ListLexicons(db) // TODO error handling
-	jsn, err := marshal(lexs, r)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
-}
-
-func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
-	// if no id or not an int, simply set id to 0:
-	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
-	name := strings.TrimSpace(r.FormValue("name"))
-	symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
-
-	if name == "" || symbolSetName == "" {
-		msg := fmt.Sprint("missing parameter value, expecting value for 'name' and 'symbolsetname'")
-		log.Printf("%s", msg)
-		http.Error(w, msg, http.StatusExpectationFailed)
-		return
-	}
-
-	res, err := dbapi.InsertOrUpdateLexicon(db, dbapi.Lexicon{ID: id, Name: name, SymbolSetName: symbolSetName})
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed database call : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	jsn, err := marshal(res, r)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
-	//fmt.Fprint(w, jsn)
-}
+// Old junk
+// func listKnownHandler(w http.ResponseWriter, r *http.Request) {
+// 	http.ServeFile(w, r, "./static/listknown.html")
+// }
 
 func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -279,83 +237,6 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 		PageLength:          pageLength}
 
 	return q, err
-}
-
-func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
-
-	// TODO check r.Method?
-
-	var err error
-	// TODO Felhantering?
-
-	// TODO report unknown params to client
-	u, err := url.Parse(r.URL.String())
-	ff("lexLookUpHandler failed to get params: %v", err)
-	params := u.Query()
-	if len(params) == 0 {
-		log.Print("lexLookUpHandler: zero params, serving lexlookup.html")
-		http.ServeFile(w, r, "./static/lexlookup.html")
-	}
-	for k, v := range params {
-		if _, ok := knownParams[k]; !ok {
-			log.Printf("lexLookUpHandler: unknown URL parameter: '%s': '%s'", k, v)
-		}
-	}
-
-	q, err := queryFromParams(r)
-	if err != nil {
-		log.Printf("failed to process query params: %v", err)
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
-		return
-	}
-
-	//res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
-	res, err := dbapi.LookUpIntoSlice(db, q) // GetEntries(db, q)
-	if err != nil {
-		log.Printf("lexserver: Failed to get entries: %v", err)
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-		return
-	}
-
-	jsn, err := marshal(res, r)
-	if err != nil {
-		log.Printf("lexserver: Failed to marshal json: %v", err)
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
-}
-
-// TODO add tests
-func addEntryHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO error check parameters
-	lexiconName := r.FormValue("lexicon")
-	lexicon, err := dbapi.GetLexicon(db, lexiconName)
-	if err != nil {
-		msg := fmt.Sprintf("failed to find lexicon %s in database : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	entryJSON := r.FormValue("entry")
-	var e lex.Entry
-	err = json.Unmarshal([]byte(entryJSON), &e)
-	if err != nil {
-		log.Printf("lexserver: Failed to unmarshal json: %v", err)
-		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	ids, err := dbapi.InsertEntries(db, lexicon, []lex.Entry{e})
-	if err != nil {
-		msg := fmt.Sprintf("lexserver failed to update entry : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprint(w, ids)
 }
 
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
@@ -856,30 +737,6 @@ func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName strin
 	return nil
 }
 
-func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconID, err := strconv.ParseInt(r.FormValue("id"), 10, 64)
-	if err != nil {
-		msg := "lexiconStatsHandler got no lexicon id"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	stats, err := dbapi.LexiconStats(db, lexiconID)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("lexiconStatsHandler: call to  dbapi.LexiconStats failed : %v", err), http.StatusInternalServerError)
-		return
-	}
-	res, err := json.Marshal(stats)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("lexiconStatsHandler: failed to marshal struct : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprint(w, string(res))
-}
-
 func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
 	fName := r.FormValue("file")
 	if fName == "" {
@@ -908,6 +765,14 @@ func keepAlive(wsC chan string) {
 	c := time.Tick(57 * time.Second)
 	for _ = range c {
 		wsC <- "WS_KEEPALIVE"
+	}
+}
+
+func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, fmt.Sprintf("the API has changed: %s\n", msg), http.StatusBadRequest)
+		return
 	}
 }
 
@@ -956,15 +821,26 @@ func main() {
 	http.HandleFunc("/favicon.ico", faviconHandler)
 	http.HandleFunc("/ipa_table.txt", ipaTableHandler)
 
+	// Old junk
 	// Temp, testing
-	http.HandleFunc("/lexicon/listknown", listKnownHandler)
+	//http.HandleFunc("/lexicon/listknown", listKnownHandler)
 
 	// function calls
-	http.HandleFunc("/listlexicons", listLexsHandler)
-	http.HandleFunc("/lexiconstats", lexiconStatsHandler)
-	http.HandleFunc("/lexlookup", lexLookUpHandler)
-	http.HandleFunc("/addentry", addEntryHandler)
-	http.HandleFunc("/updateentry", updateEntryHandler)
+	http.HandleFunc("/lexicon/listlexicons", listLexsHandler)
+	http.HandleFunc("/listlexicons", apiChangedHandler("use /lexicon/listlexicons instead"))
+
+	http.HandleFunc("/lexicon/stats", lexiconStatsHandler)
+	http.HandleFunc("/lexiconstats", apiChangedHandler("use /lexicon/stats instead"))
+
+	http.HandleFunc("/lexicon/lookup", lexLookUpHandler)
+	http.HandleFunc("/lexlookup", apiChangedHandler("use /lexicon/lookup instead"))
+
+	http.HandleFunc("/lexicon/addentry", addEntryHandler)
+	http.HandleFunc("/addentry", apiChangedHandler("use /lexicon/addentry instead"))
+
+	http.HandleFunc("/lexicon/updateentry", updateEntryHandler)
+	http.HandleFunc("/updateentry", apiChangedHandler("/lexicon/updateentry instead"))
+
 	http.HandleFunc("/validateentry", validateEntryHandler)
 	http.HandleFunc("/validateentries", validateEntriesHandler)
 	http.HandleFunc("/download", downloadFileHandler)

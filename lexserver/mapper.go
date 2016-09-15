@@ -1,5 +1,7 @@
 package main
 
+// The calls prefixed with '/mapper/'
+
 import (
 	"fmt"
 	"io"
