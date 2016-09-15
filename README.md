@@ -31,9 +31,8 @@ Create a pronlex.db and place it in the lexserver directory.
 ```
 github.com/stts-se/pronlex/lexserver$ createEmptyDB pronlex.db
 github.com/stts-se/pronlex/lexserver$ importLexToDB pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa [SYMBOL SET FOLDER]/sv-se_ws-sampa.tab
-github.com/stts-se/pronlex/lexserver$ go run lexserver.go mapper.go lexicon.go
+github.com/stts-se/pronlex/lexserver$ go run lexserver.go mapper.go lexicon.go validation.go
 ```
-(Or `CompileDaemon -command lexserver` if you use [Compile Daemon](https://github.com/githubnemo/CompileDaemon))
 
 
 ---
