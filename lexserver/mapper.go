@@ -325,17 +325,11 @@ type SymbolSetNames struct {
 	SymbolSetNames []string `json:symbol_set_names`
 }
 
-type ByString []string
-
-func (a ByString) Len() int           { return len(a) }
-func (a ByString) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByString) Less(i, j int) bool { return a[i] < a[j] }
-
 func symbolSetNames(sss map[string]symbolset.SymbolSet) SymbolSetNames {
 	var ssNames []string
 	for ss, _ := range sss {
 		ssNames = append(ssNames, ss)
 	}
-	sort.Sort(ByString(ssNames))
+	sort.Strings(ssNames)
 	return SymbolSetNames{SymbolSetNames: ssNames}
 }
