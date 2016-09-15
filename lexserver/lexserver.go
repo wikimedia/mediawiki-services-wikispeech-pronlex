@@ -21,7 +21,7 @@ import (
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/vrules"
+	"github.com/stts-se/pronlex/symbolset"
 	"golang.org/x/net/websocket"
 )
 
@@ -262,95 +262,6 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	if err3 != nil {
 		log.Printf("lexserver: Failed to marshal entry : %v", err3)
 		http.Error(w, fmt.Sprintf("failed return updated Entry : %v", err3), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(res0))
-}
-
-// TODO code duplication between validateEntriesHandler and validateEntryHandler
-
-func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
-	entriesJSON := r.FormValue("entries")
-	symbolSetName := r.FormValue("symbolsetname")
-
-	var es []*lex.Entry
-	err := json.Unmarshal([]byte(entriesJSON), &es)
-	if err != nil {
-		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entriesJSON, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	if symbolSetName == "" {
-		msg := "validateEntryHandler expected a symbol set name"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	// TODO Hardwired stuff below!!!!
-	vdator, err := vrules.ValidatorForSymbolSet(symbolSetName)
-	if err != nil {
-		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	_ = vdator.Validate(es)
-
-	res0, err3 := json.Marshal(es)
-	if err3 != nil {
-		msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(res0))
-}
-
-// TODO code duplication between validateEntriesHandler and validateEntryHandler
-
-func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
-	entryJSON := r.FormValue("entry")
-	symbolSetName := r.FormValue("symbolsetname")
-
-	var e lex.Entry
-	err := json.Unmarshal([]byte(entryJSON), &e)
-	if err != nil {
-		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entryJSON, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	if symbolSetName == "" {
-		msg := "validateEntryHandler expected a symbol set name"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	// TODO Hardwired stuff below!!!!
-	vdator, err := vrules.ValidatorForSymbolSet(symbolSetName)
-	if err != nil {
-		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	ents := []*lex.Entry{&e}
-	_ = vdator.Validate(ents)
-
-	res0, err3 := json.Marshal(e)
-	if err3 != nil {
-		msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -776,6 +687,42 @@ func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
+func loadSymbolSetsFromDir(dirName string) (map[string]symbolset.SymbolSet, error) {
+	// list files in symbol set dir
+	fileInfos, err := ioutil.ReadDir(symbolSetFileArea)
+	if err != nil {
+		return nil, fmt.Errorf("failed reading symbol set dir : %v", err)
+	}
+
+	var fErrs error
+	var symSets []symbolset.SymbolSet
+	for _, fi := range fileInfos {
+		if strings.HasSuffix(fi.Name(), ".tab") {
+			symset, err := symbolset.LoadSymbolSet(filepath.Join(symbolSetFileArea, fi.Name()))
+			if err != nil {
+				if fErrs != nil {
+					fErrs = fmt.Errorf("%v : %v", fErrs, err)
+				} else {
+					fErrs = err
+				}
+			} else {
+				symSets = append(symSets, symset)
+			}
+		}
+	}
+
+	if fErrs != nil {
+		return nil, fmt.Errorf("failed to load symbol set : %v", fErrs)
+	}
+
+	var symbolSetsMap = make(map[string]symbolset.SymbolSet)
+	for _, z := range symSets {
+		// TODO check that x.Name doesn't already exist
+		symbolSetsMap[z.Name] = z
+	}
+	return symbolSetsMap, nil
+}
+
 func main() {
 
 	dbFile := "./pronlex.db"
@@ -814,7 +761,11 @@ func main() {
 
 	// load symbol set mappers
 	loadMappersFromDir(symbolSetFileArea)
-	log.Println(fmt.Sprintf("Loaded symbol set mappers from dir %s", symbolSetFileArea))
+	log.Printf("Loaded symbol set mappers from dir %s", symbolSetFileArea)
+
+	err = loadValidators(symbolSetFileArea)
+	ff("Failed to load validators : %v", err)
+	log.Printf("Loaded validators : %v", validatorNames())
 
 	// static
 	http.HandleFunc("/", indexHandler)
@@ -841,8 +792,13 @@ func main() {
 	http.HandleFunc("/lexicon/updateentry", updateEntryHandler)
 	http.HandleFunc("/updateentry", apiChangedHandler("/lexicon/updateentry instead"))
 
-	http.HandleFunc("/validateentry", validateEntryHandler)
-	http.HandleFunc("/validateentries", validateEntriesHandler)
+	http.HandleFunc("/validation/validateentry", validateEntryHandler)
+	http.HandleFunc("/validateentry", apiChangedHandler("/validation/validateentry"))
+	http.HandleFunc("/validation/validateentries", validateEntriesHandler)
+	http.HandleFunc("/validateentries", apiChangedHandler("/validation/validateentries"))
+	http.HandleFunc("/validation", validationHelpHandler)
+	http.HandleFunc("/validation/list", listValidationHandler)
+
 	http.HandleFunc("/download", downloadFileHandler)
 
 	// admin pages/calls

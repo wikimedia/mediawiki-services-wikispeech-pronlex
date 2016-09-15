@@ -30,6 +30,7 @@ type Rule interface {
 
 // Validator is a struct containing a slice of rules
 type Validator struct {
+	Name  string
 	Rules []Rule
 }
 

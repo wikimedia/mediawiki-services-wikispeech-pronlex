@@ -2,13 +2,11 @@
 package config
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/validation"
-	"github.com/stts-se/pronlex/vrules"
 )
+
+// WORK IN PROGRESS, NOT READY FOR PROPER USE
 
 // JSON representation of a configuration used with a lexicon (string values only)
 type JSON struct {
@@ -41,71 +39,70 @@ type Config struct {
 }
 
 // New creates a new Config instance from a JSON representation
-func New(json JSON) (Config, error) {
+// func New(json JSON) (Config, error) {
+// 	v, err := validatorForName(json.Validator)
+// 	if err != nil {
+// 		return Config{}, err
+// 	}
+// 	parsers, err := lineParsersForNames(json.LineParsers)
+// 	if err != nil {
+// 		return Config{}, err
+// 	}
 
-	v, err := validatorForName(json.Validator)
-	if err != nil {
-		return Config{}, err
-	}
-	parsers, err := lineParsersForNames(json.LineParsers)
-	if err != nil {
-		return Config{}, err
-	}
+// 	result := Config{
+// 		Lexicons:    json.Lexicons,
+// 		StatusNames: json.StatusNames,
+// 		PosTags:     json.PosTags,
+// 		Languages:   json.Languages,
+// 		Users:       json.Users,
+// 		Sources:     json.Sources,
+// 		Encoding:    json.Encoding,
+// 		OrthCharsRe: json.OrthCharsRe,
+// 		Validator:   v,
+// 		LineParsers: parsers,
+// 		TTSMapper:   json.TTSMapper,
+// 	}
+// 	return result, nil
+// }
 
-	result := Config{
-		Lexicons:    json.Lexicons,
-		StatusNames: json.StatusNames,
-		PosTags:     json.PosTags,
-		Languages:   json.Languages,
-		Users:       json.Users,
-		Sources:     json.Sources,
-		Encoding:    json.Encoding,
-		OrthCharsRe: json.OrthCharsRe,
-		Validator:   v,
-		LineParsers: parsers,
-		TTSMapper:   json.TTSMapper,
-	}
-	return result, nil
-}
+// func validatorForName(name string) (validation.Validator, error) {
+// 	validators, err := validators()
+// 	if err != nil {
+// 		return validation.Validator{}, err
+// 	}
+// 	if v, ok := validators[name]; ok {
+// 		return v, nil
+// 	}
+// 	return validation.Validator{}, fmt.Errorf("No validator for name: %s", name)
+// }
 
-func validatorForName(name string) (validation.Validator, error) {
-	validators, err := validators()
-	if err != nil {
-		return validation.Validator{}, err
-	}
-	if v, ok := validators[name]; ok {
-		return v, nil
-	}
-	return validation.Validator{}, fmt.Errorf("No validator for name: %s", name)
-}
+// func lineParsersForNames(names []string) ([]line.Parser, error) {
+// 	var result = make([]line.Parser, 0)
+// 	for _, name := range names {
+// 		if lineFmt, err := lineParser(name); err != nil {
+// 			result = append(result, lineFmt)
+// 		} else {
+// 			return []line.Parser{}, err
+// 		}
+// 	}
+// 	return result, nil
+// }
 
-func lineParsersForNames(names []string) ([]line.Parser, error) {
-	var result = make([]line.Parser, 0)
-	for _, name := range names {
-		if lineFmt, err := lineParser(name); err != nil {
-			result = append(result, lineFmt)
-		} else {
-			return []line.Parser{}, err
-		}
-	}
-	return result, nil
-}
+// func validators() (map[string]validation.Validator, error) {
+// 	nstDemo, err := vrules.NewSvSeNstValidator()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return map[string]validation.Validator{
+// 		"SvSeNstValidator": nstDemo,
+// 	}, nil
+//}
 
-func validators() (map[string]validation.Validator, error) {
-	nstDemo, err := vrules.NewNSTDemoValidator()
-	if err != nil {
-		return nil, err
-	}
-	return map[string]validation.Validator{
-		"NstDemoValidator": nstDemo,
-	}, nil
-
-}
-func lineParser(name string) (line.Parser, error) {
-	switch strings.ToLower(name) {
-	case "nst":
-		return line.NewNST()
-	default:
-		return nil, fmt.Errorf("no line format for name %s", name)
-	}
-}
+// func lineParser(name string) (line.Parser, error) {
+// 	switch strings.ToLower(name) {
+// 	case "nst":
+// 		return line.NewNST()
+// 	default:
+// 		return nil, fmt.Errorf("no line format for name %s", name)
+// 	}
+// }

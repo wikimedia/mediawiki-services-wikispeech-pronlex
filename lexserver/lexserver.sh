@@ -1,1 +1,1 @@
-go run lexserver.go mapper.go lexicon.go
+go run *.go

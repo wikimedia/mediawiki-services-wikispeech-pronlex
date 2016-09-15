@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -174,40 +173,11 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 func loadMappersFromDir(dirName string) error {
 	mapperService.Clear()
 
-	// list files in symbol set dir
-	fileInfos, err := ioutil.ReadDir(symbolSetFileArea)
+	symbolSets, err := loadSymbolSetsFromDir(dirName)
 	if err != nil {
-		return fmt.Errorf("failed reading symbol set dir : %v", err)
+		return err
 	}
-
-	var fErrs error
-	var symSets []symbolset.SymbolSet
-	for _, fi := range fileInfos {
-		if strings.HasSuffix(fi.Name(), ".tab") {
-			symset, err := symbolset.LoadSymbolSet(filepath.Join(symbolSetFileArea, fi.Name()))
-			if err != nil {
-				if fErrs != nil {
-					fErrs = fmt.Errorf("%v : %v", fErrs, err)
-				} else {
-					fErrs = err
-				}
-			} else {
-				symSets = append(symSets, symset)
-			}
-		}
-	}
-
-	if fErrs != nil {
-		return fmt.Errorf("failed to load symbol set : %v", fErrs)
-	}
-
-	var symbolSetsMap = make(map[string]symbolset.SymbolSet)
-	for _, z := range symSets {
-		// TODO check that x.Name doesn't already exist
-		symbolSetsMap[z.Name] = z
-	}
-	mapperService.SymbolSets = symbolSetsMap
-
+	mapperService.SymbolSets = symbolSets
 	return nil
 }
 
