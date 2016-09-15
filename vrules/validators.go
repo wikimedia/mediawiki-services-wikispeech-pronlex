@@ -140,15 +140,11 @@ func newNbNoNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 }
 
 func newEnUsCmuNstValidator(symbolset symbolset.Symbols) (validation.Validator, error) {
-	primaryStressRe, err := ProcessTransRe(symbolset, "\"")
+	exactOnePrimStressRe, err := ProcessTransRe(symbolset, "^[^\"]*\"[^\"]*$")
 	if err != nil {
 		return validation.Validator{}, err
 	}
-	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*( (.|-) (\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*)*$")
-	if err != nil {
-		return validation.Validator{}, err
-	}
-	onePrimaryStressRe, err := ProcessTransRe(symbolset, "\".*\"")
+	maxOneSecStressRe, err := ProcessTransRe(symbolset, "%.*%")
 	if err != nil {
 		return validation.Validator{}, err
 	}
@@ -160,21 +156,15 @@ func newEnUsCmuNstValidator(symbolset symbolset.Symbols) (validation.Validator, 
 			NoEmptyTrans{},
 			RequiredTransRe{
 				Name:    "primary_stress",
-				Level:   "Fatal",
-				Message: "Primary stress required",
-				Re:      primaryStressRe,
-			},
-			RequiredTransRe{
-				Name:    "syllabic",
 				Level:   "Format",
-				Message: "Each syllable needs a syllabic phoneme",
-				Re:      syllabicRe,
+				Message: "Each trans should have one primary stress",
+				Re:      exactOnePrimStressRe,
 			},
 			IllegalTransRe{
-				Name:    "oneprimarystress",
+				Name:    "secondary_stress",
 				Level:   "Format",
-				Message: "Only one primary stress is allowed per word",
-				Re:      onePrimaryStressRe,
+				Message: "Each trans can have max one secondary stress",
+				Re:      maxOneSecStressRe,
 			},
 			SymbolSetRule{
 				SymbolSet: symbolset,
