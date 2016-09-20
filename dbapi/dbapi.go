@@ -561,6 +561,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 	//fmt.Printf("VALUES %v\n\n", values)
 
 	rows, err := tx.Query(sqlString, values...)
+	defer rows.Close()
 	if err != nil {
 		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return err
@@ -1150,7 +1151,7 @@ func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
 	if err != nil {
 		return res, fmt.Errorf("failed db query : %v", err)
 	}
-
+	defer rows.Close()
 	var lexID int64
 	var symbol, category, description, ipa string
 	for rows.Next() {
@@ -1196,11 +1197,11 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 	//select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = 3 and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name
 
 	rows, err := tx.Query("select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = ? and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name", lexiconID)
-	defer rows.Close()
 	if err != nil {
 		return res, fmt.Errorf("db query failed : %v", err)
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var status string
 		var freq string
