@@ -76,10 +76,10 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	var res []Lexicon
 	sql := "select id, name, symbolsetname from lexicon"
 	rows, err := db.Query(sql)
-	defer rows.Close()
 	if err != nil {
 		return res, fmt.Errorf("db query failed : %v", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var id int64
@@ -123,10 +123,10 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	var symbolsetname string
 
 	rows, err := db.Query("select id, name, symbolsetname from lexicon where name in "+nQs(len(names)), convS(names)...)
-	defer rows.Close()
 	if err != nil {
 		return res, fmt.Errorf("failed db select on lexicon table : %v", err)
 	}
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&id, &lname, &symbolsetname)
 		if err != nil {
@@ -135,8 +135,9 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 		found[strings.ToLower(lname)] = true
 		res = append(res, Lexicon{ID: id, Name: lname, SymbolSetName: symbolsetname})
 	}
+
 	err = rows.Err()
-	rows.Close()
+	//rows.Close()
 
 	if len(res) != len(names) {
 		var missing []string
@@ -561,11 +562,11 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 	//fmt.Printf("VALUES %v\n\n", values)
 
 	rows, err := tx.Query(sqlString, values...)
-	defer rows.Close()
 	if err != nil {
 		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return err
 	}
+	defer rows.Close()
 
 	var lexiconID, entryID int64
 	var entryStrn, entryLanguage, partOfSpeech, wordParts string
