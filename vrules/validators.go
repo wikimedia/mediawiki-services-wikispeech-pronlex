@@ -59,13 +59,15 @@ func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 	if err != nil {
 		return validation.Validator{}, err
 	}
-	decomp2Orth := Decomp2Orth{"+", func(s string) (string, error) {
-		res, err := reFrom.Replace(s, "$1+$1", 0, -1)
-		if err != nil {
-			return s, err
-		}
-		return res, nil
-	}}
+	decomp2Orth := Decomp2Orth{compDelim: "+",
+		acceptEmptyDecomp: true,
+		preFilterWordPartString: func(s string) (string, error) {
+			res, err := reFrom.Replace(s, "$1+$1", 0, -1)
+			if err != nil {
+				return s, err
+			}
+			return res, nil
+		}}
 
 	var vali = validation.Validator{
 		Name: symbolset.Name,
@@ -106,13 +108,15 @@ func newNbNoNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 	if err != nil {
 		return validation.Validator{}, err
 	}
-	decomp2Orth := Decomp2Orth{"+", func(s string) (string, error) {
-		res, err := reFrom.Replace(s, "$1+$1", 0, -1)
-		if err != nil {
-			return s, err
-		}
-		return res, nil
-	}}
+	decomp2Orth := Decomp2Orth{compDelim: "+",
+		acceptEmptyDecomp: true,
+		preFilterWordPartString: func(s string) (string, error) {
+			res, err := reFrom.Replace(s, "$1+$1", 0, -1)
+			if err != nil {
+				return s, err
+			}
+			return res, nil
+		}}
 
 	var vali = validation.Validator{
 		Name: symbolset.Name,
