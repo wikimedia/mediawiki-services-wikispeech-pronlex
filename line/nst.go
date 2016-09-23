@@ -31,6 +31,15 @@ func (nst NST) ParseToEntry(line string) (lex.Entry, error) {
 		return lex.Entry{}, err
 	}
 
+	splitted := strings.SplitN(fs[Pos], "|", 2)
+	if len(splitted) == 2 {
+		fs[Pos] = splitted[0]
+		fs[Morph] = fs[Morph] + " " + splitted[1]
+	} else if len(splitted) == 1 {
+	} else {
+		panic("???")
+	}
+
 	res := lex.Entry{
 		Strn:           strings.ToLower(fs[Orth]),
 		Language:       fs[Lang],

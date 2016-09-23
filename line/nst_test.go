@@ -84,3 +84,39 @@ func Test_NSTParse_01(t *testing.T) {
 	}
 
 }
+
+func Test_NSTParse_WithPosConversion(t *testing.T) {
+	nst, err := NewNST()
+	if err != nil {
+		t.Errorf("didn't expect error here : %s", err)
+		return
+	}
+
+	input := `Humanfonden;PM|group|COM;|||UTR;Human+fonden;;LEX;SWE;;;;;h}:$""mA:n$%fOn$den;1;STD;SWE;;;;;;;;;;;;;;81775;enter_se;;;;;;;;;;;;;;;;;;humanfonden;;;48656`
+
+	expect := lex.Entry{
+		Strn:         "humanfonden",
+		PartOfSpeech: "PM",
+		Morphology:   "|||UTR group|COM",
+		WordParts:    "Human+fonden",
+		Language:     "SWE",
+		Lemma: lex.Lemma{
+			Strn:     "",
+			Reading:  "",
+			Paradigm: "",
+		},
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
+				Strn:     `h}:$""mA:n$%fOn$den`,
+				Language: "SWE",
+			},
+		},
+	}
+	result, err := nst.ParseToEntry(input)
+	if err != nil {
+		t.Errorf("didn't expect error here : %v", err)
+	} else {
+		checkNSTResult(t, expect, result)
+	}
+
+}
