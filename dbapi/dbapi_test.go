@@ -73,6 +73,7 @@ func Test_InsertEntries(t *testing.T) {
 
 	e1 := lex.Entry{Strn: "apa",
 		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
 		WordParts:      "apa",
 		Language:       "XYZZ",
 		Transcriptions: []lex.Transcription{t1, t2},
@@ -91,6 +92,11 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, nil, err)
 	}
 	if got, want := len(entries), 1; got != want {
+		t.Errorf(fs, got, want)
+	}
+
+	ea := entries["apa"][0]
+	if got, want := ea.Morphology, "NEU UTR"; got != want {
 		t.Errorf(fs, got, want)
 	}
 
