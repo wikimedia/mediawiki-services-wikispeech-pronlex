@@ -33,6 +33,7 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 	res.Strn = fs[Orth]
 	res.Language = fs[Lang]
 	res.PartOfSpeech = fs[Pos]
+	res.Morphology = fs[Morph]
 	res.WordParts = fs[WordParts]
 	if strings.TrimSpace(fs[Lemma]) != "" {
 		res.Lemma = lex.Lemma{Strn: fs[Lemma], Paradigm: fs[Paradigm]} // TODO Reading : fs[Reading]?
@@ -71,6 +72,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 	fs[WordParts] = e.WordParts
 
 	fs[Pos] = e.PartOfSpeech
+	fs[Morph] = e.Morphology
 
 	fs[StatusName] = e.EntryStatus.Name
 	fs[StatusSource] = e.EntryStatus.Source
@@ -112,10 +114,11 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 
 func NewWS() (WS, error) {
 	tests := []FormatTest{
-		FormatTest{"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 			map[Field]string{
 				Orth:         "storstaden",
-				Pos:          "NN SIN|DEF|NOM|UTR",
+				Pos:          "NN",
+				Morph:        "SIN|DEF|NOM|UTR",
 				WordParts:    "stor+staden",
 				Lemma:        "storstad|95522",
 				Paradigm:     "s111n, a->ä, stad",
@@ -131,32 +134,32 @@ func NewWS() (WS, error) {
 				StatusName:   "imported",
 				StatusSource: "nst",
 			},
-			"storstaden	NN SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 		},
 	}
 	f, err := NewFormat(
 		"WS",
 		"	",
 		map[Field]int{
-			Orth: 0,
-			Pos:  1,
-			//Morph:      2,
-			WordParts:    2,
-			Lemma:        3,
-			Paradigm:     4,
-			Lang:         5,
-			Trans1:       6,
-			Translang1:   7,
-			Trans2:       8,
-			Translang2:   9,
-			Trans3:       10,
-			Translang3:   11,
-			Trans4:       12,
-			Translang4:   13,
-			StatusName:   14,
-			StatusSource: 15,
+			Orth:         0,
+			Pos:          1,
+			Morph:        2,
+			WordParts:    3,
+			Lemma:        4,
+			Paradigm:     5,
+			Lang:         6,
+			Trans1:       7,
+			Translang1:   8,
+			Trans2:       9,
+			Translang2:   10,
+			Trans3:       11,
+			Translang3:   12,
+			Trans4:       13,
+			Translang4:   14,
+			StatusName:   15,
+			StatusSource: 16,
 		},
-		16,
+		17,
 		tests,
 	)
 	if err != nil {

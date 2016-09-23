@@ -34,7 +34,8 @@ func (nst NST) ParseToEntry(line string) (lex.Entry, error) {
 	res := lex.Entry{
 		Strn:           strings.ToLower(fs[Orth]),
 		Language:       fs[Lang],
-		PartOfSpeech:   fs[Pos] + " " + fs[Morph],
+		PartOfSpeech:   fs[Pos],
+		Morphology:     fs[Morph],
 		WordParts:      fs[WordParts],
 		Transcriptions: getTranses(fs),
 	}
@@ -103,16 +104,19 @@ func (nst NST) fields(e lex.Entry) (map[Field]string, error) {
 	fs[WordParts] = e.WordParts
 
 	// PartOfSpeech => Pos + Morph
-	posMorph := strings.SplitN(e.PartOfSpeech, " ", 2)
-	switch len(posMorph) {
-	case 2:
-		fs[Pos] = posMorph[0]
-		fs[Morph] = posMorph[1]
-	case 1:
-		fs[Pos] = posMorph[0]
-	default:
-		return map[Field]string{}, fmt.Errorf("couldn't split db partofspeech into pos+morph: %s", e.PartOfSpeech)
-	}
+	// posMorph := strings.SplitN(e.PartOfSpeech, " ", 2)
+	// switch len(posMorph) {
+	// case 2:
+	// 	fs[Pos] = posMorph[0]
+	// 	fs[Morph] = posMorph[1]
+	// case 1:
+	// 	fs[Pos] = posMorph[0]
+	// default:
+	// 	return map[Field]string{}, fmt.Errorf("couldn't split db partofspeech into pos+morph: %s", e.PartOfSpeech)
+	// }
+
+	fs[Pos] = e.PartOfSpeech
+	fs[Morph] = e.Morphology
 
 	// Lemma
 	if e.Lemma.Reading != "" {

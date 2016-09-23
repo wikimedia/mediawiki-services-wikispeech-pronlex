@@ -19,6 +19,7 @@ func checkNSTResultField(t *testing.T, field string, x string, r string) {
 func checkNSTResult(t *testing.T, x lex.Entry, r lex.Entry) {
 	checkNSTResultField(t, Orth.String(), x.Strn, r.Strn)
 	checkNSTResultField(t, Pos.String(), x.PartOfSpeech, r.PartOfSpeech)
+	checkNSTResultField(t, Morph.String(), x.Morphology, r.Morphology)
 	checkNSTResultField(t, WordParts.String(), x.WordParts, r.WordParts)
 	checkNSTResultField(t, Lang.String(), x.Language, r.Language)
 	checkNSTResultField(t, "Lemma.Reading", x.Lemma.Reading, r.Lemma.Reading)
@@ -55,7 +56,8 @@ func Test_NSTParse_01(t *testing.T) {
 
 	expect := lex.Entry{
 		Strn:         "storstaden",
-		PartOfSpeech: "NN SIN|DEF|NOM|UTR",
+		PartOfSpeech: "NN",
+		Morphology:   "SIN|DEF|NOM|UTR",
 		WordParts:    "stor+staden",
 		Language:     "SWE",
 		Lemma: lex.Lemma{

@@ -356,14 +356,14 @@ func Test_ImportLexiconFile(t *testing.T) {
 		t.Errorf(fs, "sprängstoff", o)
 	}
 
-	q = Query{Words: []string{"arbetsbelastads"}}
+	q = Query{Words: []string{"sittriktiga"}}
 	res, err = LookUpIntoSlice(db, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
 	o = res[0].Strn
-	if o != "arbetsbelastads" {
-		t.Errorf(fs, "arbetsbelastads", o)
+	if o != "sittriktiga" {
+		t.Errorf(fs, "sittriktiga", o)
 	}
 
 }
@@ -410,7 +410,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 
 	// actual tests start here
 	errs := ImportLexiconFile(db, logger, l.Name, "./sv-lextest-invalid.txt", symbolSet)
-	if len(errs) != 2 {
+	if len(errs) != 1 {
 		t.Errorf(fs, nil, errs)
 	}
 
@@ -425,14 +425,15 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 		t.Errorf(fs, "sprängstoff", o)
 	}
 
-	q = Query{Words: []string{"arbetsbelastads"}}
+	q = Query{Words: []string{"sittriktigas"}}
 	res, err = LookUpIntoSlice(db, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
+		return
 	}
 	o = res[0].Strn
-	if o != "arbetsbelastads" {
-		t.Errorf(fs, "arbetsbelastads", o)
+	if o != "sittriktigas" {
+		t.Errorf(fs, "sittriktigas", o)
 	}
 
 }
@@ -483,25 +484,25 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 		t.Errorf(fs, nil, errs)
 	}
 
-	q := Query{Words: []string{"sprängstoffs"}}
+	q := Query{Words: []string{"sprängstoff"}}
 
 	res, err := LookUpIntoSlice(db, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
 	o := res[0].Strn
-	if o != "sprängstoffs" {
-		t.Errorf(fs, "sprängstoffs", o)
+	if o != "sprängstoff" {
+		t.Errorf(fs, "sprängstoff", o)
 	}
 
-	q = Query{Words: []string{"arbetsbelastad"}}
+	q = Query{Words: []string{"sittriktiga"}}
 	res, err = LookUpIntoSlice(db, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
 	o = res[0].Strn
-	if o != "arbetsbelastad" {
-		t.Errorf(fs, "arbetsbelastad", o)
+	if o != "sittriktiga" {
+		t.Errorf(fs, "sittriktiga", o)
 	}
 
 }
