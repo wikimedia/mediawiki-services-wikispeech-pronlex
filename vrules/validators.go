@@ -50,7 +50,7 @@ func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 	if err != nil {
 		return validation.Validator{}, err
 	}
-	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*)*$")
+	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*)*$")
 	if err != nil {
 		return validation.Validator{}, err
 	}
@@ -99,7 +99,7 @@ func newNbNoNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 	if err != nil {
 		return validation.Validator{}, err
 	}
-	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic )*syllabic( nonsyllabic)*)*$")
+	syllabicRe, err := ProcessTransRe(symbolset, "^(\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*)*$")
 	if err != nil {
 		return validation.Validator{}, err
 	}

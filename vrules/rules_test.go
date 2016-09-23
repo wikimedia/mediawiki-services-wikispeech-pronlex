@@ -535,3 +535,96 @@ func newNSTNbvHardWired_ForTesting() (symbolset.Symbols, error) {
 	}
 	return symbolset.NewSymbols(name, symbols)
 }
+
+func TestWhitespace(t *testing.T) {
+	symbolset, err := newNSTSvHardWired_ForTesting()
+	if err != nil {
+		t.Errorf("%s", err)
+		return
+	}
+	vali, err := newSvSeNstValidator(symbolset)
+	if err != nil {
+		t.Errorf("%s", err)
+		return
+	}
+
+	var e = &lex.Entry{
+		Strn:         "banen",
+		Language:     "swe",
+		PartOfSpeech: "NN",
+		WordParts:    "banen",
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
+				Strn:     "\" b A: . n @ n",
+				Language: "swe",
+			},
+		},
+	}
+
+	vali.Validate([]*lex.Entry{e})
+	var result = e.EntryValidations
+
+	var expect = []lex.EntryValidation{}
+	if len(result) != len(expect) {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = &lex.Entry{
+		Strn:         "banen",
+		Language:     "swe",
+		PartOfSpeech: "NN",
+		WordParts:    "banen",
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
+				Strn:     "\" b A: . n @ n ",
+				Language: "swe",
+			},
+		},
+	}
+
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
+
+	expect = []lex.EntryValidation{
+		lex.EntryValidation{
+			RuleName: "SymbolSet",
+			Level:    "Fatal",
+			Message:  "[...]"},
+	}
+	if len(result) != len(expect) {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+	e = &lex.Entry{
+		Strn:         "banen",
+		Language:     "swe",
+		PartOfSpeech: "NN",
+		WordParts:    "banen",
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{
+				Strn:     "\" b A: . n @  n",
+				Language: "swe",
+			},
+		},
+	}
+
+	vali.Validate([]*lex.Entry{e})
+	result = e.EntryValidations
+
+	expect = []lex.EntryValidation{
+		lex.EntryValidation{
+			RuleName: "SymbolSet",
+			Level:    "Fatal",
+			Message:  "[...]"},
+	}
+	if len(result) != len(expect) {
+		t.Errorf(fsExp, expect, result)
+	}
+
+	//
+
+}

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"sort"
+	"strings"
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/validation"
@@ -57,6 +59,7 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	trimEntries(es)
 	_ = vdator.Validate(es)
 
 	res0, err3 := json.Marshal(es)
@@ -101,8 +104,8 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ents := []*lex.Entry{&e}
-	_ = vdator.Validate(ents)
+	trimEntry(&e)
+	_ = vdator.ValidateEntry(&e)
 
 	res0, err3 := json.Marshal(e)
 	if err3 != nil {
@@ -113,6 +116,31 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprint(w, string(res0))
+}
+
+var trimWhitespaceRe = regexp.MustCompile("[\\s]+")
+
+func trimTranscriptions(e *lex.Entry) {
+	var newTs []lex.Transcription
+	for _, t := range e.Transcriptions {
+		s := trimWhitespaceRe.ReplaceAllString(strings.TrimSpace(t.Strn), " ")
+		t.Strn = s
+		newTs = append(newTs, t)
+	}
+	e.Transcriptions = newTs
+}
+
+func trimEntry(e *lex.Entry) {
+	trimTranscriptions(e)
+	e.Strn = strings.TrimSpace(e.Strn)
+	e.WordParts = strings.TrimSpace(e.WordParts)
+	e.PartOfSpeech = trimWhitespaceRe.ReplaceAllString(strings.TrimSpace(e.PartOfSpeech), " ")
+}
+
+func trimEntries(entries []*lex.Entry) {
+	for _, e := range entries {
+		trimEntry(e)
+	}
 }
 
 type ValidatorNames struct {
