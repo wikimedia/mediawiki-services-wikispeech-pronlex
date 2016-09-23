@@ -2,9 +2,9 @@ package vrules
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
+	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
@@ -41,12 +41,12 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 /*
 ProcessTransRe converts pre-defined entities to the appropriate symbols. Strings replaced are: syllabic, nonsyllabic, phoneme, symbol.
 */
-func ProcessTransRe(SymbolSet symbolset.Symbols, Regexp string) (*regexp.Regexp, error) {
+func ProcessTransRe(SymbolSet symbolset.Symbols, Regexp string) (*regexp2.Regexp, error) {
 	Regexp = strings.Replace(Regexp, "nonsyllabic", SymbolSet.NonSyllabicRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "syllabic", SymbolSet.SyllabicRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "phoneme", SymbolSet.PhonemeRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "symbol", SymbolSet.SymbolRe.String(), -1)
-	return regexp.Compile(Regexp)
+	return regexp2.Compile(Regexp, regexp2.None)
 }
 
 // IllegalTransRe is a general rule type to check for illegal transcriptions by regexp
@@ -54,17 +54,24 @@ type IllegalTransRe struct {
 	Name    string
 	Level   string
 	Message string
-	Re      *regexp.Regexp
+	Re      *regexp2.Regexp
 }
 
 func (r IllegalTransRe) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
-		if r.Re.MatchString(strings.TrimSpace(t.Strn)) {
-			result = append(result, validation.Result{
-				RuleName: r.Name,
-				Level:    r.Level,
-				Message:  fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
+		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); m {
+			if err != nil {
+				result = append(result, validation.Result{
+					RuleName: "System",
+					Level:    "Format",
+					Message:  fmt.Sprintf("error when validating rule %s on transcription string /%s/ : %v", r.Name, t.Strn, err)})
+			} else {
+				result = append(result, validation.Result{
+					RuleName: r.Name,
+					Level:    r.Level,
+					Message:  fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
+			}
 		}
 	}
 	return result
@@ -75,17 +82,24 @@ type RequiredTransRe struct {
 	Name    string
 	Level   string
 	Message string
-	Re      *regexp.Regexp
+	Re      *regexp2.Regexp
 }
 
 func (r RequiredTransRe) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
-		if !r.Re.MatchString(strings.TrimSpace(t.Strn)) {
-			result = append(result, validation.Result{
-				RuleName: r.Name,
-				Level:    r.Level,
-				Message:  fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
+		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); !m {
+			if err != nil {
+				result = append(result, validation.Result{
+					RuleName: "System",
+					Level:    "Format",
+					Message:  fmt.Sprintf("error when validating rule %s on transcription string /%s/ : %v", r.Name, t.Strn, err)})
+			} else {
+				result = append(result, validation.Result{
+					RuleName: r.Name,
+					Level:    r.Level,
+					Message:  fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
+			}
 		}
 	}
 	return result

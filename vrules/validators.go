@@ -69,6 +69,11 @@ func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 			return res, nil
 		}}
 
+	repeatedPhnRe, err := ProcessTransRe(symbolset, "symbol( +[.~])? +\\1")
+	if err != nil {
+		return validation.Validator{}, err
+	}
+
 	var vali = validation.Validator{
 		Name: symbolset.Name,
 		Rules: []validation.Rule{
@@ -85,6 +90,12 @@ func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 				Level:   "Format",
 				Message: "Each syllable needs a syllabic phoneme",
 				Re:      syllabicRe,
+			},
+			IllegalTransRe{
+				Name:    "repeated_phonemes",
+				Level:   "Fatal",
+				Message: "Repeated phonemes cannot be used within the same morpheme",
+				Re:      repeatedPhnRe,
 			},
 			decomp2Orth,
 			SymbolSetRule{
