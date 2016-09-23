@@ -11,18 +11,19 @@ CREATE TABLE Lexicon (
   );
 CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);
 
+-- Symbol set handling moved to file based solution
 -- A symbol set is the definition of allowed symbols in a lexicons phonetical transcriptions
-CREATE TABLE Symbolset (
+-- CREATE TABLE Symbolset (
     -- description varchar(128),
-    description text,
-    symbol varchar(128) not null,
-    id integer not null primary key autoincrement,
-    category varchar(128) not null,
-    lexiconId integer not null,
-    ipa varchar(128)
-  );
-CREATE INDEX idx37380686 on Symbolset (symbol);
-CREATE UNIQUE INDEX idx8bc90a52 on Symbolset (lexiconId,symbol);
+    -- description text,
+    -- symbol varchar(128) not null,
+    -- id integer not null primary key autoincrement,
+    -- category varchar(128) not null,
+    -- lexiconId integer not null,
+    -- ipa varchar(128)
+--   );
+-- CREATE INDEX idx37380686 on Symbolset (symbol);
+-- CREATE UNIQUE INDEX idx8bc90a52 on Symbolset (lexiconId,symbol);
 
 -- Lemma forms, or stems, are uninflected (theoretical, one might say) forms of words
 CREATE TABLE Lemma (
