@@ -360,7 +360,7 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 }
 
 // TODO move to function?
-var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, wordparts) values (?, ?, ?, ?, ?)"
+var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, morphology, wordparts) values (?, ?, ?, ?, ?, ?)"
 var transAfterEntrySTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
 //var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
@@ -393,6 +393,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 			strings.ToLower(e.Strn),
 			e.Language,
 			e.PartOfSpeech,
+			e.Morphology,
 			e.WordParts)
 		if err != nil {
 			tx.Rollback()
@@ -569,7 +570,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 	defer rows.Close()
 
 	var lexiconID, entryID int64
-	var entryStrn, entryLanguage, partOfSpeech, wordParts string
+	var entryStrn, entryLanguage, partOfSpeech, morphology, wordParts string
 
 	var transcriptionID, transcriptionEntryID int64
 	var transcriptionStrn, transcriptionLanguage, transcriptionSources string
@@ -602,6 +603,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 			&entryStrn,
 			&entryLanguage,
 			&partOfSpeech,
+			&morphology,
 			&wordParts,
 
 			&transcriptionID,
@@ -643,6 +645,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 				Strn:         entryStrn,
 				Language:     entryLanguage,
 				PartOfSpeech: partOfSpeech,
+				Morphology:   morphology,
 				WordParts:    wordParts,
 			}
 			// max one lemma per entry
