@@ -55,6 +55,7 @@ CREATE TABLE Entry (
     strn text not null,
     lexiconId integer not null,
     partOfSpeech varchar(128),
+    morphology varchar(128),
 foreign key (lexiconId) references Lexicon(id));
 CREATE INDEX idx28d70584 on Entry (language);
 CREATE INDEX idx15890407 on Entry (strn);

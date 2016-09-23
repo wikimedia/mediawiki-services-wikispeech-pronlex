@@ -85,13 +85,14 @@ type Lemma struct {
 
 // Entry defines a lexical entry. It does not correspond one-to-one to
 // the entry db table, since it contains data also from associated
-// tabled (Lemma, Transcription)
+// tables (Lemma, Transcription)
 type Entry struct {
 	ID               int64             `json:"id"`
 	LexiconID        int64             `json:"lexiconId"`
 	Strn             string            `json:"strn"`
 	Language         string            `json:"language"`
 	PartOfSpeech     string            `json:"partOfSpeech"`
+	Morphology       string            `json:"morphology"`
 	WordParts        string            `json:"wordParts"`
 	Lemma            Lemma             `json:"lemma"`
 	Transcriptions   []Transcription   `json:"transcriptions"`
