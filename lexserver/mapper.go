@@ -335,7 +335,13 @@ func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = loadSymbolSetFile(fName)
 	if err != nil {
-		msg := fmt.Sprintf("couldn't load symbol set file on server : %v", err)
+		msg := fmt.Sprintf("couldn't load symbol set file : %v", err)
+		err = os.Remove(fName)
+		if err != nil {
+			msg = fmt.Sprintf("%v (couldn't delete file from server)", msg)
+		} else {
+			msg = fmt.Sprintf("%v (the uploaded file has been deleted from server)", msg)
+		}
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
