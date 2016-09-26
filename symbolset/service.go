@@ -1,12 +1,51 @@
 package symbolset
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"strings"
+)
 
 // functions for use by the mapper http service
 
 type MapperService struct {
 	SymbolSets map[string]SymbolSet
 	mappers    map[string]Mapper
+}
+
+func (m MapperService) MapperNames() []string {
+	var names = make([]string, 0)
+	for name, _ := range m.mappers {
+		names = append(names, name)
+	}
+	return names
+}
+
+func (m MapperService) Delete(ssName string) error {
+	_, ok := m.SymbolSets[ssName]
+	if !ok {
+		return fmt.Errorf("no existing symbol set named %s", ssName)
+	}
+	delete(m.SymbolSets, ssName)
+	log.Printf("Deleted symbol set %v from cache", ssName)
+	for mName, _ := range m.mappers {
+		if strings.HasPrefix(mName, ssName+" ") ||
+			strings.HasSuffix(mName, " "+ssName) {
+			delete(m.mappers, mName)
+			log.Printf("Deleted mapper %v from cache", mName)
+		}
+	}
+	return nil
+}
+
+func (m MapperService) Load(fName string) error {
+	ss, err := LoadSymbolSet(fName)
+	if err != nil {
+		return fmt.Errorf("couldn't load symbol set : %v", err)
+	}
+	m.SymbolSets[ss.Name] = ss
+	log.Printf("Loaded symbol set %v into cache", ss.Name)
+	return nil
 }
 
 func (m MapperService) Clear() {
@@ -35,7 +74,11 @@ func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper
 	if !okTo {
 		return nilRes, fmt.Errorf("couldn't find right hand symbol set named '%s'", toName)
 	}
-	return LoadMapper(from, to)
+	mapper, err := LoadMapper(from, to)
+	if err == nil {
+		m.mappers[name] = mapper
+	}
+	return mapper, err
 }
 
 // Map is used by the server to map a transcription from one symbol set to another

@@ -352,7 +352,7 @@ func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
+	// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
 	r.ParseMultipartForm(32 << 20)
 	file, handler, err := r.FormFile("upload_file")
@@ -362,8 +362,15 @@ func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	fName := filepath.Join(symbolSetFileArea, handler.Filename)
-	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0755)
+	serverPath := filepath.Join(symbolSetFileArea, handler.Filename)
+	if _, err := os.Stat(serverPath); err == nil {
+		msg := fmt.Sprintf("symbol set already exists on server in file: %s", handler.Filename)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("doUploadMapperHandler failed opening local output file : %v", err), http.StatusInternalServerError)
@@ -377,10 +384,10 @@ func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	_, err = loadSymbolSetFile(fName)
+	_, err = loadSymbolSetFile(serverPath)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't load symbol set file : %v", err)
-		err = os.Remove(fName)
+		err = os.Remove(serverPath)
 		if err != nil {
 			msg = fmt.Sprintf("%v (couldn't delete file from server)", msg)
 		} else {
