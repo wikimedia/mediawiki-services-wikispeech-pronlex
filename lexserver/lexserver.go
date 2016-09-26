@@ -38,6 +38,7 @@ func ff(f string, err error) {
 var uploadFileArea = filepath.Join(".", "upload_area")
 var downloadFileArea = filepath.Join(".", "download_area")
 var symbolSetFileArea = filepath.Join(".", "symbol_set_file_area")
+var symbolSetSuffix = ".tab"
 
 // TODO config stuff
 func init() {
@@ -687,6 +688,10 @@ func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
+func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
+	return symbolset.LoadSymbolSet(fName)
+}
+
 func loadSymbolSetsFromDir(dirName string) (map[string]symbolset.SymbolSet, error) {
 	// list files in symbol set dir
 	fileInfos, err := ioutil.ReadDir(symbolSetFileArea)
@@ -697,7 +702,7 @@ func loadSymbolSetsFromDir(dirName string) (map[string]symbolset.SymbolSet, erro
 	var fErrs error
 	var symSets []symbolset.SymbolSet
 	for _, fi := range fileInfos {
-		if strings.HasSuffix(fi.Name(), ".tab") {
+		if strings.HasSuffix(fi.Name(), symbolSetSuffix) {
 			symset, err := symbolset.LoadSymbolSet(filepath.Join(symbolSetFileArea, fi.Name()))
 			if err != nil {
 				if fErrs != nil {
@@ -829,6 +834,7 @@ func main() {
 	http.HandleFunc("/mapper", mapperHelpHandler)
 	http.HandleFunc("/mapper/load", loadMapperHandler)
 	http.HandleFunc("/mapper/list", listMapperHandler)
+	http.HandleFunc("/mapper/delete", deleteMapperHandler)
 	http.HandleFunc("/mapper/symbolset", symbolSetMapperHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
 	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)

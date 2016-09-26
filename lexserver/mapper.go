@@ -202,6 +202,51 @@ func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	if len(strings.TrimSpace(name)) == 0 {
+		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	_, ok := mapperService.SymbolSets[name]
+	if !ok {
+		msg := fmt.Sprintf("no existing symbol set named %s", name)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	// todo: delete from disk
+	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
+	if _, err := os.Stat(serverPath); err != nil {
+		if os.IsNotExist(err) {
+			msg := fmt.Sprintf("couldn't locate server file for symbol set %s", name)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+	}
+	err := os.Remove(serverPath)
+	if err != nil {
+		msg := fmt.Sprintf("couldn't delete file from server : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	err = loadMappersFromDir(symbolSetFileArea)
+	if err != nil {
+		msg := fmt.Sprintf("reload failed : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	msg := fmt.Sprintf("Delete symbol set %s", name)
+	fmt.Fprint(w, msg)
+}
+
 func listMapperHandler(w http.ResponseWriter, r *http.Request) {
 	ss := symbolSetNames(mapperService.SymbolSets)
 	j, err := json.Marshal(ss)
@@ -224,6 +269,9 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 
 <h2>list</h2> Lists available mappers. Example invocation:
 <pre><a href="/mapper/list">/mapper/list</a></pre>
+
+<h2>delete</h2> Deletes specified mapper. Example invocation:
+<pre><a href="/mapper/delete">/mapper/delete?name=sv-se_nst-xsampa</a></pre>
 
 <h2>map</h2> Maps a transcription from one symbolset to another. Example invocation:
 <pre><a href="/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@">/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@</a></pre>
@@ -281,6 +329,13 @@ func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = io.Copy(f, file)
 	if err != nil {
 		msg := fmt.Sprintf("doUploadMapperHandler failed copying local output file : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	_, err = loadSymbolSetFile(fName)
+	if err != nil {
+		msg := fmt.Sprintf("couldn't load symbol set file on server : %v", err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return

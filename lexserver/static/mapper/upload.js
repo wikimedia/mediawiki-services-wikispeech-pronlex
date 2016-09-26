@@ -77,17 +77,15 @@ MAPPER.UploadFileModel = function () {
 	xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
 		// Every thing ok, file uploaded
-		console.log("uploadFile return response text", xhr.responseText); // handle response.
-		//} //else { // TODO  This doesn't seem to be the right way to handle errors here
-		//alert(xhr.responseText);
-	    };// else { // TODO this doesn't work
- 	//	console.log("uploadLexiconFile return status", xhr.statusText);
-	 //   };
+		console.log("uploadFile returned response text ", xhr.responseText); // handle response.
+		self.message("Upload completed without errors");
+	    } else {
+		self.message("Upload failed: " + xhr.responseText);
+	    };
 	};
 	fd.append("client_uuid", self.uuid);
 	fd.append("upload_file", self.selectedFile());
 	xhr.send(fd);
-	self.message("File sent!");
     };
     
 };
