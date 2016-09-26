@@ -202,6 +202,37 @@ func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func reloadMapperHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	if len(strings.TrimSpace(name)) == 0 {
+		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	err := mapperService.Delete(name)
+	if err != nil {
+		msg := fmt.Sprintf("couldn't delete symbolset : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
+	err = mapperService.Load(serverPath)
+	if err != nil {
+		msg := fmt.Sprintf("couldn't load symbolset : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	msg := fmt.Sprintf("Reloaded symbol set %s", name)
+	fmt.Fprint(w, msg)
+
+}
+
 func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	if len(strings.TrimSpace(name)) == 0 {
@@ -210,14 +241,14 @@ func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	_, ok := mapperService.SymbolSets[name]
-	if !ok {
-		msg := fmt.Sprintf("no existing symbol set named %s", name)
+	err := mapperService.Delete(name)
+	if err != nil {
+		msg := fmt.Sprintf("couldn't delete symbolset : %v", err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	// todo: delete from disk
+
 	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
 	if _, err := os.Stat(serverPath); err != nil {
 		if os.IsNotExist(err) {
@@ -227,7 +258,8 @@ func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	err := os.Remove(serverPath)
+
+	err = os.Remove(serverPath)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't delete file from server : %v", err)
 		log.Println(msg)
@@ -235,16 +267,22 @@ func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = loadMappersFromDir(symbolSetFileArea)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	msg := fmt.Sprintf("Deleted symbol set %s", name)
+	fmt.Fprint(w, msg)
+}
+
+func mappersMapperHandler(w http.ResponseWriter, r *http.Request) {
+	ms := mapperService.MapperNames()
+	j, err := json.Marshal(ms)
 	if err != nil {
-		msg := fmt.Sprintf("reload failed : %v", err)
+		msg := fmt.Sprintf("failed to marshal struct : %v", err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	msg := fmt.Sprintf("Delete symbol set %s", name)
-	fmt.Fprint(w, msg)
+	fmt.Fprint(w, string(j))
 }
 
 func listMapperHandler(w http.ResponseWriter, r *http.Request) {
@@ -267,11 +305,17 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 <h2>load</h2> Loads mappers from a pre-defined folder on the server: <code>` + symbolSetFileArea + `</code>. Example invocation:
 <pre><a href="/mapper/load">/mapper/load</a></pre>
 
-<h2>list</h2> Lists available mappers. Example invocation:
+<h2>list</h2> Lists available symbol sets. Example invocation:
 <pre><a href="/mapper/list">/mapper/list</a></pre>
 
-<h2>delete</h2> Deletes specified mapper. Example invocation:
-<pre><a href="/mapper/delete">/mapper/delete?name=sv-se_nst-xsampa</a></pre>
+<h2>delete</h2> Deletes specified symbol set. Example invocation:
+<pre><a href="/mapper/delete?name=sv-se_nst-xsampa">/mapper/delete?name=sv-se_nst-xsampa</a></pre>
+
+<h2>reload</h2> Reloads a specified symbol set. Example invocation:
+<pre><a href="/mapper/reload?name=sv-se_nst-xsampa">/mapper/reload?name=sv-se_nst-xsampa</a></pre>
+
+<h2>mappers</h2> Lists cached mappers. Example invocation:
+<pre><a href="/mapper/mappers">/mapper/mappers</a></pre>
 
 <h2>map</h2> Maps a transcription from one symbolset to another. Example invocation:
 <pre><a href="/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@">/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@</a></pre>
