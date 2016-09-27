@@ -281,6 +281,10 @@ func adminLexDefinitionHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin_lex_definition.html")
 }
 
+func adminLexImportHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/admin_lex_import.html")
+}
+
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/create_lex.html")
 }
@@ -810,6 +814,8 @@ func main() {
 	// admin pages/calls
 
 	http.HandleFunc("/admin_lex_definition.html", adminLexDefinitionHandler)
+	http.HandleFunc("/admin_lex_import.html", adminLexImportHandler)
+	http.HandleFunc("/admin_lex_do_import", adminDoLexImportHandler)
 	http.HandleFunc("/admin/admin.html", adminAdminHandler)
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)

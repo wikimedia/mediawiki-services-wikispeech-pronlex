@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>Import lexicon</title>    
+  </head>
+
+  <body>
+
+    <h1>Import lexicon</h1>
+
+    WORK IN PROGRESS 2016-09-27 /HL</p>
+    
+    <p>
+      <span>
+
+	<form data-bind="submit: $root.importLexiconFile">
+	  <table>
+	    <tr><td>Lexicon name:</td><td> <input data-bind="value: $root.lexiconName"/></td></tr>
+	    <tr><td>Symbol set name: </td><td><input data-bind="value: $root.symbolSetName"/></td></tr>
+	    <tr><td>Lexicon file: </td><td><input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/></td></tr>
+	    <tr><td colspan="2"><button data-bind="enable: $root.validForm" type="submit">Submit</button></td></tr>
+	  </table>
+	</form>
+
+      </span>
+    </p>
+
+    <p>
+      <span data-bind="text: $root.message()"></span>
+    </p>
+    
+    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
+    
+    <script type="text/javascript" src="static/admin_lex_import.js"></script>
+    
+
+  </body>
+</html>

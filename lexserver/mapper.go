@@ -370,7 +370,7 @@ func uploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 
 func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("symbol set upload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
 		return
 	}
 
