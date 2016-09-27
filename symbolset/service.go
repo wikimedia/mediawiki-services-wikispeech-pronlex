@@ -10,12 +10,12 @@ import (
 
 type MapperService struct {
 	SymbolSets map[string]SymbolSet
-	mappers    map[string]Mapper
+	Mappers    map[string]Mapper
 }
 
 func (m MapperService) MapperNames() []string {
 	var names = make([]string, 0)
-	for name, _ := range m.mappers {
+	for name, _ := range m.Mappers {
 		names = append(names, name)
 	}
 	return names
@@ -28,10 +28,10 @@ func (m MapperService) Delete(ssName string) error {
 	}
 	delete(m.SymbolSets, ssName)
 	log.Printf("Deleted symbol set %v from cache", ssName)
-	for mName, _ := range m.mappers {
+	for mName, _ := range m.Mappers {
 		if strings.HasPrefix(mName, ssName+" ") ||
 			strings.HasSuffix(mName, " "+ssName) {
-			delete(m.mappers, mName)
+			delete(m.Mappers, mName)
 			log.Printf("Deleted mapper %v from cache", mName)
 		}
 	}
@@ -51,15 +51,15 @@ func (m MapperService) Load(fName string) error {
 func (m MapperService) Clear() {
 	// TODO: MapperService need to be used as mutex, see lexserver/mapper.go
 	m.SymbolSets = make(map[string]SymbolSet)
-	m.mappers = make(map[string]Mapper)
+	m.Mappers = make(map[string]Mapper)
 }
 
 func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper, error) {
-	if m.mappers == nil {
-		m.mappers = make(map[string]Mapper)
-	}
+	// if m.Mappers == nil {
+	// 	m.Mappers = make(map[string]Mapper)
+	// }
 	name := fromName + " to " + toName
-	mapper, ok := m.mappers[name]
+	mapper, ok := m.Mappers[name]
 	if ok {
 		return mapper, nil
 	}
@@ -76,7 +76,7 @@ func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper
 	}
 	mapper, err := LoadMapper(from, to)
 	if err == nil {
-		m.mappers[name] = mapper
+		m.Mappers[name] = mapper
 	}
 	return mapper, err
 }

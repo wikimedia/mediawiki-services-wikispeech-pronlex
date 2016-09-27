@@ -18,7 +18,10 @@ import (
 )
 
 // TODO Mutex this variable
-var mapperService = symbolset.MapperService{}
+var mapperService = symbolset.MapperService{
+	SymbolSets: make(map[string]symbolset.SymbolSet),
+	Mappers:    make(map[string]symbolset.Mapper),
+}
 
 type JsonMapped struct {
 	From   string
