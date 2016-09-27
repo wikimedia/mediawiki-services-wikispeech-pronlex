@@ -61,7 +61,7 @@ type SymbolSet struct {
 
 	From      Symbols
 	To        Symbols
-	symbolMap map[Symbol]Symbol
+	symbolMap map[string]Symbol
 
 	repeatedPhonemeDelimiters *regexp.Regexp
 }
@@ -115,7 +115,7 @@ func (m SymbolSet) MapTranscriptions(e *lex.Entry) error {
 
 // MapSymbol maps one symbol into the corresponding symbol in the new symbol set
 func (m SymbolSet) MapSymbol(symbol Symbol) (Symbol, error) {
-	res, ok := m.symbolMap[symbol]
+	res, ok := m.symbolMap[symbol.String]
 	if !ok {
 		return symbol, fmt.Errorf("unknown input symbol %v", symbol)
 	}
@@ -148,7 +148,7 @@ func (m SymbolSet) MapTranscription(input string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
 		}
-		to := m.symbolMap[from]
+		to := m.symbolMap[from.String]
 		//if to.Cat == UndefinedSymbol {
 		//	return "", fmt.Errorf("couldn't map symbol /%s/", fromS)
 		//}
@@ -384,11 +384,11 @@ func (cmu cmu) filterAfterMappingToCMU(trans string, ss Symbols) (string, error)
 func (m Mapper) MapTranscription(input string) (string, error) {
 	res, err := m.SymbolSet1.MapTranscription(input)
 	if err != nil {
-		return "", fmt.Errorf("couldn't map transcription : %v", err)
+		return "", fmt.Errorf("couldn't map transcription (1) : %v", err)
 	}
 	res, err = m.SymbolSet2.MapTranscription(res)
 	if err != nil {
-		return "", fmt.Errorf("couldn't map transcription : %v", err)
+		return "", fmt.Errorf("couldn't map transcription (2) : %v", err)
 	}
 	return res, nil
 }
@@ -397,11 +397,11 @@ func (m Mapper) MapTranscription(input string) (string, error) {
 func (m Mapper) MapSymbol(input Symbol) (Symbol, error) {
 	res, err := m.SymbolSet1.MapSymbol(input)
 	if err != nil {
-		return Symbol{}, fmt.Errorf("couldn't map transcription : %v", err)
+		return Symbol{}, fmt.Errorf("couldn't map symbol (1) : %v", err)
 	}
 	res, err = m.SymbolSet2.MapSymbol(res)
 	if err != nil {
-		return Symbol{}, fmt.Errorf("couldn't map transcription : %v", err)
+		return Symbol{}, fmt.Errorf("couldn't map symbol (2) : %v", err)
 	}
 	return res, nil
 }

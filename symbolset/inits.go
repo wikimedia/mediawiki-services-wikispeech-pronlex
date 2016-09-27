@@ -143,12 +143,12 @@ func NewSymbolSet(name string, fromName string, toName string, symbolList []Symb
 	}
 	var fromSymbols = make([]Symbol, 0)
 	var toSymbols = make([]Symbol, 0)
-	var symbolMap = make(map[Symbol]Symbol)
+	var symbolMap = make(map[string]Symbol)
 
 	for _, pair := range symbolList {
 		s1 := pair.Sym1
 		s2 := pair.Sym2
-		symbolMap[s1] = s2
+		symbolMap[s1.String] = s2
 		fromSymbols = append(fromSymbols, s1)
 		toSymbols = append(toSymbols, s2)
 	}

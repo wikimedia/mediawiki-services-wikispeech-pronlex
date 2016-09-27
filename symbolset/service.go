@@ -55,9 +55,6 @@ func (m MapperService) Clear() {
 }
 
 func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper, error) {
-	// if m.Mappers == nil {
-	// 	m.Mappers = make(map[string]Mapper)
-	// }
 	name := fromName + " to " + toName
 	mapper, ok := m.Mappers[name]
 	if ok {
