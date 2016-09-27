@@ -41,12 +41,6 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 	serverPath := filepath.Join(uploadFileArea, handler.Filename)
-	// if _, err := os.Stat(serverPath); err == nil {
-	// 	msg := fmt.Sprintf("lexicon file already exists on server in file: %s", handler.Filename)
-	// 	log.Println(msg)
-	// 	http.Error(w, msg, http.StatusInternalServerError)
-	// 	return
-	// }
 
 	f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
@@ -62,7 +56,7 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	// _, err = importXXXX(serverPath)
+	// _, err = importLexToDB.ImportLexicon(....)
 	// if err != nil {
 	// 	msg := fmt.Sprintf("couldn't import lexicon file : %v", err)
 	// 	err = os.Remove(serverPath)
@@ -77,6 +71,16 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	f.Close()
+
+	// when done, delete from server!
+	// err = os.Remove(serverPath)
+	// if err != nil {
+	// 	msg := fmt.Sprintf("couldn't delete file from server : %v", err)
+	// 	log.Println(msg)
+	// } else {
+	// 	msg := fmt.Sprint("the uploaded file has been deleted from server")
+	// 	log.Println(msg)
+	// }
 
 	fmt.Fprintf(w, "%v", handler.Header)
 }

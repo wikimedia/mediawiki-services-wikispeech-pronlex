@@ -60,7 +60,7 @@ LEXIMPORT.UploadFileModel = function () {
     self.message = ko.observable("");
     
     self.lexiconName = ko.observable(null);
-    self.symbolSetName = ko.observable(null);
+    self.symbolSetName = ko.observable(null); // todo: dropdown list from /mapper/symbolsets ?
     self.selectedFile = ko.observable(null);
     self.validForm = ko.computed(function() {
 	return (self.lexiconName() != null && self.symbolSetName() != null && self.selectedFile() != null &&

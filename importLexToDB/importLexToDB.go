@@ -11,6 +11,10 @@ import (
 	"fmt"
 )
 
+// TODO: Function to be called from server
+//func ImportLexicon(dbapi dbapi, lexName string, inFile string, symbolSetName string, ssFileName string) error {
+//}
+
 func main() {
 
 	sampleInvocation := `go run importLexToDB.go pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOL SET FOLDER]/sv-se_ws-sampa.tab`
