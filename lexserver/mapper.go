@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"sync"
 	//"os"
 	"encoding/json"
 	"path/filepath"
@@ -17,10 +18,16 @@ import (
 	"github.com/stts-se/pronlex/symbolset"
 )
 
-// TODO Mutex this variable
-var mapperService = symbolset.MapperService{
-	SymbolSets: make(map[string]symbolset.SymbolSet),
-	Mappers:    make(map[string]symbolset.Mapper),
+// The calls prefixed with '/mapper/'
+
+var mMut = struct {
+	sync.RWMutex
+	service symbolset.MapperService
+}{
+	service: symbolset.MapperService{
+		SymbolSets: make(map[string]symbolset.SymbolSet),
+		Mappers:    make(map[string]symbolset.Mapper),
+	},
 }
 
 type JsonMapped struct {
@@ -52,7 +59,9 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	result0, err := mapperService.Map(fromName, toName, trans)
+	mMut.Lock()
+	result0, err := mMut.service.Map(fromName, toName, trans)
+	mMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("failed mapping transcription : %v", err)
 		log.Println(msg)
@@ -90,7 +99,9 @@ func symbolSetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	symbolset0, ok := mapperService.SymbolSets[name]
+	mMut.Lock()
+	symbolset0, ok := mMut.service.SymbolSets[name]
+	mMut.Unlock()
 	if !ok {
 		msg := fmt.Sprintf("failed getting symbol set : %v", name)
 		log.Println(msg)
@@ -142,7 +153,9 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	mapper0, err := mapperService.GetMapTable(fromName, toName)
+	mMut.Lock()
+	mapper0, err := mMut.service.GetMapTable(fromName, toName)
+	mMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("failed getting map table : %v", err)
 		log.Println(msg)
@@ -174,13 +187,17 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func loadSymbolSets(dirName string) error {
-	mapperService.Clear()
+	mMut.Lock()
+	mMut.service.Clear()
+	mMut.Unlock()
 
 	symbolSets, err := loadSymbolSetsFromDir(dirName)
 	if err != nil {
 		return err
 	}
-	mapperService.SymbolSets = symbolSets
+	mMut.Lock()
+	mMut.service.SymbolSets = symbolSets
+	mMut.Unlock()
 	return nil
 }
 
@@ -192,8 +209,9 @@ func reloadAllSymbolSetsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-
-	j, err := json.Marshal(symbolSetNames(mapperService.SymbolSets))
+	mMut.Lock()
+	j, err := json.Marshal(symbolSetNames(mMut.service.SymbolSets))
+	mMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("json marshalling error : %v", err)
 		log.Println(msg)
@@ -213,7 +231,9 @@ func reloadOneSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	err := mapperService.Delete(name)
+	mMut.Lock()
+	err := mMut.service.Delete(name)
+	mMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("couldn't delete symbolset : %v", err)
 		log.Println(msg)
@@ -222,7 +242,9 @@ func reloadOneSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
-	err = mapperService.Load(serverPath)
+	mMut.Lock()
+	err = mMut.service.Load(serverPath)
+	mMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("couldn't load symbolset : %v", err)
 		log.Println(msg)
@@ -244,7 +266,9 @@ func deleteSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	err := mapperService.Delete(name)
+	mMut.Lock()
+	err := mMut.service.Delete(name)
+	mMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("couldn't delete symbolset : %v", err)
 		log.Println(msg)
@@ -276,7 +300,9 @@ func deleteSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listMappersHandler(w http.ResponseWriter, r *http.Request) {
-	ms := mapperService.MapperNames()
+	mMut.Lock()
+	ms := mMut.service.MapperNames()
+	mMut.Unlock()
 	j, err := json.Marshal(ms)
 	if err != nil {
 		msg := fmt.Sprintf("failed to marshal struct : %v", err)
@@ -289,7 +315,9 @@ func listMappersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listSymbolSetsHandler(w http.ResponseWriter, r *http.Request) {
-	ss := symbolSetNames(mapperService.SymbolSets)
+	mMut.Lock()
+	ss := symbolSetNames(mMut.service.SymbolSets)
+	mMut.Unlock()
 	j, err := json.Marshal(ss)
 	if err != nil {
 		msg := fmt.Sprintf("failed to marshal struct : %v", err)

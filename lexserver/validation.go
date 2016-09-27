@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/validation"
@@ -16,8 +17,12 @@ import (
 
 // The calls prefixed with '/validation/'
 
-// TODO Mutex this variable
-var vService = vrules.ValidatorService{Validators: make(map[string]*validation.Validator)}
+var vMut = struct {
+	sync.RWMutex
+	service vrules.ValidatorService
+}{
+	service: vrules.ValidatorService{Validators: make(map[string]*validation.Validator)},
+}
 
 // TODO code duplication between validateEntriesHandler and validateEntryHandler
 
@@ -26,7 +31,9 @@ func loadValidators(symsetDirName string) error {
 	if err != nil {
 		return err
 	}
-	err = vService.Load(symbolSets)
+	vMut.Lock()
+	err = vMut.service.Load(symbolSets)
+	vMut.Unlock()
 	return err
 }
 
@@ -51,7 +58,9 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO Hardwired stuff below!!!!
-	vdator, err := vService.ValidatorForName(symbolSetName)
+	vMut.Lock()
+	vdator, err := vMut.service.ValidatorForName(symbolSetName)
+	vMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
 		log.Println(msg)
@@ -96,7 +105,9 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO Hardwired stuff below!!!!
-	vdator, err := vService.ValidatorForName(symbolSetName)
+	vMut.Lock()
+	vdator, err := vMut.service.ValidatorForName(symbolSetName)
+	vMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
 		log.Println(msg)
@@ -149,9 +160,11 @@ type ValidatorNames struct {
 
 func validatorNames() ValidatorNames {
 	var vNames []string
-	for vName, _ := range vService.Validators {
+	vMut.Lock()
+	for vName, _ := range vMut.service.Validators {
 		vNames = append(vNames, vName)
 	}
+	vMut.Unlock()
 	sort.Strings(vNames)
 	return ValidatorNames{ValidatorNames: vNames}
 }
