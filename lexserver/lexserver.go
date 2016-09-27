@@ -765,7 +765,8 @@ func main() {
 	ff("Failed to exec PRAGMA call %v", err)
 
 	// load symbol set mappers
-	loadMappersFromDir(symbolSetFileArea)
+	err = loadSymbolSets(symbolSetFileArea)
+	ff("Failed to load symbol sets : %v", err)
 	log.Printf("Loaded symbol set mappers from dir %s", symbolSetFileArea)
 
 	err = loadValidators(symbolSetFileArea)
@@ -832,15 +833,15 @@ func main() {
 
 	// TODO Split this main func into several files
 	http.HandleFunc("/mapper", mapperHelpHandler)
-	http.HandleFunc("/mapper/load", loadMapperHandler)
-	http.HandleFunc("/mapper/list", listMappersMapperHandler)
-	http.HandleFunc("/mapper/symbolsets", listSymbolSetsMapperHandler)
-	http.HandleFunc("/mapper/delete", deleteMapperHandler)
-	http.HandleFunc("/mapper/reload", reloadMapperHandler)
-	http.HandleFunc("/mapper/symbolset", symbolSetMapperHandler)
+	http.HandleFunc("/mapper/list", listMappersHandler)
+	http.HandleFunc("/mapper/symbolsets", listSymbolSetsHandler)
+	http.HandleFunc("/mapper/deletesymbolset", deleteSymbolSetHandler)
+	http.HandleFunc("/mapper/reloadsymbolset", reloadOneSymbolSetHandler)
+	http.HandleFunc("/mapper/reloadsymbolsets", reloadAllSymbolSetsHandler)
+	http.HandleFunc("/mapper/symbolset", symbolSetHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
 	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)
-	http.HandleFunc("/mapper_upload", uploadMapperHandler)
+	http.HandleFunc("/mapper_upload_symbolset", uploadMapperHandler)
 	http.HandleFunc("/mapper_do_upload", doUploadMapperHandler)
 
 	// TODO Why this http.StripPrefix? Looks odd.

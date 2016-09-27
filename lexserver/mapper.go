@@ -79,7 +79,7 @@ type JsonSymbol struct {
 	Cat    string
 }
 
-func symbolSetMapperHandler(w http.ResponseWriter, r *http.Request) {
+func symbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	if len(strings.TrimSpace(name)) == 0 {
 		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
@@ -170,7 +170,7 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
-func loadMappersFromDir(dirName string) error {
+func loadSymbolSets(dirName string) error {
 	mapperService.Clear()
 
 	symbolSets, err := loadSymbolSetsFromDir(dirName)
@@ -181,8 +181,8 @@ func loadMappersFromDir(dirName string) error {
 	return nil
 }
 
-func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
-	err := loadMappersFromDir(symbolSetFileArea)
+func reloadAllSymbolSetsHandler(w http.ResponseWriter, r *http.Request) {
+	err := loadSymbolSets(symbolSetFileArea)
 	if err != nil {
 		msg := err.Error()
 		log.Println(msg)
@@ -202,7 +202,7 @@ func loadMapperHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func reloadMapperHandler(w http.ResponseWriter, r *http.Request) {
+func reloadOneSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	if len(strings.TrimSpace(name)) == 0 {
 		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
@@ -233,7 +233,7 @@ func reloadMapperHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
+func deleteSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	if len(strings.TrimSpace(name)) == 0 {
 		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
@@ -272,7 +272,7 @@ func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, msg)
 }
 
-func listMappersMapperHandler(w http.ResponseWriter, r *http.Request) {
+func listMappersHandler(w http.ResponseWriter, r *http.Request) {
 	ms := mapperService.MapperNames()
 	j, err := json.Marshal(ms)
 	if err != nil {
@@ -285,7 +285,7 @@ func listMappersMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
-func listSymbolSetsMapperHandler(w http.ResponseWriter, r *http.Request) {
+func listSymbolSetsHandler(w http.ResponseWriter, r *http.Request) {
 	ss := symbolSetNames(mapperService.SymbolSets)
 	j, err := json.Marshal(ss)
 	if err != nil {
@@ -302,23 +302,23 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	html := `<h1>Mapper</h1>
-<h2>load</h2> Loads mappers from a pre-defined folder on the server: <code>` + symbolSetFileArea + `</code>. Example invocation:
-<pre><a href="/mapper/load">/mapper/load</a></pre>
+<h2>map</h2> Maps a transcription from one symbolset to another. Example invocation:
+<pre><a href="/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@">/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@</a></pre>
 
 <h2>list</h2> Lists cached mappers. Example invocation:
 <pre><a href="/mapper/list">/mapper/list</a></pre>
 
-<h2>delete</h2> Deletes specified symbol set. Example invocation:
-<pre><a href="/mapper/delete?name=sv-se_nst-xsampa">/mapper/delete?name=sv-se_nst-xsampa</a></pre>
+<h2>reloadsymbolsets</h2> Reloads all symbol sets in the pre-defined folder. All mappers will also be removed from cache. Example invocation:
+<pre><a href="/mapper/reloadsymbolsets">/mapper/reloadsymbolsets</a></pre>
 
-<h2>reload</h2> Reloads a specified symbol set. Example invocation:
-<pre><a href="/mapper/reload?name=sv-se_nst-xsampa">/mapper/reload?name=sv-se_nst-xsampa</a></pre>
+<h2>reloadsymbolset</h2> Reloads a named symbol set. All affected mappers will be cleared from cache. Example invocation:
+<pre><a href="/mapper/reloadsymbolset?name=sv-se_nst-xsampa">/mapper/reloadsymbolset?name=sv-se_nst-xsampa</a></pre>
 
-<h2>mappers</h2> Lists available symbol sets. Example invocation:
+<h2>symbolsets</h2> Lists available symbol sets. Example invocation:
 <pre><a href="/mapper/symbolsets">/mapper/symbolsets</a></pre>
 
-<h2>map</h2> Maps a transcription from one symbolset to another. Example invocation:
-<pre><a href="/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@">/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@</a></pre>
+<h2>deletesymbolset</h2> Deletes a named symbol set. Example invocation:
+<pre><a href="/mapper/deletesymbolset?name=sv-se_nst-xsampa">/mapper/deletesymbolset?name=sv-se_nst-xsampa</a></pre>
 
 <h2>symbolset</h2> Lists content of a named symbolset. Example invocation:
 <pre><a href="/mapper/symbolset?name=sv-se_ws-sampa">/mapper/symbolset?name=sv-se_ws-sampa</a></pre>
@@ -326,15 +326,15 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 <h2>maptable</h2> Lists content of a maptable given two symbolset names. Example invocation:
 <pre><a href="/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary">/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary</a></pre>
 
-<h2>upload</h2> Upload symbol set file
-<pre><a href="/mapper_upload">/mapper_upload</a></pre>		
+<h2>mapper_upload_symbolset</h2> Upload symbol set file
+<pre><a href="/mapper_upload_symbolset">/mapper_upload_symbolset</a></pre>		
 		`
 
 	fmt.Fprint(w, html)
 }
 
 func uploadMapperHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/mapper_upload.html")
+	http.ServeFile(w, r, "./static/mapper_upload_symbolset.html")
 }
 
 func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
