@@ -833,13 +833,13 @@ func main() {
 	// TODO Split this main func into several files
 	http.HandleFunc("/mapper", mapperHelpHandler)
 	http.HandleFunc("/mapper/load", loadMapperHandler)
-	http.HandleFunc("/mapper/list", listMapperHandler)
+	http.HandleFunc("/mapper/list", listMappersMapperHandler)
+	http.HandleFunc("/mapper/symbolsets", listSymbolSetsMapperHandler)
 	http.HandleFunc("/mapper/delete", deleteMapperHandler)
 	http.HandleFunc("/mapper/reload", reloadMapperHandler)
 	http.HandleFunc("/mapper/symbolset", symbolSetMapperHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
 	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)
-	http.HandleFunc("/mapper/mappers", mappersMapperHandler)
 	http.HandleFunc("/mapper_upload", uploadMapperHandler)
 	http.HandleFunc("/mapper_do_upload", doUploadMapperHandler)
 

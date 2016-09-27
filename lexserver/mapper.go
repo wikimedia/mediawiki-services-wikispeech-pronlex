@@ -272,7 +272,7 @@ func deleteMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, msg)
 }
 
-func mappersMapperHandler(w http.ResponseWriter, r *http.Request) {
+func listMappersMapperHandler(w http.ResponseWriter, r *http.Request) {
 	ms := mapperService.MapperNames()
 	j, err := json.Marshal(ms)
 	if err != nil {
@@ -285,7 +285,7 @@ func mappersMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
-func listMapperHandler(w http.ResponseWriter, r *http.Request) {
+func listSymbolSetsMapperHandler(w http.ResponseWriter, r *http.Request) {
 	ss := symbolSetNames(mapperService.SymbolSets)
 	j, err := json.Marshal(ss)
 	if err != nil {
@@ -305,7 +305,7 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 <h2>load</h2> Loads mappers from a pre-defined folder on the server: <code>` + symbolSetFileArea + `</code>. Example invocation:
 <pre><a href="/mapper/load">/mapper/load</a></pre>
 
-<h2>list</h2> Lists available symbol sets. Example invocation:
+<h2>list</h2> Lists cached mappers. Example invocation:
 <pre><a href="/mapper/list">/mapper/list</a></pre>
 
 <h2>delete</h2> Deletes specified symbol set. Example invocation:
@@ -314,8 +314,8 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 <h2>reload</h2> Reloads a specified symbol set. Example invocation:
 <pre><a href="/mapper/reload?name=sv-se_nst-xsampa">/mapper/reload?name=sv-se_nst-xsampa</a></pre>
 
-<h2>mappers</h2> Lists cached mappers. Example invocation:
-<pre><a href="/mapper/mappers">/mapper/mappers</a></pre>
+<h2>mappers</h2> Lists available symbol sets. Example invocation:
+<pre><a href="/mapper/symbolsets">/mapper/symbolsets</a></pre>
 
 <h2>map</h2> Maps a transcription from one symbolset to another. Example invocation:
 <pre><a href="/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@">/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@</a></pre>
