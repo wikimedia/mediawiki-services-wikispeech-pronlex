@@ -55,7 +55,7 @@ LEXIMPORT.UploadFileModel = function () {
     };
     
     self.lexiconName = ko.observable(null);
-    self.symbolSetName = ko.observable(null); // todo: dropdown list from /mapper/symbolsets ?
+    self.symbolSetName = ko.observable(null);
     self.selectedFile = ko.observable(null);
     self.validForm = ko.computed(function() {
 	return (self.lexiconName() != null && self.symbolSetName() != null && self.selectedFile() != null &&
@@ -66,7 +66,20 @@ LEXIMPORT.UploadFileModel = function () {
 	self.selectedFile(lexiconFile);
 	console.log("selected file: ", self.selectedFile())
     }
+    
+    self.symbolSetNames = ko.observableArray();
 
+    self.loadSymbolSetNames = function () {
+	$.getJSON(LEXIMPORT.baseURL +"/symbolset/list")
+	    .done(function (data) {
+		self.symbolSetNames(data.SymbolSetNames);
+	    })
+    	    .fail(function (xhr, textStatus, errorThrown) {
+		alert("loadSymbolSetNames says: "+ xhr.responseText);
+	    });
+    };
+    
+    
     self.importLexiconFile = function() {
 	console.log("uploading file: ", self.selectedFile())
 	var url = LEXIMPORT.baseURL + "/admin_lex_do_import"
@@ -93,6 +106,7 @@ LEXIMPORT.UploadFileModel = function () {
 };
 
 var upload = new LEXIMPORT.UploadFileModel();
+upload.loadSymbolSetNames();
 ko.applyBindings(upload);
 upload.connectWebSock();
 

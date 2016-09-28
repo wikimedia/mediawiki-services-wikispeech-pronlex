@@ -13,7 +13,9 @@
 	<form data-bind="submit: $root.importLexiconFile">
 	  <table>
 	    <tr><td>Lexicon name:</td><td> <input data-bind="value: $root.lexiconName"/></td></tr>
-	    <tr><td>Symbol set name: </td><td><input data-bind="value: $root.symbolSetName"/></td></tr>
+	    <!--	    <tr><td>Symbol set name: </td><td><input data-bind="value: $root.symbolSetName"/></td></tr>-->
+	    	<tr><td>Symbol set: </td><td><select data-bind="options: $root.symbolSetNames, optionsCaption: 'Select symbol set', value: $root.symbolSetName"></select></td></tr>
+
 	    <tr><td>Lexicon file: </td><td><input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/></td></tr>
 	    <tr><td colspan="2"><button data-bind="enable: $root.validForm" type="submit">Submit</button></td></tr>
 	  </table>
