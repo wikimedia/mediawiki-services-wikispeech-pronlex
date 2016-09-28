@@ -30,7 +30,7 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 	q.Page = 0       //todo?
 
 	ew := lex.EntrySliceWriter{}
-	logger.Write("Fetching entries from lexicon")
+	logger.Write("Fetching entries from lexicon ... ")
 	err := LookUp(db, q, &ew)
 	if err != nil {
 		return stats, fmt.Errorf("couldn't lookup for validation : %s", err)
