@@ -37,5 +37,5 @@ func (l WebSockLogger) Write(msg string) {
 }
 
 func (l WebSockLogger) LogInterval() int {
-	return 10
+	return 100
 }
