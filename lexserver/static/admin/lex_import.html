@@ -13,7 +13,6 @@
 	<form data-bind="submit: $root.importLexiconFile">
 	  <table>
 	    <tr><td>Lexicon name:</td><td> <input data-bind="value: $root.lexiconName"/></td></tr>
-	    <!--	    <tr><td>Symbol set name: </td><td><input data-bind="value: $root.symbolSetName"/></td></tr>-->
 	    	<tr><td>Symbol set: </td><td><select data-bind="options: $root.symbolSetNames, optionsCaption: 'Select symbol set', value: $root.symbolSetName"></select></td></tr>
 
 	    <tr><td>Lexicon file: </td><td><input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/></td></tr>
@@ -33,7 +32,7 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
     
-    <script type="text/javascript" src="static/admin_lex_import.js"></script>
+    <script type="text/javascript" src="/static/admin/lex_import.js"></script>
     
 
   </body>

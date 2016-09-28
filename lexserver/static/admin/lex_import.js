@@ -17,7 +17,7 @@ LEXIMPORT.generateUUID = function() {
 };
 
 
-LEXIMPORT.UploadFileModel = function () {
+LEXIMPORT.ImportFileModel = function () {
     var self = this; 
     
     
@@ -82,7 +82,7 @@ LEXIMPORT.UploadFileModel = function () {
     
     self.importLexiconFile = function() {
 	console.log("uploading file: ", self.selectedFile())
-	var url = LEXIMPORT.baseURL + "/admin_lex_do_import"
+	var url = LEXIMPORT.baseURL + "/admin/lex_do_import"
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);
@@ -105,7 +105,7 @@ LEXIMPORT.UploadFileModel = function () {
     
 };
 
-var upload = new LEXIMPORT.UploadFileModel();
+var upload = new LEXIMPORT.ImportFileModel();
 upload.loadSymbolSetNames();
 ko.applyBindings(upload);
 upload.connectWebSock();

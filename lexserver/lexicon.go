@@ -193,3 +193,6 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 	//fmt.Fprint(w, jsn)
 }
+
+func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
+}

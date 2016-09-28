@@ -211,14 +211,14 @@ func symbolSetHelpHandler(w http.ResponseWriter, r *http.Request) {
 <pre><a href="/symbolset/symbolset?name=sv-se_ws-sampa">/symbolset/symbolset?name=sv-se_ws-sampa</a></pre>
 
 <h2>symbolset_upload</h2> Upload symbol set file
-<pre><a href="/symbolset_upload">/symbolset_upload</a></pre>		
+<pre><a href="/symbolset/upload">/symbolset/upload</a></pre>		
 		`
 
 	fmt.Fprint(w, html)
 }
 
 func uploadSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/symbolset_upload.html")
+	http.ServeFile(w, r, "./static/symbolset/upload.html")
 }
 
 func doUploadSymbolSetHandler(w http.ResponseWriter, r *http.Request) {

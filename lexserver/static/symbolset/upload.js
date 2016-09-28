@@ -70,7 +70,7 @@ SYMBOLSET.UploadFileModel = function () {
 
     self.uploadFile = function() {
 	console.log("uploading file: ", self.selectedFile())
-	var url = SYMBOLSET.baseURL + "/symbolset_do_upload"
+	var url = SYMBOLSET.baseURL + "/symbolset/do_upload"
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);

@@ -277,7 +277,11 @@ func adminLexDefinitionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminLexImportHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin_lex_import.html")
+	http.ServeFile(w, r, "./static/admin/lex_import.html")
+}
+
+func lexiconValidateHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/lexicon/validate.html")
 }
 
 func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
@@ -748,6 +752,9 @@ func main() {
 	http.HandleFunc("/lexicon/updateentry", updateEntryHandler)
 	http.HandleFunc("/updateentry", apiChangedHandler("/lexicon/updateentry instead"))
 
+	http.HandleFunc("/lexicon/validate", lexiconValidateHandler)
+	http.HandleFunc("/lex_do_validate", lexiconRunValidateHandler)
+
 	http.HandleFunc("/validation/validateentry", validateEntryHandler)
 	http.HandleFunc("/validateentry", apiChangedHandler("/validation/validateentry"))
 	http.HandleFunc("/validation/validateentries", validateEntriesHandler)
@@ -760,8 +767,8 @@ func main() {
 	// admin pages/calls
 
 	http.HandleFunc("/admin_lex_definition.html", adminLexDefinitionHandler)
-	http.HandleFunc("/admin_lex_import.html", adminLexImportHandler)
-	http.HandleFunc("/admin_lex_do_import", adminDoLexImportHandler)
+	http.HandleFunc("/admin/lex_import", adminLexImportHandler)
+	http.HandleFunc("/admin/lex_do_import", adminDoLexImportHandler)
 	http.HandleFunc("/admin/admin.html", adminAdminHandler)
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
@@ -790,8 +797,8 @@ func main() {
 	http.HandleFunc("/symbolset/delete", deleteSymbolSetHandler)
 	http.HandleFunc("/symbolset/reload", reloadSymbolSetHandler)
 	http.HandleFunc("/symbolset/symbolset", symbolSetHandler)
-	http.HandleFunc("/symbolset_upload", uploadSymbolSetHandler)
-	http.HandleFunc("/symbolset_do_upload", doUploadSymbolSetHandler)
+	http.HandleFunc("/symbolset/upload", uploadSymbolSetHandler)
+	http.HandleFunc("/symbolset/do_upload", doUploadSymbolSetHandler)
 
 	http.HandleFunc("/mapper", mapperHelpHandler)
 	http.HandleFunc("/mapper/list", listMappersHandler)

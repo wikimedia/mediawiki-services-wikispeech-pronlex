@@ -110,13 +110,13 @@ type EntryWriter interface {
 // Exmaple usage:
 //	bf := bufio.NewWriter(f)
 //	defer bf.Flush()
-//	bfx := dbapi.EntriesFileWriter{bf}
+//	bfx := lex.EntriesFileWriter{bf}
 //	dbapi.LookUp(db, q, bfx)
 type EntryFileWriter struct {
 	Writer io.Writer
 }
 
-func (w EntryFileWriter) Write(e Entry) error {
+func (w *EntryFileWriter) Write(e Entry) error {
 	// TODO call to line formatting of Entry
 	_, err := fmt.Fprintf(w.Writer, "%v\n", e)
 	return err
@@ -125,7 +125,7 @@ func (w EntryFileWriter) Write(e Entry) error {
 // EntrySliceWriter is a container for returning Entries from a LookUp call to the db
 // Example usage:
 //	var q := dbapi.Query{ ... }
-//	var esw dbapi.EntrySliceWriter
+//	var esw lex.EntrySliceWriter
 //	err := dbapi.LookUp(db, q, &esw)
 //	[...] esw.Entries // process Entries
 type EntrySliceWriter struct {
@@ -134,5 +134,5 @@ type EntrySliceWriter struct {
 
 func (w *EntrySliceWriter) Write(e Entry) error {
 	w.Entries = append(w.Entries, e)
-	return nil // fmt.Errorf("not implemented")
+	return nil
 }
