@@ -1176,6 +1176,24 @@ func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
 	return res, nil
 }
 
+// EntryCount counts the number of lines in a lexicon
+func EntryCount(db *sql.DB, lexiconID int64) (int64, error) {
+	tx, err := db.Begin()
+	defer tx.Commit()
+
+	if err != nil {
+		return -1, fmt.Errorf("dbapi.LexiconStats failed opening db transaction : %v", err)
+	}
+
+	// number of entries in a lexicon
+	var entries int64
+	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
+	if err != nil || err == sql.ErrNoRows {
+		return -1, fmt.Errorf("dbapi.LexiconStats failed QueryRow : %v", err)
+	}
+	return entries, nil
+}
+
 // LexiconStats calls the database a number of times, gathering different numbers, e.g. on how many entries there are in a lexicon.
 func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 	res := LexStats{LexiconID: lexiconID}

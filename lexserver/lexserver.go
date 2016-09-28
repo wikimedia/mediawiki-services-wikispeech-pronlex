@@ -787,7 +787,7 @@ func main() {
 	//http.HandleFunc("/lexicon/listknown", listKnownHandler)
 
 	// function calls
-	http.HandleFunc("/lexicon/listlexicons", listLexsHandler)
+	http.HandleFunc("/lexicon/listlexicons", listLexsWithEntryCountHandler)
 	http.HandleFunc("/listlexicons", apiChangedHandler("use /lexicon/listlexicons instead"))
 
 	http.HandleFunc("/lexicon/stats", lexiconStatsHandler)

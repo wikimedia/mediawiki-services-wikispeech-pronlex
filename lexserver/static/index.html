@@ -12,7 +12,7 @@ Fetch lexicon files and symbol sets from <a href="https://github.com/stts-se/lex
 <pre>
 
 github.com/stts-se/pronlex$ go run createEmptyDB/createEmptyDB.go pronlex.db
-github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa ~/gitrepos/lexdata/sv-se/nst/sv-se_ws-sampa.tab 
+github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa 
 github.com/stts-se/pronlex$ mv pronlex.db lexserver/
 
 github.com/stts-se/pronlex$ cd lexserver

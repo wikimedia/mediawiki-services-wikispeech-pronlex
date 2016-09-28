@@ -8,7 +8,21 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/stts-se/pronlex/dbapi"
 )
+
+func deleteUploadedFile(serverPath string) {
+	// when done, delete from server!
+	err := os.Remove(serverPath)
+	if err != nil {
+		msg := fmt.Sprintf("couldn't delete temp file from server : %v", err)
+		log.Println(msg)
+	} else {
+		msg := fmt.Sprint("the uploaded temp file has been deleted from server")
+		log.Println(msg)
+	}
+}
 
 func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -25,10 +39,8 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ssName := r.PostFormValue("symbolset_name")
+	symbolSetName := r.PostFormValue("symbolset_name")
 	lexName := r.PostFormValue("lexicon_name")
-	fmt.Println(ssName)
-	fmt.Println(lexName)
 
 	// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
@@ -56,31 +68,55 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	// _, err = importLexToDB.ImportLexicon(....)
-	// if err != nil {
-	// 	msg := fmt.Sprintf("couldn't import lexicon file : %v", err)
-	// 	err = os.Remove(serverPath)
-	// 	if err != nil {
-	// 		msg = fmt.Sprintf("%v (couldn't delete file from server)", msg)
-	// 	} else {
-	// 		msg = fmt.Sprintf("%v (the uploaded file has been deleted from server)", msg)
-	// 	}
-	// 	log.Println(msg)
-	// 	http.Error(w, msg, http.StatusInternalServerError)
-	// 	return
-	// }
+	_, err = dbapi.GetLexicon(db, lexName)
+	if err == nil {
+		msg := fmt.Sprintf("Nothing will be added. Lexicon already exists in database: %s", lexName)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		deleteUploadedFile(serverPath)
+		return
+	}
+
+	lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
+	lexicon, err = dbapi.InsertLexicon(db, lexicon)
+
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		deleteUploadedFile(serverPath)
+	}
+
+	logger := dbapi.StderrLogger{} // todo: other logger?!
+
+	errs := dbapi.ImportLexiconFile(db, logger, lexName, serverPath)
+
+	if len(errs) == 0 {
+		msg := fmt.Sprintf("lexicon file imported successfully : %v", handler.Filename)
+		log.Println(msg)
+	} else {
+		msg := fmt.Sprintf("couldn't import lexicon file : %v", errs)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		deleteUploadedFile(serverPath)
+		return
+	}
 
 	f.Close()
+	deleteUploadedFile(serverPath)
 
-	// when done, delete from server!
-	// err = os.Remove(serverPath)
-	// if err != nil {
-	// 	msg := fmt.Sprintf("couldn't delete file from server : %v", err)
-	// 	log.Println(msg)
-	// } else {
-	// 	msg := fmt.Sprint("the uploaded file has been deleted from server")
-	// 	log.Println(msg)
-	// }
+	entryCount, err := dbapi.EntryCount(db, lexicon.ID)
+	if err != nil {
+		msg := fmt.Sprintf("lexicon imported, but couldn't retrieve lexicon info from server : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
 
-	fmt.Fprintf(w, "%v", handler.Header)
+	info := LexWithEntryCount{
+		ID:            lexicon.ID,
+		Name:          lexicon.Name,
+		SymbolSetName: lexicon.SymbolSetName,
+		EntryCount:    entryCount,
+	}
+	fmt.Fprintf(w, "imported %v entries into lexicon '%v'", info.EntryCount, info.Name)
 }

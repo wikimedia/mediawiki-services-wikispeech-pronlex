@@ -82,7 +82,7 @@ LEXIMPORT.UploadFileModel = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
 		// Every thing ok, file uploaded
 		console.log("importLexiconFile returned response text ", xhr.responseText); // handle response.
-		self.message("Import completed without errors (NBNBNB only copying, no import is done yet 20160927)");
+		self.message("Import completed without errors: " + xhr.responseText);
 	    } else {
 		self.message("Import failed: " + xhr.responseText);
 	    };
@@ -91,6 +91,7 @@ LEXIMPORT.UploadFileModel = function () {
 	fd.append("symbolset_name", self.symbolSetName());
 	fd.append("lexicon_name", self.lexiconName());
 	fd.append("upload_file", self.selectedFile());
+	self.message("Importing, please wait ...");
 	xhr.send(fd);
     };
     

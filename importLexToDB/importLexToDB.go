@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/stts-se/pronlex/dbapi"
-	"github.com/stts-se/pronlex/symbolset"
 
 	"fmt"
 )
@@ -17,28 +16,21 @@ import (
 
 func main() {
 
-	sampleInvocation := `go run importLexToDB.go pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOL SET FOLDER]/sv-se_ws-sampa.tab`
+	sampleInvocation := `go run importLexToDB.go pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa`
 
-	if len(os.Args) != 6 {
-		log.Fatal("Expected <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FILE>", "\n\tSample invocation: ", sampleInvocation)
+	if len(os.Args) != 5 {
+		log.Fatal("Expected <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME>", "\n\tSample invocation: ", sampleInvocation)
 	}
 
 	dbFile := os.Args[1]
 	lexName := os.Args[2]
 	inFile := os.Args[3]
 	symbolSetName := os.Args[4]
-	ssFileName := os.Args[5]
 
 	_, err := os.Stat(dbFile)
 	if err != nil {
 		log.Fatalf("Cannot find db file. %v", err)
 	}
-
-	ss, err := symbolset.LoadSymbolSet(ssFileName) // symbolSetName, ssFileName, "SYMBOL", "IPA")
-	if err != nil {
-		log.Fatal(err)
-	}
-	symbolSet := ss.From
 
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
@@ -67,7 +59,7 @@ func main() {
 	logger := dbapi.StderrLogger{}
 	// TODO handle errors! Does it make sent to return array of error...?
 	var errs []error
-	errs = dbapi.ImportLexiconFile(db, logger, lexName, inFile, symbolSet)
+	errs = dbapi.ImportLexiconFile(db, logger, lexName, inFile)
 
 	if len(errs) == 0 {
 		logger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")

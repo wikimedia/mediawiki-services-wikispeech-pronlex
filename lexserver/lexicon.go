@@ -18,6 +18,42 @@ import (
 func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 
 	lexs, err := dbapi.ListLexicons(db) // TODO error handling
+	if err != nil {
+		http.Error(w, fmt.Sprintf("list lexicons failed : %v", err), http.StatusInternalServerError)
+		return
+	}
+	jsn, err := marshal(lexs, r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(jsn))
+}
+
+type LexWithEntryCount struct {
+	ID            int64  `json:"id"`
+	Name          string `json:"name"`
+	SymbolSetName string `json:"symbolSetName"`
+	EntryCount    int64  `json:"entryCount"`
+}
+
+func listLexsWithEntryCountHandler(w http.ResponseWriter, r *http.Request) {
+
+	lexs0, err := dbapi.ListLexicons(db) // TODO error handling
+	if err != nil {
+		http.Error(w, fmt.Sprintf("list lexicons failed : %v", err), http.StatusInternalServerError)
+		return
+	}
+	var lexs []LexWithEntryCount
+	for _, lex := range lexs0 {
+		entryCount, err := dbapi.EntryCount(db, lex.ID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("lexicon stats failed : %v", err), http.StatusInternalServerError)
+			return
+		}
+		lexs = append(lexs, LexWithEntryCount{ID: lex.ID, Name: lex.Name, SymbolSetName: lex.SymbolSetName, EntryCount: entryCount})
+	}
 	jsn, err := marshal(lexs, r)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)

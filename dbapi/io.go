@@ -10,8 +10,6 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/symbolset"
-	"github.com/stts-se/pronlex/vrules"
 )
 
 // Olika scenarion:
@@ -19,20 +17,12 @@ import (
 // Append
 // Uppdatera
 
-// func ImportSymbolSet(db *sql.DB, logger Logger, lexiconName, symbolSetName, lexiconFileName string) error {
-
-// }
-
-// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does check the symbol set. symbolSet is only used for logging invalid symbols in transcriptions.
-func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, symbolSet symbolset.Symbols) []error {
+// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any validation whatsoever of the transcriptions.
+func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string) []error {
 	var errs []error
-
-	ssRule := vrules.SymbolSetRule{symbolSet}
-	ssName := symbolSet.Name
 
 	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))
 	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
-	logger.Write(fmt.Sprintf("symbolSetName: %v", ssName))
 
 	fh, err := os.Open(lexiconFileName)
 	defer fh.Close()
@@ -100,13 +90,6 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 			logger.Write(msg)
 			errs = append(errs, fmt.Errorf("%v", msg))
 			return errs
-		}
-
-		for _, r := range ssRule.Validate(e) {
-			logger.Write(r.String())
-			errs = append(errs, fmt.Errorf("%v", r.String()))
-			//return fmt.Errorf("%v", r)
-			//panic(r) // shouldn't happen
 		}
 
 		eBuf = append(eBuf, e)
