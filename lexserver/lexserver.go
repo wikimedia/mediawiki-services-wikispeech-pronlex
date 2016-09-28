@@ -106,11 +106,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
-// Old junk
-// func listKnownHandler(w http.ResponseWriter, r *http.Request) {
-// 	http.ServeFile(w, r, "./static/listknown.html")
-// }
-
 func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
@@ -292,55 +287,6 @@ func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
 func adminEditSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
 }
-
-func listSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	var lexIDstr = r.FormValue("lexiconid")
-	lexID, err := strconv.ParseInt(lexIDstr, 10, 64)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("listSymbolSetHandler failed to parse lexicon id : %v", err), http.StatusBadRequest)
-		return
-	}
-	symbolSet, err := dbapi.GetSymbolSet(db, lexID)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("listSymbolSetHandler failed to get symbol set from db : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	res, err := json.Marshal(symbolSet)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("listSymbolSetHandler failed to marshal symbol set : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprint(w, string(res))
-}
-
-func saveSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Printf("failed reading request body %v : ", err)
-		http.Error(w, fmt.Sprintf("failed reading request body : %v", err), http.StatusInternalServerError)
-	}
-
-	var ss []dbapi.Symbol
-	err = json.Unmarshal(body, &ss)
-
-	if err != nil {
-		log.Printf("saveSymbolSetHandler %v\t%v", err, body)
-		http.Error(w, fmt.Sprintf("failed json unmashaling : %v", err), http.StatusBadRequest)
-		return
-	}
-	err = dbapi.SaveSymbolSet(db, ss)
-	if err != nil {
-		log.Printf("failed save symbol set %v\t%v", err, ss)
-		http.Error(w, fmt.Sprintf("failed saving symbol set : %v", err), http.StatusInternalServerError)
-		return
-	}
-}
-
-// func webSockTestHandler(w http.ResponseWriter, r *http.Request) {
-// 	http.ServeFile(w, r, "./static/websock_test.html")
-// }
 
 var wsChan = make(chan string)
 
@@ -820,8 +766,8 @@ func main() {
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
 	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
-	http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
-	http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
+	//http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
+	//http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
 	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 	http.HandleFunc("/admin/superdeletelexicon", superDeleteLexHandler)

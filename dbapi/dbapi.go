@@ -49,26 +49,6 @@ func Sqlite3WithRegex() {
 		})
 }
 
-// TODO not tested... but what could possibly go wrong...?:
-
-// DeleteUnusedSymbolSets deletes symbols, from the SYMBOLSET table, that have lexiconIDs that do not exist in the LEXICON table.
-func DeleteUnusedSymbolSets(db *sql.DB) error {
-	// TODO this should optimally be taken care of by restrictions/dependencies in the db
-	var sql = "DELETE FROM symbolset WHERE lexiconid NOT IN (SELECT id from lexicon)"
-	tx, err := db.Begin()
-	if err != nil {
-		return fmt.Errorf("DeleteUnusedSymbolSets failed starting transaction: %v", err)
-	}
-	defer tx.Commit()
-
-	_, err = tx.Exec(sql)
-	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("DeleteUnusedSymbolSets failed : %v", err)
-	}
-	return err
-}
-
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., Lexicon structs corresponding to the rows of the lexicon
 // table)
@@ -234,20 +214,6 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 
 // SuperDeleteLexicon deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
-// It also deletes all entries from the Symbolset table associated to the lexicon.
-// func SuperDeleteLexicon0(db *sql.DB, id int64) error {
-// 	fmt.Printf("DeleteLexicon called with id %d\n", id)
-// 	tx, err := db.Begin()
-// 	defer tx.Commit()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return SuperDeleteLexiconTx(tx, id)
-// }
-
-// SuperDeleteLexicon deletes the lexicon name from the lexicon
-// table and also whipes all associated entries out of existence.
-// It also deletes all entries from the Symbolset table associated to the lexicon.
 // TODO Send progress message to client over websocket
 func SuperDeleteLexicon(db *sql.DB, id int64) error {
 	tx, err := db.Begin()
@@ -260,20 +226,11 @@ func SuperDeleteLexicon(db *sql.DB, id int64) error {
 
 // SuperDeleteLexiconTx deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
-// It also deletes all entries from the Symbolset table associated to the lexicon.
 func SuperDeleteLexiconTx(tx *sql.Tx, id int64) error {
 
 	fmt.Println("dbapi.superDeleteLexiconTX was called")
 
-	_, err := tx.Exec("DELETE FROM symbolset WHERE lexiconid = ?", id)
-	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete symbol set : %v", err)
-	}
-
-	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from symbol set")
-
-	_, err = tx.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
+	_, err := tx.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete entries : %v", err)
@@ -289,7 +246,7 @@ func SuperDeleteLexiconTx(tx *sql.Tx, id int64) error {
 
 	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from lexicon set")
 
-	fmt.Printf("Deleting lexicon %d\n", id)
+	fmt.Printf("Deleted lexicon %d\n", id)
 
 	return nil
 }
@@ -1089,91 +1046,6 @@ func uniqIDs(ss []Symbol) []int64 {
 		res[i] = s.LexiconID
 	}
 	return unique(res)
-}
-
-// SaveSymbolSet saves list of symbols that share the same LexiconID
-// to the db. Prior to saving the list, it removes all current Symbols
-// of the same LexiconID
-func SaveSymbolSet(db *sql.DB, symbolSet []Symbol) error {
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		return fmt.Errorf("failed begin db transaction : %v", err)
-	}
-	return SaveSymbolSetTx(tx, symbolSet)
-}
-
-// SaveSymbolSetTx saves list of symbols that share the same LexiconID
-// to the db. Prior to saving the list, it removes all current Symbols
-// of the same LexiconID. Silently ingnores the symbol if Symbol.Symbol == "".
-func SaveSymbolSetTx(tx *sql.Tx, symbolSet []Symbol) error {
-	if len(symbolSet) == 0 {
-		return nil //li vanilli
-	}
-	unqIDs := uniqIDs(symbolSet)
-	if len(unqIDs) != 1 {
-		tx.Rollback()
-		return fmt.Errorf("cannot save set of symbols with different lexiconIDs %v : ", unqIDs)
-	}
-
-	// Nuke current symbol set for lexicon of ID id:
-	id := unqIDs[0]
-	_, err := tx.Exec("delete from symbolset where lexiconid = ?", id)
-	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("failed deleting current symbol set : %v", err)
-	}
-
-	for _, s := range symbolSet {
-		// TODO prepared statement?
-		//if trm(s.Symbol) != "" { // cannot trim spaces ...
-		_, err = tx.Exec("insert into symbolset (lexiconid, symbol, category, description, ipa) values (?, ?, ?, ?, ?)",
-			s.LexiconID, s.Symbol, s.Category, s.Description, s.IPA)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed inserting symbol : %v", err)
-		}
-		//}
-	}
-	return nil
-}
-
-// GetSymbolSet returns the set of Symbols defined for a lexicon with the given db id
-func GetSymbolSet(db *sql.DB, lexiconID int64) ([]Symbol, error) {
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		return []Symbol{}, fmt.Errorf("failed to start db transaction : %v", err)
-	}
-	return SymbolSetTx(tx, lexiconID)
-}
-
-// SymbolSetTx returns the set of Symbols defined for a lexicon with the given db id
-func SymbolSetTx(tx *sql.Tx, lexiconID int64) ([]Symbol, error) {
-	var res []Symbol
-	rows, err := tx.Query("select lexiconid, symbol, category, description, ipa from symbolset where lexiconid = ? order by id", lexiconID)
-	if err != nil {
-		return res, fmt.Errorf("failed db query : %v", err)
-	}
-	defer rows.Close()
-	var lexID int64
-	var symbol, category, description, ipa string
-	for rows.Next() {
-		rows.Scan(&lexID, &symbol, &category, &description, &ipa)
-		s := Symbol{
-			LexiconID:   lexID,
-			Symbol:      symbol,
-			Category:    category,
-			Description: description,
-			IPA:         ipa,
-		}
-		res = append(res, s)
-	}
-	if rows.Err() != nil {
-		return res, fmt.Errorf("error while reading db query result : %v", rows.Err())
-	}
-
-	return res, nil
 }
 
 // EntryCount counts the number of lines in a lexicon
