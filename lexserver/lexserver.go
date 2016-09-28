@@ -838,17 +838,19 @@ func main() {
 	http.HandleFunc("/admin/exportlexicon", exportLexiconHandler)
 
 	// TODO Split this main func into several files
+
+	http.HandleFunc("/symbolset", symbolSetHelpHandler)
+	http.HandleFunc("/symbolset/list", listSymbolSetsHandler)
+	http.HandleFunc("/symbolset/delete", deleteSymbolSetHandler)
+	http.HandleFunc("/symbolset/reload", reloadSymbolSetHandler)
+	http.HandleFunc("/symbolset/symbolset", symbolSetHandler)
+	http.HandleFunc("/symbolset_upload", uploadSymbolSetHandler)
+	http.HandleFunc("/symbolset_do_upload", doUploadSymbolSetHandler)
+
 	http.HandleFunc("/mapper", mapperHelpHandler)
 	http.HandleFunc("/mapper/list", listMappersHandler)
-	http.HandleFunc("/mapper/symbolsets", listSymbolSetsHandler)
-	http.HandleFunc("/mapper/deletesymbolset", deleteSymbolSetHandler)
-	http.HandleFunc("/mapper/reloadsymbolset", reloadOneSymbolSetHandler)
-	http.HandleFunc("/mapper/reloadsymbolsets", reloadAllSymbolSetsHandler)
-	http.HandleFunc("/mapper/symbolset", symbolSetHandler)
 	http.HandleFunc("/mapper/map", mapMapperHandler)
 	http.HandleFunc("/mapper/maptable", mapTableMapperHandler)
-	http.HandleFunc("/mapper_upload_symbolset", uploadMapperHandler)
-	http.HandleFunc("/mapper_do_upload", doUploadMapperHandler)
 
 	// TODO Why this http.StripPrefix? Looks odd.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))

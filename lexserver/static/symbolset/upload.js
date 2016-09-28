@@ -1,9 +1,9 @@
-var MAPPER = {};
+var SYMBOLSET = {};
 
-MAPPER.baseURL = window.location.origin;
+SYMBOLSET.baseURL = window.location.origin;
 
 // From http://stackoverflow.com/a/8809472
-MAPPER.generateUUID = function() {
+SYMBOLSET.generateUUID = function() {
     var d = new Date().getTime();
     if(window.performance && typeof window.performance.now === "function"){
         d += performance.now(); //use high-precision timer if available
@@ -17,11 +17,11 @@ MAPPER.generateUUID = function() {
 };
 
 
-MAPPER.UploadFileModel = function () {
+SYMBOLSET.UploadFileModel = function () {
     var self = this; 
     
     
-    self.uuid = MAPPER.generateUUID();
+    self.uuid = SYMBOLSET.generateUUID();
 
     self.serverMessage = ko.observable("_");
     
@@ -29,9 +29,9 @@ MAPPER.UploadFileModel = function () {
     self.serverMessages = ko.observableArray();
     
     self.connectWebSock = function() {
-	var zock = new WebSocket(MAPPER.baseURL.replace("http://", "ws://") + "/websockreg" );
+	var zock = new WebSocket(SYMBOLSET.baseURL.replace("http://", "ws://") + "/websockreg" );
 	zock.onopen = function() {
-	    console.log("MAPPER.connectWebSock: sending uuid over zock: "+ self.uuid);
+	    console.log("SYMBOLSET.connectWebSock: sending uuid over zock: "+ self.uuid);
 	    zock.send("CLIENT_ID: "+ self.uuid);
 	};
 	zock.onmessage = function(e) {
@@ -70,13 +70,13 @@ MAPPER.UploadFileModel = function () {
 
     self.uploadFile = function() {
 	console.log("uploading file: ", self.selectedFile())
-	var url = MAPPER.baseURL + "/mapper_do_upload"
+	var url = SYMBOLSET.baseURL + "/symbolset_do_upload"
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);
 	xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-		// Every thing ok, file uploaded
+		// Everything ok, file uploaded
 		console.log("uploadFile returned response text ", xhr.responseText); // handle response.
 		self.message("Upload completed without errors");
 	    } else {
@@ -90,7 +90,7 @@ MAPPER.UploadFileModel = function () {
     
 };
 
-var upload = new MAPPER.UploadFileModel();
+var upload = new SYMBOLSET.UploadFileModel();
 ko.applyBindings(upload);
 upload.connectWebSock();
 

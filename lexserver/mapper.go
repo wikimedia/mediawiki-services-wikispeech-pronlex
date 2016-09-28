@@ -1,14 +1,11 @@
 package main
 
-// The calls prefixed with '/mapper/'
-
 import (
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"sort"
 	"sync"
 	//"os"
 	"encoding/json"
@@ -70,51 +67,6 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	result := JsonMapped{Input: trans, Result: result0, From: fromName, To: toName}
 	j, err := json.Marshal(result)
-	if err != nil {
-		msg := fmt.Sprintf("json marshalling error : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprint(w, string(j))
-}
-
-type JsonSymbolSet struct {
-	Name    string
-	Symbols []JsonSymbol
-}
-
-type JsonSymbol struct {
-	Symbol string
-	IPA    string
-	Desc   string
-	Cat    string
-}
-
-func symbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
-	if len(strings.TrimSpace(name)) == 0 {
-		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	mMut.Lock()
-	symbolset0, ok := mMut.service.SymbolSets[name]
-	mMut.Unlock()
-	if !ok {
-		msg := fmt.Sprintf("failed getting symbol set : %v", name)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	symbolset := JsonSymbolSet{Name: symbolset0.Name}
-	symbolset.Symbols = make([]JsonSymbol, 0)
-	for _, sym := range symbolset0.Symbols {
-		symbolset.Symbols = append(symbolset.Symbols, JsonSymbol{Symbol: sym.Sym1.String, IPA: sym.Sym2.String, Desc: sym.Sym1.Desc, Cat: sym.Sym1.Cat.String()})
-	}
-
-	j, err := json.Marshal(symbolset)
 	if err != nil {
 		msg := fmt.Sprintf("json marshalling error : %v", err)
 		log.Println(msg)
@@ -186,139 +138,11 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
-func loadSymbolSets(dirName string) error {
-	mMut.Lock()
-	mMut.service.Clear()
-	mMut.Unlock()
-
-	symbolSets, err := loadSymbolSetsFromDir(dirName)
-	if err != nil {
-		return err
-	}
-	mMut.Lock()
-	mMut.service.SymbolSets = symbolSets
-	mMut.Unlock()
-	return nil
-}
-
-func reloadAllSymbolSetsHandler(w http.ResponseWriter, r *http.Request) {
-	err := loadSymbolSets(symbolSetFileArea)
-	if err != nil {
-		msg := err.Error()
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	mMut.Lock()
-	j, err := json.Marshal(symbolSetNames(mMut.service.SymbolSets))
-	mMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("json marshalling error : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprint(w, string(j))
-
-}
-
-func reloadOneSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
-	if len(strings.TrimSpace(name)) == 0 {
-		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	mMut.Lock()
-	err := mMut.service.Delete(name)
-	mMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("couldn't delete symbolset : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
-	mMut.Lock()
-	err = mMut.service.Load(serverPath)
-	mMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("couldn't load symbolset : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	msg := fmt.Sprintf("Reloaded symbol set %s", name)
-	fmt.Fprint(w, msg)
-
-}
-
-func deleteSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
-	if len(strings.TrimSpace(name)) == 0 {
-		msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	mMut.Lock()
-	err := mMut.service.Delete(name)
-	mMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("couldn't delete symbolset : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
-	if _, err := os.Stat(serverPath); err != nil {
-		if os.IsNotExist(err) {
-			msg := fmt.Sprintf("couldn't locate server file for symbol set %s", name)
-			log.Println(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
-			return
-		}
-	}
-
-	err = os.Remove(serverPath)
-	if err != nil {
-		msg := fmt.Sprintf("couldn't delete file from server : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	msg := fmt.Sprintf("Deleted symbol set %s", name)
-	fmt.Fprint(w, msg)
-}
-
 func listMappersHandler(w http.ResponseWriter, r *http.Request) {
 	mMut.Lock()
 	ms := mMut.service.MapperNames()
 	mMut.Unlock()
 	j, err := json.Marshal(ms)
-	if err != nil {
-		msg := fmt.Sprintf("failed to marshal struct : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(j))
-}
-
-func listSymbolSetsHandler(w http.ResponseWriter, r *http.Request) {
-	mMut.Lock()
-	ss := symbolSetNames(mMut.service.SymbolSets)
-	mMut.Unlock()
-	j, err := json.Marshal(ss)
 	if err != nil {
 		msg := fmt.Sprintf("failed to marshal struct : %v", err)
 		log.Println(msg)
@@ -339,26 +163,8 @@ func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
 <h2>list</h2> Lists cached mappers. Example invocation:
 <pre><a href="/mapper/list">/mapper/list</a></pre>
 
-<h2>reloadsymbolsets</h2> Reloads all symbol sets in the pre-defined folder. All mappers will also be removed from cache. Example invocation:
-<pre><a href="/mapper/reloadsymbolsets">/mapper/reloadsymbolsets</a></pre>
-
-<h2>reloadsymbolset</h2> Reloads a named symbol set. All affected mappers will be cleared from cache. Example invocation:
-<pre><a href="/mapper/reloadsymbolset?name=sv-se_nst-xsampa">/mapper/reloadsymbolset?name=sv-se_nst-xsampa</a></pre>
-
-<h2>symbolsets</h2> Lists available symbol sets. Example invocation:
-<pre><a href="/mapper/symbolsets">/mapper/symbolsets</a></pre>
-
-<h2>deletesymbolset</h2> Deletes a named symbol set. Example invocation:
-<pre><a href="/mapper/deletesymbolset?name=sv-se_nst-xsampa">/mapper/deletesymbolset?name=sv-se_nst-xsampa</a></pre>
-
-<h2>symbolset</h2> Lists content of a named symbolset. Example invocation:
-<pre><a href="/mapper/symbolset?name=sv-se_ws-sampa">/mapper/symbolset?name=sv-se_ws-sampa</a></pre>
-
 <h2>maptable</h2> Lists content of a maptable given two symbolset names. Example invocation:
 <pre><a href="/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary">/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary</a></pre>
-
-<h2>mapper_upload_symbolset</h2> Upload symbol set file
-<pre><a href="/mapper_upload_symbolset">/mapper_upload_symbolset</a></pre>		
 		`
 
 	fmt.Fprint(w, html)
@@ -432,17 +238,4 @@ func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
 	f.Close()
 
 	fmt.Fprintf(w, "%v", handler.Header)
-}
-
-type SymbolSetNames struct {
-	SymbolSetNames []string `json:symbol_set_names`
-}
-
-func symbolSetNames(sss map[string]symbolset.SymbolSet) SymbolSetNames {
-	var ssNames []string
-	for ss, _ := range sss {
-		ssNames = append(ssNames, ss)
-	}
-	sort.Strings(ssNames)
-	return SymbolSetNames{SymbolSetNames: ssNames}
 }
