@@ -195,4 +195,51 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+		return
+	}
+
+	clientUUID := r.FormValue("client_uuid")
+
+	if "" == strings.TrimSpace(clientUUID) {
+		msg := "adminDoLexImportHandler got no client uuid"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	conn, ok := webSocks.clients[clientUUID]
+	if !ok {
+		msg := fmt.Sprintf("adminDoLexImportHandler couldn't find connection for uuid %v", clientUUID)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	logger := dbapi.NewWebSockLogger(conn)
+
+	lexName := r.FormValue("lexicon_name")
+	lexicon, err := dbapi.GetLexicon(db, lexName)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("couldn't retrive lexicon : %v", err), http.StatusInternalServerError)
+		return
+	}
+	vMut.Lock()
+	v, err := vMut.service.ValidatorForName(lexicon.SymbolSetName)
+	vMut.Unlock()
+	if err != nil {
+		msg := fmt.Sprintf("lexiconRunValidateHandler failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	q := dbapi.Query{Lexicons: []dbapi.Lexicon{lexicon}}
+	stats, err := dbapi.Validate(db, logger, *v, q)
+	if err != nil {
+		msg := fmt.Sprintf("lexiconRunValidateHandler failed validate : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	fmt.Fprint(w, stats)
 }

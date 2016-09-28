@@ -22,7 +22,7 @@ func (v ValStats) increment(key string, incr int) {
 
 func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
 
-	stats := ValStats{}
+	stats := ValStats{Values: make(map[string]int)}
 
 	logger.Write(fmt.Sprintf("query: %v", q))
 
@@ -30,13 +30,18 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 	q.Page = 0       //todo?
 
 	ew := lex.EntrySliceWriter{}
+	logger.Write("Fetching entries from lexicon")
 	err := LookUp(db, q, &ew)
 	if err != nil {
 		return stats, fmt.Errorf("couldn't lookup for validation : %s", err)
 	}
 	stats.Values["Total"] = len(ew.Entries)
+	logger.Write(fmt.Sprintf("Found %d entries", len(ew.Entries)))
+
+	n := 0
 
 	for _, e := range ew.Entries {
+		n = n + 1
 		oldVal := e.EntryValidations
 		vd.ValidateEntry(&e)
 		newVal := e.EntryValidations
@@ -45,12 +50,17 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 		if len(oldVal) > 0 || len(newVal) > 0 {
 			UpdateEntry(db, e)
 		}
+		stats.increment("Validated", 1)
 		if len(newVal) > 0 {
 			stats.increment("Invalid", 1)
 		}
 		for _, v := range newVal {
 			stats.increment("Level:"+v.Level, 1)
 			stats.increment("Rule:"+v.RuleName, 1)
+		}
+		if n%10 == 0 {
+			msg := fmt.Sprintf("%v", stats)
+			logger.Write(msg)
 		}
 	}
 

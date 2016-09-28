@@ -33,6 +33,7 @@ func NewWebSockLogger(websock *websocket.Conn) WebSockLogger {
 }
 
 func (l WebSockLogger) Write(msg string) {
+	//log.Println(msg)
 	websocket.Message.Send(l.websock, msg)
 }
 

@@ -7,12 +7,14 @@
 
     <h1>Validate lexicon</h1>
 
+    WORK IN PROGRESS 20160928  /HL
+    
     <p>
       <span>
 
 	<form data-bind="submit: $root.runValidation">
 	  <table>
-	    <tr><td>Lexicon: </td><td><select data-bind="options: $root.lexNames, optionsCaption: 'Select lexicon', value: $root.lexName"></select></td></tr>
+	    <tr><td>Lexicon: </td><td><select data-bind="options: $root.availableLexicons, optionsCaption: 'Select lexicon', optionsText: 'name', value: $root.selectedLexicon"></select></td></tr>
 
 	    <tr><td colspan="2"><button data-bind="enable: $root.validForm" type="submit">Submit</button></td></tr>
 	  </table>

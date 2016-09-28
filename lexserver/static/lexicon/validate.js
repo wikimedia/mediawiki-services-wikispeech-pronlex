@@ -54,26 +54,26 @@ LEXVDATE.VdateModel = function () {
 	};
     };
     
-    self.lexName = ko.observable(null);
+    self.selectedLexicon = ko.observable(null);
     self.validForm = ko.computed(function() {
-	return (self.lexName() != null &&  self.lexName().trim() != "");
+	return (self.selectedLexicon() != null);
     });
     
-    self.lexNmaes = ko.observableArray();
+    self.availableLexicons = ko.observableArray();
 
-    self.loadLexNames = function () {
+    self.loadLexicons = function () {
 	$.getJSON(LEXVDATE.baseURL +"/lexicon/listlexicons")
 	    .done(function (data) {
-		self.lexNames(data);
+		self.availableLexicons(data);
 	    })
     	    .fail(function (xhr, textStatus, errorThrown) {
-		alert("loadLexNames says: "+ xhr.responseText);
+		alert("loadLexicons says: "+ xhr.responseText);
 	    });
     };
     
     
     self.runValidation = function() {
-	console.log("validating lexicon: ", self.lexName())
+	console.log("validating lexicon: ", self.selectedLexicon())
 	var url = LEXVDATE.baseURL + "/lex_do_validate"
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
@@ -82,22 +82,21 @@ LEXVDATE.VdateModel = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
 		// Every thing ok
 		console.log("runValidation returned response text ", xhr.responseText);
-		self.message("validation completed without errors: " + xhr.responseText);
+		self.message("Validation completed without errors: " + xhr.responseText);
 	    } else {
-		self.message("validation failed: " + xhr.responseText);
+		self.message("Validation failed: " + xhr.responseText);
 	    };
 	};
 	fd.append("client_uuid", self.uuid);
-	fd.append("lexicon_name", self.lexName());
-	fd.append("lexicon_id", self.lexId());
-	self.message("Validation, please wait ...");
+	fd.append("lexicon_name", self.selectedLexicon().name);
+	self.message("Validating, please wait ...");
 	xhr.send(fd);
     };
     
 };
 
 var vdate = new LEXVDATE.VdateModel();
-vdate.loadLexNames;
+vdate.loadLexicons();
 ko.applyBindings(vdate);
 vdate.connectWebSock();
 
