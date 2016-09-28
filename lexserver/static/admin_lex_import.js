@@ -23,10 +23,7 @@ LEXIMPORT.UploadFileModel = function () {
     
     self.uuid = LEXIMPORT.generateUUID();
 
-    self.serverMessage = ko.observable("_");
-    
-    self.maxMessages = 10;
-    self.serverMessages = ko.observableArray();
+    self.message = ko.observable("_");
     
     self.connectWebSock = function() {
 	var zock = new WebSocket(LEXIMPORT.baseURL.replace("http://", "ws://") + "/websockreg" );
@@ -42,11 +39,11 @@ LEXIMPORT.UploadFileModel = function () {
 		// var m = d.getMinutes();
 		// var s = d.getSeconds();
 		// var msg = "Websocket keepalive recieved "+ h +":"+ m +":"+ s;
-		// self.serverMessage(msg);
+		// self.message(msg);
 	    }
 	    else {
 		//console.log("Websocket got: "+ e.data)
-		self.serverMessage(e.data);
+		self.message(e.data);
 	    };
 	};
 	zock.onerror = function(e){
@@ -56,8 +53,6 @@ LEXIMPORT.UploadFileModel = function () {
 	    console.log("websocket got close event: "+ e.code)
 	};
     };
-    
-    self.message = ko.observable("");
     
     self.lexiconName = ko.observable(null);
     self.symbolSetName = ko.observable(null); // todo: dropdown list from /mapper/symbolsets ?

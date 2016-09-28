@@ -38,6 +38,14 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
+	conn, ok := webSocks.clients[clientUUID]
+	if !ok {
+		msg := fmt.Sprintf("adminDoLexImportHandler couldn't find connection for uuid %v", clientUUID)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	logger := dbapi.NewWebSockLogger(conn)
 
 	symbolSetName := r.PostFormValue("symbolset_name")
 	lexName := r.PostFormValue("lexicon_name")
@@ -85,8 +93,6 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		deleteUploadedFile(serverPath)
 	}
-
-	logger := dbapi.StderrLogger{} // todo: other logger?!
 
 	errs := dbapi.ImportLexiconFile(db, logger, lexName, serverPath)
 

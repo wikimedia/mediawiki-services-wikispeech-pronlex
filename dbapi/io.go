@@ -95,19 +95,39 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		eBuf = append(eBuf, e)
 		n++
 		if n%10000 == 0 {
+			msg2 := fmt.Sprintf("Inserting %d entries (total lines read: %d)  ...", len(eBuf), n)
+			logger.Write(msg2)
 			_, err = InsertEntries(db, lexicon, eBuf)
 			if err != nil {
 				var msg = fmt.Sprintf("lexserver failed to insert entries : %v", err)
 				logger.Write(msg)
 				errs = append(errs, fmt.Errorf("%v", msg))
 				return errs
+			} else {
+				msg2 := fmt.Sprintf("Inserted %d entries (total lines read: %d)", len(eBuf), n)
+				logger.Write(msg2)
 			}
 			eBuf = make([]lex.Entry, 0)
-			msg2 := fmt.Sprintf("Lines so far: %d", n)
+		}
+		if n%logger.LogInterval() == 0 {
+			msg2 := fmt.Sprintf("Lines read: %d", n)
 			logger.Write(msg2)
 		}
 	}
-	InsertEntries(db, lexicon, eBuf) // flushing the buffer
+	msg2 := fmt.Sprintf("Inserting %d entries (total lines read: %d)  ...", len(eBuf), n)
+	logger.Write(msg2)
+	_, err = InsertEntries(db, lexicon, eBuf) // flushing the buffer
+	if err != nil {
+		var msg = fmt.Sprintf("lexserver failed to insert entries : %v", err)
+		logger.Write(msg)
+		errs = append(errs, fmt.Errorf("%v", msg))
+		return errs
+	} else {
+		msg2 := fmt.Sprintf("Inserted %d entries (total lines read: %d)", len(eBuf), n)
+		logger.Write(msg2)
+	}
+
+	logger.Write("Finalizing ... ")
 
 	_, err = db.Exec("ANALYZE")
 	if err != nil {
