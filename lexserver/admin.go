@@ -94,13 +94,13 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		deleteUploadedFile(serverPath)
 	}
 
-	errs := dbapi.ImportLexiconFile(db, logger, lexName, serverPath)
+	err = dbapi.ImportLexiconFile(db, logger, lexName, serverPath)
 
-	if len(errs) == 0 {
+	if err == nil {
 		msg := fmt.Sprintf("lexicon file imported successfully : %v", handler.Filename)
 		log.Println(msg)
 	} else {
-		msg := fmt.Sprintf("couldn't import lexicon file : %v", errs)
+		msg := fmt.Sprintf("couldn't import lexicon file : %v", err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		deleteUploadedFile(serverPath)

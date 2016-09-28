@@ -18,8 +18,7 @@ import (
 // Uppdatera
 
 // ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any validation whatsoever of the transcriptions.
-func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string) []error {
-	var errs []error
+func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string) error {
 
 	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))
 	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
@@ -29,8 +28,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexionFile failed to open file : %v", err)
 		logger.Write(msg)
-		errs = append(errs, fmt.Errorf("%v", msg))
-		return errs
+		return fmt.Errorf("%v", msg)
 	}
 
 	var s *bufio.Scanner
@@ -39,8 +37,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		if err != nil {
 			var msg = fmt.Sprintf("ImportLexionFile failed to open gz reader : %v", err)
 			logger.Write(msg)
-			errs = append(errs, fmt.Errorf("%v", msg))
-			return errs
+			return fmt.Errorf("%v", msg)
 		}
 		s = bufio.NewScanner(gz)
 	} else {
@@ -51,16 +48,14 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	if err != nil {
 		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
 		logger.Write(msg)
-		errs = append(errs, fmt.Errorf("%v", msg))
-		return errs
+		return fmt.Errorf("%v", msg)
 	}
 
 	lexicon, err := GetLexicon(db, lexiconName)
 	if err != nil {
 		var msg = fmt.Sprintf("lexserver failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
 		logger.Write(msg)
-		errs = append(errs, fmt.Errorf("%v", msg))
-		return errs
+		return fmt.Errorf("%v", msg)
 	}
 
 	msg := fmt.Sprintf("Trying to load file: %s", lexiconFileName)
@@ -72,8 +67,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		if err := s.Err(); err != nil {
 			var msg = fmt.Sprintf("error when reading lines from lexicon file : %v", err)
 			logger.Write(msg)
-			errs = append(errs, fmt.Errorf("%v", msg))
-			return errs
+			return fmt.Errorf("%v", msg)
 		}
 		l := s.Text()
 
@@ -88,8 +82,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		if err != nil {
 			var msg = fmt.Sprintf("couldn't parse line to entry : %v", err)
 			logger.Write(msg)
-			errs = append(errs, fmt.Errorf("%v", msg))
-			return errs
+			return fmt.Errorf("%v", msg)
 		}
 
 		eBuf = append(eBuf, e)
@@ -101,8 +94,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 			if err != nil {
 				var msg = fmt.Sprintf("lexserver failed to insert entries : %v", err)
 				logger.Write(msg)
-				errs = append(errs, fmt.Errorf("%v", msg))
-				return errs
+				return fmt.Errorf("%v", msg)
 			} else {
 				msg2 := fmt.Sprintf("Inserted entries (total lines read: %d)", n)
 				logger.Write(msg2)
@@ -120,8 +112,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	if err != nil {
 		var msg = fmt.Sprintf("lexserver failed to insert entries : %v", err)
 		logger.Write(msg)
-		errs = append(errs, fmt.Errorf("%v", msg))
-		return errs
+		return fmt.Errorf("%v", msg)
 	} else {
 		msg2 := fmt.Sprintf("Inserted entries (total lines read: %d)", n)
 		logger.Write(msg2)
@@ -133,8 +124,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	if err != nil {
 		var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
 		logger.Write(msg)
-		errs = append(errs, fmt.Errorf("%v", msg))
-		return errs
+		return fmt.Errorf("%v", msg)
 	}
 
 	msg3 := fmt.Sprintf("Lines read:\t%d", n)
@@ -143,9 +133,8 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	if err := s.Err(); err != nil {
 		msg4 := fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
 		logger.Write(msg4)
-		errs = append(errs, fmt.Errorf("%v", msg4))
-		return errs
+		return fmt.Errorf("%v", msg4)
 	}
 
-	return errs
+	return nil
 }

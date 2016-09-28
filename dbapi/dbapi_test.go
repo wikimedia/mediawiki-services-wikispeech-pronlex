@@ -346,9 +346,9 @@ func Test_ImportLexiconFile(t *testing.T) {
 	}
 
 	// actual tests start here
-	errs := ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt")
-	if len(errs) > 0 {
-		t.Errorf(fs, nil, errs)
+	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt")
+	if err != nil {
+		t.Errorf(fs, nil, err)
 	}
 
 	q := Query{Words: []string{"sprängstoff"}}
@@ -485,9 +485,9 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	}
 
 	// actual tests start here
-	errs := ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt.gz")
-	if len(errs) > 0 {
-		t.Errorf(fs, nil, errs)
+	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt.gz")
+	if err != nil {
+		t.Errorf(fs, nil, err)
 	}
 
 	q := Query{Words: []string{"sprängstoff"}}

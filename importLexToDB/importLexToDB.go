@@ -58,16 +58,18 @@ func main() {
 
 	logger := dbapi.StderrLogger{}
 	// TODO handle errors! Does it make sent to return array of error...?
-	var errs []error
-	errs = dbapi.ImportLexiconFile(db, logger, lexName, inFile)
+	err = dbapi.ImportLexiconFile(db, logger, lexName, inFile)
 
-	if len(errs) == 0 {
-		logger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")
-		_, err = db.Exec("ANALYZE")
-		if err != nil {
-			logger.Write(fmt.Sprintf("failed to run ANALYZE command : %v", err))
-			return
-		}
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	logger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")
+	_, err = db.Exec("ANALYZE")
+	if err != nil {
+		logger.Write(fmt.Sprintf("failed to run ANALYZE command : %v", err))
+		return
 	}
 
 	logger.Write("finished importing lexicon file")
