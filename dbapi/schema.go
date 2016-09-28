@@ -10,6 +10,7 @@ CREATE TABLE Lexicon (
     id integer not null primary key autoincrement
   );
 CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);
+CREATE UNIQUE INDEX namesymset on Lexicon (name, symbolSetName);
 
 -- Symbol set handling moved to file based solution
 -- A symbol set is the definition of allowed symbols in a lexicons phonetical transcriptions
@@ -107,14 +108,14 @@ CREATE TABLE Transcription (
 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX traeid ON Transcription (entryId);
 
-CREATE TABLE TranscriptionStatus (
-    name varchar(128) not null,
-    source varchar(128) not null,
-    timestamp timestamp not null,
-    transcriptionId integer not null,
-    id integer not null primary key autoincrement,
-foreign key (transcriptionId) references Transcription(id) on delete cascade);
-CREATE INDEX nizze ON TranscriptionStatus (transcriptionId); 
+-- CREATE TABLE TranscriptionStatus (
+--    name varchar(128) not null,
+--    source varchar(128) not null,
+--    timestamp timestamp not null,
+--    transcriptionId integer not null,
+--    id integer not null primary key autoincrement,
+-- foreign key (transcriptionId) references Transcription(id) on delete cascade);
+-- CREATE INDEX nizze ON TranscriptionStatus (transcriptionId); 
 
 -- Linking table between a lemma form and its different surface forms 
 CREATE TABLE Lemma2Entry (
