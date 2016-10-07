@@ -12,26 +12,22 @@ Obtain lexicon data files from the [lexdata](https://github.com/stts-se/lexdata)
 
 Clone pronlex under src/github.com/stts-se/ in your [GOPATH](https://golang.org/doc/code.html#GOPATH) root.
 
-```
-cd pronlex/createEmptyDB/
-go get
-go install
-cd ../importLexToDB
-go install
-cd ../lexserver
-go install
-
-
 Make sure GOPATH/bin is in $PATH
-```
 
 ---
 Create a pronlex.db and place it in the lexserver directory.
 
 ```
-github.com/stts-se/pronlex/lexserver$ createEmptyDB pronlex.db
-github.com/stts-se/pronlex/lexserver$ importLexToDB pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa [SYMBOL SET FOLDER]/sv-se_ws-sampa.tab
-github.com/stts-se/pronlex/lexserver$ go run lexserver.go mapper.go lexicon.go validation.go
+github.com/stts-se/pronlex$ go run createEmptyDB/createEmptyDB.go pronlex.db
+github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst [LEXDATA]/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa 
+github.com/stts-se/pronlex$ mv pronlex.db lexserver/
+
+github.com/stts-se/pronlex$ cd lexserver
+
+github.com/stts-se/pronlex/lexserver$ mkdir symbol_set_file_area
+github.com/stts-se/pronlex/lexserver$ cp [LEXDATA]/*/*/*.tab symbol_set_file_area
+
+github.com/stts-se/pronlex/lexserver$ go run *.go
 ```
 
 
