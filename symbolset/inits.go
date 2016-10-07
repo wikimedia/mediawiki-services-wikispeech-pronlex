@@ -148,7 +148,9 @@ func NewSymbolSet(name string, fromName string, toName string, symbolList []Symb
 	for _, pair := range symbolList {
 		s1 := pair.Sym1
 		s2 := pair.Sym2
-		symbolMap[s1.String] = s2
+		if _, ok := symbolMap[s1.String]; !ok {
+			symbolMap[s1.String] = s2
+		}
 		fromSymbols = append(fromSymbols, s1)
 		toSymbols = append(toSymbols, s2)
 	}
