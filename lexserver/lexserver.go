@@ -761,6 +761,7 @@ func main() {
 	http.HandleFunc("/validateentries", apiChangedHandler("/validation/validateentries"))
 	http.HandleFunc("/validation", validationHelpHandler)
 	http.HandleFunc("/validation/list", listValidationHandler)
+	http.HandleFunc("/validation/stats", validationStatsHandler)
 
 	http.HandleFunc("/download", downloadFileHandler)
 

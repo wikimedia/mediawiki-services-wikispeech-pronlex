@@ -40,6 +40,9 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 
 	n := 0
 
+	chunkSize := 1000
+	var chunk []lex.Entry
+
 	for _, e := range ew.Entries {
 		n = n + 1
 		oldVal := e.EntryValidations
@@ -48,7 +51,7 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 
 		// if entry is updated with validations, update entry in db
 		if len(oldVal) > 0 || len(newVal) > 0 {
-			UpdateEntry(db, e)
+			chunk = append(chunk, e)
 		}
 		stats.increment("Validated", 1)
 		if len(newVal) > 0 {
@@ -62,6 +65,20 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 			msg := fmt.Sprintf("%v", stats)
 			logger.Write(msg)
 		}
+		if n%chunkSize == 0 {
+			err := UpdateValidation(db, chunk)
+			if err != nil {
+				return stats, fmt.Errorf("couldn't update validation : %s", err)
+			}
+			chunk = []lex.Entry{}
+		}
+	}
+	if len(chunk) > 0 {
+		err := UpdateValidation(db, chunk)
+		if err != nil {
+			return stats, fmt.Errorf("couldn't update validation : %s", err)
+		}
+		chunk = []lex.Entry{}
 	}
 
 	return stats, nil

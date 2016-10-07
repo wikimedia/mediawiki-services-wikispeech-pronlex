@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 
+	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/vrules"
@@ -129,6 +131,39 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(res0))
 }
 
+func validationStatsHandler(w http.ResponseWriter, r *http.Request) {
+	lexiconIdS := r.FormValue("lexiconId")
+	if len(strings.TrimSpace(lexiconIdS)) == 0 {
+		msg := fmt.Sprintf("lexicon id should be specified by variable 'lexiconId'")
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	lexiconId, err := strconv.Atoi(lexiconIdS)
+	if err != nil {
+		msg := fmt.Sprintf("lexicon id should be an integer")
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	stats, err := dbapi.ValidationStats(db, lexiconId)
+	if err != nil {
+		msg := fmt.Sprintf("lexiconRunValidateHandler failed to retreive validation stats : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	j, err := json.Marshal(stats)
+	if err != nil {
+		msg := fmt.Sprintf("lexserver: Failed to marshal stats : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(j))
+}
+
 var trimWhitespaceRe = regexp.MustCompile("[\\s]+")
 
 func trimTranscriptions(e *lex.Entry) {
@@ -201,6 +236,9 @@ func validationHelpHandler(w http.ResponseWriter, r *http.Request) {
 
 <h2>list</h2> Lists available validators. Example invocation:
 <pre><a href="/validation/list">/validation/list</a></pre>
+
+<h2>stats</h2> Lists validation stats. Example invocation:
+<pre><a href="/validation/stats?lexiconId=1">/validation/stats?lexiconId=1</a></pre>
 		`
 
 	fmt.Fprint(w, html)
