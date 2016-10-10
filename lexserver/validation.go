@@ -148,7 +148,7 @@ func validationStatsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	stats, err := dbapi.ValidationStats(db, lexiconId)
 	if err != nil {
-		msg := fmt.Sprintf("lexiconRunValidateHandler failed to retreive validation stats : %v", err)
+		msg := fmt.Sprintf("validationStatsHandler failed to retreive validation stats : %v", err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return

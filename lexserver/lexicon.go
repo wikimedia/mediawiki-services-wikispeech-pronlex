@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
@@ -200,6 +201,8 @@ func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	start := time.Now()
+
 	clientUUID := r.FormValue("client_uuid")
 
 	if "" == strings.TrimSpace(clientUUID) {
@@ -241,5 +244,26 @@ func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
+	dur := round(time.Since(start), time.Second)
+	fmt.Fprintf(w, "\nDuration %v\n", dur)
 	fmt.Fprint(w, stats)
+}
+
+func round(d, r time.Duration) time.Duration {
+	if r <= 0 {
+		return d
+	}
+	neg := d < 0
+	if neg {
+		d = -d
+	}
+	if m := d % r; m+m < r {
+		d = d - m
+	} else {
+		d = d + r - m
+	}
+	if neg {
+		return -d
+	}
+	return d
 }

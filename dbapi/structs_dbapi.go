@@ -126,3 +126,10 @@ type LexStats struct {
 	// TODO better structure for status/freq (string/int)
 	StatusFrequencies []string `json:"statusFrequencies"`
 }
+
+// QueryStats holds the result of a call to the dbapi.LexiconStats function.
+// TODO add fields for additional stats
+type QueryStats struct {
+	Query   Query `json:"query"`
+	Entries int64 `json:"entries"`
+}

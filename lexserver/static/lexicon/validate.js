@@ -82,7 +82,7 @@ LEXVDATE.VdateModel = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
 		// Every thing ok
 		console.log("runValidation returned response text ", xhr.responseText);
-		self.message("Validation completed without errors: " + xhr.responseText);
+		self.message("Validation completed without errors. " + xhr.responseText);
 	    } else {
 		self.message("Validation failed: " + xhr.responseText);
 	    };

@@ -494,6 +494,24 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (lex.Lemma, error) {
 	return res, nil
 }
 
+// QueryStats takes a Query struct, searches the lexicon db, and generates statistics on what the query matches in the database
+// work in progress
+// func QueryStats(db *sql.DB, q Query) (QueryStats, error) {
+// 	tx, err := db.Begin()
+// 	defer tx.Commit()
+// 	if err != nil {
+// 		tx.Rollback()
+// 		return nil, fmt.Errorf("failed to initialize transaction : %v", err)
+// 	}
+// 	return QueryStatsTx(tx, q)
+// }
+
+// func QueryStatsTx(tx *sql.Tx, q Query, out lex.EntryWriter) (QueryStats, error) {
+
+// 	sqlString, values := CountEntriesSQL(q)
+// 	return nil, nil
+// }
+
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
 func LookUp(db *sql.DB, q Query, out lex.EntryWriter) error {

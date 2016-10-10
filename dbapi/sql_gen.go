@@ -221,15 +221,18 @@ func ToLower(ss []string) []string {
 
 // This is not sane.
 
-// Queries db for all entries with transcriptions and optional lemma forms.
-var baseSQL = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp
-FROM lexicon, entry, transcription 
+var baseSQLFrom = `FROM lexicon, entry, transcription 
 LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id 
 LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid 
 LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1
 LEFT JOIN entryvalidation ON entryvalidation.entryid = entry.id 
 WHERE entry.id = transcription.entryid AND entry.lexiconid = lexicon.id` // entry.lexiconid = lexicon.id needed when no single input lexicon ID is given
 // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+
+// Queries db for all entries with transcriptions and optional lemma forms.
+var baseSQLSelect = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp ` + baseSQLFrom
+
+var baseSQLCount = `SELECT count(entry.id) ` + baseSQLFrom + " group by entry.id"
 
 // SelectEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
@@ -238,7 +241,7 @@ func SelectEntriesSQL(q Query) (string, []interface{}) {
 	var sqlQuery string
 	var args []interface{}
 
-	sqlQuery += baseSQL
+	sqlQuery += baseSQLSelect
 
 	// Query.Lexicons
 	l, lv := lexicons(q)
@@ -267,6 +270,42 @@ func SelectEntriesSQL(q Query) (string, []interface{}) {
 	if q.PageLength > 0 || q.Page > 0 {
 		sqlQuery += " LIMIT " + strconv.FormatInt(q.PageLength, 10) + " OFFSET " + strconv.FormatInt(q.PageLength*q.Page, 10)
 	}
+	return sqlQuery, args
+
+}
+
+func appendQuery(sql string, q Query) (string, []interface{}) {
+	var args []interface{}
+	// Query.Lexicons
+	l, lv := lexicons(q)
+	args = append(args, lv...)
+	// Query.Words, Query.WordsLike, Query.PartOfSpeechLike, Query.WordsRegexp, Query.PartOfSpeechRegexp
+	w, wv := words(q)
+	args = append(args, wv...)
+	// Query.Lemmas, Query.LemmaLike, Query.ReadingLike, Query.ParadigmLike, Query.LemmaRegexp, Query.ReadingRegexp, Query.ParadigmRegexp
+	le, lev := lemmas(q)
+	args = append(args, lev...)
+	// Query.TranscriptionLike, Query.TranscriptionRegexp
+	t, tv := transcriptions(q) // V2 simply returns 'transkription.strn like ?' + param value
+	args = append(args, tv...)
+
+	// puts together pieces of sql created above with " and " in between
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " AND "))
+	if "" != qRes {
+		sql = " AND " + qRes
+	}
+	return sql, args
+}
+
+// CountEntriesSQL creates a SQL query string based on the values of
+// a Query struct instance, along with a slice of values,
+// corresponding to the params to be set (the '?':s of the query)
+func CountEntriesSQL(q Query) (string, []interface{}) {
+	var sqlQuery string
+
+	sqlQuery += baseSQLCount
+	sqlQuery, args := appendQuery(sqlQuery, q)
+
 	return sqlQuery, args
 
 }

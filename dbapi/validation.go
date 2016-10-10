@@ -2,6 +2,7 @@ package dbapi
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/stts-se/pronlex/lex"
@@ -9,7 +10,7 @@ import (
 )
 
 type ValStats struct {
-	Values map[string]int
+	Values map[string]int `json:"values"`
 }
 
 func (v ValStats) increment(key string, incr int) {
@@ -62,7 +63,11 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 			stats.increment("Rule:"+v.RuleName, 1)
 		}
 		if n%10 == 0 {
-			msg := fmt.Sprintf("%v", stats)
+			js, err := json.Marshal(stats)
+			if err != nil {
+				return stats, fmt.Errorf("couldn't marshal validation stats : %s", err)
+			}
+			msg := fmt.Sprintf("%s", js)
 			logger.Write(msg)
 		}
 		if n%chunkSize == 0 {
