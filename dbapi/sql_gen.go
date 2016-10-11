@@ -234,6 +234,8 @@ var baseSQLSelect = `SELECT lexicon.id, entry.id, entry.strn, entry.language, en
 
 var baseSQLCount = `SELECT count(distinct entry.id) ` + baseSQLFrom
 
+var baseSQLSelectIds = `SELECT distinct entry.id ` + baseSQLFrom
+
 // sqlStmt container class for prepared sql statement:
 // sql is a plain sql string with selects and '?' for arguments to be populated
 // values is a range of values corresponding to the '?' arguments in the sql string
@@ -282,6 +284,14 @@ func SelectEntriesSQL(q Query) sqlStmt {
 	}
 	return sqlStmt{sql: sqlQuery, values: args}
 
+}
+
+// SelectEntryIdsSQL creates a SQL query string based on the values of
+// a Query struct instance, along with a slice of values,
+// corresponding to the params to be set (the '?':s of the query)
+func SelectEntryIdsSQL(q Query) sqlStmt {
+	sqlQuery, args := appendQuery(baseSQLSelectIds, q)
+	return sqlStmt{sql: sqlQuery, values: args}
 }
 
 // CountEntriesSQL creates a SQL query string based on the values of
