@@ -494,23 +494,44 @@ func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (lex.Lemma, error) {
 	return res, nil
 }
 
-// QueryStats takes a Query struct, searches the lexicon db, and generates statistics on what the query matches in the database
-// work in progress
-// func QueryStats(db *sql.DB, q Query) (QueryStats, error) {
-// 	tx, err := db.Begin()
-// 	defer tx.Commit()
-// 	if err != nil {
-// 		tx.Rollback()
-// 		return nil, fmt.Errorf("failed to initialize transaction : %v", err)
-// 	}
-// 	return QueryStatsTx(tx, q)
-// }
+// LookUpIds takes a Query struct, searches the lexicon db, and writes the result to a slice of ids
+func LookUpIds(db *sql.DB, q Query) ([]int64, error) {
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to initialize transaction : %v", err)
+	}
+	return LookUpIdsTx(tx, q)
+}
 
-// func QueryStatsTx(tx *sql.Tx, q Query, out lex.EntryWriter) (QueryStats, error) {
+// LookUpIdsTx takes a Query struct, searches the lexicon db, and returns a slice of ids
+func LookUpIdsTx(tx *sql.Tx, q Query) ([]int64, error) {
 
-// 	sqlString, values := CountEntriesSQL(q)
-// 	return nil, nil
-// }
+	sqlStmt := SelectEntryIdsSQL(q)
+
+	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
+	if err != nil {
+		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []int64
+	for rows.Next() {
+		var entryID int64
+		rows.Scan(
+			&entryID,
+		)
+		result = append(result, entryID)
+	}
+	if rows.Err() != nil {
+		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		return nil, rows.Err()
+	}
+
+	return result, nil
+}
 
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
@@ -774,10 +795,7 @@ func UpdateValidation(db *sql.DB, entries []lex.Entry) error {
 	}
 
 	for _, e := range entries {
-		var esw lex.EntrySliceWriter
-		err = LookUpTx(tx, Query{EntryIDs: []int64{e.ID}}, &esw)
-		dbEntries := esw.Entries
-		_, err := updateEntryValidation(tx, e, dbEntries[0])
+		_, err := updateEntryValidationForce(tx, e)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed updating validation : %v", err)
@@ -1045,6 +1063,21 @@ func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidatio
 		}
 	}
 	return nil
+}
+
+func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
+	_, err := tx.Exec("DELETE FROM entryvalidation WHERE entryid = ?", e.ID)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("failed deleting EntryValidation : %v", err)
+	}
+
+	err = insertEntryValidations(tx, e, e.EntryValidations)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
