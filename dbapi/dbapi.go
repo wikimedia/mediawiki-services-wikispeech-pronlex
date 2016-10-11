@@ -531,13 +531,13 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 
 	//fmt.Printf("QUWRY %v\n\n", q)
 
-	sqlString, values := SelectEntriesSQL(q)
+	sqlStmt := SelectEntriesSQL(q)
 
 	//fmt.Printf("SQL %v\n\n", sqlString)
 
 	//fmt.Printf("VALUES %v\n\n", values)
 
-	rows, err := tx.Query(sqlString, values...)
+	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
 	if err != nil {
 		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return err

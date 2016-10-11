@@ -94,14 +94,14 @@ func TestSql_nQs(t *testing.T) {
 
 func TestSql_SelectEntriesSQL(t *testing.T) {
 	q := Query{LemmaLike: "%gal_", ReadingLike: "%grus_"}
-	sqlS, vs := SelectEntriesSQL(q)
-	if sqlS == "" {
-		t.Error(fs, "non empty", sqlS)
+	sq := SelectEntriesSQL(q)
+	if sq.sql == "" {
+		t.Error(fs, "non empty", sq.sql)
 	}
 
 	//fmt.Printf("%s\n\n%v\n", sqlS, vs)
 
-	if len(vs) != 2 {
-		t.Error(fs, 2, len(vs))
+	if len(sq.values) != 2 {
+		t.Error(fs, 2, len(sq.values))
 	}
 }

@@ -232,50 +232,19 @@ WHERE entry.id = transcription.entryid AND entry.lexiconid = lexicon.id` // entr
 // Queries db for all entries with transcriptions and optional lemma forms.
 var baseSQLSelect = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp ` + baseSQLFrom
 
-var baseSQLCount = `SELECT count(entry.id) ` + baseSQLFrom + " group by entry.id"
+var baseSQLCount = `SELECT count(distinct entry.id) ` + baseSQLFrom
 
-// SelectEntriesSQL creates a SQL query string based on the values of
-// a Query struct instance, along with a slice of values,
-// corresponding to the params to be set (the '?':s of the query)
-func SelectEntriesSQL(q Query) (string, []interface{}) {
-	var sqlQuery string
-	var args []interface{}
-
-	sqlQuery += baseSQLSelect
-
-	// Query.Lexicons
-	l, lv := lexicons(q)
-	args = append(args, lv...)
-	// Query.Words, Query.WordsLike, Query.PartOfSpeechLike, Query.WordsRegexp, Query.PartOfSpeechRegexp
-	w, wv := words(q)
-	args = append(args, wv...)
-	// Query.Lemmas, Query.LemmaLike, Query.ReadingLike, Query.ParadigmLike, Query.LemmaRegexp, Query.ReadingRegexp, Query.ParadigmRegexp
-	le, lev := lemmas(q)
-	args = append(args, lev...)
-	// Query.TranscriptionLike, Query.TranscriptionRegexp
-	t, tv := transcriptions(q) // V2 simply returns 'transkription.strn like ?' + param value
-	args = append(args, tv...)
-
-	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " AND "))
-	if "" != qRes {
-		sqlQuery += " AND " + qRes
-	}
-
-	// sort by id to make sql rows -> Entry simpler
-	sqlQuery += " ORDER BY entry.id, transcription.id"
-
-	// When both PageLenth and Page values are zero, no page limit is used
-	// This is useful for example when exporting a complete lexicon
-	if q.PageLength > 0 || q.Page > 0 {
-		sqlQuery += " LIMIT " + strconv.FormatInt(q.PageLength, 10) + " OFFSET " + strconv.FormatInt(q.PageLength*q.Page, 10)
-	}
-	return sqlQuery, args
-
+// sqlStmt container class for prepared sql statement:
+// sql is a plain sql string with selects and '?' for arguments to be populated
+// values is a range of values corresponding to the '?' arguments in the sql string
+type sqlStmt struct {
+	sql    string
+	values []interface{}
 }
 
 func appendQuery(sql string, q Query) (string, []interface{}) {
 	var args []interface{}
+
 	// Query.Lexicons
 	l, lv := lexicons(q)
 	args = append(args, lv...)
@@ -292,22 +261,35 @@ func appendQuery(sql string, q Query) (string, []interface{}) {
 	// puts together pieces of sql created above with " and " in between
 	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " AND "))
 	if "" != qRes {
-		sql = " AND " + qRes
+		sql += " AND " + qRes
 	}
 	return sql, args
+}
+
+// SelectEntriesSQL creates a SQL query string based on the values of
+// a Query struct instance, along with a slice of values,
+// corresponding to the params to be set (the '?':s of the query)
+func SelectEntriesSQL(q Query) sqlStmt {
+	sqlQuery, args := appendQuery(baseSQLSelect, q)
+
+	// sort by id to make sql rows -> Entry simpler
+	sqlQuery += " ORDER BY entry.id, transcription.id"
+
+	// When both PageLength and Page values are zero, no page limit is used
+	// This is useful for example when exporting a complete lexicon
+	if q.PageLength > 0 || q.Page > 0 {
+		sqlQuery += " LIMIT " + strconv.FormatInt(q.PageLength, 10) + " OFFSET " + strconv.FormatInt(q.PageLength*q.Page, 10)
+	}
+	return sqlStmt{sql: sqlQuery, values: args}
+
 }
 
 // CountEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
-func CountEntriesSQL(q Query) (string, []interface{}) {
-	var sqlQuery string
-
-	sqlQuery += baseSQLCount
-	sqlQuery, args := appendQuery(sqlQuery, q)
-
-	return sqlQuery, args
-
+func CountEntriesSQL(q Query) sqlStmt {
+	sqlQuery, args := appendQuery(baseSQLCount, q)
+	return sqlStmt{sql: sqlQuery, values: args}
 }
 
 // // entriesFromIdsSelect builds an sql select and returns it along with slice of matching id values
