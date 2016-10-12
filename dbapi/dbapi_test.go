@@ -28,12 +28,14 @@ func TestMain(m *testing.M) {
 
 func Test_InsertEntries(t *testing.T) {
 
-	err := os.Remove("./testlex.db")
-	ff("failed to remove testlex.db : %v", err)
+	dbPath := "./testlex.db"
 
-	//Sqlite3WithRegex()
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		err := os.Remove(dbPath)
+		ff("failed to remove "+dbPath+" : %v", err)
+	}
 
-	db, err := sql.Open("sqlite3_with_regexp", "./testlex.db")
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}

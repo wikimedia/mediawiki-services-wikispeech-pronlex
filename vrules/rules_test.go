@@ -81,7 +81,7 @@ func Test1(t *testing.T) {
 		},
 	}
 
-	var result = vali.Validate([]*lex.Entry{e})
+	var result = vali.ValidateEntries([]*lex.Entry{e})
 
 	if result != true {
 		t.Errorf(fsExp, make([]validation.Result, 0), result)
@@ -100,7 +100,7 @@ func Test2(t *testing.T) {
 		Transcriptions: []lex.Transcription{},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
@@ -137,7 +137,7 @@ func Test3(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
@@ -173,7 +173,7 @@ func Test4(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -207,7 +207,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -230,7 +230,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -254,7 +254,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -278,7 +278,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -302,7 +302,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -331,7 +331,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -561,7 +561,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -584,7 +584,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -612,7 +612,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -654,7 +654,7 @@ func TestRepeated(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -677,7 +677,7 @@ func TestRepeated(t *testing.T) {
 		},
 	}
 
-	vali.Validate([]*lex.Entry{e})
+	vali.ValidateEntries([]*lex.Entry{e})
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{

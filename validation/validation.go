@@ -39,6 +39,7 @@ type Validator struct {
 // function returns true if the entry is valid (i.e., no validation
 // issues are found), otherwise false.
 func (v Validator) ValidateEntry(e *lex.Entry) bool {
+	e.EntryValidations = make([]lex.EntryValidation, 0)
 	for _, rule := range v.Rules {
 		for _, res := range rule.Validate(*e) {
 			var ev = lex.EntryValidation{
@@ -56,7 +57,7 @@ func (v Validator) ValidateEntry(e *lex.Entry) bool {
 // errors are added to each entry's EntryValidations field. The
 // function returns true if the entry is valid (i.e., no validation
 // issues are found), otherwise false.
-func (v Validator) Validate(entries []*lex.Entry) bool {
+func (v Validator) ValidateEntries(entries []*lex.Entry) bool {
 	var result = true
 	for _, e := range entries {
 		var ok = v.ValidateEntry(e)

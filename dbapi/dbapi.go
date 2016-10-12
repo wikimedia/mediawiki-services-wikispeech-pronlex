@@ -786,25 +786,6 @@ func GetEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 
 }
 
-func UpdateValidation(db *sql.DB, entries []lex.Entry) error {
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("failed starting transaction for updating validation : %v", err)
-	}
-
-	for _, e := range entries {
-		_, err := updateEntryValidationForce(tx, e)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed updating validation : %v", err)
-		}
-	}
-	tx.Commit()
-	return nil
-}
-
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
 // TODO Consider how to handle inconsistent input entries
 func UpdateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err error) {
@@ -1065,6 +1046,24 @@ func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidatio
 	return nil
 }
 
+func UpdateValidation(db *sql.DB, entries []lex.Entry) error {
+	tx, err := db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed starting transaction for updating validation : %v", err)
+	}
+
+	for _, e := range entries {
+		_, err := updateEntryValidationForce(tx, e)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed updating validation : %v", err)
+		}
+	}
+	tx.Commit()
+	return nil
+}
 func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
 	_, err := tx.Exec("DELETE FROM entryvalidation WHERE entryid = ?", e.ID)
 	if err != nil {
@@ -1188,7 +1187,7 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 
 }
 
-func ValidationStats(db *sql.DB, lexiconID int) (ValStats, error) {
+func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
 	res := ValStats{Values: make(map[string]int)}
 
 	tx, err := db.Begin()
@@ -1205,15 +1204,23 @@ func ValidationStats(db *sql.DB, lexiconID int) (ValStats, error) {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
 
-	res.Values["total entries"] = entries
+	res.Values["Total entries"] = entries
 
-	// number of validation messages
-	var validations int
-	err = tx.QueryRow("SELECT COUNT(entryvalidation.entryid) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&validations)
+	// number of invalid entries
+	var invalidEntries int
+	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.entryid) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&invalidEntries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
-	res.Values["total validations"] = validations
+	res.Values["Invalid entries"] = invalidEntries
+
+	// number of validations
+	var validations int
+	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.id) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&validations)
+	if err != nil || err == sql.ErrNoRows {
+		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
+	}
+	res.Values["Total validations"] = validations
 
 	levels, err := tx.Query("select entryvalidation.level, count(entryvalidation.level) from entry, entryvalidation where entry.lexiconid = ? and entry.id = entryvalidation.entryid group by entryvalidation.level", lexiconID)
 	if err != nil {
@@ -1229,7 +1236,7 @@ func ValidationStats(db *sql.DB, lexiconID int) (ValStats, error) {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
 
-		res.Values[name] = count
+		res.Values["Level: "+strings.ToLower(name)] = count
 	}
 	err = levels.Err()
 	if err != nil {
@@ -1247,7 +1254,7 @@ func ValidationStats(db *sql.DB, lexiconID int) (ValStats, error) {
 		var level string
 		var count int
 		err = names.Scan(&level, &name, &count)
-		nameWithLevel := fmt.Sprintf("%s (%s)", name, level)
+		nameWithLevel := fmt.Sprintf("Rule: %s (%s)", strings.ToLower(name), strings.ToLower(level))
 		if err != nil {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}

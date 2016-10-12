@@ -13,6 +13,7 @@ import (
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/vrules"
 )
@@ -26,10 +27,8 @@ var vMut = struct {
 	service: vrules.ValidatorService{Validators: make(map[string]*validation.Validator)},
 }
 
-// TODO code duplication between validateEntriesHandler and validateEntryHandler
-
 func loadValidators(symsetDirName string) error {
-	symbolSets, err := loadSymbolSetsFromDir(symsetDirName)
+	symbolSets, err := symbolset.LoadSymbolSetsFromDir(symsetDirName)
 	if err != nil {
 		return err
 	}
@@ -38,6 +37,8 @@ func loadValidators(symsetDirName string) error {
 	vMut.Unlock()
 	return err
 }
+
+// TODO code duplication between validateEntriesHandler and validateEntryHandler
 
 func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 	entriesJSON := r.FormValue("entries")
@@ -71,7 +72,7 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trimEntries(es)
-	_ = vdator.Validate(es)
+	_ = vdator.ValidateEntries(es)
 
 	res0, err3 := json.Marshal(es)
 	if err3 != nil {
@@ -139,7 +140,7 @@ func validationStatsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	lexiconId, err := strconv.Atoi(lexiconIdS)
+	lexiconId, err := strconv.ParseInt(lexiconIdS, 10, 64)
 	if err != nil {
 		msg := fmt.Sprintf("lexicon id should be an integer")
 		log.Println(msg)

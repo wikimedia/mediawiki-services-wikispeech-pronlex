@@ -67,7 +67,7 @@ func loadSymbolSets(dirName string) error {
 	mMut.service.Clear()
 	mMut.Unlock()
 
-	symbolSets, err := loadSymbolSetsFromDir(dirName)
+	symbolSets, err := symbolset.LoadSymbolSetsFromDir(dirName)
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func reloadOneSymbolSetHandler(w http.ResponseWriter, r *http.Request, name stri
 		return
 	}
 
-	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
+	serverPath := filepath.Join(symbolSetFileArea, name+symbolset.SymbolSetSuffix)
 	mMut.Lock()
 	err = mMut.service.Load(serverPath)
 	mMut.Unlock()
@@ -155,7 +155,7 @@ func deleteSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serverPath := filepath.Join(symbolSetFileArea, name+symbolSetSuffix)
+	serverPath := filepath.Join(symbolSetFileArea, name+symbolset.SymbolSetSuffix)
 	if _, err := os.Stat(serverPath); err != nil {
 		if os.IsNotExist(err) {
 			msg := fmt.Sprintf("couldn't locate server file for symbol set %s", name)

@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -38,7 +37,6 @@ func ff(f string, err error) {
 var uploadFileArea = filepath.Join(".", "upload_area")
 var downloadFileArea = filepath.Join(".", "download_area")
 var symbolSetFileArea = filepath.Join(".", "symbol_set_file_area")
-var symbolSetSuffix = ".tab"
 
 // TODO config stuff
 func init() {
@@ -644,42 +642,6 @@ func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 
 func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
 	return symbolset.LoadSymbolSet(fName)
-}
-
-func loadSymbolSetsFromDir(dirName string) (map[string]symbolset.SymbolSet, error) {
-	// list files in symbol set dir
-	fileInfos, err := ioutil.ReadDir(symbolSetFileArea)
-	if err != nil {
-		return nil, fmt.Errorf("failed reading symbol set dir : %v", err)
-	}
-
-	var fErrs error
-	var symSets []symbolset.SymbolSet
-	for _, fi := range fileInfos {
-		if strings.HasSuffix(fi.Name(), symbolSetSuffix) {
-			symset, err := symbolset.LoadSymbolSet(filepath.Join(symbolSetFileArea, fi.Name()))
-			if err != nil {
-				if fErrs != nil {
-					fErrs = fmt.Errorf("%v : %v", fErrs, err)
-				} else {
-					fErrs = err
-				}
-			} else {
-				symSets = append(symSets, symset)
-			}
-		}
-	}
-
-	if fErrs != nil {
-		return nil, fmt.Errorf("failed to load symbol set : %v", fErrs)
-	}
-
-	var symbolSetsMap = make(map[string]symbolset.SymbolSet)
-	for _, z := range symSets {
-		// TODO check that x.Name doesn't already exist
-		symbolSetsMap[z.Name] = z
-	}
-	return symbolSetsMap, nil
 }
 
 func main() {

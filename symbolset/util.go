@@ -2,10 +2,50 @@ package symbolset
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 )
+
+var SymbolSetSuffix = ".tab"
+
+func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
+	// list files in symbol set dir
+	fileInfos, err := ioutil.ReadDir(dirName)
+	if err != nil {
+		return nil, fmt.Errorf("failed reading symbol set dir : %v", err)
+	}
+
+	var fErrs error
+	var symSets []SymbolSet
+	for _, fi := range fileInfos {
+		if strings.HasSuffix(fi.Name(), SymbolSetSuffix) {
+			symset, err := LoadSymbolSet(filepath.Join(dirName, fi.Name()))
+			if err != nil {
+				if fErrs != nil {
+					fErrs = fmt.Errorf("%v : %v", fErrs, err)
+				} else {
+					fErrs = err
+				}
+			} else {
+				symSets = append(symSets, symset)
+			}
+		}
+	}
+
+	if fErrs != nil {
+		return nil, fmt.Errorf("failed to load symbol set : %v", fErrs)
+	}
+
+	var symbolSetsMap = make(map[string]SymbolSet)
+	for _, z := range symSets {
+		// TODO check that x.Name doesn't already exist
+		symbolSetsMap[z.Name] = z
+	}
+	return symbolSetsMap, nil
+}
 
 // FilterSymbolsByCat is used to filter out specific symbol types from the symbol set (syllabic, non syllabic, etc)
 func FilterSymbolsByCat(symbols []Symbol, types []SymbolCat) []Symbol {

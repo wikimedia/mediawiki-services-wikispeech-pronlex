@@ -40,3 +40,14 @@ func (l WebSockLogger) Write(msg string) {
 func (l WebSockLogger) LogInterval() int {
 	return 100
 }
+
+// SilentLogger is a muted logger, used for testing to skip too much confusing test output
+type SilentLogger struct {
+}
+
+func (l SilentLogger) Write(s string) {
+
+}
+func (l SilentLogger) LogInterval() int {
+	return 10000
+}
