@@ -28,6 +28,10 @@ type EntryValidation struct {
 	Timestamp string `json:"timestamp"`
 }
 
+func (ev EntryValidation) String() string {
+	return fmt.Sprintf("%s|%s: %s (%v)", ev.Level, ev.RuleName, ev.Message, ev.Timestamp)
+}
+
 // SourceDelimiter is used to split a string of sevaral sources into a slice
 var SourceDelimiter = " : "
 

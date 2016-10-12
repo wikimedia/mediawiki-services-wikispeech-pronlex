@@ -33,7 +33,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		return fmt.Errorf("couldn't lookup from ids : %s", err)
 	}
 	updated := []lex.Entry{}
-	for _, e := range w.Entries {
+	for i, e := range w.Entries {
 		oldVal := e.EntryValidations
 		vd.ValidateEntry(&e)
 		newVal := e.EntryValidations
@@ -45,6 +45,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 				stats.increment("Rule: "+strings.ToLower(v.RuleName+" ("+v.Level+")"), 1)
 			}
 		}
+		w.Entries[i] = e
 		if len(oldVal) > 0 || len(newVal) > 0 {
 			updated = append(updated, e)
 		}
