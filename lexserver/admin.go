@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/validation"
 )
 
 func deleteUploadedFile(serverPath string) {
@@ -49,7 +51,13 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 
 	symbolSetName := r.PostFormValue("symbolset_name")
 	lexName := r.PostFormValue("lexicon_name")
-
+	vString := r.PostFormValue("validate")
+	validate, err := strconv.ParseBool(vString)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("adminDoLexImportHandler failed parsing boolean argument %s : %v", vString, err), http.StatusInternalServerError)
+		return
+	}
 	// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
 	r.ParseMultipartForm(32 << 20)
@@ -87,14 +95,26 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 
 	lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
 	lexicon, err = dbapi.InsertLexicon(db, lexicon)
-
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		deleteUploadedFile(serverPath)
 	}
 
-	err = dbapi.ImportLexiconFile(db, logger, lexName, serverPath)
+	var validator *validation.Validator
+	if validate {
+		vMut.Lock()
+		validator, err = vMut.service.ValidatorForName(lexicon.SymbolSetName)
+		vMut.Unlock()
+		if err != nil {
+			msg := fmt.Sprintf("lexiconRunValidateHandler failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	err = dbapi.ImportLexiconFile(db, logger, lexName, serverPath, validator)
 
 	if err == nil {
 		msg := fmt.Sprintf("lexicon file imported successfully : %v", handler.Filename)
@@ -109,6 +129,33 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 
 	f.Close()
 	deleteUploadedFile(serverPath)
+
+	// if validate {
+	// 	start := time.Now()
+	// 	logger.Write("validating lexicon ... ")
+	// 	fmt.Fprintf(w, "validating lexicon ...")
+	// 	vMut.Lock()
+	// 	v, err := vMut.service.ValidatorForName(lexicon.SymbolSetName)
+	// 	vMut.Unlock()
+	// 	if err != nil {
+	// 		msg := fmt.Sprintf("lexiconRunValidateHandler failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
+	// 		log.Println(msg)
+	// 		http.Error(w, msg, http.StatusBadRequest)
+	// 		return
+	// 	}
+
+	// 	q := dbapi.Query{Lexicons: []dbapi.Lexicon{lexicon}}
+	// 	stats, err := dbapi.Validate(db, logger, *v, q)
+	// 	if err != nil {
+	// 		msg := fmt.Sprintf("lexiconRunValidateHandler failed validate : %v", err)
+	// 		log.Println(msg)
+	// 		http.Error(w, msg, http.StatusBadRequest)
+	// 		return
+	// 	}
+	// 	dur := round(time.Since(start), time.Second)
+	// 	fmt.Fprintf(w, "\nValidation took %v\n", dur)
+	// 	fmt.Fprint(w, stats)
+	// }
 
 	entryCount, err := dbapi.EntryCount(db, lexicon.ID)
 	if err != nil {
@@ -125,4 +172,22 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		EntryCount:    entryCount,
 	}
 	fmt.Fprintf(w, "imported %v entries into lexicon '%v'", info.EntryCount, info.Name)
+}
+
+func adminHelpHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	html := `<h1>Admin</h1>
+<h2>lex_import</h2>Import lexicon file.
+<pre><a href="/admin/lex_import">/admin/lex_import</a></pre>
+
+<h2>deletelexicon</h2> Delete a lexicon reference from the database without removing associated entries.
+<pre>/admin/deletelexicon?id=N</a></pre>
+
+<h2>superdeletelexicon</h2> Delete a complete lexicon from the database, including associated entries.
+<pre>/admin/superdeletelexicon?id=N</a></pre>
+
+		`
+
+	fmt.Fprint(w, html)
 }

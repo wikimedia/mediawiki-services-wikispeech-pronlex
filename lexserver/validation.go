@@ -60,7 +60,6 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO Hardwired stuff below!!!!
 	vMut.Lock()
 	vdator, err := vMut.service.ValidatorForName(symbolSetName)
 	vMut.Unlock()

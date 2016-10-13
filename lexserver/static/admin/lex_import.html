@@ -16,6 +16,7 @@
 	    	<tr><td>Symbol set: </td><td><select data-bind="options: $root.symbolSetNames, optionsCaption: 'Select symbol set', value: $root.symbolSetName"></select></td></tr>
 
 	    <tr><td>Lexicon file: </td><td><input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/></td></tr>
+	    <tr><td>Validate after import: </td><td><input type="checkbox" data-bind="checked: $root.validate"/></td></tr>
 	    <tr><td colspan="2"><button data-bind="enable: $root.validForm" type="submit">Submit</button></td></tr>
 	  </table>
 	</form>

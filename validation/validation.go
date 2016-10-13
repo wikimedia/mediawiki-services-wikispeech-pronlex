@@ -34,6 +34,10 @@ type Validator struct {
 	Rules []Rule
 }
 
+func (v Validator) IsDefined() bool {
+	return v.Name != ""
+}
+
 // ValidateEntry is used to validate single entries. Any validation
 // errors are added to the entry's EntryValidations field. The
 // function returns true if the entry is valid (i.e., no validation

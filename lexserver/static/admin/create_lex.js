@@ -54,7 +54,7 @@ DMCRLX.CreateLexModel = function() {
 
     DMCRLX.loadLexiconNames = function () {
 	
-	$.getJSON(DMCRLX.baseURL +"/listlexicons")
+	$.getJSON(DMCRLX.baseURL +"/lexicon/list")
 	    .done(function (data) {
 		DMCRLX.lexicons(data);
 	    })

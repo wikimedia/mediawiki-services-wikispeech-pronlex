@@ -185,15 +185,17 @@ func Test_Validation1(t *testing.T) {
 	ff("validation failed : %v", err)
 
 	expect := ValStats{
-		Values: map[string]int{
-			"Total entries":                4,
-			"Total validations":            5,
-			"Invalid entries":              3,
-			"Level: fatal":                 3,
-			"Level: format":                2,
-			"Rule: symbolset (fatal)":      2,
-			"Rule: primary_stress (fatal)": 1,
-			"Rule: syllabic (format)":      2,
+		TotalEntries:     4,
+		TotalValidations: 5,
+		InvalidEntries:   3,
+		Levels: map[string]int{
+			"fatal":  3,
+			"format": 2,
+		},
+		Rules: map[string]int{
+			"symbolset (fatal)":      2,
+			"primary_stress (fatal)": 1,
+			"syllabic (format)":      2,
 		},
 	}
 
@@ -206,15 +208,17 @@ func Test_Validation1(t *testing.T) {
 	ff("validation stats failed : %v", err)
 
 	expectFull := ValStats{
-		Values: map[string]int{
-			"Total entries":                4,
-			"Total validations":            5,
-			"Invalid entries":              3,
-			"Level: fatal":                 3,
-			"Level: format":                2,
-			"Rule: symbolset (fatal)":      2,
-			"Rule: primary_stress (fatal)": 1,
-			"Rule: syllabic (format)":      2,
+		TotalEntries:     4,
+		TotalValidations: 5,
+		InvalidEntries:   3,
+		Levels: map[string]int{
+			"fatal":  3,
+			"format": 2,
+		},
+		Rules: map[string]int{
+			"symbolset (fatal)":      2,
+			"primary_stress (fatal)": 1,
+			"syllabic (format)":      2,
 		},
 	}
 
@@ -234,13 +238,12 @@ func Test_Validation2(t *testing.T) {
 	ff("validation failed : %v", err)
 
 	expect := ValStats{
-		Values: map[string]int{
-			"Total entries":     1,
-			"Total validations": 0,
-			"Invalid entries":   0,
-		},
+		TotalEntries:     1,
+		TotalValidations: 0,
+		InvalidEntries:   0,
+		Levels:           make(map[string]int),
+		Rules:            make(map[string]int),
 	}
-
 	if !reflect.DeepEqual(expect, stats) {
 		t.Errorf(vfs, expect, stats)
 	}
@@ -250,11 +253,11 @@ func Test_Validation2(t *testing.T) {
 	ff("validation stats failed : %v", err)
 
 	expectFull := ValStats{
-		Values: map[string]int{
-			"Total entries":     4,
-			"Total validations": 0,
-			"Invalid entries":   0,
-		},
+		TotalEntries:     4,
+		TotalValidations: 0,
+		InvalidEntries:   0,
+		Levels:           make(map[string]int),
+		Rules:            make(map[string]int),
 	}
 
 	if !reflect.DeepEqual(expectFull, lexStats) {
@@ -268,15 +271,17 @@ func Test_Validation2(t *testing.T) {
 	ff("validation failed : %v", err)
 
 	expect = ValStats{
-		Values: map[string]int{
-			"Total entries":                4,
-			"Total validations":            5,
-			"Invalid entries":              3,
-			"Level: fatal":                 3,
-			"Level: format":                2,
-			"Rule: symbolset (fatal)":      2,
-			"Rule: primary_stress (fatal)": 1,
-			"Rule: syllabic (format)":      2,
+		TotalEntries:     4,
+		TotalValidations: 5,
+		InvalidEntries:   3,
+		Levels: map[string]int{
+			"fatal":  3,
+			"format": 2,
+		},
+		Rules: map[string]int{
+			"symbolset (fatal)":      2,
+			"primary_stress (fatal)": 1,
+			"syllabic (format)":      2,
 		},
 	}
 
@@ -289,15 +294,17 @@ func Test_Validation2(t *testing.T) {
 	ff("validation stats failed : %v", err)
 
 	expectFull = ValStats{
-		Values: map[string]int{
-			"Total entries":                4,
-			"Total validations":            5,
-			"Invalid entries":              3,
-			"Level: fatal":                 3,
-			"Level: format":                2,
-			"Rule: symbolset (fatal)":      2,
-			"Rule: primary_stress (fatal)": 1,
-			"Rule: syllabic (format)":      2,
+		TotalEntries:     4,
+		TotalValidations: 5,
+		InvalidEntries:   3,
+		Levels: map[string]int{
+			"fatal":  3,
+			"format": 2,
+		},
+		Rules: map[string]int{
+			"symbolset (fatal)":      2,
+			"primary_stress (fatal)": 1,
+			"syllabic (format)":      2,
 		},
 	}
 
@@ -323,15 +330,17 @@ func Test_ValidationUpdate1(t *testing.T) {
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{
-		Values: map[string]int{
-			"Total entries":                4,
-			"Total validations":            5,
-			"Invalid entries":              3,
-			"Level: fatal":                 3,
-			"Level: format":                2,
-			"Rule: symbolset (fatal)":      2,
-			"Rule: primary_stress (fatal)": 1,
-			"Rule: syllabic (format)":      2,
+		TotalEntries:     4,
+		TotalValidations: 5,
+		InvalidEntries:   3,
+		Levels: map[string]int{
+			"fatal":  3,
+			"format": 2,
+		},
+		Rules: map[string]int{
+			"symbolset (fatal)":      2,
+			"primary_stress (fatal)": 1,
+			"syllabic (format)":      2,
 		},
 	}
 
@@ -359,15 +368,17 @@ func Test_ValidationUpdate2(t *testing.T) {
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{
-		Values: map[string]int{
-			"Total entries":                4,
-			"Total validations":            5,
-			"Invalid entries":              3,
-			"Level: fatal":                 3,
-			"Level: format":                2,
-			"Rule: symbolset (fatal)":      2,
-			"Rule: primary_stress (fatal)": 1,
-			"Rule: syllabic (format)":      2,
+		TotalEntries:     4,
+		TotalValidations: 5,
+		InvalidEntries:   3,
+		Levels: map[string]int{
+			"fatal":  3,
+			"format": 2,
+		},
+		Rules: map[string]int{
+			"symbolset (fatal)":      2,
+			"primary_stress (fatal)": 1,
+			"syllabic (format)":      2,
 		},
 	}
 
@@ -391,15 +402,17 @@ func Test_ValidationUpdate3(t *testing.T) {
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{
-		Values: map[string]int{
-			"Total entries":                4,
-			"Total validations":            5,
-			"Invalid entries":              3,
-			"Level: fatal":                 3,
-			"Level: format":                2,
-			"Rule: symbolset (fatal)":      2,
-			"Rule: primary_stress (fatal)": 1,
-			"Rule: syllabic (format)":      2,
+		TotalEntries:     4,
+		TotalValidations: 5,
+		InvalidEntries:   3,
+		Levels: map[string]int{
+			"fatal":  3,
+			"format": 2,
+		},
+		Rules: map[string]int{
+			"symbolset (fatal)":      2,
+			"primary_stress (fatal)": 1,
+			"syllabic (format)":      2,
 		},
 	}
 

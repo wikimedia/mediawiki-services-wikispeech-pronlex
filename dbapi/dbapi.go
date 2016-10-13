@@ -1126,14 +1126,14 @@ func EntryCount(db *sql.DB, lexiconID int64) (int64, error) {
 	defer tx.Commit()
 
 	if err != nil {
-		return -1, fmt.Errorf("dbapi.LexiconStats failed opening db transaction : %v", err)
+		return -1, fmt.Errorf("dbapi.EntryCount failed opening db transaction : %v", err)
 	}
 
 	// number of entries in a lexicon
 	var entries int64
 	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
 	if err != nil || err == sql.ErrNoRows {
-		return -1, fmt.Errorf("dbapi.LexiconStats failed QueryRow : %v", err)
+		return -1, fmt.Errorf("dbapi.EntryCount failed QueryRow : %v", err)
 	}
 	return entries, nil
 }
@@ -1188,7 +1188,7 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 }
 
 func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
-	res := ValStats{Values: make(map[string]int)}
+	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
 
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -1204,7 +1204,7 @@ func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
 
-	res.Values["Total entries"] = entries
+	res.TotalEntries = entries
 
 	// number of invalid entries
 	var invalidEntries int
@@ -1212,7 +1212,7 @@ func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
-	res.Values["Invalid entries"] = invalidEntries
+	res.InvalidEntries = invalidEntries
 
 	// number of validations
 	var validations int
@@ -1220,7 +1220,7 @@ func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
-	res.Values["Total validations"] = validations
+	res.TotalValidations = validations
 
 	levels, err := tx.Query("select entryvalidation.level, count(entryvalidation.level) from entry, entryvalidation where entry.lexiconid = ? and entry.id = entryvalidation.entryid group by entryvalidation.level", lexiconID)
 	if err != nil {
@@ -1236,7 +1236,7 @@ func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
 
-		res.Values["Level: "+strings.ToLower(name)] = count
+		res.Levels[strings.ToLower(name)] = count
 	}
 	err = levels.Err()
 	if err != nil {
@@ -1254,12 +1254,12 @@ func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
 		var level string
 		var count int
 		err = names.Scan(&level, &name, &count)
-		nameWithLevel := fmt.Sprintf("Rule: %s (%s)", strings.ToLower(name), strings.ToLower(level))
+		nameWithLevel := fmt.Sprintf("%s (%s)", strings.ToLower(name), strings.ToLower(level))
 		if err != nil {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
 
-		res.Values[nameWithLevel] = count
+		res.Rules[nameWithLevel] = count
 	}
 	err = names.Err()
 	if err != nil {

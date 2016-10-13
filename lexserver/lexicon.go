@@ -65,7 +65,7 @@ func listLexsWithEntryCountHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconID, err := strconv.ParseInt(r.FormValue("id"), 10, 64)
+	lexiconID, err := strconv.ParseInt(r.FormValue("lexiconId"), 10, 64)
 	if err != nil {
 		msg := "lexiconStatsHandler got no lexicon id"
 		log.Println(msg)
@@ -266,4 +266,31 @@ func round(d, r time.Duration) time.Duration {
 		return -d
 	}
 	return d
+}
+
+func lexiconHelpHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	addEntryUrl := "/lexicon/addentry?lexicon=&entry={...}"
+
+	updateEntryUrl := "/lexicon/updateentry?entry={...}"
+
+	html := `<h1>Lexicon</h1>
+<h2>addentry</h2>Add an entry to the database. Example invocation:
+<pre><a href="` + addEntryUrl + `">` + addEntryUrl + `</a></pre>
+
+<h2>updateentry</h2> Updates an entry in the database. Example invocation:
+<pre><a href="` + updateEntryUrl + `">` + updateEntryUrl + `</a></pre>
+
+<h2>validate</h2> Validates a list of entries.
+<pre><a href="/lexicon/validate">/lexicon/validate</a></pre>
+
+<h2>list</h2> Lists available lexicons.
+<pre><a href="/lexicon/list">/lexicon/list</a></pre>
+
+<h2>stats</h2> Lists lexicon stats. Example invocation:
+<pre><a href="/lexicon/stats?lexiconId=1">/lexicon/stats?lexiconId=1</a></pre>
+		`
+
+	fmt.Fprint(w, html)
 }

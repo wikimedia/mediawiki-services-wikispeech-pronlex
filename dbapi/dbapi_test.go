@@ -6,6 +6,7 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/validation"
 	//"github.com/mattn/go-sqlite3"
 	"log"
 	"os"
@@ -348,7 +349,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt")
+	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -487,7 +488,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt.gz")
+	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt.gz", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}

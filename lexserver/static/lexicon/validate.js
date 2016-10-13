@@ -62,7 +62,7 @@ LEXVDATE.VdateModel = function () {
     self.availableLexicons = ko.observableArray();
 
     self.loadLexicons = function () {
-	$.getJSON(LEXVDATE.baseURL +"/lexicon/listlexicons")
+	$.getJSON(LEXVDATE.baseURL +"/lexicon/list")
 	    .done(function (data) {
 		self.availableLexicons(data);
 	    })
@@ -74,7 +74,7 @@ LEXVDATE.VdateModel = function () {
     
     self.runValidation = function() {
 	console.log("validating lexicon: ", self.selectedLexicon())
-	var url = LEXVDATE.baseURL + "/lex_do_validate"
+	var url = LEXVDATE.baseURL + "/lexicon/do_validate"
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);

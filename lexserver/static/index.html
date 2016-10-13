@@ -11,14 +11,14 @@ Fetch lexicon files and symbol sets from <a href="https://github.com/stts-se/lex
 
 <pre>
 
+github.com/stts-se/pronlex/lexserver$ mkdir symbol_set_file_area
+github.com/stts-se/pronlex/lexserver$ cp ~/gitrepos/lexdata/*/*/*.tab symbol_set_file_area
+
 github.com/stts-se/pronlex$ go run createEmptyDB/createEmptyDB.go pronlex.db
-github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa 
+github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz lexserver/symbol_set_file_area sv-se_ws-sampa 
 github.com/stts-se/pronlex$ mv pronlex.db lexserver/
 
 github.com/stts-se/pronlex$ cd lexserver
-
-github.com/stts-se/pronlex/lexserver$ mkdir symbol_set_file_area
-github.com/stts-se/pronlex/lexserver$ cp ~/gitrepos/lexdata/*/*/*.tab symbol_set_file_area
 
 github.com/stts-se/pronlex/lexserver$ go run *.go
 </pre>
@@ -26,39 +26,13 @@ github.com/stts-se/pronlex/lexserver$ go run *.go
 <h1>Lexserver</h1>
 
 
-<p/><b style="font-size:150%">List lexicons:</b>
+<p/><b style="font-size:150%">Admin:</b>
 
-<a href='/lexicon/listlexicons'>/lexicon/listlexicons</a>
+<a href="/admin">/admin</a>
 
-<p/><b style="font-size:150%">Lexicon look up:</b>
+<p/><b style="font-size:150%">Lexicon:</b>
 
-<a href="/lexicon/lookup">/lexicon/lookup</a>
-
-<p/><b style="font-size:150%">Add entry:</b>
-<p>
-  <code>/addentry?lexicon=<LEX_NAME>&entry={...}</code>
-  
-</p>
-where <code>{...}</code> is a JSON entry.
-
-<p/><b style="font-size:150%">Lexicon validation:</b>
-
-<a href="/lexicon/validate">/lexicon/validate</a>
-
-
-<p/><b style="font-size:150%">Update entry:</b>
-
-<p>
-  
-  <code> 
-    /updateentry?entry={...}
-  </code>
-</p>
-where <code>{...}</code> is a JSON entry.
-
-<p/><b style="font-size:150%">Import lexicon file:</b>
-
-<a href="/admin/lex_import">/admin/lex_import</a>
+<a href="/lexicon">/lexicon</a>
 
 
 <p/><b style="font-size:150%">Mapper:</b>

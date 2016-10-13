@@ -123,7 +123,7 @@ ADMLD.AdminLexDefModel = function () {
 
     self.loadLexiconNames = function () {
 	
-	$.getJSON(ADMLD.baseURL +"/listlexicons")
+	$.getJSON(ADMLD.baseURL +"/lexicon/list")
 	    .done(function (data) {
 		self.lexicons(data);
 		self.loadSymbolSetsIfEmpty(data); 

@@ -106,7 +106,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 
-	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+	idS := r.FormValue("id")
+	if idS == "" {
+		msg := "deleteLexHander expected a lexicon id defined by 'id'"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	id, _ := strconv.ParseInt(idS, 10, 64)
 
 	err := dbapi.DeleteLexicon(db, id)
 	if err != nil {
@@ -119,7 +127,16 @@ func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
 func superDeleteLexHandler(w http.ResponseWriter, r *http.Request) {
 	// Aha! Turns out that Go treats POST and GET the same way, as I understand it.
 	// No need for checking whether GET or POST, as far as I understand.
-	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+	idS := r.FormValue("id")
+	if idS == "" {
+		msg := "deleteLexHander expected a lexicon id defined by 'id'"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	id, _ := strconv.ParseInt(idS, 10, 64)
+
 	uuid := r.FormValue("client_uuid")
 	log.Println("lexserver.superDeleteLexHandler was called")
 	messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon id %d", id))
@@ -699,8 +716,10 @@ func main() {
 	//http.HandleFunc("/lexicon/listknown", listKnownHandler)
 
 	// function calls
-	http.HandleFunc("/lexicon/listlexicons", listLexsWithEntryCountHandler)
-	http.HandleFunc("/listlexicons", apiChangedHandler("use /lexicon/listlexicons instead"))
+	http.HandleFunc("/lexicon", lexiconHelpHandler)
+	http.HandleFunc("/lexicon/list", listLexsWithEntryCountHandler)
+	http.HandleFunc("/listlexicons", apiChangedHandler("use /lexicon/list instead"))
+	http.HandleFunc("/lexicon/listlexicons", apiChangedHandler("use /lexicon/list instead"))
 
 	http.HandleFunc("/lexicon/stats", lexiconStatsHandler)
 	http.HandleFunc("/lexiconstats", apiChangedHandler("use /lexicon/stats instead"))
@@ -715,7 +734,7 @@ func main() {
 	http.HandleFunc("/updateentry", apiChangedHandler("/lexicon/updateentry instead"))
 
 	http.HandleFunc("/lexicon/validate", lexiconValidateHandler)
-	http.HandleFunc("/lex_do_validate", lexiconRunValidateHandler)
+	http.HandleFunc("/lexicon/do_validate", lexiconRunValidateHandler)
 
 	http.HandleFunc("/validation/validateentry", validateEntryHandler)
 	http.HandleFunc("/validateentry", apiChangedHandler("/validation/validateentry"))
@@ -725,33 +744,34 @@ func main() {
 	http.HandleFunc("/validation/list", listValidationHandler)
 	http.HandleFunc("/validation/stats", validationStatsHandler)
 
-	http.HandleFunc("/download", downloadFileHandler)
+	//http.HandleFunc("/download", downloadFileHandler)
 
 	// admin pages/calls
 
-	http.HandleFunc("/admin_lex_definition.html", adminLexDefinitionHandler)
+	//http.HandleFunc("/admin_lex_definition.html", adminLexDefinitionHandler)
 	http.HandleFunc("/admin/lex_import", adminLexImportHandler)
 	http.HandleFunc("/admin/lex_do_import", adminDoLexImportHandler)
-	http.HandleFunc("/admin/admin.html", adminAdminHandler)
-	http.HandleFunc("/admin", adminHandler)
-	http.HandleFunc("/admin/createlex", adminCreateLexHandler)
-	http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
+	//http.HandleFunc("/admin/admin.html", adminAdminHandler)
+	http.HandleFunc("/admin", adminHelpHandler)
+	//http.HandleFunc("/admin", adminHandler)
+	//http.HandleFunc("/admin/createlex", adminCreateLexHandler)
+	//http.HandleFunc("/admin/editsymbolset", adminEditSymbolSetHandler)
 	//http.HandleFunc("/admin/listsymbolset", listSymbolSetHandler)
 	//http.HandleFunc("/admin/savesymbolset", saveSymbolSetHandler)
-	http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
+	//http.HandleFunc("/admin/insertorupdatelexicon", insertOrUpdateLexHandler)
 	http.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 	http.HandleFunc("/admin/superdeletelexicon", superDeleteLexHandler)
 
 	// Sqlite3 ANALYZE command in some instances make search quicker,
 	// but it takes a while to perform
-	http.HandleFunc("/admin/sqlite3_analyze", sqlite3AnalyzeHandler)
+	//http.HandleFunc("/admin/sqlite3_analyze", sqlite3AnalyzeHandler)
 
 	//http.HandleFunc("/websocktest", webSockTestHandler)
 
 	http.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
-	http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
-	http.HandleFunc("/admin/exportlexicon", exportLexiconHandler)
+	//http.HandleFunc("/admin/lexiconfileupload", lexiconFileUploadHandler)
+	//http.HandleFunc("/admin/exportlexicon", exportLexiconHandler)
 
 	// TODO Split this main func into several files
 

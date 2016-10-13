@@ -10,6 +10,7 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
+	"github.com/stts-se/pronlex/validation"
 )
 
 // Olika scenarion:
@@ -17,8 +18,8 @@ import (
 // Append
 // Uppdatera
 
-// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any validation whatsoever of the transcriptions.
-func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string) error {
+// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any validation whatsoever of the transcriptions. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
+func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, validator *validation.Validator) error {
 
 	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))
 	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
@@ -79,6 +80,9 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		}
 
 		e, err := wsFmt.ParseToEntry(l)
+		if validator.IsDefined() {
+			e, _ = validator.ValidateEntry(e)
+		}
 		if err != nil {
 			var msg = fmt.Sprintf("couldn't parse line to entry : %v", err)
 			logger.Write(msg)
@@ -118,7 +122,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		logger.Write(msg2)
 	}
 
-	logger.Write("Finalizing ... ")
+	logger.Write("Finalizing import ... ")
 
 	_, err = db.Exec("ANALYZE")
 	if err != nil {
@@ -127,7 +131,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		return fmt.Errorf("%v", msg)
 	}
 
-	msg3 := fmt.Sprintf("Lines read:\t%d", n)
+	msg3 := fmt.Sprintf("Lines imported:\t%d", n)
 	logger.Write(msg3)
 
 	if err := s.Err(); err != nil {
