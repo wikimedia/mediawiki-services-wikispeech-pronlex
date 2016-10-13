@@ -38,11 +38,10 @@ type Validator struct {
 // errors are added to the entry's EntryValidations field. The
 // function returns true if the entry is valid (i.e., no validation
 // issues are found), otherwise false.
-func (v Validator) ValidateEntry(e *lex.Entry) bool {
-	e.EntryValidations = e.EntryValidations[:0]
-	//e.EntryValidations = make([]lex.EntryValidation, 0)
+func (v Validator) ValidateEntry(e lex.Entry) (lex.Entry, bool) {
+	e.EntryValidations = make([]lex.EntryValidation, 0)
 	for _, rule := range v.Rules {
-		for _, res := range rule.Validate(*e) {
+		for _, res := range rule.Validate(e) {
 			var ev = lex.EntryValidation{
 				RuleName: res.RuleName,
 				Level:    res.Level,
@@ -51,21 +50,22 @@ func (v Validator) ValidateEntry(e *lex.Entry) bool {
 			e.EntryValidations = append(e.EntryValidations, ev)
 		}
 	}
-	return len(e.EntryValidations) == 0
+	return e, len(e.EntryValidations) == 0
 }
 
-// Validate is used to validate a slice of entries.  Any validation
+// ValidateEntries is used to validate a slice of entries.  Any validation
 // errors are added to each entry's EntryValidations field. The
 // function returns true if the entry is valid (i.e., no validation
 // issues are found), otherwise false.
-func (v Validator) ValidateEntries(entries []*lex.Entry) bool {
-	var result = true
-	for i, e := range entries {
-		var ok = v.ValidateEntry(e)
+func (v Validator) ValidateEntries(entries []lex.Entry) ([]lex.Entry, bool) {
+	var res []lex.Entry
+	var valid = true
+	for _, e0 := range entries {
+		var e, ok = v.ValidateEntry(e0)
 		if !ok {
-			result = false
+			valid = false
 		}
-		entries[i] = e
+		res = append(res, e)
 	}
-	return result
+	return res, valid
 }

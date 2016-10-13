@@ -313,13 +313,11 @@ func Test_ValidationUpdate1(t *testing.T) {
 	err := LookUp(db, Query{}, &ew)
 	ff("lookup failed : %v", err)
 
-	// FUNKAR: START
 	for _, e := range ew.Entries {
-		v.ValidateEntry(&e)
+		e, _ = v.ValidateEntry(e)
 		err = UpdateValidation(db, []lex.Entry{e})
 		ff("update validation failed : %v", err)
 	}
-	// FUNKAR: END
 
 	stats, err := ValidationStats(db, lexId)
 	ff("validation stats failed : %v", err)
@@ -349,11 +347,12 @@ func Test_ValidationUpdate2(t *testing.T) {
 	err := LookUp(db, Query{}, &ew)
 	ff("lookup failed : %v", err)
 
-	for i, e := range ew.Entries {
-		v.ValidateEntry(&e)
-		ew.Entries[i] = e // OBS!
+	var es []lex.Entry
+	for _, e := range ew.Entries {
+		e, _ = v.ValidateEntry(e)
+		es = append(es, e)
 	}
-	err = UpdateValidation(db, ew.Entries)
+	err = UpdateValidation(db, es)
 	ff("update validation failed : %v", err)
 
 	stats, err := ValidationStats(db, lexId)
@@ -377,50 +376,34 @@ func Test_ValidationUpdate2(t *testing.T) {
 	}
 }
 
-func refifySlice(es []lex.Entry) []*lex.Entry {
-	var res []*lex.Entry
-	for _, e := range es {
-		res = append(res, &e)
+func Test_ValidationUpdate3(t *testing.T) {
+	db, lexId := vInsertEntries(t, "test5")
+	v := createValidator()
+	ew := lex.EntrySliceWriter{}
+	err := LookUp(db, Query{}, &ew)
+	ff("lookup failed : %v", err)
+
+	es, _ := v.ValidateEntries(ew.Entries)
+	err = UpdateValidation(db, es)
+	ff("update validation failed : %v", err)
+
+	stats, err := ValidationStats(db, lexId)
+	ff("validation stats failed : %v", err)
+
+	expect := ValStats{
+		Values: map[string]int{
+			"Total entries":                4,
+			"Total validations":            5,
+			"Invalid entries":              3,
+			"Level: fatal":                 3,
+			"Level: format":                2,
+			"Rule: symbolset (fatal)":      2,
+			"Rule: primary_stress (fatal)": 1,
+			"Rule: syllabic (format)":      2,
+		},
 	}
-	return res
-}
-func deRefifySlice(es []*lex.Entry) []lex.Entry {
-	var res []lex.Entry
-	for _, e := range es {
-		res = append(res, *e)
+
+	if !reflect.DeepEqual(expect, stats) {
+		t.Errorf(vfs, expect, stats)
 	}
-	return res
 }
-
-// func Test_ValidationUpdate3(t *testing.T) {
-// 	db, lexId := vInsertEntries(t, "test5")
-// 	v := createValidator()
-// 	ew := lex.EntrySliceWriter{}
-// 	err := LookUp(db, Query{}, &ew)
-// 	ff("lookup failed : %v", err)
-// 	es := refifySlice(ew.Entries)
-
-// 	v.ValidateEntries(es)
-// 	err = UpdateValidation(db, deRefifySlice(es))
-// 	ff("update validation failed : %v", err)
-
-// 	stats, err := ValidationStats(db, lexId)
-// 	ff("validation stats failed : %v", err)
-
-// 	expect := ValStats{
-// 		Values: map[string]int{
-// 			"Total entries":                4,
-// 			"Total validations":            5,
-// 			"Invalid entries":              3,
-// 			"Level: fatal":                 3,
-// 			"Level: format":                2,
-// 			"Rule: symbolset (fatal)":      2,
-// 			"Rule: primary_stress (fatal)": 1,
-// 			"Rule: syllabic (format)":      2,
-// 		},
-// 	}
-
-// 	if !reflect.DeepEqual(expect, stats) {
-// 		t.Errorf(vfs, expect, stats)
-// 	}
-// }

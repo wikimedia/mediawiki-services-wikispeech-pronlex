@@ -44,8 +44,8 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 	entriesJSON := r.FormValue("entries")
 	symbolSetName := r.FormValue("symbolsetname")
 
-	var es []*lex.Entry
-	err := json.Unmarshal([]byte(entriesJSON), &es)
+	var es []lex.Entry
+	err := json.Unmarshal([]byte(entriesJSON), es)
 	if err != nil {
 		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entriesJSON, err)
 		log.Println(msg)
@@ -71,8 +71,8 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trimEntries(es)
-	_ = vdator.ValidateEntries(es)
+	es = trimEntries(es)
+	es, _ = vdator.ValidateEntries(es)
 
 	res0, err3 := json.Marshal(es)
 	if err3 != nil {
@@ -92,7 +92,7 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	symbolSetName := r.FormValue("symbolsetname")
 
 	var e lex.Entry
-	err := json.Unmarshal([]byte(entryJSON), &e)
+	err := json.Unmarshal([]byte(entryJSON), e)
 	if err != nil {
 		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entryJSON, err)
 		log.Println(msg)
@@ -118,8 +118,8 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trimEntry(&e)
-	_ = vdator.ValidateEntry(&e)
+	e = trimEntry(e)
+	e, _ = vdator.ValidateEntry(e)
 
 	res0, err3 := json.Marshal(e)
 	if err3 != nil {
@@ -167,7 +167,7 @@ func validationStatsHandler(w http.ResponseWriter, r *http.Request) {
 
 var trimWhitespaceRe = regexp.MustCompile("[\\s]+")
 
-func trimTranscriptions(e *lex.Entry) {
+func trimTranscriptions(e lex.Entry) lex.Entry {
 	var newTs []lex.Transcription
 	for _, t := range e.Transcriptions {
 		s := trimWhitespaceRe.ReplaceAllString(strings.TrimSpace(t.Strn), " ")
@@ -175,19 +175,24 @@ func trimTranscriptions(e *lex.Entry) {
 		newTs = append(newTs, t)
 	}
 	e.Transcriptions = newTs
+	return e
 }
 
-func trimEntry(e *lex.Entry) {
-	trimTranscriptions(e)
+func trimEntry(e lex.Entry) lex.Entry {
+	e = trimTranscriptions(e)
 	e.Strn = strings.TrimSpace(e.Strn)
 	e.WordParts = strings.TrimSpace(e.WordParts)
 	e.PartOfSpeech = trimWhitespaceRe.ReplaceAllString(strings.TrimSpace(e.PartOfSpeech), " ")
+	return e
 }
 
-func trimEntries(entries []*lex.Entry) {
+func trimEntries(entries []lex.Entry) []lex.Entry {
+	var res []lex.Entry
 	for _, e := range entries {
 		trimEntry(e)
+		res = append(res, e)
 	}
+	return res
 }
 
 type ValidatorNames struct {

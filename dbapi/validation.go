@@ -35,7 +35,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	updated := []lex.Entry{}
 	for i, e := range w.Entries {
 		oldVal := e.EntryValidations
-		vd.ValidateEntry(&e)
+		e, _ = vd.ValidateEntry(e)
 		newVal := e.EntryValidations
 		if len(newVal) > 0 {
 			stats.increment("Invalid entries", 1)

@@ -140,15 +140,16 @@ func createValidator() Validator {
 
 func Test_ValidateEntry1(t *testing.T) {
 	v := createValidator()
-	es := createEntries()
+	es0 := createEntries()
 
 	eVals1 := make([]string, 0)
-	for i, e := range es {
-		v.ValidateEntry(&e)
-		es[i] = e
+	es := make([]lex.Entry, 0)
+	for _, e := range es0 {
+		e, _ = v.ValidateEntry(e)
 		for _, v := range e.EntryValidations {
 			eVals1 = append(eVals1, v.String())
 		}
+		es = append(es, e)
 	}
 	sort.Strings(eVals1)
 	if len(eVals1) < 1 {

@@ -68,7 +68,7 @@ func Test1(t *testing.T) {
 	var vali = validation.Validator{
 		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
-	var e = &lex.Entry{
+	var e = lex.Entry{
 		Strn:         "anka",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -81,7 +81,7 @@ func Test1(t *testing.T) {
 		},
 	}
 
-	var result = vali.ValidateEntries([]*lex.Entry{e})
+	var _, result = vali.ValidateEntries([]lex.Entry{e})
 
 	if result != true {
 		t.Errorf(fsExp, make([]validation.Result, 0), result)
@@ -92,7 +92,7 @@ func Test2(t *testing.T) {
 	var vali = validation.Validator{
 		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
 
-	var e = &lex.Entry{
+	var e = lex.Entry{
 		Strn:           "anka",
 		Language:       "swe",
 		PartOfSpeech:   "NN",
@@ -100,7 +100,7 @@ func Test2(t *testing.T) {
 		Transcriptions: []lex.Transcription{},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
@@ -124,7 +124,7 @@ func Test3(t *testing.T) {
 	var vali = validation.Validator{
 		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
-	var e = &lex.Entry{
+	var e = lex.Entry{
 		Strn:         "ankstjärt",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -137,7 +137,7 @@ func Test3(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
@@ -160,7 +160,7 @@ func Test4(t *testing.T) {
 	var vali = validation.Validator{
 		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
-	var e = &lex.Entry{
+	var e = lex.Entry{
 		Strn:         "ankstjärtsbad",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -173,7 +173,7 @@ func Test4(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -194,7 +194,7 @@ func TestNst1(t *testing.T) {
 		return
 	}
 
-	var e = &lex.Entry{
+	var e = lex.Entry{
 		Strn:         "banen",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -207,7 +207,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -217,7 +217,7 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "bantorget",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -230,7 +230,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -241,7 +241,7 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "battorget",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -254,7 +254,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -265,7 +265,7 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "battorget",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -278,7 +278,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -289,7 +289,7 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "batttorget",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -302,7 +302,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -318,7 +318,7 @@ func TestNst1(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "apnos",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -331,7 +331,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -548,7 +548,7 @@ func TestWhitespace(t *testing.T) {
 		return
 	}
 
-	var e = &lex.Entry{
+	var e = lex.Entry{
 		Strn:         "banen",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -561,7 +561,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -571,7 +571,7 @@ func TestWhitespace(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "banen",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -584,7 +584,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -599,7 +599,7 @@ func TestWhitespace(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "banen",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -612,7 +612,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -641,7 +641,7 @@ func TestRepeated(t *testing.T) {
 		return
 	}
 
-	var e = &lex.Entry{
+	var e = lex.Entry{
 		Strn:         "banen",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -654,7 +654,7 @@ func TestRepeated(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -664,7 +664,7 @@ func TestRepeated(t *testing.T) {
 
 	//
 
-	e = &lex.Entry{
+	e = lex.Entry{
 		Strn:         "banen",
 		Language:     "swe",
 		PartOfSpeech: "NN",
@@ -677,7 +677,7 @@ func TestRepeated(t *testing.T) {
 		},
 	}
 
-	vali.ValidateEntries([]*lex.Entry{e})
+	e, _ = vali.ValidateEntry(e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
