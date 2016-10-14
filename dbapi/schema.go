@@ -37,6 +37,7 @@ CREATE TABLE Lemma (
 CREATE INDEX idx21d604f4 on Lemma (reading);
 CREATE INDEX idx273f055f on Lemma (paradigm);
 CREATE INDEX idx149303e1 on Lemma (strn);
+CREATE INDEX lemidstrn on Lemma (id, strn);
 CREATE UNIQUE INDEX idx407206e8 on Lemma (strn,reading);
 --CREATE TABLE SurfaceForm (
 --    id integer not null primary key autoincrement,
@@ -63,7 +64,7 @@ CREATE INDEX idx28d70584 on Entry (language);
 CREATE INDEX idx15890407 on Entry (strn);
 CREATE INDEX entrylexid ON Entry (lexiconId);
 CREATE INDEX idx4a250778 on Entry (strn,language);
-
+CREATE INDEX idid on Entry (id, lexiconId);
 
 -- Validiation results of entries
 CREATE TABLE EntryValidation (
@@ -78,6 +79,7 @@ CREATE TABLE EntryValidation (
 CREATE INDEX evallev ON EntryValidation(level);
 CREATE INDEX evalnam ON EntryValidation(name);
 CREATE INDEX entvalEid ON EntryValidation(entryId); 
+CREATE INDEX identvalEid ON EntryValidation(id,entryId); 
 
 -- Status of entries
 CREATE TABLE EntryStatus (
@@ -93,7 +95,9 @@ CREATE INDEX esn ON EntryStatus (name);
 CREATE INDEX ess ON EntryStatus (source);
 CREATE INDEX esc ON EntryStatus (current);
 CREATE INDEX esceid ON EntryStatus (entryId);
-CREATE UNIQUE INDEX eseii ON EntryStatus  (entryId, id);
+CREATE UNIQUE INDEX eseii ON EntryStatus  (id, entryId);
+CREATE UNIQUE INDEX eseiicurr ON EntryStatus  (id, entryId, current);
+CREATE UNIQUE INDEX idcurr ON EntryStatus  (id, current);
 
 CREATE TABLE Transcription (
     entryId integer not null,
@@ -107,6 +111,7 @@ CREATE TABLE Transcription (
     sources TEXT not null,
 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX traeid ON Transcription (entryId);
+CREATE INDEX idtraeid ON Transcription (id, entryId);
 
 -- CREATE TABLE TranscriptionStatus (
 --    name varchar(128) not null,
@@ -124,7 +129,7 @@ CREATE TABLE Lemma2Entry (
 unique(lemmaId,entryId),
 foreign key (entryId) references Entry(id) on delete cascade,
 foreign key (lemmaId) references Lemma(id) on delete cascade);
-CREATE INDEX l2eind1 on Lemma2Entry (entryId);
+--CREATE INDEX l2eind1 on Lemma2Entry (entryId);
 CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);
 CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);
 CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
