@@ -12,14 +12,6 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
-type ValStats struct {
-	InvalidEntries   int
-	TotalEntries     int
-	TotalValidations int
-	Levels           map[string]int `json:levels`
-	Rules            map[string]int `json:rules`
-}
-
 func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValStats) (ValStats, error) {
 	q := Query{EntryIDs: chunk}
 	var w lex.EntrySliceWriter

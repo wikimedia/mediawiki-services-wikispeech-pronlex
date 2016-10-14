@@ -125,6 +125,8 @@ type LexStats struct {
 	// Status frequencies, as strings: StatusName<TAB>Frequency
 	// TODO better structure for status/freq (string/int)
 	StatusFrequencies []string `json:"statusFrequencies"`
+
+	ValStats ValStats
 }
 
 // QueryStats holds the result of a call to the dbapi.LexiconStats function.
@@ -132,4 +134,12 @@ type LexStats struct {
 type QueryStats struct {
 	Query   Query `json:"query"`
 	Entries int64 `json:"entries"`
+}
+
+type ValStats struct {
+	InvalidEntries   int
+	TotalEntries     int
+	TotalValidations int
+	Levels           map[string]int `json:levels`
+	Rules            map[string]int `json:rules`
 }

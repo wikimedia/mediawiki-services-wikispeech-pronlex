@@ -12,6 +12,8 @@ package dbapi
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"time"
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/lex"
@@ -1149,18 +1151,21 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 		return res, fmt.Errorf("dbapi.LexiconStats failed opening db transaction : %v", err)
 	}
 
+	t1 := time.Now()
 	// number of entries in a lexicon
 	var entries int64
 	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.LexiconStats failed QueryRow : %v", err)
 	}
-
 	res.Entries = entries
 
 	// number of each type of entry status
 
 	//select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = 3 and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name
+
+	t2 := time.Now()
+	log.Printf("dbapi.LexiconStats TOTAL COUNT TOOK %v\n", t2.Sub(t1))
 
 	rows, err := tx.Query("select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = ? and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name", lexiconID)
 	if err != nil {
@@ -1179,27 +1184,38 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 		res.StatusFrequencies = append(res.StatusFrequencies, status+"\t"+freq)
 	}
 	err = rows.Err()
+	if err != nil {
+		return res, err
+	}
+
+	t3 := time.Now()
+	log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
+	valStats, err := ValidationStatsTx(tx, lexiconID)
+	res.ValStats = valStats
+
+	t4 := time.Now()
+	log.Printf("dbapi.LexiconStats VAL STATS TOOK %v\n", t4.Sub(t3))
+
 	return res, err
-
-	// TODO add queries for additional stats
-
-	//return res, nil
 
 }
 
 func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
-	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
-
 	tx, err := db.Begin()
 	defer tx.Commit()
 
 	if err != nil {
-		return res, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
+		return ValStats{}, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
 	}
+	return ValidationStatsTx(tx, lexiconID)
+}
+
+func ValidationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
+	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
 
 	// number of entries in the lexicon
 	var entries int
-	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
+	err := tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
