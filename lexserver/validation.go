@@ -45,7 +45,7 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 	symbolSetName := r.FormValue("symbolsetname")
 
 	var es []lex.Entry
-	err := json.Unmarshal([]byte(entriesJSON), es)
+	err := json.Unmarshal([]byte(entriesJSON), &es) //TODO check if OK. NL 20161019 es -> &es
 	if err != nil {
 		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entriesJSON, err)
 		log.Println(msg)
@@ -91,7 +91,7 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	symbolSetName := r.FormValue("symbolsetname")
 
 	var e lex.Entry
-	err := json.Unmarshal([]byte(entryJSON), e)
+	err := json.Unmarshal([]byte(entryJSON), &e)
 	if err != nil {
 		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entryJSON, err)
 		log.Println(msg)
