@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/stts-se/pronlex/lex"
@@ -92,6 +93,72 @@ func mapTransLanguages(e *lex.Entry) error {
 	return nil
 }
 
+func mapTranscription(t0 string) string {
+	t := t0
+	long2From := regexp.MustCompile("2:( *[.]? *[%\"]* *[r])")
+	long2To := "9:$1"
+	short2From := regexp.MustCompile("2( *[.]? *[%\"]* *[r])")
+	short2To := "9$1"
+	longEFrom := regexp.MustCompile("E:( *[.]? *[%\"]* *[r])")
+	longETo := "{:$1"
+	shortEFrom := regexp.MustCompile("E( *[.]? *[%\"]* *[r])")
+	shortETo := "{$1"
+	t = long2From.ReplaceAllString(t, long2To)
+	t = short2From.ReplaceAllString(t, short2To)
+	t = longEFrom.ReplaceAllString(t, longETo)
+	t = shortEFrom.ReplaceAllString(t, shortETo)
+	if len(t0) != len(t) {
+		panic(fmt.Sprintf("mapTranscription | Conversion error %s => %s", t0, t))
+	}
+	return t
+}
+
+func testMapTranscription(input string, expect string) string {
+	result := mapTranscription(input)
+	if result != expect {
+		return fmt.Sprintf("input: %s\nexpected : %s\ngot      : %s", input, expect, result)
+	}
+	return ""
+}
+
+func testMapTranscriptions() {
+	var res []string
+	res = append(res, testMapTranscription(`"" b A: rn . k a . m a . % rd 2 . r e n`, `"" b A: rn . k a . m a . % rd 9 . r e n`))
+	res = append(res, testMapTranscription(`"" b A: rn . k a . m a . % rn 2: . rd e n`, `"" b A: rn . k a . m a . % rn 9: . rd e n`))
+	res = append(res, testMapTranscription(`"" m a s . f 2 . % rs rt 2: . r e l . s e n s`, `"" m a s . f 9 . % rs rt 9: . r e l . s e n s`))
+	res = append(res, testMapTranscription(`m 2 rd . 2: r . 2 rt`, `m 9 rd . 9: r . 9 rt`))
+	res = append(res, testMapTranscription(`k a . p I . "" t A: l . f 2 . % rs 2 r j . n I N . e n s`, `k a . p I . "" t A: l . f 9 . % rs 9 r j . n I N . e n s`))
+	res = append(res, testMapTranscription(`k a . p I . "" t A: l . f 2: . % rs 2 r j . n I N . e n s`, `k a . p I . "" t A: l . f 9: . % rs 9 r j . n I N . e n s`))
+	res = append(res, testMapTranscription(`" l E: n`, `" l E: n`))
+	res = append(res, testMapTranscription(`" l E: rn`, `" l {: rn`))
+	res = append(res, testMapTranscription(`"" E rt . % v E k s t`, `"" { rt . % v E k s t`))
+	var errs []string
+	for _, s := range res {
+		if s != "" {
+			errs = append(errs, s)
+		}
+	}
+	if len(errs) > 0 {
+		panic(fmt.Sprintf("%v", errs))
+	}
+}
+
+func mapTranscriptions(e *lex.Entry, mapper symbolset.Mapper) error {
+
+	err := mapper.MapTranscriptions(e)
+	if err != nil {
+		return err
+	}
+	var newTs []lex.Transcription
+	for _, t := range e.Transcriptions {
+
+		t.Strn = mapTranscription(t.Strn)
+		newTs = append(newTs, t)
+	}
+	e.Transcriptions = newTs
+	return nil
+}
+
 func main() {
 
 	if len(os.Args) != 4 {
@@ -109,6 +176,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
 	}
+
+	testMapTranscriptions()
+
 	ssRuleTo := vrules.SymbolSetRule{mapper.SymbolSet2.To}
 
 	nstFile, err := os.Open(nstFileName)
@@ -162,7 +232,7 @@ func main() {
 			hasError = true
 		}
 
-		err = mapper.MapTranscriptions(&e)
+		err = mapTranscriptions(&e, mapper)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "transcription error	failed to map transcription symbols : %v\n", err)
 			hasError = true
