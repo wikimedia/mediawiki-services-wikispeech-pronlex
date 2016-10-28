@@ -15,7 +15,7 @@ github.com/stts-se/pronlex/lexserver$ mkdir symbol_set_file_area
 github.com/stts-se/pronlex/lexserver$ cp ~/gitrepos/lexdata/*/*/*.tab symbol_set_file_area
 
 github.com/stts-se/pronlex$ go run createEmptyDB/createEmptyDB.go pronlex.db
-github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz lexserver/symbol_set_file_area sv-se_ws-sampa 
+github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa 
 github.com/stts-se/pronlex$ mv pronlex.db lexserver/
 
 github.com/stts-se/pronlex$ cd lexserver
