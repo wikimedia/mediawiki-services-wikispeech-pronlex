@@ -55,6 +55,11 @@ func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 		return validation.Validator{}, err
 	}
 
+	maxOneSyllabic, err := ProcessTransRe(symbolset, "syllabic[^.+%\"-]*( +syllabic)")
+	if err != nil {
+		return validation.Validator{}, err
+	}
+
 	reFrom, err := regexp2.Compile("(.)\\1[+]\\1", regexp2.None)
 	if err != nil {
 		return validation.Validator{}, err
@@ -90,6 +95,12 @@ func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 				Level:   "Format",
 				Message: "Each syllable needs a syllabic phoneme",
 				Re:      syllabicRe,
+			},
+			IllegalTransRe{
+				Name:    "MaxOneSyllabic",
+				Level:   "Fatal",
+				Message: "A syllable cannot contain more than one syllabic phoneme",
+				Re:      maxOneSyllabic,
 			},
 			IllegalTransRe{
 				Name:    "repeated_phonemes",
