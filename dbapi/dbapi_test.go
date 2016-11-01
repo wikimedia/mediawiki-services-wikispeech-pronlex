@@ -180,6 +180,15 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, 1, len(ees))
 	}
 
+	// Check that no entries with entryvalidation exist
+	noev, err := LookUpIntoSlice(db, Query{HasEntryValidation: true})
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if got, want := len(noev), 0; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
 	// Change transcriptions and update db
 	ees0 := ees["apa"][0]
 	t10 := lex.Transcription{Strn: "A: p A:", Language: "Apo"}
@@ -245,6 +254,15 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
+	// Check that one entry with entryvalidation exists
+	noev, err = LookUpIntoSlice(db, Query{HasEntryValidation: true})
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if got, want := len(noev), 1; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
 	eApa.Lemma.Strn = "tjubba"
 	eApa.WordParts = "fin+krog"
 	eApa.Language = "gummiapa"
@@ -274,6 +292,15 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "gummiapa", eApax.Language)
 	}
 	if got, want := len(eApax.EntryValidations), 0; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
+	// Check that no entries with entryvalidation exist
+	noev, err = LookUpIntoSlice(db, Query{HasEntryValidation: true})
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if got, want := len(noev), 0; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 

@@ -37,6 +37,14 @@ type Query struct {
 	// an SQL 'like' expression to match lemma paradigms
 	ParadigmLike   string `json:"paradigmLike"`
 	ParadigmRegexp string `json:"paradigmRegexp"`
+
+	// Select entries with one or more EntryValidations
+	HasEntryValidation bool `json:"hasEntryValidation"`
+
+	// // Search for Entries with EntryValidations with the listed
+	// // validation rule names (such as 'Decomp2Orth', etc)
+	// EntryValidations []string `json:"entryValidations"`
+
 	// the page returned by the SQL query's 'LIMIT' (starts at 1)
 	Page int64 `json:"page"`
 	// the page length of the SQL query's 'LIMIT'

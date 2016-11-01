@@ -260,8 +260,14 @@ func appendQuery(sql string, q Query) (string, []interface{}) {
 	t, tv := transcriptions(q) // V2 simply returns 'transkription.strn like ?' + param value
 	args = append(args, tv...)
 
+	// HasEntryValidation doesn't take any argument
+	ev := ""
+	if q.HasEntryValidation {
+		ev = "entryValidation.entryId = entry.id"
+	}
+
 	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t}), " AND "))
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, ev}), " AND "))
 	if "" != qRes {
 		sql += " AND " + qRes
 	}
