@@ -347,6 +347,10 @@ func TestNst1(t *testing.T) {
 			RuleName: "symbolset",
 			Level:    "Format",
 			Message:  "[...]"},
+		lex.EntryValidation{
+			RuleName: "MaxOneSyllabic",
+			Level:    "Fatal",
+			Message:  "[...]"},
 	}
 
 	if len(result) != len(expect) || result[0].RuleName != expect[0].RuleName || result[1].RuleName != expect[1].RuleName {
