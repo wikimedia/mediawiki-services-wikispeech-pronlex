@@ -185,6 +185,7 @@ var knownParams = map[string]int{
 	"page":                1,
 	"pagelength":          1,
 	"pp":                  1,
+	"hasEntryValidation":  1,
 }
 
 var splitRE = regexp.MustCompile("[, ]")
@@ -211,6 +212,11 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 	paradigmLike := strings.TrimSpace(r.FormValue("paradigmlike"))
 	paradigmRegexp := strings.TrimSpace(r.FormValue("paradigmregexp"))
 
+	// If true, returns only entries with at least one EntryValidation issue
+	hasEntryValidation := false
+	if strings.ToLower(r.FormValue("hasEntryValidation")) == "true" {
+		hasEntryValidation = true
+	}
 	// TODO report error if r.FormValue("page") != ""?
 	// Silently sets deafault if no value, or faulty value
 	page, err := strconv.ParseInt(r.FormValue("page"), 10, 64)
@@ -245,7 +251,9 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 		ParadigmLike:        paradigmLike,
 		ParadigmRegexp:      paradigmRegexp,
 		Page:                page,
-		PageLength:          pageLength}
+		PageLength:          pageLength,
+		HasEntryValidation:  hasEntryValidation,
+	}
 
 	return q, err
 }

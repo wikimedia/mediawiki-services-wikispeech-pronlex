@@ -18,6 +18,34 @@
 
       <a href='/lexicon/lookup?lexicons=sv-se.nst&words=hund,häst'>/lexicon/lookup?lexicons=sv-se.nst&words=hund,häst</a>
       
+    </p>
+
+
+    <h2>Look up word using SQL 'LIKE':</h2>
+    
+    <code>wordlike=häst__</code>
+    <p>
+
+      <a href='/lexicon/lookup?lexicons=sv-se.nst&wordlike=häst__'>/lexicon/lookup?lexicons=sv-se.nst&wordlike=häst__</a>
+      
+    </p>
+
+    
+    
+    <h2>Look up words with validation issues</h2>
+    
+    <code>hasEntryValidation=true</code>
+    <p>
+
+      <a href='/lexicon/lookup?lexicons=sv-se.nst&hasEntryValidation=true'>/lexicon/lookup?lexicons=sv-se.nst&hasEntryValidation=true</a>
+
+
+      <br>Please note that it doesn't work to set to "false" and
+      expect only entries without validation
+      issues. hasEntryValidation=false simply doesn't mean or do
+      anything.
+      
+    </p>
       
       <h2>transcriptionlike</h2>
       Look up word <code>dom</code> where transcription includes string <code>o:</code>
