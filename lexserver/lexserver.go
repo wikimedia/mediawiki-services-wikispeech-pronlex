@@ -182,10 +182,10 @@ var knownParams = map[string]int{
 	"readingregexp":       1,
 	"paradigmlike":        1,
 	"paradigmregexp":      1,
+	"hasEntryValidation":  1,
 	"page":                1,
 	"pagelength":          1,
 	"pp":                  1,
-	"hasEntryValidation":  1,
 }
 
 var splitRE = regexp.MustCompile("[, ]")
