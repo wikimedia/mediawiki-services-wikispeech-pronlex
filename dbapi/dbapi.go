@@ -1056,16 +1056,25 @@ func UpdateValidation(db *sql.DB, entries []lex.Entry) error {
 		return fmt.Errorf("failed starting transaction for updating validation : %v", err)
 	}
 
-	for _, e := range entries {
-		_, err := updateEntryValidationForce(tx, e)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed updating validation : %v", err)
-		}
+	err = UpdateValidationTx(tx, entries)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed updating validation : %v", err)
 	}
 	tx.Commit()
 	return nil
 }
+
+func UpdateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
+	for _, e := range entries {
+		_, err := updateEntryValidationForce(tx, e)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
 	_, err := tx.Exec("DELETE FROM entryvalidation WHERE entryid = ?", e.ID)
 	if err != nil {

@@ -704,6 +704,11 @@ func main() {
 	ff("Failed to exec PRAGMA call %v", err)
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
+	_, err = db.Exec("PRAGMA journal_mode=WAL")
+	ff("Failed to exec PRAGMA call %v", err)
+	//_, err = db.Exec("PRAGMA busy_timeout=500") // doesn't seem to do the trick
+	//ff("Failed to exec PRAGMA call %v", err)
+	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
 
 	// load symbol set mappers
 	err = loadSymbolSets(symbolSetFileArea)

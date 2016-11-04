@@ -16,10 +16,19 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	q := Query{EntryIDs: chunk}
 	var w lex.EntrySliceWriter
 
-	err := LookUp(db, q, &w)
+	tx, err := db.Begin()
+	defer tx.Commit()
 	if err != nil {
+		tx.Rollback()
+		return stats, fmt.Errorf("failed to initialize transaction : %v", err)
+	}
+
+	err = LookUpTx(tx, q, &w)
+	if err != nil {
+		tx.Rollback()
 		return stats, fmt.Errorf("couldn't lookup from ids : %s", err)
 	}
+
 	updated := []lex.Entry{}
 	for i, e := range w.Entries {
 		oldVal := e.EntryValidations
@@ -38,10 +47,12 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 			updated = append(updated, e)
 		}
 	}
-	err = UpdateValidation(db, updated)
+	err = UpdateValidationTx(tx, updated)
 	if err != nil {
+		tx.Rollback()
 		return stats, fmt.Errorf("couldn't update validation : %s", err)
 	}
+	tx.Commit()
 	return stats, nil
 }
 
