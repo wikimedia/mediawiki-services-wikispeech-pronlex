@@ -187,9 +187,6 @@ func paths(as []arc, from, to int) [][]arc {
 }
 
 func pathsAccu(as map[int][]arc, from, to int, currPath []arc, paths *[][]arc) {
-	//var res [][]arc
-
-	//fmt.Printf("HEJ: %#v\n", as)
 
 	arcs, ok := as[from]
 	if !ok { // no path from 'from'
