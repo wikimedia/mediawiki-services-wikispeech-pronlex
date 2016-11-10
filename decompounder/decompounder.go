@@ -10,8 +10,12 @@ import (
 // compute freqs
 // completion?
 // bestGuess (heuristics)
+// Handling 's' and other infixes between compound parts: 'handel+s+'trädgård'
+// Handling tripple consonats clusters merged to two consonants in compounds ('natt+tåg' -> 'nattåg')
 
-// TNode is kind of a trie-structure
+// TNode is kind of a trie-structure representing strings (words).
+// A path trough the TNode that ends with leaf = true represents a
+// string/word.
 type TNode struct {
 	// the current character in a string
 	r rune
@@ -36,11 +40,13 @@ func (t *TNode) add(s string) *TNode {
 	// Pick off first rune in string
 	r, l := utf8.DecodeRuneInString(s)
 
-	// This path already exists
-	// recursively keep adding
+	// This path so far already exists.
+	// Recursively keep adding
 	if son, ok := t.sons[r]; ok {
 		if len(s) == 1 {
 			son.leaf = true
+			// This is where you could increment a frequency counter.
+			// You'd want to add a frequency field to bot TNode and arc.
 		}
 		son.add(s[l:len(s)])
 
@@ -57,6 +63,15 @@ func (t *TNode) add(s string) *TNode {
 	return t
 }
 
+// arc represents a substring of a string, with a start and end index
+// of the string.
+type arc struct {
+	start int
+	end   int
+}
+
+// Returns the matching prefix substrings of s that exist in t in the
+// form of arcs.
 func (t *TNode) prefixes(s string) []arc {
 	var res []arc
 
@@ -130,11 +145,6 @@ func (t SuffixTree) Suffixes(s string) []arc {
 	}
 
 	return res
-}
-
-type arc struct {
-	start int
-	end   int
 }
 
 type Decompounder struct {
