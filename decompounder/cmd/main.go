@@ -75,6 +75,9 @@ func main() {
 		ps := decompParts(d)
 		if len(ps) == 2 { // two part compounds
 			decomp.Prefixes.Add(ps[0])
+			if ps[0] == "ale" {
+				fmt.Printf("GMF! %s %s\n", d, ps[1])
+			}
 			decomp.Suffixes.Add(ps[1])
 			n++
 		}
