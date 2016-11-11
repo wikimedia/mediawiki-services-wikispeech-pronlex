@@ -236,5 +236,41 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 		t.Errorf(ts, w, g)
 	}
 
-	//fmt.Printf("%#v\n", ds5)
+	n3 := "xnikolaj3000"
+
+	decomp.Prefixes.Add(n3)
+	ds6 := decomp.Decomp(n3)
+	if w, g := 0, len(ds6); w != g {
+		t.Errorf(ts, w, g)
+	}
+	p6 := decomp.Prefixes.Prefixes(n3)
+	if w, g := 0, len(p6); w != g {
+		t.Errorf(ts, w, g)
+	}
+	p6b := decomp.Prefixes.RecursivePrefixes(n3)
+	if w, g := 0, len(p6b); w != g {
+		t.Errorf(ts, w, g)
+	}
+	p6b2 := decomp.Prefixes.RecursivePrefixes(n3 + n3)
+	if w, g := 1, len(p6b2); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	decomp.Suffixes.Add(n3)
+	ds7 := decomp.Decomp(n3)
+	if w, g := 0, len(ds7); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	s7 := decomp.Suffixes.Suffixes(n3)
+	if w, g := 0, len(s7); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	ds8 := decomp.Decomp(n3 + n3)
+	if w, g := 1, len(ds8); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	//fmt.Printf("%#v\n", ds8)
 }

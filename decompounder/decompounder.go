@@ -155,6 +155,8 @@ func (t SuffixTree) Add(s string) {
 	t.tree.add(r)
 }
 
+// Suffixes returns the arc for suffixes of s in t. A suffix may not
+// span the complete s.
 func (t SuffixTree) Suffixes(s string) []arc {
 	r := reverse(s)
 
@@ -163,7 +165,7 @@ func (t SuffixTree) Suffixes(s string) []arc {
 	suffArcs := t.tree.prefixes(r)
 
 	// invert arcs to go from left to right
-	l := len(s)
+	l := len(r)
 	var res []arc
 	for _, a := range suffArcs {
 		res = append(res, arc{start: l - a.end, end: l - a.start})
