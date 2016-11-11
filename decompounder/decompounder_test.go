@@ -170,14 +170,41 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 	decomp := NewDecompounder()
 	decomp.Prefixes.Add("svavel")
 	decomp.Prefixes.Add("kanin")
+
 	decomp.Suffixes.Add("förening")
 
 	ds1 := decomp.Decomp("svavelkaninförening")
 	//ds1 := decomp.Decomp("svavelförening")
 	if w, g := 1, len(ds1); w != g {
 
-		t.Errorf("OH NOOOOO!")
+		t.Errorf(ts, w, g)
 	}
 
-	//fmt.Printf("%#v\n", ds1)
+	decomp.Suffixes.Add("kanin")
+
+	ds2 := decomp.Decomp("kaninkanin")
+	if w, g := 1, len(ds2); w != g {
+
+		t.Errorf(ts, w, g)
+	}
+
+	ds3 := decomp.Decomp("kaninkaninkaninkaninkanin")
+	if w, g := 1, len(ds3); w != g {
+		t.Errorf(ts, w, g)
+
+	}
+	if w, g := 5, len(ds3[0]); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	ds4 := decomp.Decomp("kaninkaninsvavelkaninkanin")
+	if w, g := 1, len(ds4); w != g {
+		t.Errorf(ts, w, g)
+
+	}
+	if w, g := 5, len(ds4[0]); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	//fmt.Printf("%#v\n", ds4)
 }
