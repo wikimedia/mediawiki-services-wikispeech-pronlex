@@ -16,22 +16,22 @@ import (
 // TNode is kind of a trie-structure representing strings (words).
 // A path trough the TNode that ends with leaf = true represents a
 // string/word.
-type TNode struct {
+type tNode struct {
 	// the current character in a string
 	r rune
 	// child nodes of this node
-	sons map[rune]*TNode
+	sons map[rune]*tNode
 	// true if this character ends an input string
 	leaf bool
 }
 
-func NewTNode() *TNode {
-	return &TNode{sons: make(map[rune]*TNode)}
+func NewtNode() *tNode {
+	return &tNode{sons: make(map[rune]*tNode)}
 }
 
-// add inserts a strings into the TNode and builds up sub-nodes as it
+// add inserts a strings into the tNode and builds up sub-nodes as it
 // goes
-func (t *TNode) add(s string) *TNode {
+func (t *tNode) add(s string) *tNode {
 
 	if s == "" {
 		return t
@@ -46,12 +46,12 @@ func (t *TNode) add(s string) *TNode {
 		if len(s) == 1 {
 			son.leaf = true
 			// This is where you could increment a frequency counter.
-			// You'd want to add a frequency field to bot TNode and arc.
+			// You'd want to add a frequency field to bot tNode and arc.
 		}
 		son.add(s[l:len(s)])
 
 	} else { // new path
-		son := NewTNode()
+		son := NewtNode()
 		son.r = r
 		if len(s) == 1 {
 			son.leaf = true
@@ -72,7 +72,7 @@ type arc struct {
 
 // Returns the matching prefix substrings of s that exist in t in the
 // form of arcs.
-func (t *TNode) prefixes(s string) []arc {
+func (t *tNode) prefixes(s string) []arc {
 	var res []arc
 
 	sons := t.sons
@@ -92,11 +92,11 @@ func (t *TNode) prefixes(s string) []arc {
 }
 
 type PrefixTree struct {
-	tree *TNode
+	tree *tNode
 }
 
 func NewPrefixTree() PrefixTree {
-	return PrefixTree{tree: NewTNode()}
+	return PrefixTree{tree: NewtNode()}
 }
 
 func (t PrefixTree) Add(s string) {
@@ -107,12 +107,36 @@ func (t PrefixTree) Prefixes(s string) []arc {
 	return t.tree.prefixes(s)
 }
 
+func (t PrefixTree) RecursivePrefixes(s string) []arc {
+	var res []arc
+	// TODO the following call is probably broken
+	t.recursivePrefixes(s, 0, len(s), &res)
+	return res
+}
+
+// TODO Broke: it overgenerates, it seems.
+// Yet to add test case.
+func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
+
+	// TODO Where to look for infixes, like compounding 's'?
+	// Probably somewhere around here
+
+	newAs := t.Prefixes(s[from:])
+	for _, a := range newAs {
+		newArc := arc{start: a.start + from, end: a.end + from}
+		if a.end < to {
+			*as = append(*as, newArc)
+			t.recursivePrefixes(s, from+a.end, to, as)
+		}
+	}
+}
+
 type SuffixTree struct {
-	tree *TNode
+	tree *tNode
 }
 
 func NewSuffixTree() SuffixTree {
-	return SuffixTree{tree: NewTNode()}
+	return SuffixTree{tree: NewtNode()}
 }
 
 // Reverse returns its argument string reversed rune-wise left to right.
@@ -148,19 +172,34 @@ func (t SuffixTree) Suffixes(s string) []arc {
 }
 
 type Decompounder struct {
-	prefixes PrefixTree
-	suffixes SuffixTree
+	Prefixes PrefixTree
+	Suffixes SuffixTree
 }
 
 func NewDecompounder() Decompounder {
-	return Decompounder{prefixes: NewPrefixTree(), suffixes: NewSuffixTree()}
+	return Decompounder{Prefixes: NewPrefixTree(), Suffixes: NewSuffixTree()}
 }
 
 func (d Decompounder) arcs(s string) []arc {
 	var res []arc
 
-	res = append(res, d.prefixes.Prefixes(s)...)
-	res = append(res, d.suffixes.Suffixes(s)...)
+	res0 := append(res, d.Prefixes.RecursivePrefixes(s)...)
+	res1 := append(res, d.Suffixes.Suffixes(s)...)
+
+	// ensure no duplicate arcs
+	found := make(map[arc]bool)
+	for _, a := range res0 {
+		if !found[a] {
+			res = append(res, a)
+			found[a] = true
+		}
+	}
+	for _, a := range res1 {
+		if !found[a] {
+			res = append(res, a)
+			found[a] = true
+		}
+	}
 
 	return res
 }
@@ -184,8 +223,19 @@ func punk() {
 
 func paths(as []arc, from, to int) [][]arc {
 
-	arcMap := make(map[int][]arc)
+	// ensure that there are no duplicate arcs, since these will
+	// generate multiple identical paths
+	found := make(map[arc]bool)
+	var uniqueAs []arc
 	for _, a := range as {
+		if !found[a] {
+			uniqueAs = append(uniqueAs, a)
+			found[a] = true
+		}
+	}
+
+	arcMap := make(map[int][]arc)
+	for _, a := range uniqueAs {
 		v, _ := arcMap[a.start]
 		arcMap[a.start] = append(v, a)
 	}

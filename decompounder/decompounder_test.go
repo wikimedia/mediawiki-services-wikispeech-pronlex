@@ -11,7 +11,7 @@ func spunk() { fmt.Println() }
 
 func Test_Tree(t *testing.T) {
 
-	tr := NewTNode()
+	tr := NewtNode()
 
 	if want, got := rune(0), tr.r; want != got {
 		t.Errorf(ts, want, got)
@@ -133,11 +133,11 @@ func Test_Decompounder(t *testing.T) {
 
 	d := NewDecompounder()
 
-	d.prefixes.Add("sylt")
-	d.prefixes.Add("syl")
+	d.Prefixes.Add("sylt")
+	d.Prefixes.Add("syl")
 
-	d.suffixes.Add("järn")
-	d.suffixes.Add("tjärn")
+	d.Suffixes.Add("järn")
+	d.Suffixes.Add("tjärn")
 
 	decomps := d.Decomp("syltjärn")
 	if w, g := 2, len(decomps); w != g {
@@ -163,4 +163,21 @@ func Test_Decompounder(t *testing.T) {
 	if p1 != "sylt" && p2 != "sylt" {
 		t.Error("Aouch")
 	}
+}
+
+func Test_Decomp_RecursivePrefixes(t *testing.T) {
+
+	decomp := NewDecompounder()
+	decomp.Prefixes.Add("svavel")
+	decomp.Prefixes.Add("kanin")
+	decomp.Suffixes.Add("förening")
+
+	ds1 := decomp.Decomp("svavelkaninförening")
+	//ds1 := decomp.Decomp("svavelförening")
+	if w, g := 1, len(ds1); w != g {
+
+		t.Errorf("OH NOOOOO!")
+	}
+
+	//fmt.Printf("%#v\n", ds1)
 }
