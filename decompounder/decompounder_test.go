@@ -2,6 +2,7 @@ package decompounder
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -206,5 +207,34 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 		t.Errorf(ts, w, g)
 	}
 
-	//fmt.Printf("%#v\n", ds4)
+	// Oh my... the following test was made to cath an
+	// over-generation error, due to the fact that a prefix
+	// initially was allowed to end at the end of the input
+	// string. This was changed, so that a prefix must end before
+	// the end of the input string.
+
+	decomp.Prefixes.Add("k")
+	decomp.Prefixes.Add("a")
+	decomp.Prefixes.Add("ka")
+	decomp.Prefixes.Add("kan")
+	decomp.Prefixes.Add("nin")
+	decomp.Prefixes.Add("in")
+	decomp.Prefixes.Add("i")
+	decomp.Prefixes.Add("n")
+
+	ds5 := decomp.Decomp("kaninkanin")
+	unique := make(map[string]bool)
+	for _, d0 := range ds5 {
+		d := strings.Join(d0, "+")
+		if unique[d] {
+			fmt.Printf("DARN! %v\n", d)
+		} else {
+			unique[d] = true
+		}
+	}
+	if w, g := len(unique), len(ds5); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	//fmt.Printf("%#v\n", ds5)
 }

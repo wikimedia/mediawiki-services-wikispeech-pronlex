@@ -71,7 +71,7 @@ type arc struct {
 }
 
 // Returns the matching prefix substrings of s that exist in t in the
-// form of arcs.
+// form of arcs. A prefix must be shorter than the input string.
 func (t *tNode) prefixes(s string) []arc {
 	var res []arc
 
@@ -80,7 +80,8 @@ func (t *tNode) prefixes(s string) []arc {
 		// path in tree
 		if v, ok := sons[r]; ok {
 			sons = v.sons
-			if v.leaf {
+			// '&& i < len(s)-1' ensures that the prefix is shorter than s
+			if v.leaf && i < len(s)-1 {
 				res = append(res, arc{end: i + 1})
 			}
 		} else { // not a path in tree
