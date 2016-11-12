@@ -274,3 +274,37 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 
 	fmt.Println("OBS: bugg: alen -> ale+n (stockholmsfinalen)")
 }
+
+func Test_Alen(t *testing.T) {
+	decomp := NewDecompounder()
+	decomp.Prefixes.Add("ale")
+	decomp.Prefixes.Add("n")
+	decomp.Prefixes.Add("fin")
+	decomp.Prefixes.Add("stockholms")
+
+	decomp.Suffixes.Add("finalen")
+
+	ds1 := decomp.Decomp("alen")
+	if w, g := 0, len(ds1); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	p1 := decomp.Prefixes.Prefixes("alen")
+	if w, g := 1, len(p1); w != g {
+		t.Errorf(ts, w, g)
+	}
+	w := arc{start: 0, end: 3}
+	g := p1[0]
+	if w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	ds2 := decomp.Decomp("stockholmsfinalen")
+	if w, g := 1, len(ds2); w != g {
+		t.Errorf(ts, w, g)
+	}
+	if w, g := 2, len(ds2[0]); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+}
