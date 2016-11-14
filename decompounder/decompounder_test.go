@@ -134,11 +134,11 @@ func Test_Decompounder(t *testing.T) {
 
 	d := NewDecompounder()
 
-	d.Prefixes.Add("sylt")
-	d.Prefixes.Add("syl")
+	d.AddPrefix("sylt")
+	d.AddPrefix("syl")
 
-	d.Suffixes.Add("järn")
-	d.Suffixes.Add("tjärn")
+	d.AddSuffix("järn")
+	d.AddSuffix("tjärn")
 
 	decomps := d.Decomp("syltjärn")
 	if w, g := 2, len(decomps); w != g {
@@ -169,10 +169,10 @@ func Test_Decompounder(t *testing.T) {
 func Test_Decomp_RecursivePrefixes(t *testing.T) {
 
 	decomp := NewDecompounder()
-	decomp.Prefixes.Add("svavel")
-	decomp.Prefixes.Add("kanin")
+	decomp.AddPrefix("svavel")
+	decomp.AddPrefix("kanin")
 
-	decomp.Suffixes.Add("förening")
+	decomp.AddSuffix("förening")
 
 	ds1 := decomp.Decomp("svavelkaninförening")
 	//ds1 := decomp.Decomp("svavelförening")
@@ -181,7 +181,7 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 		t.Errorf(ts, w, g)
 	}
 
-	decomp.Suffixes.Add("kanin")
+	decomp.AddSuffix("kanin")
 
 	ds2 := decomp.Decomp("kaninkanin")
 	if w, g := 1, len(ds2); w != g {
@@ -213,14 +213,14 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 	// string. This was changed, so that a prefix must end before
 	// the end of the input string.
 
-	decomp.Prefixes.Add("k")
-	decomp.Prefixes.Add("a")
-	decomp.Prefixes.Add("ka")
-	decomp.Prefixes.Add("kan")
-	decomp.Prefixes.Add("nin")
-	decomp.Prefixes.Add("in")
-	decomp.Prefixes.Add("i")
-	decomp.Prefixes.Add("n")
+	decomp.AddPrefix("k")
+	decomp.AddPrefix("a")
+	decomp.AddPrefix("ka")
+	decomp.AddPrefix("kan")
+	decomp.AddPrefix("nin")
+	decomp.AddPrefix("in")
+	decomp.AddPrefix("i")
+	decomp.AddPrefix("n")
 
 	ds5 := decomp.Decomp("kaninkanin")
 	unique := make(map[string]bool)
@@ -238,31 +238,31 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 
 	n3 := "xnikolaj3000"
 
-	decomp.Prefixes.Add(n3)
+	decomp.AddPrefix(n3)
 	ds6 := decomp.Decomp(n3)
 	if w, g := 0, len(ds6); w != g {
 		t.Errorf(ts, w, g)
 	}
-	p6 := decomp.Prefixes.Prefixes(n3)
+	p6 := decomp.prefixes.Prefixes(n3)
 	if w, g := 0, len(p6); w != g {
 		t.Errorf(ts, w, g)
 	}
-	p6b := decomp.Prefixes.RecursivePrefixes(n3)
+	p6b := decomp.prefixes.RecursivePrefixes(n3)
 	if w, g := 0, len(p6b); w != g {
 		t.Errorf(ts, w, g)
 	}
-	p6b2 := decomp.Prefixes.RecursivePrefixes(n3 + n3)
+	p6b2 := decomp.prefixes.RecursivePrefixes(n3 + n3)
 	if w, g := 1, len(p6b2); w != g {
 		t.Errorf(ts, w, g)
 	}
 
-	decomp.Suffixes.Add(n3)
+	decomp.AddSuffix(n3)
 	ds7 := decomp.Decomp(n3)
 	if w, g := 0, len(ds7); w != g {
 		t.Errorf(ts, w, g)
 	}
 
-	s7 := decomp.Suffixes.Suffixes(n3)
+	s7 := decomp.suffixes.Suffixes(n3)
 	if w, g := 0, len(s7); w != g {
 		t.Errorf(ts, w, g)
 	}
@@ -277,19 +277,19 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 
 func Test_Alen(t *testing.T) {
 	decomp := NewDecompounder()
-	decomp.Prefixes.Add("ale")
-	decomp.Prefixes.Add("n")
-	decomp.Prefixes.Add("fin")
-	decomp.Prefixes.Add("stockholms")
+	decomp.AddPrefix("ale")
+	decomp.AddPrefix("n")
+	decomp.AddPrefix("fin")
+	decomp.AddPrefix("stockholms")
 
-	decomp.Suffixes.Add("finalen")
+	decomp.AddSuffix("finalen")
 
 	ds1 := decomp.Decomp("alen")
 	if w, g := 0, len(ds1); w != g {
 		t.Errorf(ts, w, g)
 	}
 
-	p1 := decomp.Prefixes.Prefixes("alen")
+	p1 := decomp.prefixes.Prefixes("alen")
 	if w, g := 1, len(p1); w != g {
 		t.Errorf(ts, w, g)
 	}

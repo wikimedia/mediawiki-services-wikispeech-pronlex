@@ -175,19 +175,19 @@ func (t SuffixTree) Suffixes(s string) []arc {
 }
 
 type Decompounder struct {
-	Prefixes PrefixTree
-	Suffixes SuffixTree
+	prefixes PrefixTree
+	suffixes SuffixTree
 }
 
 func NewDecompounder() Decompounder {
-	return Decompounder{Prefixes: NewPrefixTree(), Suffixes: NewSuffixTree()}
+	return Decompounder{prefixes: NewPrefixTree(), suffixes: NewSuffixTree()}
 }
 
 func (d Decompounder) arcs(s string) []arc {
 	var res []arc
 
-	res0 := append(res, d.Prefixes.RecursivePrefixes(s)...)
-	res1 := append(res, d.Suffixes.Suffixes(s)...)
+	res0 := append(res, d.prefixes.RecursivePrefixes(s)...)
+	res1 := append(res, d.suffixes.Suffixes(s)...)
 
 	// ensure no duplicate arcs
 	found := make(map[arc]bool)
@@ -205,6 +205,14 @@ func (d Decompounder) arcs(s string) []arc {
 	}
 
 	return res
+}
+
+func (d Decompounder) AddPrefix(s string) {
+	d.prefixes.Add(s)
+}
+
+func (d Decompounder) AddSuffix(s string) {
+	d.suffixes.Add(s)
 }
 
 func (d Decompounder) Decomp(s string) [][]string {
