@@ -2,6 +2,7 @@ package decompounder
 
 import (
 	"fmt"
+	"sort"
 	"unicode/utf8"
 )
 
@@ -215,6 +216,21 @@ func (d Decompounder) AddSuffix(s string) {
 	d.suffixes.Add(s)
 }
 
+// sorting [][]string according to length
+type ByLen [][]string
+
+func (b ByLen) Len() int {
+	return len(b)
+}
+func (b ByLen) Swap(i, j int) {
+	b[i], b[j] = b[j], b[i]
+}
+func (b ByLen) Less(i, j int) bool {
+	// TODO? add frequency to arcs, and sort them instead: first by
+	// length, second by highest lowest freq.
+	return len(b[i]) < len(b[j])
+}
+
 func (d Decompounder) Decomp(s string) [][]string {
 	var res [][]string
 
@@ -225,6 +241,7 @@ func (d Decompounder) Decomp(s string) [][]string {
 		res = append(res, pathToDecomp(p, s))
 	}
 
+	sort.Sort(ByLen(res))
 	return res
 }
 

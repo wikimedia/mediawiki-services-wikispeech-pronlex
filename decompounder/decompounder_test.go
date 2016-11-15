@@ -308,3 +308,29 @@ func Test_Alen(t *testing.T) {
 	}
 
 }
+
+func Test_LenSort(t *testing.T) {
+
+	// return the versions with fewest compound parts first
+
+	decomp := NewDecompounder()
+	decomp.AddPrefix("odalbonde")
+	decomp.AddPrefix("bonde")
+	decomp.AddPrefix("odal")
+
+	decomp.AddSuffix("husbil")
+	decomp.AddSuffix("bil")
+
+	decomp.AddPrefix("hus")
+
+	ds1 := decomp.Decomp("odalbondehusbil")
+	soFar := 0
+	for _, d := range ds1 {
+		if len(d) < soFar {
+			t.Errorf("this thingy is not sorted: %#v", ds1)
+			return
+		}
+		soFar = len(d)
+	}
+
+}
