@@ -145,6 +145,7 @@ func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 					*as = append(*as, infix)
 					// TODO Aouch... nested recursion. Fix this to have only one recursive call below.
 					// I guess this might blow things up.
+					// 'from' could be a list of arcs instead of a single int?
 					t.recursivePrefixes(s, infix.end, to, as)
 				}
 			}
