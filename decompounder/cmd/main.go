@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	//"io"
+	"compress/gzip"
 	"log"
 	"os"
 	"strings"
@@ -28,13 +29,13 @@ func decompParts(s string) []string {
 	var res []string
 
 	// For now, nuke compounding 's', etc
-	s = strings.Replace(s, "+s+", "s+", -1)
-	s = strings.Replace(s, "+n+", "n+", -1)
-	s = strings.Replace(s, "+e+", "e+", -1)
-	s = strings.Replace(s, "+a+", "a+", -1)
-	s = strings.Replace(s, "+o+", "o+", -1)
-	s = strings.Replace(s, "+r+", "r+", -1)
-	s = strings.Replace(s, "+u+", "u+", -1)
+	//s = strings.Replace(s, "+s+", "s+", -1)
+	//s = strings.Replace(s, "+n+", "n+", -1)
+	//s = strings.Replace(s, "+e+", "e+", -1)
+	//s = strings.Replace(s, "+a+", "a+", -1)
+	//s = strings.Replace(s, "+o+", "o+", -1)
+	//s = strings.Replace(s, "+r+", "r+", -1)
+	//s = strings.Replace(s, "+u+", "u+", -1)
 
 	for _, s := range strings.Split(s, "+") {
 		res = append(res, strings.ToLower(s))
@@ -51,15 +52,31 @@ func main() {
 	}
 
 	fn := os.Args[1]
+
+	var s *bufio.Scanner
 	fh, err := os.Open(fn)
+	defer fh.Close()
 	if err != nil {
 		log.Fatalf("failed tyo open file: %v", err)
 		return
 	}
 
+	if strings.HasSuffix(fn, ".gz") {
+		gz, err := gzip.NewReader(fh)
+		if err != nil {
+			var msg = fmt.Sprintf("failed to open gz reader : %v", err)
+			//logger.Write(msg)
+			fmt.Printf("%v\n", msg)
+			return
+		}
+		s = bufio.NewScanner(gz)
+	} else {
+
+		s = bufio.NewScanner(fh)
+	}
+
 	decomp := decompounder.NewDecompounder()
 	n, m := 0, 0
-	s := bufio.NewScanner(fh)
 
 	fmt.Fprint(os.Stderr, "loading compound parts...")
 
@@ -90,6 +107,11 @@ func main() {
 	}
 
 	fmt.Fprint(os.Stderr, " done\n")
+
+	// Hardwired +s+ for now:
+	decomp.AddInfix("s")
+
+	fmt.Fprintf(os.Stderr, "hardwired compounding infix 's'\n")
 
 	fmt.Fprintf(os.Stderr, "loaded %d compounds of %d input lines\n", n, m)
 

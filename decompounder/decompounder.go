@@ -130,8 +130,8 @@ func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 	for _, a := range newAs {
 		newArc := arc{start: a.start + from, end: a.end + from}
 
-		fmt.Printf("newArc: %#v\n", newArc)
-		fmt.Printf("s: %s %s\n", s, s[newArc.start:newArc.end])
+		//fmt.Printf("newArc: %#v\n", newArc)
+		//fmt.Printf("s: %s %s\n", s, s[newArc.start:newArc.end])
 
 		if a.end < to {
 			*as = append(*as, newArc)
