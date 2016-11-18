@@ -362,5 +362,11 @@ func Test_InfixS(t *testing.T) {
 	if w, g := "s", ds2[0][1]; w != g {
 		t.Errorf(ts, w, g)
 	}
+	if w, g := "finland", ds2[0][0]; w != g {
+		t.Errorf(ts, w, g)
+	}
+	if w, g := "båt", ds2[0][2]; w != g {
+		t.Errorf(ts, w, g)
+	}
 
 }
