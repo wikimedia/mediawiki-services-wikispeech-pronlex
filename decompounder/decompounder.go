@@ -138,7 +138,9 @@ func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 			infixes := t.Infixes(s[newArc.end:])
 			for _, in := range infixes {
 				infix := arc{start: newArc.end, end: in.end + newArc.end}
-				*as = append(*as, infix)
+				if infix.end < to {
+					*as = append(*as, infix)
+				}
 			}
 
 			t.recursivePrefixes(s, from+a.end, to, as)
