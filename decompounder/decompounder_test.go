@@ -369,4 +369,12 @@ func Test_InfixS(t *testing.T) {
 		t.Errorf(ts, w, g)
 	}
 
+	decomp.AddPrefix("båt")
+	decomp.AddSuffix("kapten")
+
+	ds3 := decomp.Decomp("finlandsbåtskapten")
+	if w, g := 1, len(ds3); w != g {
+		t.Errorf(ts, w, g)
+	}
+
 }

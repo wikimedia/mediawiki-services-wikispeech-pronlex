@@ -129,6 +129,10 @@ func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 
 	for _, a := range newAs {
 		newArc := arc{start: a.start + from, end: a.end + from}
+
+		fmt.Printf("newArc: %#v\n", newArc)
+		fmt.Printf("s: %s %s\n", s, s[newArc.start:newArc.end])
+
 		if a.end < to {
 			*as = append(*as, newArc)
 
@@ -139,6 +143,9 @@ func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 				infix := arc{start: newArc.end, end: in.end + newArc.end}
 				if infix.end < to {
 					*as = append(*as, infix)
+					// TODO Aouch... nested recursion. Fix this to have only one recursive call below.
+					// I guess this might blow things up.
+					t.recursivePrefixes(s, infix.end, to, as)
 				}
 			}
 
