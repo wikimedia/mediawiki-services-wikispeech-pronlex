@@ -119,7 +119,6 @@ func (t PrefixTree) Infixes(s string) []arc {
 
 func (t PrefixTree) RecursivePrefixes(s string) []arc {
 	var res []arc
-	// TODO the following call is probably broken
 	t.recursivePrefixes(s, 0, len(s), &res)
 	return res
 }
