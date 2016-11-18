@@ -95,18 +95,27 @@ func (t *tNode) prefixes(s string) []arc {
 
 type PrefixTree struct {
 	tree *tNode
+	// infixes are gluing parts that may appear once after a prefix
+	infixes *tNode
 }
 
 func NewPrefixTree() PrefixTree {
-	return PrefixTree{tree: NewtNode()}
+	return PrefixTree{tree: NewtNode(), infixes: NewtNode()}
 }
 
 func (t PrefixTree) Add(s string) {
 	t.tree.add(s)
 }
+func (t PrefixTree) AddInfix(s string) {
+	t.infixes.add(s)
+}
 
 func (t PrefixTree) Prefixes(s string) []arc {
 	return t.tree.prefixes(s)
+}
+
+func (t PrefixTree) Infixes(s string) []arc {
+	return t.infixes.prefixes(s)
 }
 
 func (t PrefixTree) RecursivePrefixes(s string) []arc {
@@ -116,18 +125,23 @@ func (t PrefixTree) RecursivePrefixes(s string) []arc {
 	return res
 }
 
-// TODO Broke: it overgenerates, it seems.
-// Yet to add test case.
 func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 
-	// TODO Where to look for infixes, like compounding 's'?
-	// Probably somewhere around here
-
 	newAs := t.Prefixes(s[from:])
+
 	for _, a := range newAs {
 		newArc := arc{start: a.start + from, end: a.end + from}
 		if a.end < to {
 			*as = append(*as, newArc)
+
+			// We have found a prefix above.
+			// Go looking for potential infixes, and add these to prefix list
+			infixes := t.Infixes(s[newArc.end:])
+			for _, in := range infixes {
+				infix := arc{start: newArc.end, end: in.end + newArc.end}
+				*as = append(*as, infix)
+			}
+
 			t.recursivePrefixes(s, from+a.end, to, as)
 		}
 	}
@@ -210,6 +224,10 @@ func (d Decompounder) arcs(s string) []arc {
 
 func (d Decompounder) AddPrefix(s string) {
 	d.prefixes.Add(s)
+}
+
+func (d Decompounder) AddInfix(s string) {
+	d.prefixes.AddInfix(s)
 }
 
 func (d Decompounder) AddSuffix(s string) {

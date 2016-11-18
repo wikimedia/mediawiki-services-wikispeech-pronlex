@@ -334,3 +334,33 @@ func Test_LenSort(t *testing.T) {
 	}
 
 }
+
+func Test_InfixS(t *testing.T) {
+
+	decomp := NewDecompounder()
+	decomp.AddPrefix("finland")
+	decomp.AddSuffix("båt")
+
+	ds1 := decomp.Decomp("finlandbåt")
+	if w, g := 1, len(ds1); w != g {
+		t.Errorf(ts, w, g)
+	}
+	if w, g := 2, len(ds1[0]); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	decomp.AddInfix("s")
+
+	ds2 := decomp.Decomp("finlandsbåt")
+	if w, g := 1, len(ds2); w != g {
+		t.Errorf(ts, w, g)
+	}
+	if w, g := 3, len(ds2[0]); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	if w, g := "s", ds2[0][1]; w != g {
+		t.Errorf(ts, w, g)
+	}
+
+}
