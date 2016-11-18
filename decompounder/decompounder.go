@@ -11,8 +11,7 @@ import (
 // compute freqs
 // completion?
 // bestGuess (heuristics)
-// Handling 's' and other infixes between compound parts: 'handel+s+'trädgård'
-// Handling tripple consonats clusters merged to two consonants in compounds ('natt+tåg' -> 'nattåg')
+// Handling tripple consonats clusters merged into two consonants in compounds ('natt+tåg' -> 'nattåg')
 
 // TNode is kind of a trie-structure representing strings (words).
 // A path trough the TNode that ends with leaf = true represents a
