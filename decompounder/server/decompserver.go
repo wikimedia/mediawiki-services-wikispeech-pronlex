@@ -96,6 +96,9 @@ func main() {
 	r0 := http.StripPrefix("/decomp/built/", http.FileServer(http.Dir("./built/")))
 	r.PathPrefix("/decomp/built/").Handler(r0)
 
+	r1 := http.StripPrefix("/decomp/externals/", http.FileServer(http.Dir("./externals/")))
+	r.PathPrefix("/decomp/externals/").Handler(r1)
+
 	port := ":6778"
 	log.Printf("starting decomp server at port %s\n", port)
 	err := http.ListenAndServe(port, r)

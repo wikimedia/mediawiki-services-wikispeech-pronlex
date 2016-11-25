@@ -9,9 +9,13 @@
       <input type="text" id="decomp_word" value="bilskrot" ></input>
       <button type="button" id="decomp_button" onclick="decomp()">Decomp</button>
     </div>
-    <div id="decomp_output"></div>
+
+    <div data-bind="text: decomps">
+      
+    </div>
     
     
+    <script src="./decomp/externals/knockout-3.4.1.js"></script>
     <script src="./decomp/built/decomp_demo.js"></script>
   </body>
 </html>

@@ -15,3 +15,10 @@ mkdir externals
 cd externals
 
 wget http://knockoutjs.com/downloads/knockout-3.4.1.js
+
+
+-----
+
+tsc
+
+go run decompserver.go
