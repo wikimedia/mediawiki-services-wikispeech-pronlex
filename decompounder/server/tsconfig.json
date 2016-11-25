@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+	"outDir": "./built/",
+	"sourceMap": true,
+	"watch": true
+    },
+    
+    "files": [
+	"src/decomp_demo.ts"
+    ]
+}
