@@ -1,4 +1,4 @@
-* pronlex/decompounder/server
+# pronlex/decompounder/server
 
 From https://www.typescriptlang.org/docs/handbook/knockout.html
 
