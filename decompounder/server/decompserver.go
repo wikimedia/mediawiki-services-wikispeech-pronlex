@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -42,6 +43,10 @@ func addSuffix(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "added '%s'", suffix)
 }
 
+type Decomp struct {
+	Parts []string `json:"parts"`
+}
+
 func decompWord(w http.ResponseWriter, r *http.Request) {
 
 	word := r.FormValue("word")
@@ -60,11 +65,22 @@ func decompWord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := fmt.Sprintf("%#v", decomper.Decomp(word))
+	var res []Decomp
+	//res := fmt.Sprintf("%#v", decomper.Decomp(word))
+	for _, d := range decomper.Decomp(word) {
+		res = append(res, Decomp{Parts: d})
+	}
 	log.Println(res)
 
-	w.Header().Set("Content-Type", "text/plain;charset=UTF-8")
-	fmt.Fprintf(w, res)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	j, err := json.Marshal(res)
+	if err != nil {
+		msg := fmt.Sprintf("failed json marshalling : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, string(j))
 }
 
 func decompMain(w http.ResponseWriter, r *http.Request) {
