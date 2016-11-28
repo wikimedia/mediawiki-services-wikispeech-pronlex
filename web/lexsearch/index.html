@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Search Demo</title>
+</head>
+<body>
+<h1>Search Demo</h1>
+
+<form data-bind="submit: search">
+  <table>
+    <tr>
+      <td>
+	<label for="lexicons">Lexicon</label>
+      </td>
+      <td>
+	<input data-bind="value: lexicons" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<label for="words">Words</label>
+      </td>
+      <td>
+	<input data-bind="value: words" />
+      </td>
+    </tr>
+  </table>
+  <button type="submit">Submit</button>
+  </form>
+
+  <p>
+  <table>
+    <thead><tr><td><b>EId</b></td><td><b>Strn</b></td><td><b>WordParts</b></td><td><b>Transcription</b></td></tr></thead>
+    <!-- ko foreach: { data: result, as: 'e' } -->
+    <tbody data-bind="foreach: { data: e.transcriptions, as: 't' }">
+      <tr>
+	<td><span data-bind="text: e.id"></span></td>
+	<td><span data-bind="text: e.strn"></span></td>
+	  <td><span data-bind="text: e.wordParts"></span></td>
+	  <td><span data-bind="text: t.strn"></span></td>
+	</tr>
+    </tbody>
+    <!-- /ko -->
+  </table>
+  </p>
+
+
+</body>
+<script type="text/javascript" src="/lexsearch/externals/knockout-3.4.1.js"></script>
+<script type="text/javascript" src="/lexsearch/built/search_demo.js"></script>
+</html>
