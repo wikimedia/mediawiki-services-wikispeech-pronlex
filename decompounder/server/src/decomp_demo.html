@@ -6,14 +6,17 @@
     <h1>Decomp demo</h1>
     
     <div>
-      <input type="text" id="decomp_word" value="bilskrot" ></input>
-      <button type="button" id="decomp_button" onclick="decomp()">Decomp</button>
-    </div>
-
-    <div data-bind="text: decomps">
-      
+      <input data-bind="value: word" />
     </div>
     
+    <table>
+      <thead></thead>
+      <tbody data-bind="foreach: decomps">
+	<tr>
+	  <td data-bind="text: parts.join(' ')"></td>
+	</tr>
+      </tbody>
+    </table>    
     
     <script src="./decomp/externals/knockout-3.4.1.js"></script>
     <script src="./decomp/built/decomp_demo.js"></script>
