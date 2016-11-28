@@ -666,7 +666,7 @@ func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 }
 
 func searchDemoHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/search_demo.html")
+	http.ServeFile(w, r, "../web/lexsearch/index.html")
 }
 
 func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
@@ -807,6 +807,12 @@ func main() {
 
 	// typescript experiments
 	http.HandleFunc("/search_demo", searchDemoHandler)
+
+	r0 := http.StripPrefix("/lexsearch/built/", http.FileServer(http.Dir("../web/lexsearch/built/")))
+	http.Handle("/lexsearch/built/", r0)
+
+	r1 := http.StripPrefix("/lexsearch/externals/", http.FileServer(http.Dir("../web/lexsearch/externals/")))
+	http.Handle("/lexsearch/externals/", r1)
 
 	// TODO Why this http.StripPrefix? Looks odd.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
