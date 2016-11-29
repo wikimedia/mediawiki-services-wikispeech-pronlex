@@ -4,6 +4,7 @@ namespace Entry {
         entryId: number;
         strn: string;
         language: string;
+        symbolSetName: string;
         sources: string[];
     }
 

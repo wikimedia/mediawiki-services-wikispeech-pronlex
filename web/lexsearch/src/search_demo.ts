@@ -47,7 +47,8 @@ class SearchModel {
         r.send();
     };
 
-    ipa(transcription: string): string {
+    ipa(transcription: string, symbolSetName: string): string {
+        console.log(symbolSetName);
         let base_url = window.location.origin;
         let itself = this;
         let ipa = ""
@@ -60,7 +61,7 @@ class SearchModel {
             return;
         };
         let r = new XMLHttpRequest();
-        let url = base_url + "/mapper/map?from=" + encodeURIComponent(itself.selectedLexicon().symbolSetName) + "&to=ipa&trans=" + encodeURIComponent(transcription);
+        let url = base_url + "/mapper/map?from=" + encodeURIComponent(symbolSetName) + "&to=ipa&trans=" + encodeURIComponent(transcription);
         r.open("GET", url, false);
         r.onload = function () {
             if (r.status === 200) {
@@ -87,13 +88,19 @@ class SearchModel {
             return;
         };
         let r = new XMLHttpRequest();
-        let url = base_url + "/lexicon/lookup?lexicons=" + itself.selectedLexicon().name + "&words=" + encodeURIComponent(itself.words()); // TODO: urlencode
+        let url = base_url + "/lexicon/lookup?lexicons=" + encodeURIComponent(itself.selectedLexicon().name) + "&words=" + encodeURIComponent(itself.words());
         r.open("GET", url);
         r.onload = function () {
             if (r.status === 200) {
                 let json: JSON = JSON.parse(r.responseText);
                 //console.log(JSON.stringify(json));
-                itself.entries(Entry.json2entries(json));
+                let tmp = Entry.json2entries(json);
+                for (let e of tmp) {
+                    for (let t of e.transcriptions) {
+                        t.symbolSetName = itself.selectedLexicon().symbolSetName;
+                    }
+                }
+                itself.entries(tmp);
             }
             else {
                 alert("ERROR\n" + r.status + "\n" + r.responseText);
