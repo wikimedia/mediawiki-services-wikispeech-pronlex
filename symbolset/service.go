@@ -80,11 +80,29 @@ func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper
 
 // Map is used by the server to map a transcription from one symbol set to another
 func (m MapperService) Map(fromName string, toName string, trans string) (string, error) {
-	mapper, err := m.getOrCreateMapper(fromName, toName)
-	if err != nil {
-		return "", fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
+	if toName == "ipa" {
+		symbolset, ok := m.SymbolSets[fromName]
+		if !ok {
+			return "", fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
+		}
+		return symbolset.MapTranscription(trans)
+	} else if fromName == "ipa" {
+		symbolsetR, ok := m.SymbolSets[toName]
+		if !ok {
+			return "", fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
+		}
+		symbolset, err := symbolsetR.reverse(toName + "2" + fromName)
+		if err != nil {
+			return "", fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
+		}
+		return symbolset.MapTranscription(trans)
+	} else {
+		mapper, err := m.getOrCreateMapper(fromName, toName)
+		if err != nil {
+			return "", fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
+		}
+		return mapper.MapTranscription(trans)
 	}
-	return mapper.MapTranscription(trans)
 }
 
 // GetMapTable is used by the server to show/get a mapping table between two symbol sets
