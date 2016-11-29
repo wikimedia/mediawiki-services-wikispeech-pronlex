@@ -64,6 +64,29 @@ func listLexsWithEntryCountHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 }
 
+func lexInfoHandler(w http.ResponseWriter, r *http.Request) {
+	lexName := r.FormValue("name")
+	if len(strings.TrimSpace(lexName)) == 0 {
+		msg := fmt.Sprintf("lexicon name should be specified by variable 'name'")
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	lex, err := dbapi.GetLexicon(db, lexName) // TODO error handling
+	if err != nil {
+		http.Error(w, fmt.Sprintf("get lexicon failed : %v", err), http.StatusInternalServerError)
+		return
+	}
+	jsn, err := marshal(lex, r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(jsn))
+}
+
 func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
 	lexiconID, err := strconv.ParseInt(r.FormValue("lexiconId"), 10, 64)
 	if err != nil {
@@ -287,6 +310,9 @@ func lexiconHelpHandler(w http.ResponseWriter, r *http.Request) {
 
 <h2>list</h2> Lists available lexicons.
 <pre><a href="/lexicon/list">/lexicon/list</a></pre>
+
+<h2>list</h2> Display lexicon info.
+<pre><a href="/lexicon/info?name=sv-se.nst">/lexicon/info?name=sv-se.nst</a></pre>
 
 <h2>stats</h2> Lists lexicon stats. Example invocation:
 <pre><a href="/lexicon/stats?lexiconId=1">/lexicon/stats?lexiconId=1</a></pre>
