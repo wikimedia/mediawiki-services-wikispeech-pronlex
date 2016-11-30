@@ -307,6 +307,7 @@ type ipa struct {
 	ipa      string
 	accentI  string
 	accentII string
+	length   string
 }
 
 func (ipa ipa) isIPA(symbolSetName string) bool {
@@ -343,8 +344,9 @@ func (ipa ipa) filterAfterMappingToIpa(trans string, ss Symbols) (string, error)
 			return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
 		}
 		res := repl.ReplaceAllString(trans, ipa.accentI+"$1$2"+ipa.accentII)
-		return res, nil
+		trans = res
 	}
+	trans = strings.Replace(trans, ipa.length+ipa.accentII, ipa.accentII+ipa.length, -1)
 	return trans, nil
 }
 

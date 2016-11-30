@@ -25,6 +25,7 @@ func newIPA() ipa {
 		ipa:      "ipa",
 		accentI:  "\u02C8",
 		accentII: "\u0300",
+		length:   "\u02D0",
 	}
 }
 

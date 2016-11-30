@@ -321,7 +321,7 @@ func Test_MapTranscription_Sampa2Ipa_WithSwedishStress_2(t *testing.T) {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 	}
 	input := "\"\"brA:$ka"
-	expect := "\u02C8brɑː\u0300.ka"
+	expect := "\u02C8brɑ\u0300ː.ka"
 	result, err := ssm.MapTranscription(input)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
