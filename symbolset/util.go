@@ -17,7 +17,6 @@ func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed reading symbol set dir : %v", err)
 	}
-
 	var fErrs error
 	var symSets []SymbolSet
 	for _, fi := range fileInfos {
@@ -34,6 +33,10 @@ func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 			}
 		}
 	}
+
+	// if len(symSets) == 0 {
+	// 	return nil, fmt.Errorf("no symbol sets defined in dir : %v", dirName)
+	// }
 
 	if fErrs != nil {
 		return nil, fmt.Errorf("failed to load symbol set : %v", fErrs)
