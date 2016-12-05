@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"sync"
 	//"os"
 	"encoding/json"
@@ -34,10 +35,17 @@ type JsonMapped struct {
 	Result string
 }
 
+func trimTrans(trans string) string {
+	re := "  +"
+	repl := regexp.MustCompile(re)
+	trans = repl.ReplaceAllString(trans, " ")
+	return trans
+}
+
 func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fromName := r.FormValue("from")
 	toName := r.FormValue("to")
-	trans := r.FormValue("trans")
+	trans := trimTrans(r.FormValue("trans"))
 	if len(strings.TrimSpace(fromName)) == 0 {
 		msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
 		log.Println(msg)
