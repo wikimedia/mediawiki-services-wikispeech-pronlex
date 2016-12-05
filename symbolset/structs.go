@@ -316,6 +316,8 @@ func (ipa ipa) isIPA(symbolSetName string) bool {
 
 func (ipa ipa) filterBeforeMappingFromIpa(trans string, ss Symbols) (string, error) {
 	// IPA: ˈba`ŋ.ka => ˈ`baŋ.ka"
+	// IPA: ˈɑ̀ː.pa => ˈ`ɑː.pa
+	trans = strings.Replace(trans, ipa.accentII+ipa.length, ipa.length+ipa.accentII, -1)
 	s := ipa.accentI + "(" + ss.PhonemeRe.String() + "+)" + ipa.accentII
 	repl, err := regexp.Compile(s)
 	if err != nil {

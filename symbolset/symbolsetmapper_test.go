@@ -707,6 +707,42 @@ func Test_loadSymbolSet_SAMPA2MARY(t *testing.T) {
 	testMapTranscriptionX(t, mappers, "@ s . \"\" e", "e s - \" e")
 }
 
+func Test_loadSymbolSet_MARY2SAMPA(t *testing.T) {
+	name := "MARY2IPA"
+	fromColumn := "SAMPA"
+	toColumn := "IPA"
+	fName := "static/sv-se_sampa_mary.tab"
+	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+		return
+	}
+
+	name = "IPA2SAMPA"
+	fromColumn = "IPA"
+	toColumn = "SYMBOL"
+	fName = "static/sv-se_ws-sampa.tab"
+	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+		return
+	}
+	mappers := []SymbolSet{ssm1, ssm2}
+	testMapTranscriptionX(t, mappers, "E*U - r ' u: p a", "eu . r \" u: p a")
+	testMapTranscriptionX(t, mappers, "e s - \" e", "e s . \"\" e")
+	testMapTranscriptionX(t, mappers, "\" e: - p a", "\"\" e: . p a")
+	testMapTranscriptionX(t, mappers, "\" A: - p a", "\"\" A: . p a")
+
+	mapper, err := LoadMapperFromFile("SAMPA", "SYMBOL", "static/sv-se_sampa_mary.tab", "static/sv-se_ws-sampa.tab")
+	if err != nil {
+		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
+		return
+	}
+
+	testMapTranscriptionY(t, mapper, "\" e: - p a", "\"\" e: . p a")
+	testMapTranscriptionY(t, mapper, "\" A: - p a", "\"\" A: . p a")
+}
+
 func Test_loadSymbolSet_NST2MARY(t *testing.T) {
 	name := "NST2IPA"
 	fromColumn := "SAMPA"
