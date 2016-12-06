@@ -1,4 +1,4 @@
-// Package symbolset2 work in progress -- refactoring symbolset package
+// Package symbolset2 is a work in progress. Will eventually replace the older symbolset package
 package symbolset2
 
 // refactoring, to replace package symbolset in the future
