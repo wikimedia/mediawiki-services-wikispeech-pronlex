@@ -110,7 +110,7 @@ func LoadSymbolSet(fName string) (SymbolSet, error) {
 	return loadSymbolSet_(name, fName)
 }
 
-var Header = "DESCRIPTION	SYMBOL	IPA	IPA UNICODE	CATEGORY"
+var header = "DESCRIPTION	SYMBOL	IPA	IPA UNICODE	CATEGORY"
 
 // loadSymbolSet_ loads a SymbolSet from file
 func loadSymbolSet_(name string, fName string) (SymbolSet, error) {
@@ -136,7 +136,7 @@ func loadSymbolSet_(name string, fName string) (SymbolSet, error) {
 		l := s.Text()
 		if len(strings.TrimSpace(l)) > 0 && !strings.HasPrefix(strings.TrimSpace(l), "#") {
 			if n == 1 { // header
-				if l != Header {
+				if l != header {
 					return nilRes, fmt.Errorf("expected header '%s', found '%s'", Header, l)
 				}
 			} else {
