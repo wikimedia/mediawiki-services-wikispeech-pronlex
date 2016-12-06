@@ -1,3 +1,4 @@
+// symbolset2 work in progress -- refactoring symbolset package
 package symbolset2
 
 // refactoring, to replace package symbolset in the future
