@@ -137,7 +137,7 @@ func loadSymbolSet_(name string, fName string) (SymbolSet, error) {
 		if len(strings.TrimSpace(l)) > 0 && !strings.HasPrefix(strings.TrimSpace(l), "#") {
 			if n == 1 { // header
 				if l != header {
-					return nilRes, fmt.Errorf("expected header '%s', found '%s'", Header, l)
+					return nilRes, fmt.Errorf("expected header '%s', found '%s'", header, l)
 				}
 			} else {
 				fs := strings.Split(l, "\t")
