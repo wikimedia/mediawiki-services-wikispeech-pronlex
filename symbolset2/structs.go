@@ -7,8 +7,8 @@ package symbolset2
 type SymbolSetType int
 
 const (
-	CMU SymbolSetType = iota
-	SAMPA
+	Cmu SymbolSetType = iota
+	Sampa
 	Other
 )
 
@@ -43,8 +43,8 @@ const (
 	WordDelimiter
 )
 
-// IPA symbol with Unicode representation
-type IPA struct {
+// Ipa symbol with Unicode representation
+type Ipa struct {
 	String  string
 	Unicode string
 }
@@ -54,5 +54,5 @@ type Symbol struct {
 	String string
 	Cat    SymbolCat
 	Desc   string
-	IPA    IPA
+	Ipa    Ipa
 }
