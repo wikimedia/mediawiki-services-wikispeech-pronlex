@@ -29,12 +29,12 @@ func Test_LenSort(t *testing.T) {
 
 func Test_splitIntoPhonemes(t *testing.T) {
 	phs := []Symbol{
-		Symbol{"aa", NonSyllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"a", NonSyllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"bb", NonSyllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"b", NonSyllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"ddddd", NonSyllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"f33", NonSyllabic, "", Ipa{"n/a", "n/a"}},
+		Symbol{"aa", NonSyllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"a", NonSyllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"bb", NonSyllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"b", NonSyllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"ddddd", NonSyllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"f33", NonSyllabic, "", IPA{"n/a", "n/a"}},
 	}
 	s1 := "c"
 	res, unk, err := splitIntoPhonemes(phs, s1)
@@ -97,9 +97,9 @@ func Test_splitIntoPhonemes(t *testing.T) {
 
 func Test_splitIntoPhonemes2(t *testing.T) {
 	phs1 := []Symbol{
-		Symbol{"aa", Syllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"b", NonSyllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{" ", PhonemeDelimiter, "", Ipa{" ", "n/a"}},
+		Symbol{"aa", Syllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"b", NonSyllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{" ", PhonemeDelimiter, "", IPA{" ", "n/a"}},
 	}
 	s1 := "a b a"
 	_, _, err := splitIntoPhonemes(phs1, s1)
@@ -108,9 +108,9 @@ func Test_splitIntoPhonemes2(t *testing.T) {
 	}
 
 	phs2 := []Symbol{
-		Symbol{"aa", Syllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"b", NonSyllabic, "", Ipa{"n/a", "n/a"}},
-		Symbol{"", PhonemeDelimiter, "", Ipa{" ", "n/a"}},
+		Symbol{"aa", Syllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"b", NonSyllabic, "", IPA{"n/a", "n/a"}},
+		Symbol{"", PhonemeDelimiter, "", IPA{" ", "n/a"}},
 	}
 	s2 := "a b a"
 	_, _, err = splitIntoPhonemes(phs2, s2)

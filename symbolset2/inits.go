@@ -168,7 +168,7 @@ func loadSymbolSet_(name string, fName string) (SymbolSet, error) {
 					return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
 				}
 				sym := Symbol{String: symbol, Cat: symCat, Desc: desc,
-					Ipa: Ipa{String: ipa, Unicode: ipaUnicode},
+					IPA: IPA{String: ipa, Unicode: ipaUnicode},
 				}
 				symbols = append(symbols, sym)
 			}

@@ -58,7 +58,7 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 	symbols := []Symbol{}
 	for _, s := range ss.Symbols {
 		ipa := s
-		ipa.String = ipa.Ipa.String
+		ipa.String = ipa.IPA.String
 		symbols = append(symbols, ipa)
 	}
 	splitted, unknown, err := splitIntoPhonemes(symbols, input)
