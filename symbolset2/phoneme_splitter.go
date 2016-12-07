@@ -36,18 +36,19 @@ func splitIntoPhonemes(knownPhonemes []Symbol, transcription string) (phonemes [
 	}
 
 	sort.Sort(byLength(known))
-	ps, uk := splurt(&known, transcription, []string{}, []string{})
+	ps, uk := splitIntoPhonemes0(&known, transcription, []string{}, []string{})
 	return ps, uk, nil
 }
 
-func splurt(srted *[]string, trans string, phs []string, unk []string) ([]string, []string) {
+// the recursive loop
+func splitIntoPhonemes0(srted *[]string, trans string, phs []string, unk []string) ([]string, []string) {
 
 	if len(trans) > 0 {
 		pre, rest, ok := consume(srted, trans)
 		if ok { // known phoneme is prefix if trans
-			return splurt(srted, rest, append(phs, pre), unk)
+			return splitIntoPhonemes0(srted, rest, append(phs, pre), unk)
 		} else { // unknown prefix, chopped off first rune
-			return splurt(srted, rest, append(phs, pre), append(unk, pre))
+			return splitIntoPhonemes0(srted, rest, append(phs, pre), append(unk, pre))
 		}
 	}
 	return phs, unk
