@@ -46,7 +46,7 @@ const (
 	WordDelimiter
 )
 
-// IPA symbol with Unicode representation
+// IPASymbol ipa symbol string with Unicode representation
 type IPASymbol struct {
 	String  string
 	Unicode string
