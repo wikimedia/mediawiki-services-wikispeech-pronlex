@@ -6,6 +6,60 @@ import (
 	"strings"
 )
 
+type SymbolSetType int
+
+const (
+	CMU SymbolSetType = iota
+	SAMPA
+	IPA
+	Other
+)
+
+// SymbolCat is used to categorize transcription symbols.
+type SymbolCat int
+
+const (
+	// Syllabic is used for syllabic phonemes (typically vowels and syllabic consonants)
+	Syllabic SymbolCat = iota
+
+	// NonSyllabic is used for non-syllabic phonemes (typically consonants)
+	NonSyllabic
+
+	// Stress is used for stress and accent symbols (primary, secondary, tone accents, etc)
+	Stress
+
+	// PhonemeDelimiter is used for phoneme delimiters (white space, empty string, etc)
+	PhonemeDelimiter
+
+	// SyllableDelimiter is used for syllable delimiters
+	SyllableDelimiter
+
+	// MorphemeDelimiter is used for morpheme delimiters that need not align with
+	// morpheme boundaries in the decompounded orthography
+	MorphemeDelimiter
+
+	// CompoundDelimiter is used for compound delimiters that should be aligned
+	// with compound boundaries in the decompounded orthography
+	CompoundDelimiter
+
+	// WordDelimiter is used for word delimiters
+	WordDelimiter
+)
+
+// IPA symbol with Unicode representation
+type IPASymbol struct {
+	String  string
+	Unicode string
+}
+
+// Symbol represent a phoneme, stress or delimiter symbol used in transcriptions, including the IPA symbol with unicode
+type Symbol struct {
+	String string
+	Cat    SymbolCat
+	Desc   string
+	IPA    IPASymbol
+}
+
 // SymbolSet is a struct for package private usage.
 // To create a new 'SymbolSet' instance, use NewSymbolSet
 type SymbolSet struct {
@@ -28,9 +82,18 @@ type SymbolSet struct {
 	NonSyllabicRe *regexp.Regexp
 	SymbolRe      *regexp.Regexp
 
+	ipaPhonemeRe     *regexp.Regexp
+	ipaSyllabicRe    *regexp.Regexp
+	ipaNonSyllabicRe *regexp.Regexp
+
 	phonemeDelimiter          Symbol
 	phonemeDelimiterRe        *regexp.Regexp
 	repeatedPhonemeDelimiters *regexp.Regexp
+}
+
+// ValidSymbol checks if a string is a valid symbol or not
+func (ss SymbolSet) ValidSymbol(symbol string) bool {
+	return contains(ss.Symbols, symbol)
 }
 
 // Get searches the SymbolSet for a symbol with the given string
@@ -44,13 +107,13 @@ func (ss SymbolSet) Get(symbol string) (Symbol, error) {
 }
 
 // GetFromIPA searches the SymbolSet for a symbol with the given IPA symbol string
-func (ss SymbolSet) GetFromIPA(symbol string) (Symbol, error) {
+func (ss SymbolSet) GetFromIPA(ipa string) (Symbol, error) {
 	for _, s := range ss.Symbols {
-		if s.IPA.String == symbol {
+		if s.IPA.String == ipa {
 			return s, nil
 		}
 	}
-	return Symbol{}, fmt.Errorf("no symbol /%s/ in symbol set", symbol)
+	return Symbol{}, fmt.Errorf("no ipa symbol /%s/ in symbol set", ipa)
 }
 
 // SplitTranscription splits the input transcription into separate symbols
@@ -93,31 +156,13 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 	return splitted, nil
 }
 
-// func (ss SymbolSet) preFilter(trans string, fromType SymbolSetType) (string, error) {
-// 	if fromType == IPA {
-// 		return ipaFilter.filterBeforeMappingFromIpa(trans, ss)
-// 	} else if fromType == CMU {
-// 		return cmuFilter.filterBeforeMappingFromCMU(trans, ss)
-// 	}
-// 	return trans, nil
-// }
-
-// func (ss SymbolSet) postFilter(trans string, toType SymbolSetType) (string, error) {
-// 	if toType == IPA {
-// 		return ipaFilter.filterAfterMappingToIpa(trans, ss)
-// 	} else if toType == CMU {
-// 		return cmuFilter.filterAfterMappingToCMU(trans, ss)
-// 	}
-// 	return trans, nil
-// }
-
 // ConvertToIPA maps one input transcription string into an IPA transcription
 func (ss SymbolSet) ConvertToIPA(trans string) (string, error) {
 	res := trans
-	//res, err := ss.preFilter(input, ss.From)
-	// if err != nil {
-	// 	return "", err
-	// }
+	res, err := preFilter(ss, trans, ss.Type)
+	if err != nil {
+		return "", err
+	}
 	splitted, err := ss.SplitTranscription(res)
 	if err != nil {
 		return "", err
@@ -135,18 +180,18 @@ func (ss SymbolSet) ConvertToIPA(trans string) (string, error) {
 	}
 	res = strings.Join(mapped, ss.phonemeDelimiter.IPA.String)
 
-	//res, err = ss.postFilter(res, ss.To)
+	res, err = postFilter(ss, res, IPA)
 	return res, err
 }
 
 // ConvertFromIPA maps one input IPA transcription into the current symbol set
 func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 	res := trans
-	//res, err := ss.preFilter(trans, ss.From)
-	// if err != nil {
-	// 	return "", err
-	// }
-	splitted, err := ss.SplitTranscription(res)
+	res, err := preFilter(ss, trans, IPA)
+	if err != nil {
+		return "", err
+	}
+	splitted, err := ss.SplitIPATranscription(res)
 	if err != nil {
 		return "", err
 	}
@@ -165,6 +210,6 @@ func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 
 	// remove repeated phoneme delimiters, if any
 	res = ss.repeatedPhonemeDelimiters.ReplaceAllString(res, ss.phonemeDelimiter.IPA.String)
-	//res, err = ss.postFilter(res, ss.To)
+	res, err = postFilter(ss, res, ss.Type)
 	return res, err
 }

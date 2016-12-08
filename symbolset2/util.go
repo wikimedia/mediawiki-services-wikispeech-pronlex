@@ -21,6 +21,14 @@ func (a symbolSlice) Less(i, j int) bool {
 
 var SymbolSetSuffix = ".tab"
 
+func trimIfNeeded(s string) string {
+	trimmed := strings.TrimSpace(s)
+	if len(trimmed) > 0 {
+		return trimmed
+	}
+	return s
+}
+
 // func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 // 	// list files in symbol set dir
 // 	fileInfos, err := ioutil.ReadDir(dirName)
@@ -56,8 +64,8 @@ var SymbolSetSuffix = ".tab"
 // 	return symbolSetsMap, nil
 // }
 
-// FilterSymbolsByCat is used to filter out specific symbol types from the symbol set (syllabic, non syllabic, etc)
-func FilterSymbolsByCat(symbols []Symbol, types []SymbolCat) []Symbol {
+// filterSymbolsByCat is used to filter out specific symbol types from the symbol set (syllabic, non syllabic, etc)
+func filterSymbolsByCat(symbols []Symbol, types []SymbolCat) []Symbol {
 	var res = make([]Symbol, 0)
 	for _, s := range symbols {
 		if containsCat(types, s.Cat) {
@@ -67,8 +75,40 @@ func FilterSymbolsByCat(symbols []Symbol, types []SymbolCat) []Symbol {
 	return res
 }
 
+func buildIPARegexp(symbols []Symbol) (*regexp.Regexp, error) {
+	return buildIPARegexpWithGroup(symbols, false, true)
+}
+
 func buildRegexp(symbols []Symbol) (*regexp.Regexp, error) {
 	return buildRegexpWithGroup(symbols, false, true)
+}
+
+func buildIPARegexpWithGroup(symbols []Symbol, removeEmpty bool, anonGroup bool) (*regexp.Regexp, error) {
+	sorted := make([]Symbol, len(symbols))
+	copy(sorted, symbols)
+	sort.Sort(symbolSlice(sorted))
+	var acc = make([]string, 0)
+	for _, s := range sorted {
+		if removeEmpty {
+			if len(s.String) > 0 {
+				acc = append(acc, regexp.QuoteMeta(s.IPA.String))
+			}
+		} else {
+			acc = append(acc, regexp.QuoteMeta(s.IPA.String))
+		}
+	}
+	prefix := "(?:"
+	if !anonGroup {
+		prefix = "("
+	}
+	s := prefix + strings.Join(acc, "|") + ")"
+	regexp.MustCompile(s)
+	re, err := regexp.Compile(s)
+	if err != nil {
+		err = fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
+		return nil, err
+	}
+	return re, nil
 }
 
 func buildRegexpWithGroup(symbols []Symbol, removeEmpty bool, anonGroup bool) (*regexp.Regexp, error) {
@@ -124,4 +164,12 @@ func indexOf(elements []string, element string) int {
 		}
 	}
 	return -1
+}
+
+func string2unicode(s string) string {
+	res := ""
+	for _, ch := range s {
+		res = res + fmt.Sprintf("%U", ch)
+	}
+	return res
 }

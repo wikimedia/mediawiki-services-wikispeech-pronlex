@@ -11,14 +11,6 @@ import (
 
 // inits.go Initialization functions for structs in package symbolset
 
-func trimIfNeeded(s string) string {
-	trimmed := strings.TrimSpace(s)
-	if len(trimmed) > 0 {
-		return trimmed
-	}
-	return s
-}
-
 // NewSymbolSet is a constructor for 'symbols' with built-in error checks
 func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	return NewSymbolSetWithTests(name, symbols, true)
@@ -29,12 +21,12 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 	var nilRes SymbolSet
 
 	// filtered lists
-	phonemes := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic, Stress})
-	phoneticSymbols := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic})
-	stressSymbols := FilterSymbolsByCat(symbols, []SymbolCat{Stress})
-	syllabic := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic})
-	nonSyllabic := FilterSymbolsByCat(symbols, []SymbolCat{NonSyllabic})
-	phonemeDelimiters := FilterSymbolsByCat(symbols, []SymbolCat{PhonemeDelimiter})
+	phonemes := filterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic, Stress})
+	phoneticSymbols := filterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic})
+	stressSymbols := filterSymbolsByCat(symbols, []SymbolCat{Stress})
+	syllabic := filterSymbolsByCat(symbols, []SymbolCat{Syllabic})
+	nonSyllabic := filterSymbolsByCat(symbols, []SymbolCat{NonSyllabic})
+	phonemeDelimiters := filterSymbolsByCat(symbols, []SymbolCat{PhonemeDelimiter})
 
 	// specific symbol initialization
 	if len(phonemeDelimiters) < 1 {
@@ -65,6 +57,32 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		return nilRes, err
 	}
 
+	// IPA regexps
+	ipaSyllabicRe, err := buildIPARegexp(syllabic)
+	if err != nil {
+		return nilRes, err
+	}
+	ipaNonSyllabicRe, err := buildIPARegexp(nonSyllabic)
+	if err != nil {
+		return nilRes, err
+	}
+	ipaPhonemeRe, err := buildIPARegexp(phonemes)
+	if err != nil {
+		return nilRes, err
+	}
+
+	// compare ipa string vs unicode
+	for _, symbol := range symbols {
+		uFromString := string2unicode(symbol.IPA.String)
+
+		if len(symbol.IPA.String) == 0 {
+			uFromString = ""
+		}
+		if symbol.IPA.Unicode != uFromString {
+			return nilRes, fmt.Errorf("ipa symbol /%s/ does not match unicode '%s' -- got '%s'", symbol.IPA.String, symbol.IPA.Unicode, uFromString)
+		}
+	}
+
 	if checkForDups {
 		seenSymbols := make(map[string]Symbol)
 		var dupSymbols []string
@@ -84,8 +102,19 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		return nilRes, err
 	}
 
+	ssType := Other
+	nameLC := strings.ToLower(name)
+	if strings.Contains(nameLC, "ipa") {
+		ssType = IPA
+	} else if strings.Contains(nameLC, "sampa") {
+		ssType = SAMPA
+	} else if strings.Contains(nameLC, "cmu") {
+		ssType = CMU
+	}
+
 	res := SymbolSet{
 		Name:    name,
+		Type:    ssType,
 		Symbols: symbols,
 
 		isInit: true,
@@ -96,12 +125,16 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		syllabic:        syllabic,
 		nonSyllabic:     nonSyllabic,
 
-		phonemeDelimiter: phonemeDelimiter,
+		PhonemeRe:     phonemeRe,
+		SyllabicRe:    syllabicRe,
+		NonSyllabicRe: nonSyllabicRe,
+		SymbolRe:      symbolRe,
 
-		PhonemeRe:                 phonemeRe,
-		SyllabicRe:                syllabicRe,
-		NonSyllabicRe:             nonSyllabicRe,
-		SymbolRe:                  symbolRe,
+		ipaSyllabicRe:    ipaSyllabicRe,
+		ipaNonSyllabicRe: ipaNonSyllabicRe,
+		ipaPhonemeRe:     ipaPhonemeRe,
+
+		phonemeDelimiter:          phonemeDelimiter,
 		phonemeDelimiterRe:        phonemeDelimiterRe,
 		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}

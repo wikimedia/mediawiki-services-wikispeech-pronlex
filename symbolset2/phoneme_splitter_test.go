@@ -101,6 +101,8 @@ func Test_splitIntoPhonemes2(t *testing.T) {
 		Symbol{"b", NonSyllabic, "", IPASymbol{"n/a", "n/a"}},
 		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", "n/a"}},
 	}
+
+	// _
 	s1 := "a b a"
 	_, _, err := splitIntoPhonemes(phs1, s1)
 	if err == nil {
@@ -112,7 +114,43 @@ func Test_splitIntoPhonemes2(t *testing.T) {
 		Symbol{"b", NonSyllabic, "", IPASymbol{"n/a", "n/a"}},
 		Symbol{"", PhonemeDelimiter, "", IPASymbol{" ", "n/a"}},
 	}
+
+	// _
 	s2 := "a b a"
+	_, _, err = splitIntoPhonemes(phs2, s2)
+	if err != nil {
+		t.Errorf("didn't expect error here. Found %s", err)
+	}
+}
+
+func Test_splitIntoPhonemesIPA(t *testing.T) {
+	phs1 := []Symbol{
+		Symbol{"a", Syllabic, "", IPASymbol{"a", ""}},
+		Symbol{"b", NonSyllabic, "", IPASymbol{"b", ""}},
+		Symbol{"r", NonSyllabic, "", IPASymbol{"r", ""}},
+		Symbol{"k", NonSyllabic, "", IPASymbol{"k", ""}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"ɑː", Syllabic, "", IPASymbol{"ɑː", ""}},
+		Symbol{".", SyllableDelimiter, "", IPASymbol{".", ""}},
+		Symbol{"\u02C8", Stress, "", IPASymbol{"\u02C8", ""}},
+		Symbol{"\u02C8\u0300", Stress, "", IPASymbol{"\u02C8\u0300", ""}},
+	}
+
+	// _
+	s1 := "\u02C8brɑ\u0300ː.ka"
+	_, _, err := splitIntoPhonemes(phs1, s1)
+	if err != nil {
+		t.Errorf("didn't expect error here. Found %s", err)
+	}
+
+	phs2 := []Symbol{
+		Symbol{"aa", Syllabic, "", IPASymbol{"n/a", "n/a"}},
+		Symbol{"b", NonSyllabic, "", IPASymbol{"n/a", "n/a"}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{" ", "n/a"}},
+	}
+
+	// _
+	s2 := "\u02C8brɑː.ka"
 	_, _, err = splitIntoPhonemes(phs2, s2)
 	if err != nil {
 		t.Errorf("didn't expect error here. Found %s", err)
