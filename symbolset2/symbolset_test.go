@@ -310,7 +310,7 @@ func Test_NewSymbolSet_WithCorrectInput1(t *testing.T) {
 	symbols := []Symbol{
 		Symbol{"a", Syllabic, "", IPASymbol{"A", "U+0041"}},
 		Symbol{"p", NonSyllabic, "", IPASymbol{"P", "U+0050"}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", "U+0020"}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	_, err := NewSymbolSet("test", symbols)
 	if err != nil {
@@ -485,15 +485,15 @@ func Test_NewSymbolSet_IPADuplicates_ConvertToIPA(t *testing.T) {
 		Symbol{"i", Syllabic, "", IPASymbol{"I", "U+0049"}},
 		Symbol{"i3", Syllabic, "", IPASymbol{"I", "U+0049"}},
 		Symbol{"p", NonSyllabic, "", IPASymbol{"P", "U+0050"}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", "U+0020"}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"_", "U+005F"}},
 	}
 	ss, err := NewSymbolSet("test", symbols)
 	if err != nil {
 		t.Errorf("NewSymbolSet() didn't expect error here : %v", err)
 		return
 	}
-	testSymbolSetConvertToIPA(t, ss, "i3 p", "I P")
-	testSymbolSetConvertToIPA(t, ss, "i p", "I P")
+	testSymbolSetConvertToIPA(t, ss, "i3 p", "I_P")
+	testSymbolSetConvertToIPA(t, ss, "i p", "I_P")
 }
 
 func Test_NewSymbolSet_IPADuplicates_ConvertFromIPA(t *testing.T) {
@@ -516,7 +516,7 @@ func Test_NewSymbolSet_FailIfLacksPhonemeDelimiter(t *testing.T) {
 	symbols := []Symbol{
 		Symbol{"a", Syllabic, "", IPASymbol{"A", "U+0041"}},
 		Symbol{"p", NonSyllabic, "", IPASymbol{"P", "U+0050"}},
-		Symbol{" ", NonSyllabic, "", IPASymbol{" ", "U+0020"}},
+		Symbol{" ", NonSyllabic, "", IPASymbol{"", ""}},
 	}
 	_, err := NewSymbolSet("test", symbols)
 	if err == nil {
@@ -626,7 +626,7 @@ func Test_Get(t *testing.T) {
 	symbols := []Symbol{
 		Symbol{"a", Syllabic, "", IPASymbol{"A", "U+0041"}},
 		Symbol{"P", NonSyllabic, "", IPASymbol{"p", "U+0070"}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", "U+0020"}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	ss, err := NewSymbolSet("test", symbols)
 	if err != nil {
@@ -664,7 +664,7 @@ func Test_getFromIPA(t *testing.T) {
 	symbols := []Symbol{
 		Symbol{"a", Syllabic, "", IPASymbol{"A", "U+0041"}},
 		Symbol{"P", NonSyllabic, "", IPASymbol{"p", "U+0070"}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", "U+0020"}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	ss, err := NewSymbolSet("test", symbols)
 	if err != nil {
@@ -703,10 +703,23 @@ func Test_NewSymbolSet_DontFailIfIPAContainsDuplicates(t *testing.T) {
 		Symbol{"a", NonSyllabic, "", IPASymbol{"A", "U+0041"}},
 		Symbol{"A", Syllabic, "", IPASymbol{"A", "U+0041"}},
 		Symbol{"p", NonSyllabic, "", IPASymbol{"P", "U+0050"}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", "U+0020"}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	_, err := NewSymbolSet("test", symbols)
 	if err != nil {
 		t.Errorf("NewSymbolSet() didn't expect error when output phoneme set contains duplicates : %v", err)
+	}
+}
+
+func Test_NewSymbolSet_FailIPAContainsWhitespace(t *testing.T) {
+	symbols := []Symbol{
+		Symbol{"a", NonSyllabic, "", IPASymbol{"A", "U+0041"}},
+		Symbol{"A", Syllabic, "", IPASymbol{"A", "U+0041"}},
+		Symbol{"p", NonSyllabic, "", IPASymbol{"P", "U+0050"}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", "U+0020"}},
+	}
+	_, err := NewSymbolSet("test", symbols)
+	if err == nil {
+		t.Errorf("expected error for IPA white space here", err)
 	}
 }

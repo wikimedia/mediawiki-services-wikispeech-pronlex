@@ -82,6 +82,9 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		if symbol.IPA.Unicode != uFromString {
 			return nilRes, fmt.Errorf("ipa symbol /%s/ does not match unicode '%s' -- expected '%s'", symbol.IPA.String, symbol.IPA.Unicode, uFromString)
 		}
+		if strings.Contains(symbol.IPA.String, " ") {
+			return nilRes, fmt.Errorf("ipa symbols cannot contain white space -- found /%s/", symbol.IPA.String)
+		}
 	}
 
 	if checkForDups {
@@ -296,6 +299,14 @@ func LoadMapper(s1 SymbolSet, s2 SymbolSet) (Mapper, error) {
 
 // LoadMapperFromFile loads two SymbolSet instances from files.
 func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 string) (Mapper, error) {
+
+	if fromName == toName {
+		return Mapper{}, fmt.Errorf("should not load symbol sets with the same name: %s", fromName)
+	}
+	if fName1 == fName2 {
+		return Mapper{}, fmt.Errorf("should not load both symbol sets from the same file: %s", fName1)
+	}
+
 	m1, err := loadSymbolSet0(fromName, fName1)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
