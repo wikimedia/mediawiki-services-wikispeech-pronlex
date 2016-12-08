@@ -81,17 +81,17 @@ func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper
 // Map is used by the server to map a transcription from one symbol set to another
 func (m MapperService) Map(fromName string, toName string, trans string) (string, error) {
 	if toName == "ipa" {
-		symbolset, ok := m.SymbolSets[fromName]
+		ss, ok := m.SymbolSets[fromName]
 		if !ok {
 			return "", fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
 		}
-		return symbolset.ConvertToIPA(trans)
+		return ss.ConvertToIPA(trans)
 	} else if fromName == "ipa" {
-		symbolset, ok := m.SymbolSets[toName]
+		ss, ok := m.SymbolSets[toName]
 		if !ok {
 			return "", fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
 		}
-		return symbolset.ConvertFromIPA(trans)
+		return ss.ConvertFromIPA(trans)
 	} else {
 		mapper, err := m.getOrCreateMapper(fromName, toName)
 		if err != nil {
