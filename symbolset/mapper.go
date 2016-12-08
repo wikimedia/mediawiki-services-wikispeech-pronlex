@@ -51,11 +51,11 @@ func (m Mapper) MapSymbolString(input string) (string, error) {
 
 // MapTranscriptions maps the input entry's transcriptions (in-place)
 func (m Mapper) MapTranscriptions(e *lex.Entry) error {
-	err := m.SymbolSet1.MapTranscriptions(e)
+	err := m.SymbolSet1.MapTranscriptionsToIPA(e)
 	if err != nil {
 		return fmt.Errorf("couldn't map transcription : %v", err)
 	}
-	err = m.SymbolSet2.MapTranscriptions(e)
+	err = m.SymbolSet2.MapTranscriptionsFromIPA(e)
 	if err != nil {
 		return fmt.Errorf("couldn't map transcription : %v", err)
 	}

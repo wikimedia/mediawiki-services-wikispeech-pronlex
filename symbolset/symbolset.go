@@ -218,11 +218,29 @@ func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 }
 
 // MapTranscriptions maps the input entry's transcriptions (in-place)
-func (ss SymbolSet) MapTranscriptions(e *lex.Entry) error {
+func (ss SymbolSet) MapTranscriptionsToIPA(e *lex.Entry) error {
 	var newTs []lex.Transcription
 	var errs []string
 	for _, t := range e.Transcriptions {
 		newT, err := ss.ConvertToIPA(t.Strn)
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
+	}
+	e.Transcriptions = newTs
+	if len(errs) > 0 {
+		return fmt.Errorf("%v", strings.Join(errs, "; "))
+	}
+	return nil
+}
+
+// MapTranscriptions maps the input entry's transcriptions (in-place)
+func (ss SymbolSet) MapTranscriptionsFromIPA(e *lex.Entry) error {
+	var newTs []lex.Transcription
+	var errs []string
+	for _, t := range e.Transcriptions {
+		newT, err := ss.ConvertFromIPA(t.Strn)
 		if err != nil {
 			errs = append(errs, err.Error())
 		}
