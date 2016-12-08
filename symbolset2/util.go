@@ -31,6 +31,7 @@ func trimIfNeeded(s string) string {
 	return s
 }
 
+// LoadSymbolSetsFromDir loads a all symbol sets from the specified folder (all files with .tab extension)
 func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 	// list files in symbol set dir
 	fileInfos, err := ioutil.ReadDir(dirName)
