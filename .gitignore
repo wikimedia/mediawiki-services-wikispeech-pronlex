@@ -5,3 +5,5 @@ lexserver/upload_area
 lexserver/symbol_set_file_area
 lexserver/pronlex.db.ORIG
 dbapi/*.db-journal
+lexserver/pronlex.db-shm
+lexserver/pronlex.db-wal
