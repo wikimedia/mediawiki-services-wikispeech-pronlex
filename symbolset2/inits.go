@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -78,6 +79,11 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		}
 	}
 
+	repeatedPhonemeDelimiters, err := regexp.Compile(phonemeDelimiterRe.String() + "+")
+	if err != nil {
+		return nilRes, err
+	}
+
 	res := SymbolSet{
 		Name:    name,
 		Symbols: symbols,
@@ -92,11 +98,12 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 
 		phonemeDelimiter: phonemeDelimiter,
 
-		PhonemeRe:          phonemeRe,
-		SyllabicRe:         syllabicRe,
-		NonSyllabicRe:      nonSyllabicRe,
-		SymbolRe:           symbolRe,
-		phonemeDelimiterRe: phonemeDelimiterRe,
+		PhonemeRe:                 phonemeRe,
+		SyllabicRe:                syllabicRe,
+		NonSyllabicRe:             nonSyllabicRe,
+		SymbolRe:                  symbolRe,
+		phonemeDelimiterRe:        phonemeDelimiterRe,
+		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}
 	return res, nil
 
@@ -167,8 +174,12 @@ func loadSymbolSet_(name string, fName string) (SymbolSet, error) {
 				default:
 					return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
 				}
-				sym := Symbol{String: symbol, Cat: symCat, Desc: desc,
-					IPA: IPA{String: ipa, Unicode: ipaUnicode},
+				ipaSym := IPASymbol{String: ipa, Unicode: ipaUnicode}
+				sym := Symbol{
+					String: symbol,
+					Cat:    symCat,
+					Desc:   desc,
+					IPA:    ipaSym,
 				}
 				symbols = append(symbols, sym)
 			}

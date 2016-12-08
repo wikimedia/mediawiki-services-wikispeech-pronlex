@@ -3,6 +3,7 @@ package symbolset2
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 // SymbolSet is a struct for package private usage.
@@ -22,13 +23,34 @@ type SymbolSet struct {
 	syllabic        []Symbol
 	nonSyllabic     []Symbol
 
-	phonemeDelimiter Symbol
+	PhonemeRe     *regexp.Regexp
+	SyllabicRe    *regexp.Regexp
+	NonSyllabicRe *regexp.Regexp
+	SymbolRe      *regexp.Regexp
 
-	PhonemeRe          *regexp.Regexp
-	SyllabicRe         *regexp.Regexp
-	NonSyllabicRe      *regexp.Regexp
-	SymbolRe           *regexp.Regexp
-	phonemeDelimiterRe *regexp.Regexp
+	phonemeDelimiter          Symbol
+	phonemeDelimiterRe        *regexp.Regexp
+	repeatedPhonemeDelimiters *regexp.Regexp
+}
+
+// Get searches the SymbolSet for a symbol with the given string
+func (ss SymbolSet) Get(symbol string) (Symbol, error) {
+	for _, s := range ss.Symbols {
+		if s.String == symbol {
+			return s, nil
+		}
+	}
+	return Symbol{}, fmt.Errorf("no symbol /%s/ in symbol set", symbol)
+}
+
+// GetFromIPA searches the SymbolSet for a symbol with the given IPA symbol string
+func (ss SymbolSet) GetFromIPA(symbol string) (Symbol, error) {
+	for _, s := range ss.Symbols {
+		if s.IPA.String == symbol {
+			return s, nil
+		}
+	}
+	return Symbol{}, fmt.Errorf("no symbol /%s/ in symbol set", symbol)
 }
 
 // SplitTranscription splits the input transcription into separate symbols
@@ -71,78 +93,78 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 	return splitted, nil
 }
 
-// func (ss SymbolSet) preFilter(trans string, ss Symbols) (string, error) {
-// 	if ss.fromIsIPA {
-// 		return ss.ipa.filterBeforeMappingFromIpa(trans, ss)
-// 	} else if ss.fromIsCMU {
-// 		return ss.cmu.filterBeforeMappingFromCMU(trans, ss)
+// func (ss SymbolSet) preFilter(trans string, fromType SymbolSetType) (string, error) {
+// 	if fromType == IPA {
+// 		return ipaFilter.filterBeforeMappingFromIpa(trans, ss)
+// 	} else if fromType == CMU {
+// 		return cmuFilter.filterBeforeMappingFromCMU(trans, ss)
 // 	}
 // 	return trans, nil
 // }
 
-// func (m SymbolSet) postFilter(trans string, ss Symbols) (string, error) {
-// 	if m.toIsIPA {
-// 		return m.ipa.filterAfterMappingToIpa(trans, ss)
-// 	} else if m.toIsCMU {
-// 		return m.cmu.filterAfterMappingToCMU(trans, ss)
+// func (ss SymbolSet) postFilter(trans string, toType SymbolSetType) (string, error) {
+// 	if toType == IPA {
+// 		return ipaFilter.filterAfterMappingToIpa(trans, ss)
+// 	} else if toType == CMU {
+// 		return cmuFilter.filterAfterMappingToCMU(trans, ss)
 // 	}
 // 	return trans, nil
 // }
 
-// // MapTranscription maps one input transcription string into the new symbol set.
-// func (ss SymbolSet) MapTranscriptionToIpa(input string) (string, error) {
-// 	res, err := ss.preFilter(input, ss.From)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	splitted, err := ss.SplitTranscription(res)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	var mapped = make([]string, 0)
-// 	for _, fromS := range splitted {
-// 		from, err := m.From.Get(fromS)
-// 		if err != nil {
-// 			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
-// 		}
-// 		to := m.symbolMap[from.String]
-// 		if len(to.String) > 0 {
-// 			mapped = append(mapped, to.String)
-// 		}
-// 	}
-// 	res = strings.Join(mapped, m.To.phonemeDelimiter.String)
+// ConvertToIPA maps one input transcription string into an IPA transcription
+func (ss SymbolSet) ConvertToIPA(trans string) (string, error) {
+	res := trans
+	//res, err := ss.preFilter(input, ss.From)
+	// if err != nil {
+	// 	return "", err
+	// }
+	splitted, err := ss.SplitTranscription(res)
+	if err != nil {
+		return "", err
+	}
+	var mapped = make([]string, 0)
+	for _, fromS := range splitted {
+		symbol, err := ss.Get(fromS)
+		if err != nil {
+			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
+		}
+		to := symbol.IPA.String
+		if len(to) > 0 {
+			mapped = append(mapped, to)
+		}
+	}
+	res = strings.Join(mapped, ss.phonemeDelimiter.IPA.String)
 
-// 	// remove repeated phoneme delimiters
-// 	res = m.repeatedPhonemeDelimiters.ReplaceAllString(res, m.To.phonemeDelimiter.String)
-// 	res, err = m.postFilter(res, m.To)
-// 	return res, err
-// }
+	//res, err = ss.postFilter(res, ss.To)
+	return res, err
+}
 
-// // MapTranscription maps one input transcription string into the new symbol set.
-// func (ss SymbolSet) MapTranscriptionFromIpa(input string) (string, error) {
-// 	res, err := ss.preFilter(input, ss.From)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	splitted, err := ss.SplitTranscription(res)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	var mapped = make([]string, 0)
-// 	for _, fromS := range splitted {
-// 		from, err := m.From.Get(fromS)
-// 		if err != nil {
-// 			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
-// 		}
-// 		to := m.symbolMap[from.String]
-// 		if len(to.String) > 0 {
-// 			mapped = append(mapped, to.String)
-// 		}
-// 	}
-// 	res = strings.Join(mapped, m.To.phonemeDelimiter.String)
+// ConvertFromIPA maps one input IPA transcription into the current symbol set
+func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
+	res := trans
+	//res, err := ss.preFilter(trans, ss.From)
+	// if err != nil {
+	// 	return "", err
+	// }
+	splitted, err := ss.SplitTranscription(res)
+	if err != nil {
+		return "", err
+	}
+	var mapped = make([]string, 0)
+	for _, fromS := range splitted {
+		symbol, err := ss.GetFromIPA(fromS)
+		if err != nil {
+			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
+		}
+		to := symbol.String
+		if len(to) > 0 {
+			mapped = append(mapped, to)
+		}
+	}
+	res = strings.Join(mapped, ss.phonemeDelimiter.String)
 
-// 	// remove repeated phoneme delimiters
-// 	res = m.repeatedPhonemeDelimiters.ReplaceAllString(res, m.To.phonemeDelimiter.String)
-// 	res, err = m.postFilter(res, m.To)
-// 	return res, err
-// }
+	// remove repeated phoneme delimiters, if any
+	res = ss.repeatedPhonemeDelimiters.ReplaceAllString(res, ss.phonemeDelimiter.IPA.String)
+	//res, err = ss.postFilter(res, ss.To)
+	return res, err
+}
