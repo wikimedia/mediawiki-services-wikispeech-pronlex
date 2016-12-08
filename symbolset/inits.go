@@ -3,6 +3,7 @@ package symbolset
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,47 +12,22 @@ import (
 
 // inits.go Initialization functions for structs in package symbolset
 
-func trimIfNeeded(s string) string {
-	trimmed := strings.TrimSpace(s)
-	if len(trimmed) > 0 {
-		return trimmed
-	}
-	return s
+// NewSymbolSet is a constructor for 'symbols' with built-in error checks
+func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
+	return NewSymbolSetWithTests(name, symbols, true)
 }
 
-// newIPA is a package private contructor for the ipa struct with fixed-value fields
-func newIPA() ipa {
-	return ipa{
-		ipa:      "ipa",
-		accentI:  "\u02C8",
-		accentII: "\u0300",
-		length:   "\u02D0",
-	}
-}
-
-// newCMU is a package private contructor for the ipa struct with fixed-value fields
-func newCMU() cmu {
-	return cmu{
-		cmu: "cmu",
-	}
-}
-
-// NewSymbols is a constructor for 'symbols' with built-in error checks
-func NewSymbols(name string, symbols []Symbol) (Symbols, error) {
-	return NewSymbolsWithTests(name, symbols, true)
-}
-
-// NewsymbolsWithTests is a constructor for 'symbols' with built-in error checks
-func NewSymbolsWithTests(name string, symbols []Symbol, checkForDups bool) (Symbols, error) {
-	var nilRes Symbols
+// NewSymbolSetWithTests is a constructor for 'symbols' with built-in error checks
+func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (SymbolSet, error) {
+	var nilRes SymbolSet
 
 	// filtered lists
-	phonemes := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic, Stress})
-	phoneticSymbols := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic})
-	stressSymbols := FilterSymbolsByCat(symbols, []SymbolCat{Stress})
-	syllabic := FilterSymbolsByCat(symbols, []SymbolCat{Syllabic})
-	nonSyllabic := FilterSymbolsByCat(symbols, []SymbolCat{NonSyllabic})
-	phonemeDelimiters := FilterSymbolsByCat(symbols, []SymbolCat{PhonemeDelimiter})
+	phonemes := filterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic, Stress})
+	phoneticSymbols := filterSymbolsByCat(symbols, []SymbolCat{Syllabic, NonSyllabic})
+	stressSymbols := filterSymbolsByCat(symbols, []SymbolCat{Stress})
+	syllabic := filterSymbolsByCat(symbols, []SymbolCat{Syllabic})
+	nonSyllabic := filterSymbolsByCat(symbols, []SymbolCat{NonSyllabic})
+	phonemeDelimiters := filterSymbolsByCat(symbols, []SymbolCat{PhonemeDelimiter})
 
 	// specific symbol initialization
 	if len(phonemeDelimiters) < 1 {
@@ -82,6 +58,35 @@ func NewSymbolsWithTests(name string, symbols []Symbol, checkForDups bool) (Symb
 		return nilRes, err
 	}
 
+	// IPA regexps
+	ipaSyllabicRe, err := buildIPARegexp(syllabic)
+	if err != nil {
+		return nilRes, err
+	}
+	ipaNonSyllabicRe, err := buildIPARegexp(nonSyllabic)
+	if err != nil {
+		return nilRes, err
+	}
+	ipaPhonemeRe, err := buildIPARegexp(phonemes)
+	if err != nil {
+		return nilRes, err
+	}
+
+	// compare ipa string vs unicode
+	for _, symbol := range symbols {
+		uFromString := string2unicode(symbol.IPA.String)
+
+		if len(symbol.IPA.String) == 0 {
+			uFromString = ""
+		}
+		if symbol.IPA.Unicode != uFromString {
+			return nilRes, fmt.Errorf("ipa symbol /%s/ does not match unicode '%s' -- expected '%s'", symbol.IPA.String, symbol.IPA.Unicode, uFromString)
+		}
+		if strings.Contains(symbol.IPA.String, " ") {
+			return nilRes, fmt.Errorf("ipa symbols cannot contain white space -- found /%s/", symbol.IPA.String)
+		}
+	}
+
 	if checkForDups {
 		seenSymbols := make(map[string]Symbol)
 		var dupSymbols []string
@@ -96,8 +101,24 @@ func NewSymbolsWithTests(name string, symbols []Symbol, checkForDups bool) (Symb
 		}
 	}
 
-	res := Symbols{
+	repeatedPhonemeDelimiters, err := regexp.Compile(phonemeDelimiterRe.String() + "+")
+	if err != nil {
+		return nilRes, err
+	}
+
+	ssType := Other
+	nameLC := strings.ToLower(name)
+	if strings.Contains(nameLC, "ipa") {
+		ssType = IPA
+	} else if strings.Contains(nameLC, "sampa") {
+		ssType = SAMPA
+	} else if strings.Contains(nameLC, "cmu") {
+		ssType = CMU
+	}
+
+	res := SymbolSet{
 		Name:    name,
+		Type:    ssType,
 		Symbols: symbols,
 
 		isInit: true,
@@ -108,159 +129,21 @@ func NewSymbolsWithTests(name string, symbols []Symbol, checkForDups bool) (Symb
 		syllabic:        syllabic,
 		nonSyllabic:     nonSyllabic,
 
-		phonemeDelimiter: phonemeDelimiter,
+		PhonemeRe:     phonemeRe,
+		SyllabicRe:    syllabicRe,
+		NonSyllabicRe: nonSyllabicRe,
+		SymbolRe:      symbolRe,
 
-		PhonemeRe:          phonemeRe,
-		SyllabicRe:         syllabicRe,
-		NonSyllabicRe:      nonSyllabicRe,
-		SymbolRe:           symbolRe,
-		phonemeDelimiterRe: phonemeDelimiterRe,
+		ipaSyllabicRe:    ipaSyllabicRe,
+		ipaNonSyllabicRe: ipaNonSyllabicRe,
+		ipaPhonemeRe:     ipaPhonemeRe,
+
+		phonemeDelimiter:          phonemeDelimiter,
+		phonemeDelimiterRe:        phonemeDelimiterRe,
+		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}
 	return res, nil
 
-}
-
-// NewSymbolSet is a public constructor for SymbolSet with built-in error checks
-func NewSymbolSet(name string, fromName string, toName string, symbolList []SymbolPair) (SymbolSet, error) {
-	var nilRes SymbolSet
-
-	if fromName == "" {
-		return nilRes, fmt.Errorf("cannot create symbol set with empty fromName!")
-	}
-	if toName == "" {
-		return nilRes, fmt.Errorf("cannot create symbol set with empty toName!")
-	}
-
-	ipa := newIPA()
-	cmu := newCMU()
-
-	toIsIPA := ipa.isIPA(toName)
-	fromIsIPA := ipa.isIPA(fromName)
-	toIsCMU := cmu.isCMU(toName)
-	fromIsCMU := cmu.isCMU(fromName)
-
-	if !(fromIsIPA || toIsIPA) {
-		return nilRes, fmt.Errorf("one of the defined symbol sets must always be IPA -- found %v - %v", fromName, toName)
-	}
-	var fromSymbols = make([]Symbol, 0)
-	var toSymbols = make([]Symbol, 0)
-	var symbolMap = make(map[string]Symbol)
-
-	for _, pair := range symbolList {
-		s1 := pair.Sym1
-		s2 := pair.Sym2
-		if _, ok := symbolMap[s1.String]; !ok {
-			symbolMap[s1.String] = s2
-		}
-		fromSymbols = append(fromSymbols, s1)
-		toSymbols = append(toSymbols, s2)
-	}
-
-	//from, err := NewSymbolsWithTests(fromName, fromSymbols, true) // check for duplicates in input symbol set
-	from, err := NewSymbolsWithTests(fromName, fromSymbols, false) // do not check for duplicates in input symbol set here, will be done at a later stage
-	if err != nil {
-		return nilRes, err
-	}
-	to, err := NewSymbolsWithTests(toName, toSymbols, false) // do not check for duplicates in output phoneme set
-	if err != nil {
-		return nilRes, err
-	}
-	if from.Name == to.Name {
-		return nilRes, fmt.Errorf("both phoneme sets cannot have the same name: %s", from.Name)
-	}
-	err = from.preCheckAmbiguous()
-	if err != nil {
-		return nilRes, err
-	}
-	err = to.preCheckAmbiguous()
-	if err != nil {
-		return nilRes, err
-	}
-
-	repeatedPhonemeDelimiters, err := regexp.Compile(to.phonemeDelimiterRe.String() + "+")
-	if err != nil {
-		return nilRes, err
-	}
-
-	m := SymbolSet{
-		Name:                      name,
-		FromName:                  fromName,
-		ToName:                    toName,
-		Symbols:                   symbolList,
-		fromIsIPA:                 fromIsIPA,
-		toIsIPA:                   toIsIPA,
-		fromIsCMU:                 fromIsCMU,
-		toIsCMU:                   toIsCMU,
-		From:                      from,
-		To:                        to,
-		ipa:                       ipa,
-		symbolMap:                 symbolMap,
-		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
-	}
-	return m, nil
-
-}
-
-// LoadMapper loads a 'mapper pair' from two SymbolSet instances
-func LoadMapper(m1 SymbolSet, m2 SymbolSet) (Mapper, error) {
-	fromName := m1.Name
-	toName := m2.Name
-	name := fromName + "2" + toName
-
-	m2rev, err := m2.reverse("IPA2" + toName)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-	}
-
-	mappers := Mapper{name, m1, m2rev}
-
-	// for testing:
-	// m1rev, err := m1.reverse(fromName + "2IPA")
-	// if err != nil {
-	// 	fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-	// }
-
-	//mappersrev := Mapper{toName + "2" + fromName, m2, m1rev}
-
-	var errs []string
-
-	for _, symbol := range m1.From.Symbols {
-		if len(symbol.String) > 0 {
-			mapped, err := mappers.MapTranscription(symbol.String)
-			if len(mapped) > 0 {
-				if err != nil {
-					return mappers, fmt.Errorf("couldn't test mapper: %v\n", err)
-				}
-				// mapped, err = mappersrev.MapTranscription(mapped)
-				// if err != nil {
-				// 	return mappers, fmt.Errorf("couldn't test mapper: %v\n", err)
-				// }
-				// if mapped != symbol.String {
-				// 	errs = append(errs, "couldn't map /"+symbol.String+"/ back and forth -- got /"+mapped+"/")
-				// }
-			}
-		}
-	}
-	if len(errs) > 0 {
-		return mappers, fmt.Errorf("Mapper initialization tests failed : %v", strings.Join(errs, "; "))
-	}
-
-	return mappers, nil
-}
-
-// LoadMapperFromFile loads two SymbolSet instances from files.
-func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 string) (Mapper, error) {
-	m1, err := loadSymbolSet_(fromName+"2IPA", fName1, fromName, "IPA")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
-	}
-	m2, err := loadSymbolSet_(toName+"2IPA", fName2, toName, "IPA")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
-		return Mapper{"", SymbolSet{}, SymbolSet{}}, err
-	}
-	return LoadMapper(m1, m2)
 }
 
 // LoadSymbolSet loads a SymbolSet from file
@@ -268,12 +151,13 @@ func LoadSymbolSet(fName string) (SymbolSet, error) {
 	name := filepath.Base(fName)
 	var extension = filepath.Ext(name)
 	name = name[0 : len(name)-len(extension)]
-
-	return loadSymbolSet_(name, fName, "", "")
+	return loadSymbolSet0(name, fName)
 }
 
+var header = "DESCRIPTION	SYMBOL	IPA	IPA UNICODE	CATEGORY"
+
 // loadSymbolSet_ loads a SymbolSet from file
-func loadSymbolSet_(name string, fName string, fromColumn string, toColumn string) (SymbolSet, error) {
+func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 	var nilRes SymbolSet
 	fh, err := os.Open(fName)
 	defer fh.Close()
@@ -282,19 +166,12 @@ func loadSymbolSet_(name string, fName string, fromColumn string, toColumn strin
 	}
 	s := bufio.NewScanner(fh)
 	n := 0
-	var descIndex = -1
-	var fromIndex = -1
-	var toIndex = -1
-	var typeIndex = -1
-	if fromColumn == "" { // TODO: Clean up
-		fromIndex = 1
-		fromColumn = "SYMBOL"
-	}
-	if toColumn == "" { // TODO: Clean up
-		toIndex = 2
-		toColumn = "IPA"
-	}
-	var maptable = make([]SymbolPair, 0)
+	var descIndex = 0
+	var symbolIndex = 1
+	var ipaIndex = 2
+	var ipaUnicodeIndex = 3
+	var typeIndex = 4
+	var symbols = make([]Symbol, 0)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			return nilRes, err
@@ -302,38 +179,15 @@ func loadSymbolSet_(name string, fName string, fromColumn string, toColumn strin
 		n++
 		l := s.Text()
 		if len(strings.TrimSpace(l)) > 0 && !strings.HasPrefix(strings.TrimSpace(l), "#") {
-			fs := strings.Split(l, "\t")
 			if n == 1 { // header
-				descIndex = indexOf(fs, "DESCRIPTION")
-				if fromIndex == -1 {
-					fromIndex = indexOf(fs, fromColumn)
-					if fromIndex == -1 {
-						return nilRes, fmt.Errorf("from index %v undefined", fromColumn)
-					}
+				if l != header {
+					return nilRes, fmt.Errorf("expected header '%s', found '%s'", header, l)
 				}
-				if toIndex == -1 {
-					toIndex = indexOf(fs, toColumn)
-					if toIndex == -1 {
-						return nilRes, fmt.Errorf("to index %v undefined", toColumn)
-					}
-				}
-				typeIndex = indexOf(fs, "CATEGORY")
-
 			} else {
-				if descIndex == -1 {
-					return nilRes, fmt.Errorf("%v", "description index unset")
-				}
-				if fromIndex == -1 {
-					return nilRes, fmt.Errorf("%v", "from index unset")
-				}
-				if toIndex == -1 {
-					return nilRes, fmt.Errorf("%v", "to index unset")
-				}
-				if typeIndex == -1 {
-					return nilRes, fmt.Errorf("%v", "type index unset")
-				}
-				from := trimIfNeeded(fs[fromIndex])
-				to := trimIfNeeded(fs[toIndex])
+				fs := strings.Split(l, "\t")
+				symbol := trimIfNeeded(fs[symbolIndex])
+				ipa := trimIfNeeded(fs[ipaIndex])
+				ipaUnicode := trimIfNeeded(fs[ipaUnicodeIndex])
 				desc := fs[descIndex]
 				typeS := fs[typeIndex]
 				var symCat SymbolCat
@@ -357,30 +211,111 @@ func loadSymbolSet_(name string, fName string, fromColumn string, toColumn strin
 				default:
 					return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
 				}
-				symFrom := Symbol{String: from, Cat: symCat, Desc: desc}
-				symTo := Symbol{String: to, Cat: symCat, Desc: desc}
-				maptable = append(maptable, SymbolPair{symFrom, symTo})
+				ipaSym := IPASymbol{String: ipa, Unicode: ipaUnicode}
+				sym := Symbol{
+					String: symbol,
+					Cat:    symCat,
+					Desc:   desc,
+					IPA:    ipaSym,
+				}
+				symbols = append(symbols, sym)
 			}
 		}
 	}
 
-	fromName := ""
-	toName := ""
-	if fromColumn == "SYMBOL" {
-		fromName = name
-	} else {
-		fromName = fromColumn
-	}
-	if toColumn == "SYMBOL" {
-		toName = name
-	} else {
-		toName = toColumn
-	}
-	m, err := NewSymbolSet(name, fromName, toName, maptable)
+	m, err := NewSymbolSet(name, symbols)
 	if err != nil {
 		return nilRes, fmt.Errorf("couldn't load mapper from file %v : %v", fName, err)
 	}
 	return m, nil
 }
 
-// end: initialization
+// LoadSymbolSetsFromDir loads a all symbol sets from the specified folder (all files with .tab extension)
+func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
+	// list files in symbol set dir
+	fileInfos, err := ioutil.ReadDir(dirName)
+	if err != nil {
+		return nil, fmt.Errorf("failed reading symbol set dir : %v", err)
+	}
+	var fErrs error
+	var symSets []SymbolSet
+	for _, fi := range fileInfos {
+		if strings.HasSuffix(fi.Name(), SymbolSetSuffix) {
+			symset, err := LoadSymbolSet(filepath.Join(dirName, fi.Name()))
+			if err != nil {
+				if fErrs != nil {
+					fErrs = fmt.Errorf("%v : %v", fErrs, err)
+				} else {
+					fErrs = err
+				}
+			} else {
+				symSets = append(symSets, symset)
+			}
+		}
+	}
+
+	if fErrs != nil {
+		return nil, fmt.Errorf("failed to load symbol set : %v", fErrs)
+	}
+
+	var symbolSetsMap = make(map[string]SymbolSet)
+	for _, z := range symSets {
+		// TODO checks that x.Name doesn't already exist ?
+		if _, ok := symbolSetsMap[z.Name]; ok {
+			// do nothing
+		} else {
+			symbolSetsMap[z.Name] = z
+		}
+	}
+	return symbolSetsMap, nil
+}
+
+// LoadMapper loads a symbol set mapper from two SymbolSet instances
+func LoadMapper(s1 SymbolSet, s2 SymbolSet) (Mapper, error) {
+	fromName := s1.Name
+	toName := s2.Name
+	name := fromName + "_2_" + toName
+
+	mapper := Mapper{name, s1, s2}
+
+	var errs []string
+
+	for _, symbol := range s1.Symbols {
+		if len(symbol.String) > 0 {
+			mapped, err := mapper.MapTranscription(symbol.String)
+			if len(mapped) > 0 {
+				if err != nil {
+					return mapper, fmt.Errorf("couldn't test mapper: %v\n", err)
+				}
+			}
+		}
+	}
+	if len(errs) > 0 {
+		return mapper, fmt.Errorf("mapper initialization tests failed : %v", strings.Join(errs, "; "))
+	}
+
+	return mapper, nil
+}
+
+// LoadMapperFromFile loads two SymbolSet instances from files.
+func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 string) (Mapper, error) {
+
+	if fromName == toName {
+		return Mapper{}, fmt.Errorf("should not load symbol sets with the same name: %s", fromName)
+	}
+	if fName1 == fName2 {
+		return Mapper{}, fmt.Errorf("should not load both symbol sets from the same file: %s", fName1)
+	}
+
+	m1, err := loadSymbolSet0(fromName, fName1)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		return Mapper{}, err
+	}
+	s2, err := loadSymbolSet0(toName, fName2)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		return Mapper{}, err
+	}
+	return LoadMapper(m1, s2)
+}

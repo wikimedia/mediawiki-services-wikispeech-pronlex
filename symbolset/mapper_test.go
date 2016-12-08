@@ -1,4 +1,4 @@
-package symbolset2
+package symbolset
 
 import "testing"
 

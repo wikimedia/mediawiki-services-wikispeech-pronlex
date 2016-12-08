@@ -1,12 +1,15 @@
-package symbolset2
+package symbolset0
+
+// For testing or standalone use only! In production use symbolset.SymbolSet.SplitTranscription
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
-)
 
-// package internal util for splitting transcriptions where there is no explicit phoneme delimiter
+	"github.com/stts-se/pronlex/lex"
+)
 
 // Sort slice of strings according to len, longest string first
 // TODO Should this live in a util lib?
@@ -22,35 +25,33 @@ func (s byLength) Less(i, j int) bool {
 	return len(s[i]) > len(s[j])
 }
 
-func splitIntoPhonemes(knownPhonemes []Symbol, transcription string) (phonemes []string, unknown []string, error error) {
+func splitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string) {
 
 	var known []string
 	// start by discarding any phoneme strings not substrings of transcription
 	for _, ph := range knownPhonemes {
-		if ph.Cat == PhonemeDelimiter && len(ph.String) > 0 {
-			return []string{}, []string{}, fmt.Errorf("splitIntoPhonemes should not be used for phoneme sets with empty phoneme delimiter; found /%s/", ph.String)
-		}
-		if len(ph.String) > 0 && strings.Index(transcription, ph.String) > -1 {
-			known = append(known, ph.String)
+		if strings.Index(transcription, ph) > -1 {
+			known = append(known, ph)
 		}
 	}
 
 	sort.Sort(byLength(known))
-	ps, uk := splitIntoPhonemes0(&known, transcription, []string{}, []string{})
-	return ps, uk, nil
+	return splurt(&known, transcription, []string{}, []string{})
 }
 
-// the recursive loop
-func splitIntoPhonemes0(srted *[]string, trans string, phs []string, unk []string) ([]string, []string) {
+func splurt(srted *[]string, trans string, phs []string, unk []string) ([]string, []string) {
 
 	if len(trans) > 0 {
 		pre, rest, ok := consume(srted, trans)
 		if ok { // known phoneme is prefix if trans
-			return splitIntoPhonemes0(srted, rest, append(phs, pre), unk)
+			return splurt(srted, rest, append(phs, pre), unk)
 		} else { // unknown prefix, chopped off first rune
-			return splitIntoPhonemes0(srted, rest, append(phs, pre), append(unk, pre))
+			return splurt(srted, rest, append(phs, pre), append(unk, pre))
 		}
-	}
+	} //else {
+	//	return phs, unk
+	//}
+
 	return phs, unk
 }
 
@@ -92,7 +93,24 @@ func consume(srtd *[]string, trans string) (string, string, bool) {
 	// no known phoneme prefix, separate first rune
 	if prefixFound {
 		return resPref, resSuffix, prefixFound
+	} else {
+
+		t := []rune(trans)
+		return string(t[0]), string(t[1:]), false
 	}
-	t := []rune(trans)
-	return string(t[0]), string(t[1:]), false
+}
+
+// splitTrans applies splitIntoPhonemes to the transcription strings of a lex.Entry
+func splitTrans(e *lex.Entry, symbols []string) {
+	var newTs []lex.Transcription
+	for _, t := range e.Transcriptions {
+		t2, u2 := splitIntoPhonemes(symbols, t.Strn)
+		newT := strings.Join(t2, " ")
+		if len(u2) > 0 {
+			fmt.Fprintf(os.Stderr, "%s > %v --> %v\n", t.Strn, t2, u2)
+		}
+		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
+	}
+
+	e.Transcriptions = newTs
 }

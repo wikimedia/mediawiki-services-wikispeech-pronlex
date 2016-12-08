@@ -22,18 +22,18 @@ var vDbPath = "./vtestlex.db"
 func createValidator() validation.Validator {
 	name := "sampa"
 	symbols := []symbolset.Symbol{
-		symbolset.Symbol{"a", symbolset.Syllabic, ""},
-		symbolset.Symbol{"A:", symbolset.Syllabic, ""},
-		symbolset.Symbol{"b", symbolset.NonSyllabic, ""},
-		symbolset.Symbol{"p", symbolset.NonSyllabic, ""},
-		symbolset.Symbol{"N", symbolset.NonSyllabic, ""},
-		symbolset.Symbol{"n", symbolset.NonSyllabic, ""},
-		symbolset.Symbol{" ", symbolset.PhonemeDelimiter, ""},
-		symbolset.Symbol{".", symbolset.SyllableDelimiter, ""},
-		symbolset.Symbol{"\"", symbolset.Stress, ""},
-		symbolset.Symbol{"\"\"", symbolset.Stress, ""},
+		symbolset.Symbol{"a", symbolset.Syllabic, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"A:", symbolset.Syllabic, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"b", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"p", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"N", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"n", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{" ", symbolset.PhonemeDelimiter, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{".", symbolset.SyllableDelimiter, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"\"", symbolset.Stress, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"\"\"", symbolset.Stress, "", symbolset.IPASymbol{"", ""}},
 	}
-	ss, err := symbolset.NewSymbols(name, symbols)
+	ss, err := symbolset.NewSymbolSet(name, symbols)
 	ff("failed to init symbols : %v", err)
 
 	primaryStressRe, err := vrules.ProcessTransRe(ss, "\"")

@@ -34,14 +34,14 @@ func testEqSymbols(t *testing.T, expect []Symbol, result []Symbol) {
 
 func Test_buildRegexp1(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, ""},
-		Symbol{"t", NonSyllabic, ""},
-		Symbol{".", SyllableDelimiter, ""},
-		Symbol{"s", NonSyllabic, ""},
-		Symbol{"t_s", NonSyllabic, ""},
-		Symbol{"", PhonemeDelimiter, ""},
-		Symbol{" ", PhonemeDelimiter, ""},
-		Symbol{"e", Syllabic, ""},
+		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
+		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	re, err := buildRegexp(symbols)
 	if err != nil {
@@ -55,14 +55,14 @@ func Test_buildRegexp1(t *testing.T) {
 
 func Test_buildRegexp2(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, ""},
-		Symbol{"t", NonSyllabic, ""},
-		Symbol{".", SyllableDelimiter, ""},
-		Symbol{"s", NonSyllabic, ""},
-		Symbol{"t_s", NonSyllabic, ""},
-		Symbol{"", PhonemeDelimiter, ""},
-		Symbol{" ", PhonemeDelimiter, ""},
-		Symbol{"e", Syllabic, ""},
+		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
+		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	re, err := buildRegexpWithGroup(symbols, true, false)
 	if err != nil {
@@ -76,15 +76,15 @@ func Test_buildRegexp2(t *testing.T) {
 
 func Test_buildRegexp3(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, ""},
-		Symbol{"t", NonSyllabic, ""},
-		Symbol{".", SyllableDelimiter, ""},
-		Symbol{"s", NonSyllabic, ""},
-		Symbol{"t_s", NonSyllabic, ""},
-		Symbol{"$", PhonemeDelimiter, ""},
-		Symbol{" ", PhonemeDelimiter, ""},
-		Symbol{"", PhonemeDelimiter, ""},
-		Symbol{"e", Syllabic, ""},
+		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
+		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	re, err := buildRegexpWithGroup(symbols, false, false)
 	if err != nil {
@@ -98,46 +98,46 @@ func Test_buildRegexp3(t *testing.T) {
 
 func Test_FilterSymbolsByCat(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, ""},
-		Symbol{"t", NonSyllabic, ""},
-		Symbol{"%", Stress, ""},
-		Symbol{".", SyllableDelimiter, ""},
-		Symbol{"s", NonSyllabic, ""},
-		Symbol{"t_s", NonSyllabic, ""},
-		Symbol{"$", PhonemeDelimiter, ""},
-		Symbol{"\"", Stress, ""},
-		Symbol{"e", Syllabic, ""},
-		Symbol{"", PhonemeDelimiter, ""},
-		Symbol{"+", MorphemeDelimiter, ""},
+		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
+		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"%", Stress, "", IPASymbol{"", ""}},
+		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"\"", Stress, "", IPASymbol{"", ""}},
+		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"+", MorphemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	stressE := []Symbol{
-		Symbol{"%", Stress, ""},
-		Symbol{"\"", Stress, ""},
+		Symbol{"%", Stress, "", IPASymbol{"", ""}},
+		Symbol{"\"", Stress, "", IPASymbol{"", ""}},
 	}
-	stressR := FilterSymbolsByCat(symbols, []SymbolCat{Stress})
+	stressR := filterSymbolsByCat(symbols, []SymbolCat{Stress})
 	testEqSymbols(t, stressE, stressR)
 
 	delimE := []Symbol{
-		Symbol{".", SyllableDelimiter, ""},
-		Symbol{"$", PhonemeDelimiter, ""},
-		Symbol{"", PhonemeDelimiter, ""},
-		Symbol{"+", MorphemeDelimiter, ""},
+		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"+", MorphemeDelimiter, "", IPASymbol{"", ""}},
 	}
-	delimR := FilterSymbolsByCat(symbols, []SymbolCat{SyllableDelimiter, PhonemeDelimiter, MorphemeDelimiter})
+	delimR := filterSymbolsByCat(symbols, []SymbolCat{SyllableDelimiter, PhonemeDelimiter, MorphemeDelimiter})
 	testEqSymbols(t, delimE, delimR)
 }
 
 func Test_contains(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, ""},
-		Symbol{"t", NonSyllabic, ""},
-		Symbol{".", SyllableDelimiter, ""},
-		Symbol{"s", NonSyllabic, ""},
-		Symbol{"t_s", NonSyllabic, ""},
-		Symbol{"$", PhonemeDelimiter, ""},
-		Symbol{" ", PhonemeDelimiter, ""},
-		Symbol{"", PhonemeDelimiter, ""},
-		Symbol{"e", Syllabic, ""},
+		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
+		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	var s string
 
@@ -148,5 +148,24 @@ func Test_contains(t *testing.T) {
 	s = "_"
 	if contains(symbols, s) {
 		t.Errorf("contains() Expected false for symbol %s in %v", s, symbols)
+	}
+}
+
+func Test_string2unicode(t *testing.T) {
+
+	// --
+	s := "a"
+	expect := "U+0061"
+	result := string2unicode(s)
+	if result != expect {
+		t.Errorf("For /%s/, expected '%s', got '%s'", s, expect, result)
+	}
+
+	// --
+	s = "_"
+	expect = "U+005F"
+	result = string2unicode(s)
+	if result != expect {
+		t.Errorf("For /%s/, expected '%s', got '%s'", s, expect, result)
 	}
 }

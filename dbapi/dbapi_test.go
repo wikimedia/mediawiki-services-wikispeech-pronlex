@@ -337,12 +337,10 @@ func Test_unique(t *testing.T) {
 
 func Test_ImportLexiconFile(t *testing.T) {
 
-	ssMapper, err := symbolset.LoadSymbolSet("./../symbolset/static/sv-se_ws-sampa.tab")
+	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/static/sv-se_ws-sampa.tab")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	symbolSet := ssMapper.From
 
 	dbFile := "./iotestlex.db"
 	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
@@ -476,12 +474,10 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 func Test_ImportLexiconFileGz(t *testing.T) {
 
-	ssMapper, err := symbolset.LoadSymbolSet("./../symbolset/static/sv-se_ws-sampa.tab")
+	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/static/sv-se_ws-sampa.tab")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	symbolSet := ssMapper.From
 
 	dbFile := "./iotestlex.db"
 	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {

@@ -1,4 +1,4 @@
-package symbolset2
+package symbolset
 
 // symbol set filters for accent/stress placement
 

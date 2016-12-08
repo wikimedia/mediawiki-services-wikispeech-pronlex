@@ -22,21 +22,21 @@ func (vs ValidatorService) ValidatorForName(symbolSetName string) (*validation.V
 
 func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error {
 	if ss, ok := symbolsets["sv-se_ws-sampa"]; ok {
-		v, err := newSvSeNstValidator(ss.From)
+		v, err := newSvSeNstValidator(ss)
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
 		}
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["nb-no_ws-sampa"]; ok {
-		v, err := newNbNoNstValidator(ss.From)
+		v, err := newNbNoNstValidator(ss)
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
 		}
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["en-us_sampa_mary"]; ok {
-		v, err := newEnUsCmuNstValidator(ss.From)
+		v, err := newEnUsCmuNstValidator(ss)
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
 		}
@@ -45,7 +45,7 @@ func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error
 	return nil
 }
 
-func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, error) {
+func newSvSeNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, error) {
 	primaryStressRe, err := ProcessTransRe(symbolset, "\"")
 	if err != nil {
 		return validation.Validator{}, err
@@ -116,7 +116,7 @@ func newSvSeNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 	return vali, nil
 }
 
-func newNbNoNstValidator(symbolset symbolset.Symbols) (validation.Validator, error) {
+func newNbNoNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, error) {
 	primaryStressRe, err := ProcessTransRe(symbolset, "\"")
 	if err != nil {
 		return validation.Validator{}, err
@@ -165,7 +165,7 @@ func newNbNoNstValidator(symbolset symbolset.Symbols) (validation.Validator, err
 	return vali, nil
 }
 
-func newEnUsCmuNstValidator(symbolset symbolset.Symbols) (validation.Validator, error) {
+func newEnUsCmuNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, error) {
 	exactOnePrimStressRe, err := ProcessTransRe(symbolset, "^[^\"]*\"[^\"]*$")
 	if err != nil {
 		return validation.Validator{}, err

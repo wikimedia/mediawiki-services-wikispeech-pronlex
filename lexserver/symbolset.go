@@ -24,9 +24,14 @@ type JsonSymbolSet struct {
 
 type JsonSymbol struct {
 	Symbol string
-	IPA    string
+	IPA    JsonIPA
 	Desc   string
 	Cat    string
+}
+
+type JsonIPA struct {
+	String  string
+	Unicode string
 }
 
 func symbolSetHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +54,7 @@ func symbolSetHandler(w http.ResponseWriter, r *http.Request) {
 	symbolset := JsonSymbolSet{Name: symbolset0.Name}
 	symbolset.Symbols = make([]JsonSymbol, 0)
 	for _, sym := range symbolset0.Symbols {
-		symbolset.Symbols = append(symbolset.Symbols, JsonSymbol{Symbol: sym.Sym1.String, IPA: sym.Sym2.String, Desc: sym.Sym1.Desc, Cat: sym.Sym1.Cat.String()})
+		symbolset.Symbols = append(symbolset.Symbols, JsonSymbol{Symbol: sym.String, IPA: JsonIPA{String: sym.IPA.String, Unicode: sym.IPA.Unicode}, Desc: sym.Desc, Cat: sym.Cat.String()})
 	}
 
 	j, err := json.Marshal(symbolset)

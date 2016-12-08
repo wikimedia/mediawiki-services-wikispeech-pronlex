@@ -1,4 +1,4 @@
-package symbolset2
+package symbolset0
 
 import (
 	"fmt"
@@ -81,17 +81,21 @@ func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper
 // Map is used by the server to map a transcription from one symbol set to another
 func (m MapperService) Map(fromName string, toName string, trans string) (string, error) {
 	if toName == "ipa" {
-		ss, ok := m.SymbolSets[fromName]
+		symbolset, ok := m.SymbolSets[fromName]
 		if !ok {
 			return "", fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
 		}
-		return ss.ConvertToIPA(trans)
+		return symbolset.MapTranscription(trans)
 	} else if fromName == "ipa" {
-		ss, ok := m.SymbolSets[toName]
+		symbolsetR, ok := m.SymbolSets[toName]
 		if !ok {
 			return "", fmt.Errorf("couldn't create mapper from %s to %s", fromName, toName)
 		}
-		return ss.ConvertFromIPA(trans)
+		symbolset, err := symbolsetR.reverse(toName + "2" + fromName)
+		if err != nil {
+			return "", fmt.Errorf("couldn't create mapper from %s to %s : %v", fromName, toName, err)
+		}
+		return symbolset.MapTranscription(trans)
 	} else {
 		mapper, err := m.getOrCreateMapper(fromName, toName)
 		if err != nil {

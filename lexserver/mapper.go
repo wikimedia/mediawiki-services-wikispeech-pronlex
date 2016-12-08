@@ -8,12 +8,12 @@ import (
 	"os"
 	"regexp"
 	"sync"
+
+	"github.com/stts-se/pronlex/symbolset"
 	//"os"
 	"encoding/json"
 	"path/filepath"
 	"strings"
-
-	"github.com/stts-se/pronlex/symbolset"
 )
 
 // The calls prefixed with '/mapper/'
@@ -93,7 +93,7 @@ type JsonMapper struct {
 type JsonMSymbol struct {
 	From string
 	To   string
-	IPA  string
+	IPA  JsonIPA
 	Desc string
 	Cat  string
 }
@@ -122,10 +122,9 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	mapper := JsonMapper{From: mapper0.SymbolSet1.FromName, To: mapper0.SymbolSet2.ToName}
+	mapper := JsonMapper{From: mapper0.SymbolSet1.Name, To: mapper0.SymbolSet2.Name}
 	mapper.Symbols = make([]JsonMSymbol, 0)
-	for _, sym := range mapper0.SymbolSet1.Symbols {
-		from := sym.Sym1
+	for _, from := range mapper0.SymbolSet1.Symbols {
 		to, err := mapper0.MapSymbol(from)
 		if err != nil {
 			msg := fmt.Sprintf("failed getting map table : %v", err)
@@ -133,7 +132,7 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		mapper.Symbols = append(mapper.Symbols, JsonMSymbol{From: from.String, To: to.String, IPA: sym.Sym2.String, Desc: sym.Sym1.Desc, Cat: sym.Sym1.Cat.String()})
+		mapper.Symbols = append(mapper.Symbols, JsonMSymbol{From: from.String, To: to.String, IPA: JsonIPA{String: from.IPA.String, Unicode: from.IPA.Unicode}, Desc: from.Desc, Cat: from.Cat.String()})
 	}
 
 	j, err := json.Marshal(mapper)

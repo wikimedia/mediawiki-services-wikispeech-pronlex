@@ -12,7 +12,7 @@ import (
 
 // SymbolSetRule is a general rule for verifying that each phoneme is a legal symbol
 type SymbolSetRule struct {
-	SymbolSet symbolset.Symbols
+	SymbolSet symbolset.SymbolSet
 }
 
 func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
@@ -41,7 +41,7 @@ func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 /*
 ProcessTransRe converts pre-defined entities to the appropriate symbols. Strings replaced are: syllabic, nonsyllabic, phoneme, symbol.
 */
-func ProcessTransRe(SymbolSet symbolset.Symbols, Regexp string) (*regexp2.Regexp, error) {
+func ProcessTransRe(SymbolSet symbolset.SymbolSet, Regexp string) (*regexp2.Regexp, error) {
 	Regexp = strings.Replace(Regexp, "nonsyllabic", SymbolSet.NonSyllabicRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "syllabic", SymbolSet.SyllabicRe.String(), -1)
 	Regexp = strings.Replace(Regexp, "phoneme", SymbolSet.PhonemeRe.String(), -1)
