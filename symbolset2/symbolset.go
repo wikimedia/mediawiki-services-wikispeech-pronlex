@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 // SymbolSetType is used for accent placement, etc.
@@ -210,7 +212,25 @@ func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 	res = strings.Join(mapped, ss.phonemeDelimiter.String)
 
 	// remove repeated phoneme delimiters, if any
-	res = ss.repeatedPhonemeDelimiters.ReplaceAllString(res, ss.phonemeDelimiter.IPA.String)
+	res = ss.repeatedPhonemeDelimiters.ReplaceAllString(res, ss.phonemeDelimiter.String)
 	res, err = postFilter(ss, res, ss.Type)
 	return res, err
+}
+
+// MapTranscriptions maps the input entry's transcriptions (in-place)
+func (ss SymbolSet) MapTranscriptions(e *lex.Entry) error {
+	var newTs []lex.Transcription
+	var errs []string
+	for _, t := range e.Transcriptions {
+		newT, err := ss.ConvertToIPA(t.Strn)
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
+	}
+	e.Transcriptions = newTs
+	if len(errs) > 0 {
+		return fmt.Errorf("%v", strings.Join(errs, "; "))
+	}
+	return nil
 }

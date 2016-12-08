@@ -46,7 +46,7 @@ func filterBeforeMappingFromIPA(ss SymbolSet, trans string) (string, error) {
 
 func filterAfterMappingToIPA(ss SymbolSet, trans string) (string, error) {
 	// IPA: /ə.ba⁀ʊˈt/ => /ə.ˈba⁀ʊt/
-	s := "(" + ss.NonSyllabicRe.String() + "*)(" + ss.SyllabicRe.String() + ")" + ipaAccentI
+	s := "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")" + ipaAccentI
 	repl, err := regexp.Compile(s)
 	if err != nil {
 		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)

@@ -80,7 +80,7 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 			uFromString = ""
 		}
 		if symbol.IPA.Unicode != uFromString {
-			return nilRes, fmt.Errorf("ipa symbol /%s/ does not match unicode '%s' -- got '%s'", symbol.IPA.String, symbol.IPA.Unicode, uFromString)
+			return nilRes, fmt.Errorf("ipa symbol /%s/ does not match unicode '%s' -- expected '%s'", symbol.IPA.String, symbol.IPA.Unicode, uFromString)
 		}
 	}
 
@@ -257,8 +257,54 @@ func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 
 	var symbolSetsMap = make(map[string]SymbolSet)
 	for _, z := range symSets {
-		// TODO check that x.Name doesn't already exist
-		symbolSetsMap[z.Name] = z
+		// TODO checks that x.Name doesn't already exist ?
+		if _, ok := symbolSetsMap[z.Name]; ok {
+			// do nothing
+		} else {
+			symbolSetsMap[z.Name] = z
+		}
 	}
 	return symbolSetsMap, nil
+}
+
+// LoadMapper loads a symbol set mapper from two SymbolSet instances
+func LoadMapper(s1 SymbolSet, s2 SymbolSet) (Mapper, error) {
+	fromName := s1.Name
+	toName := s2.Name
+	name := fromName + "_2_" + toName
+
+	mapper := Mapper{name, s1, s2}
+
+	var errs []string
+
+	for _, symbol := range s1.Symbols {
+		if len(symbol.String) > 0 {
+			mapped, err := mapper.MapTranscription(symbol.String)
+			if len(mapped) > 0 {
+				if err != nil {
+					return mapper, fmt.Errorf("couldn't test mapper: %v\n", err)
+				}
+			}
+		}
+	}
+	if len(errs) > 0 {
+		return mapper, fmt.Errorf("mapper initialization tests failed : %v", strings.Join(errs, "; "))
+	}
+
+	return mapper, nil
+}
+
+// LoadMapperFromFile loads two SymbolSet instances from files.
+func LoadMapperFromFile(fromName string, toName string, fName1 string, fName2 string) (Mapper, error) {
+	m1, err := loadSymbolSet0(fromName, fName1)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		return Mapper{}, err
+	}
+	s2, err := loadSymbolSet0(toName, fName2)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't load mapper: %v\n", err)
+		return Mapper{}, err
+	}
+	return LoadMapper(m1, s2)
 }
