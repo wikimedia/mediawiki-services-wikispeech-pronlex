@@ -28,7 +28,7 @@ func splitIntoPhonemes(knownPhonemes []Symbol, transcription string) (phonemes [
 	// start by discarding any phoneme strings not substrings of transcription
 	for _, ph := range knownPhonemes {
 		if ph.Cat == PhonemeDelimiter && len(ph.String) > 0 {
-			return []string{}, []string{}, fmt.Errorf("splitIntoPhonemes should not be used for phoneme sets with empty phoneme delimiter; found /%s/", ph)
+			return []string{}, []string{}, fmt.Errorf("splitIntoPhonemes should not be used for phoneme sets with empty phoneme delimiter; found /%s/", ph.String)
 		}
 		if len(ph.String) > 0 && strings.Index(transcription, ph.String) > -1 {
 			known = append(known, ph.String)
@@ -92,9 +92,7 @@ func consume(srtd *[]string, trans string) (string, string, bool) {
 	// no known phoneme prefix, separate first rune
 	if prefixFound {
 		return resPref, resSuffix, prefixFound
-	} else {
-
-		t := []rune(trans)
-		return string(t[0]), string(t[1:]), false
 	}
+	t := []rune(trans)
+	return string(t[0]), string(t[1:]), false
 }

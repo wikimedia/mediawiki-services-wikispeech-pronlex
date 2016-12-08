@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// SymbolSetType is used for accent placement, etc.
 type SymbolSetType int
 
 const (

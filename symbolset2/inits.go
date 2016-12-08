@@ -16,7 +16,7 @@ func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	return NewSymbolSetWithTests(name, symbols, true)
 }
 
-// NewsymbolsWithTests is a constructor for 'symbols' with built-in error checks
+// NewSymbolSetWithTests is a constructor for 'symbols' with built-in error checks
 func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (SymbolSet, error) {
 	var nilRes SymbolSet
 
@@ -147,13 +147,13 @@ func LoadSymbolSet(fName string) (SymbolSet, error) {
 	name := filepath.Base(fName)
 	var extension = filepath.Ext(name)
 	name = name[0 : len(name)-len(extension)]
-	return loadSymbolSet_(name, fName)
+	return loadSymbolSet0(name, fName)
 }
 
 var header = "DESCRIPTION	SYMBOL	IPA	IPA UNICODE	CATEGORY"
 
 // loadSymbolSet_ loads a SymbolSet from file
-func loadSymbolSet_(name string, fName string) (SymbolSet, error) {
+func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 	var nilRes SymbolSet
 	fh, err := os.Open(fName)
 	defer fh.Close()

@@ -21,6 +21,7 @@ func (a symbolSlice) Less(i, j int) bool {
 	return a[i].String < a[j].String
 }
 
+// SymbolSetSuffix defines the filename extension for symbol sets
 var SymbolSetSuffix = ".tab"
 
 func trimIfNeeded(s string) string {

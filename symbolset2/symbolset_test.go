@@ -274,12 +274,12 @@ func Test_LoadSymbolSetsFromDir(t *testing.T) {
 		t.Errorf("LoadSymbolSetsFromDir() didn't expect error here : %v", err)
 		return
 	}
-	ssNames := make([]string, 0)
+	var ssNames []string
 	for _, ss := range symbolsets {
 		ssNames = append(ssNames, ss.Name)
 	}
 	if len(symbolsets) != 7 {
-		t.Errorf("Expected 7 symbol sets in folder ./static, found %s", len(symbolsets))
+		t.Errorf("Expected 7 symbol sets in folder ./static, found %d", len(symbolsets))
 	}
 	if !stringSliceContains(ssNames, "sv-se_nst-xsampa") {
 		t.Errorf("Expected %s in symbolsets. Found: %v", "sv-se_nst-xsampa", ssNames)
