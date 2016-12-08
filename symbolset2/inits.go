@@ -3,6 +3,7 @@ package symbolset2
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -224,4 +225,40 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 		return nilRes, fmt.Errorf("couldn't load mapper from file %v : %v", fName, err)
 	}
 	return m, nil
+}
+
+// LoadSymbolSetsFromDir loads a all symbol sets from the specified folder (all files with .tab extension)
+func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
+	// list files in symbol set dir
+	fileInfos, err := ioutil.ReadDir(dirName)
+	if err != nil {
+		return nil, fmt.Errorf("failed reading symbol set dir : %v", err)
+	}
+	var fErrs error
+	var symSets []SymbolSet
+	for _, fi := range fileInfos {
+		if strings.HasSuffix(fi.Name(), SymbolSetSuffix) {
+			symset, err := LoadSymbolSet(filepath.Join(dirName, fi.Name()))
+			if err != nil {
+				if fErrs != nil {
+					fErrs = fmt.Errorf("%v : %v", fErrs, err)
+				} else {
+					fErrs = err
+				}
+			} else {
+				symSets = append(symSets, symset)
+			}
+		}
+	}
+
+	if fErrs != nil {
+		return nil, fmt.Errorf("failed to load symbol set : %v", fErrs)
+	}
+
+	var symbolSetsMap = make(map[string]SymbolSet)
+	for _, z := range symSets {
+		// TODO check that x.Name doesn't already exist
+		symbolSetsMap[z.Name] = z
+	}
+	return symbolSetsMap, nil
 }
