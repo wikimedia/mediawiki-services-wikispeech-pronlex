@@ -106,8 +106,8 @@ func (ss SymbolSet) Get(symbol string) (Symbol, error) {
 	return Symbol{}, fmt.Errorf("no symbol /%s/ in symbol set", symbol)
 }
 
-// GetFromIPA searches the SymbolSet for a symbol with the given IPA symbol string
-func (ss SymbolSet) GetFromIPA(ipa string) (Symbol, error) {
+// getFromIPA searches the SymbolSet for a symbol with the given IPA symbol string
+func (ss SymbolSet) getFromIPA(ipa string) (Symbol, error) {
 	for _, s := range ss.Symbols {
 		if s.IPA.String == ipa {
 			return s, nil
@@ -197,7 +197,7 @@ func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 	}
 	var mapped = make([]string, 0)
 	for _, fromS := range splitted {
-		symbol, err := ss.GetFromIPA(fromS)
+		symbol, err := ss.getFromIPA(fromS)
 		if err != nil {
 			return "", fmt.Errorf("input symbol /%s/ is undefined : %v", fromS, err)
 		}

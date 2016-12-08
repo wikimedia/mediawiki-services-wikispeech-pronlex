@@ -30,6 +30,20 @@ func Test_NewSymbolSet_FailIfInputContainsDuplicates(t *testing.T) {
 	}
 }
 
+func Test_NewSymbolSet_FailOnIncorrectIPAUnicode(t *testing.T) {
+	name := "ss"
+	symbols := []Symbol{
+		Symbol{"a", Syllabic, "", IPASymbol{"a", "U+0061"}},
+		Symbol{"t", NonSyllabic, "", IPASymbol{"t", "U+0074"}},
+		Symbol{"A:", Syllabic, "", IPASymbol{"ɑː", "U+0251:"}},
+		Symbol{" ", PhonemeDelimiter, "phn delim", IPASymbol{"", ""}},
+	}
+	_, err := NewSymbolSet(name, symbols)
+	if err == nil {
+		t.Errorf("NewSymbolSet() expected ipa/unicode error here")
+	}
+}
+
 func Test_SplitTranscription_Normal1(t *testing.T) {
 	name := "ss"
 	symbols := []Symbol{
@@ -242,5 +256,32 @@ func Test_ConvertFromIPA(t *testing.T) {
 	}
 	if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
+	}
+}
+
+func stringSliceContains(slice []string, s string) bool {
+	for _, sl := range slice {
+		if sl == s {
+			return true
+		}
+	}
+	return false
+}
+
+func Test_LoadSymbolSetsFromDir(t *testing.T) {
+	symbolsets, err := LoadSymbolSetsFromDir("./static")
+	if err != nil {
+		t.Errorf("LoadSymbolSetsFromDir() didn't expect error here : %v", err)
+		return
+	}
+	ssNames := make([]string, 0)
+	for _, ss := range symbolsets {
+		ssNames = append(ssNames, ss.Name)
+	}
+	if len(symbolsets) != 7 {
+		t.Errorf("Expected 7 symbol sets in folder ./static, found %s", len(symbolsets))
+	}
+	if !stringSliceContains(ssNames, "sv-se_nst-xsampa") {
+		t.Errorf("Expected %s in symbolsets. Found: %v", "sv-se_nst-xsampa", ssNames)
 	}
 }
