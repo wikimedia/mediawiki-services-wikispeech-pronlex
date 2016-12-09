@@ -3,6 +3,8 @@ package dbapi
 import (
 	"database/sql"
 	"flag"
+	"fmt"
+	"time"
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
@@ -19,6 +21,13 @@ func ff(f string, err error) {
 	if err != nil {
 		log.Fatalf(f, err)
 	}
+}
+
+func execSchema(db *sql.DB) (sql.Result, error) {
+	ti := time.Now()
+	res, err := db.Exec(Schema)
+	fmt.Printf("db.Exec(Schema) took %v\n", time.Since(ti))
+	return res, err
 }
 
 func TestMain(m *testing.M) {
@@ -50,7 +59,8 @@ func Test_InsertEntries(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = db.Exec(Schema) // Creates new lexicon database
+	_, err = execSchema(db) // Creates new lexicon database
+
 	ff("Failed to create lexicon db: %v", err)
 
 	// TODO Borde returnera error
@@ -362,7 +372,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = db.Exec(Schema) // Creates new lexicon database
+	_, err = execSchema(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -431,7 +441,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 // 	defer db.Close()
 
-// 	_, err = db.Exec(Schema) // Creates new lexicon database
+// 	_, err = execSchema(db) // Creates new lexicon database
 // 	ff("Failed to create lexicon db: %v", err)
 
 // 	logger := StderrLogger{}
@@ -499,7 +509,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = db.Exec(Schema) // Creates new lexicon database
+	_, err = execSchema(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}

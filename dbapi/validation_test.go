@@ -105,12 +105,13 @@ func vInsertEntries(t *testing.T, lexName string) (*sql.DB, int64) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
 	//defer db.Close()
 
-	_, err = db.Exec(Schema) // Creates new lexicon database
+	_, err = execSchema(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	l := Lexicon{Name: lexName, SymbolSetName: "ZZ"}
