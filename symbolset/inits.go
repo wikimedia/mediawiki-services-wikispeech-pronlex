@@ -12,6 +12,45 @@ import (
 
 // inits.go Initialization functions for structs in package symbolset
 
+func symbolSetTypeFromString(ssName string) SymbolSetType {
+	ssNameLC := strings.ToLower(ssName)
+	if strings.Contains(ssNameLC, "ipa") {
+		return IPA
+	} else if strings.Contains(ssNameLC, "sampa") {
+		return SAMPA
+	} else if strings.Contains(ssNameLC, "cmu") {
+		return CMU
+	} else {
+		return Other
+	}
+
+}
+
+func symbolCatFromString(s string) (SymbolCat, error) {
+	var symCat SymbolCat
+	switch s {
+	case "Syllabic":
+		symCat = Syllabic
+	case "NonSyllabic":
+		symCat = NonSyllabic
+	case "Stress":
+		symCat = Stress
+	case "PhonemeDelimiter":
+		symCat = PhonemeDelimiter
+	case "SyllableDelimiter":
+		symCat = SyllableDelimiter
+	case "MorphemeDelimiter":
+		symCat = MorphemeDelimiter
+	case "CompoundDelimiter":
+		symCat = CompoundDelimiter
+	case "WordDelimiter":
+		symCat = WordDelimiter
+	default:
+		return symCat, fmt.Errorf("unknown symbolcat %s", s)
+	}
+	return symCat, nil
+}
+
 // NewSymbolSet is a constructor for 'symbols' with built-in error checks
 func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
 	return NewSymbolSetWithTests(name, symbols, true)
@@ -106,15 +145,7 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		return nilRes, err
 	}
 
-	ssType := Other
-	nameLC := strings.ToLower(name)
-	if strings.Contains(nameLC, "ipa") {
-		ssType = IPA
-	} else if strings.Contains(nameLC, "sampa") {
-		ssType = SAMPA
-	} else if strings.Contains(nameLC, "cmu") {
-		ssType = CMU
-	}
+	ssType := symbolSetTypeFromString(name)
 
 	res := SymbolSet{
 		Name:    name,
@@ -170,7 +201,7 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 	var symbolIndex = 1
 	var ipaIndex = 2
 	var ipaUnicodeIndex = 3
-	var typeIndex = 4
+	var symCatIndex = 4
 	var symbols = make([]Symbol, 0)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
@@ -189,27 +220,9 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 				ipa := trimIfNeeded(fs[ipaIndex])
 				ipaUnicode := trimIfNeeded(fs[ipaUnicodeIndex])
 				desc := fs[descIndex]
-				typeS := fs[typeIndex]
-				var symCat SymbolCat
-				switch typeS {
-				case "syllabic":
-					symCat = Syllabic
-				case "non syllabic":
-					symCat = NonSyllabic
-				case "stress":
-					symCat = Stress
-				case "phoneme delimiter":
-					symCat = PhonemeDelimiter
-				case "syllable delimiter":
-					symCat = SyllableDelimiter
-				case "morpheme delimiter":
-					symCat = MorphemeDelimiter
-				case "compound delimiter":
-					symCat = CompoundDelimiter
-				case "word delimiter":
-					symCat = WordDelimiter
-				default:
-					return nilRes, fmt.Errorf("unknown symbol type on line:\t" + l)
+				symCat, err := symbolCatFromString(fs[symCatIndex])
+				if err != nil {
+					return nilRes, fmt.Errorf("couldn't load symbol cat in file %s : %s", fName, err)
 				}
 				ipaSym := IPASymbol{String: ipa, Unicode: ipaUnicode}
 				sym := Symbol{
