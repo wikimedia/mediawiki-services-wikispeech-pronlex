@@ -347,7 +347,7 @@ func Test_unique(t *testing.T) {
 
 func Test_ImportLexiconFile(t *testing.T) {
 
-	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/static/sv-se_ws-sampa.tab")
+	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.tab")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -414,7 +414,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 // func Test_ImportLexiconFileInvalid(t *testing.T) {
 
-// 	ssMapper, err := symbolset.LoadSymbolSet("./../symbolset/static/sv-se_ws-sampa.tab")
+// 	ssMapper, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.tab")
 // 	if err != nil {
 // 		log.Fatal(err)
 // 	}
@@ -484,7 +484,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 func Test_ImportLexiconFileGz(t *testing.T) {
 
-	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/static/sv-se_ws-sampa.tab")
+	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.tab")
 	if err != nil {
 		log.Fatal(err)
 	}
