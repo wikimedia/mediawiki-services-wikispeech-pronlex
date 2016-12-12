@@ -114,4 +114,5 @@ class SearchModel {
 }
 
 let model = new SearchModel("sv-se.nst", "hund, häst")
+let x = model.availableLexicons();
 ko.applyBindings(model);

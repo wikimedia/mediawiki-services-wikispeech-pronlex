@@ -289,7 +289,7 @@ func stringSliceContains(slice []string, s string) bool {
 }
 
 func Test_LoadSymbolSetsFromDir(t *testing.T) {
-	symbolsets, err := LoadSymbolSetsFromDir("./static")
+	symbolsets, err := LoadSymbolSetsFromDir("./test_data")
 	if err != nil {
 		t.Errorf("LoadSymbolSetsFromDir() didn't expect error here : %v", err)
 		return
@@ -299,7 +299,7 @@ func Test_LoadSymbolSetsFromDir(t *testing.T) {
 		ssNames = append(ssNames, ss.Name)
 	}
 	if len(symbolsets) != 7 {
-		t.Errorf("Expected 7 symbol sets in folder ./static, found %d", len(symbolsets))
+		t.Errorf("Expected 7 symbol sets in folder ./test_data, found %d", len(symbolsets))
 	}
 	if !stringSliceContains(ssNames, "sv-se_nst-xsampa") {
 		t.Errorf("Expected %s in symbolsets. Found: %v", "sv-se_nst-xsampa", ssNames)
@@ -319,7 +319,7 @@ func Test_NewSymbolSet_WithCorrectInput1(t *testing.T) {
 }
 func Test_loadSymbolSet_NST2IPA_SV(t *testing.T) {
 	name := "NST-XSAMPA"
-	fName := "static/sv-se_nst-xsampa.tab"
+	fName := "test_data/sv-se_nst-xsampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("loadSymbolSet0() didn't expect error here : %v", err)
@@ -356,7 +356,7 @@ func Test_MapTranscription_Sampa2Ipa_Simple(t *testing.T) {
 
 func Test_loadSymbolSet_WS2IPA(t *testing.T) {
 	name := "WS-SAMPA"
-	fName := "static/sv-se_ws-sampa.tab"
+	fName := "test_data/sv-se_ws-sampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() error here : %v", err)
@@ -367,7 +367,7 @@ func Test_loadSymbolSet_WS2IPA(t *testing.T) {
 
 func Test_loadSymbolSet_CMU2IPA(t *testing.T) {
 	name := "CMU"
-	fName := "static/en-us_cmu.tab"
+	fName := "test_data/en-us_cmu.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() error here : %v", err)
@@ -377,7 +377,7 @@ func Test_loadSymbolSet_CMU2IPA(t *testing.T) {
 
 func Test_loadSymbolSet_MARY2IPA(t *testing.T) {
 	name := "en-us_sampa_mary"
-	fName := "static/en-us_sampa_mary.tab"
+	fName := "test_data/en-us_sampa_mary.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() error here : %v", err)
@@ -387,7 +387,7 @@ func Test_loadSymbolSet_MARY2IPA(t *testing.T) {
 
 func Test_loadSymbolSet_NST2IPA_NB(t *testing.T) {
 	name := "nb-no_nst-xsampa"
-	fName := "static/nb-no_nst-xsampa.tab"
+	fName := "test_data/nb-no_nst-xsampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() error here : %v", err)
@@ -404,7 +404,7 @@ func Test_loadSymbolSet_NST2IPA_NB(t *testing.T) {
 
 func Test_loadSymbolSet_IPA2WS(t *testing.T) {
 	name := "WS-SAMPA"
-	fName := "static/sv-se_ws-sampa.tab"
+	fName := "test_data/sv-se_ws-sampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
@@ -419,7 +419,7 @@ func Test_loadSymbolSet_IPA2WS(t *testing.T) {
 
 func Test_loadSymbolSet_IPA2MARY(t *testing.T) {
 	name := "sampa-mary"
-	fName := "static/en-us_sampa_mary.tab"
+	fName := "test_data/en-us_sampa_mary.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
@@ -435,7 +435,7 @@ func Test_loadSymbolSet_IPA2MARY(t *testing.T) {
 
 func Test_loadSymbolSet_IPA2SAMPA(t *testing.T) {
 	name := "ws-xsampa"
-	fName := "static/sv-se_ws-sampa.tab"
+	fName := "test_data/sv-se_ws-sampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
@@ -452,7 +452,7 @@ func Test_loadSymbolSet_IPA2SAMPA(t *testing.T) {
 
 func Test_loadSymbolSet_IPA2CMU(t *testing.T) {
 	name := "en-us_cmu"
-	fName := "static/en-us_cmu.tab"
+	fName := "test_data/en-us_cmu.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
@@ -469,7 +469,7 @@ func Test_loadSymbolSet_IPA2CMU(t *testing.T) {
 
 func Test_loadSymbolSet_IPA2NST_NB(t *testing.T) {
 	name := "NST-XSAMPA"
-	fName := "static/nb-no_nst-xsampa.tab"
+	fName := "test_data/nb-no_nst-xsampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
