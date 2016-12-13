@@ -1,4 +1,4 @@
-// Package line is used to define lexicon line format for parsing input and printing output.
+// Package line is used to define lexicon line formats for parsing input and printing output.
 //
 // 	Interfaces:
 // 	* Format - simple line format definition (field names and indices)
