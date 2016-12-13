@@ -3,26 +3,59 @@ package lexserver // TODO Restructure lexserver into sub-directories
 import (
 	"database/sql"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"os"
+	"strings"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type UserDB struct {
-	userDB *sql.DB
+	*sql.DB
 }
 
 type User struct {
-	ID    int64
-	Name  string
-	Roles string
-	DBs   string
+	ID           int64
+	Name         string
+	PasswordHash string
+	Roles        string
+	DBs          string
 }
 
-func (udb UserDB) getUserByName(name string) User {
+func (udb UserDB) GetUserByName(name string) (User, error) {
+	res := User{}
+	tx, err := udb.Begin()
+	if err != nil {
+		return res, fmt.Errorf("GetUserByName failed to start transaction : %v", err)
+	}
+	defer tx.Commit()
 
-	return User{}
+	//err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&qid, &qname, &qpasswordHash, &qroles, &qdbs)
+	err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name, &res.PasswordHash, &res.Roles, &res.DBs)
+	if err != nil {
+		return res, fmt.Errorf("GetUserByName failed to get user '%s' : %v", name, err)
+	}
+
+	return res, nil
 }
 
-func (udb UserDB) insertUser(u User) error {
+func (udb UserDB) InsertUser(u User, password string) error {
+	// TODO add transactions
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	name := strings.ToLower(u.Name)
+
+	fmt.Printf("insertUser: %s %s %s", name, password, passwordHash)
+
+	if err != nil {
+		return fmt.Errorf("failed to generate hash: %v", err)
+	}
+	_, err = udb.Exec("INSERT INTO user (name, password_hash, roles, dbs) VALUES (?, ?, ?, ?)", name, string(passwordHash), u.Roles, u.DBs)
+
+	if err != nil {
+		return fmt.Errorf("failed to insert user into db: %v", err)
+	}
 
 	return nil
 }
@@ -34,7 +67,7 @@ var userDBSchema = `CREATE TABLE IF NOT EXISTS user (
   roles TEXT,
   dbs TEXT);`
 
-func createEmptyUserDB(fName string) error {
+func CreateEmptyUserDB(fName string) error {
 	if _, err := os.Stat(fName); !os.IsNotExist(err) {
 		return fmt.Errorf("Cannot create file that already exists: '%s'", fName)
 	}
@@ -52,7 +85,7 @@ func createEmptyUserDB(fName string) error {
 	return nil
 }
 
-func initUserDB(fName string) (*sql.DB, error) {
+func InitUserDB(fName string) (*sql.DB, error) {
 	if _, err := os.Stat(fName); os.IsNotExist(err) {
 		return nil, fmt.Errorf("db file doesn't exist: '%s'", fName)
 	}
@@ -65,3 +98,20 @@ func initUserDB(fName string) (*sql.DB, error) {
 
 	return userDB, nil
 }
+
+// func InsertUser(db *sql.DB, u User, password string) error {
+// 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+// 	fmt.Printf("insertUser: %s %s %s", u.Name, password, passwordHash)
+
+// 	if err != nil {
+// 		return fmt.Errorf("failed to generate hash: %v", err)
+// 	}
+// 	_, err = db.Exec("INSERT INTO user (name, password_hash, roles, dbs) VALUES (?, ?, ?, ?)", u.Name, string(passwordHash), u.Roles, u.DBs)
+
+// 	if err != nil {
+// 		return fmt.Errorf("failed to insert user into db: %v", err)
+// 	}
+
+// 	return nil
+// }
