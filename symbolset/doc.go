@@ -15,7 +15,6 @@ Sample lines (Swedish Wikispeech SAMPA):
      accent I             "        ˈ  	 U+02C8               Stress
      accent II            ""       ˈ̀  	 U+02C8U+0300         Stress
      secondary stress     %        ˌ  	 U+02CC               Stress
-     phoneme delimiter                	                      PhonemeDelimiter
 
 Note that the header is required on the first line. As you can see in the examples, the IPA UNICODE is specified on the format U+<NUMBER> (no space between symbol sequences).
 
