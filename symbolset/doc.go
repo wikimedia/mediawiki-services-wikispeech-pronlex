@@ -35,7 +35,7 @@ Legal categories (pre-defined in code):
 
  WordDelimiter: word delimiters
 
-For real world examples (used for unit tests), see the test_data folder in this package.
+For real world examples (used for unit tests), see the test_data folder: https://github.com/stts-se/pronlex/tree/master/symbolset/test_data
 
 */
 package symbolset
