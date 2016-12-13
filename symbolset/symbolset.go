@@ -217,8 +217,8 @@ func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 	return res, err
 }
 
-// MapTranscriptions maps the input entry's transcriptions (in-place)
-func (ss SymbolSet) MapTranscriptionsToIPA(e *lex.Entry) error {
+// ConvertTranscriptionsToIPA converts the input entry's transcriptions to IPA (in-place)
+func (ss SymbolSet) ConvertTranscriptionsToIPA(e *lex.Entry) error {
 	var newTs []lex.Transcription
 	var errs []string
 	for _, t := range e.Transcriptions {
@@ -235,8 +235,8 @@ func (ss SymbolSet) MapTranscriptionsToIPA(e *lex.Entry) error {
 	return nil
 }
 
-// MapTranscriptions maps the input entry's transcriptions (in-place)
-func (ss SymbolSet) MapTranscriptionsFromIPA(e *lex.Entry) error {
+// ConvertTranscriptionsFromIPA converts the input entry's transcriptions from IPA (in-place)
+func (ss SymbolSet) ConvertTranscriptionsFromIPA(e *lex.Entry) error {
 	var newTs []lex.Transcription
 	var errs []string
 	for _, t := range e.Transcriptions {

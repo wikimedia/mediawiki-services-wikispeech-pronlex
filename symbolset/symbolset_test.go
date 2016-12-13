@@ -720,6 +720,6 @@ func Test_NewSymbolSet_FailIPAContainsWhitespace(t *testing.T) {
 	}
 	_, err := NewSymbolSet("test", symbols)
 	if err == nil {
-		t.Errorf("expected error for IPA white space here", err)
+		t.Errorf("expected error for IPA white space here : %v", err)
 	}
 }
