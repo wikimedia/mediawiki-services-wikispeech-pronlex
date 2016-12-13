@@ -1,4 +1,4 @@
-// Package config is used for lexicon configuration settings
+// Package config is used for lexicon configuration settings (work in progress, not ready for proper use!)
 package config
 
 import (
