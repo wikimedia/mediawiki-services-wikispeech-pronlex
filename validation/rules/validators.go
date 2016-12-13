@@ -1,4 +1,4 @@
-package vrules
+package rules
 
 import (
 	"fmt"

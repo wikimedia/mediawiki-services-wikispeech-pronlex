@@ -26,7 +26,7 @@ func ff(f string, err error) {
 func execSchema(db *sql.DB) (sql.Result, error) {
 	ti := time.Now()
 	res, err := db.Exec(Schema)
-	fmt.Printf("db.Exec(Schema) took %v\n", time.Since(ti))
+	fmt.Printf("[dbapi_test] db.Exec(Schema) took %v\n", time.Since(ti))
 	return res, err
 }
 

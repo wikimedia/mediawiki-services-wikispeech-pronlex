@@ -10,7 +10,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
-	"github.com/stts-se/pronlex/vrules"
+	"github.com/stts-se/pronlex/validation/rules"
 )
 
 var sucTags = map[string]bool{
@@ -117,7 +117,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT NST LEX FILE> <NST-SAMPA SYMBOLSET> <WS-SAMPA SYMBOLSET>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go swe030224NST.pron.utf8 sv-se_nst-xsampa.tab sv-se_ws-sampa.tab ")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convert.go swe030224NST.pron.utf8 sv-se_nst-xsampa.tab sv-se_ws-sampa.tab ")
 		return
 	}
 
@@ -130,7 +130,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
 	}
-	ssRuleTo := vrules.SymbolSetRule{mapper.SymbolSet2}
+	ssRuleTo := rules.SymbolSetRule{mapper.SymbolSet2}
 
 	nstFile, err := os.Open(nstFileName)
 	defer nstFile.Close()

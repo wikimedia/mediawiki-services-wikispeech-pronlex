@@ -1,4 +1,4 @@
-// Package config is used for lexicon configuration settings
+// Package config is used for lexicon configuration settings (work in progress, not ready for proper use!)
 package config
 
 import (
@@ -89,7 +89,7 @@ type Config struct {
 // }
 
 // func validators() (map[string]validation.Validator, error) {
-// 	nstDemo, err := vrules.NewSvSeNstValidator()
+// 	nstDemo, err := validation.rules.NewSvSeNstValidator()
 // 	if err != nil {
 // 		return nil, err
 // 	}

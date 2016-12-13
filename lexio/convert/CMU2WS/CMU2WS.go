@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	//"io"
 	"log"
 	"os"
 	"regexp"
@@ -12,7 +11,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
-	"github.com/stts-se/pronlex/vrules"
+	"github.com/stts-se/pronlex/validation/rules"
 )
 
 var ws, errrr = line.NewWS()
@@ -37,7 +36,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU SYMBOLSET> <WS-SAMPA SYMBOLSET>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertCMU2WS.go cmudict-0.7b.utf8 en-us_cmu.tab en_us_sampa_mary.tab")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convert.go cmudict-0.7b.utf8 en-us_cmu.tab en_us_sampa_mary.tab")
 		return
 	}
 
@@ -50,7 +49,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
 	}
-	ssRuleTo := vrules.SymbolSetRule{mapper.SymbolSet2}
+	ssRuleTo := rules.SymbolSetRule{mapper.SymbolSet2}
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()

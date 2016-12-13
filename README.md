@@ -18,8 +18,8 @@ Make sure GOPATH/bin is in $PATH
 Create a pronlex.db and place it in the lexserver directory.
 
 ```
-github.com/stts-se/pronlex$ go run createEmptyDB/createEmptyDB.go pronlex.db
-github.com/stts-se/pronlex$ go run importLexToDB/importLexToDB.go pronlex.db sv-se.nst [LEX FILE FOLDER]/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa [SYMBOLSET FOLDER]
+github.com/stts-se/pronlex$ go run dbapi/createEmptyDB/createEmptyDB.go pronlex.db
+github.com/stts-se/pronlex$ go run lexio/import/import.go pronlex.db sv-se.nst [LEX FILE FOLDER]/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa [SYMBOLSET FOLDER]
 # [SYMBOLSET FOLDER] is used for validation upon import. skip if you don't want validation (it takes some extra time).
 
 github.com/stts-se/pronlex$ mv pronlex.db lexserver/
