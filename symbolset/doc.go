@@ -1,4 +1,6 @@
-/* Package symbolset is used to define symbol sets and mapping between different sets, such as IPA to SAMPA, and so on.
+/*
+
+Package symbolset is used to define symbol sets and mapping between different sets, such as IPA to SAMPA, and so on.
 
 The basis of this package is a symbol set file on this tab-separated format:
 	DESCRIPTION	SYMBOL	IPA	IPA UNICODE	CATEGORY
