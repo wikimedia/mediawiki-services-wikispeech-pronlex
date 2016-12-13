@@ -89,7 +89,7 @@ type Config struct {
 // }
 
 // func validators() (map[string]validation.Validator, error) {
-// 	nstDemo, err := vrules.NewSvSeNstValidator()
+// 	nstDemo, err := validation.rules.NewSvSeNstValidator()
 // 	if err != nil {
 // 		return nil, err
 // 	}
