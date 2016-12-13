@@ -18,14 +18,22 @@ Sample lines (Swedish Wikispeech SAMPA):
 Note that the header is required on the first line. As you can see in the examples, the IPA UNICODE is specified on the format U+<NUMBER> (no space between symbol sequences).
 
 Legal categories (pre-defined in code):
- * Syllabic: syllabic phonemes (typically vowels and syllabic consonants)
- * NonSyllabic: non-syllabic phonemes (typically consonants)
- * Stress: stress and accent symbols (primary, secondary, tone accents, etc)
- * PhonemeDelimiter: phoneme delimiters (white space, empty string, etc)
- * SyllableDelimiter: syllable delimiters
- * MorphemeDelimiter: morpheme delimiters that need not align with morpheme boundaries in the decompounded orthography
- * CompoundDelimiter: compound delimiters that should be aligned with compound boundaries in the decompounded orthography
- * WordDelimiter: word delimiters
+
+ Syllabic: syllabic phonemes (typically vowels and syllabic consonants)
+
+ NonSyllabic: non-syllabic phonemes (typically consonants)
+
+ Stress: stress and accent symbols (primary, secondary, tone accents, etc)
+
+ PhonemeDelimiter: phoneme delimiters (white space, empty string, etc)
+
+ SyllableDelimiter: syllable delimiters
+
+ MorphemeDelimiter: morpheme delimiters that need not align with morpheme boundaries in the decompounded orthography
+
+ CompoundDelimiter: compound delimiters that should be aligned with compound boundaries in the decompounded orthography
+
+ WordDelimiter: word delimiters
 
 For real world examples (used for unit tests), see the test_data folder in this package.
 
