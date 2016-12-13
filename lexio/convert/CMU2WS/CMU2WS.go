@@ -36,7 +36,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU SYMBOLSET> <WS-SAMPA SYMBOLSET>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertCMU2WS.go cmudict-0.7b.utf8 en-us_cmu.tab en_us_sampa_mary.tab")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convert.go cmudict-0.7b.utf8 en-us_cmu.tab en_us_sampa_mary.tab")
 		return
 	}
 

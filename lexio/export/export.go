@@ -17,7 +17,7 @@ func main() {
 	// + db look up
 
 	if len(os.Args) != 4 {
-		log.Println("exportlex <DB_FILE> <LEXICON_DB_ID> <OUTPUT_FILE_NAME>")
+		log.Println("gun run export.go <DB_FILE> <LEXICON_DB_ID> <OUTPUT_FILE_NAME>")
 		return
 	}
 

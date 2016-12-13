@@ -163,7 +163,7 @@ func main() {
 
 	if len(os.Args) != 4 {
 		fmt.Fprintln(os.Stderr, "<INPUT NST LEX FILE> <NST-SAMPA SYMBOLSET> <WS-SAMPA SYMBOLSET>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convertNST2WS.go swe030224NST.pron.utf8 sv-se_nst-xsampa.tab sv-se_ws-sampa.tab ")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convert.go swe030224NST.pron.utf8 sv-se_nst-xsampa.tab sv-se_ws-sampa.tab ")
 		return
 	}
 

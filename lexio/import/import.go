@@ -26,7 +26,7 @@ func loadValidators(symsetDirName string) error {
 
 func main() {
 
-	sampleInvocation := `go run importLexToDB.go pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
+	sampleInvocation := `go run import.go pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
 
 	if len(os.Args) != 5 && len(os.Args) != 6 {
 		log.Fatal("Expected <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER> (optional)", "\n\t if <SYMBOLSET FOLDER> is specified, all entries will be validated upon import, and the validation result will be d in the database\n\tSample invocation: ", sampleInvocation)
