@@ -8,9 +8,6 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-// BUG(hanna) Add field property to indicate whether a field is required or optional (or just use two maps: RequiredFields and OptionalFields).
-// BUG(hanna) Should unknown content generate an error? Depends on the required/optional property (above).
-
 // Field is a simple const for line field definition types
 type Field int
 
