@@ -18,7 +18,7 @@ Sample lines (Swedish Wikispeech SAMPA):
 
 Note that the header is required on the first line. As you can see in the examples, the IPA UNICODE is specified on the format U+<NUMBER> (no space between symbols in sequence).
 
-Each symbol set has a name, extraced from the .tab file name.
+Each symbol set has a name, extracted from the .tab file name.
 
 Legal categories (pre-defined in code):
 
