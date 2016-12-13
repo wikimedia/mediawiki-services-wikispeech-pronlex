@@ -3,6 +3,7 @@ package lexserver
 import (
 	"os"
 	"testing"
+	//"fmt"
 )
 
 var fs = "Expected '%v', got '%v'"
@@ -49,4 +50,20 @@ func Test_UserDB(t *testing.T) {
 	if u1.PasswordHash == "" {
 		t.Errorf("Expected non zero value hash: %#v", u1)
 	}
+
+	// ==================================
+
+	ok, _, err := udb.Authorized(u.Name, "sekret")
+
+	//fmt.Printf("User: %#v\n", user)
+
+	if w, g := true, ok; w != g {
+		t.Errorf(fs, w, g)
+	}
+
+	ok, _, err = udb.Authorized(u.Name, "wrongily")
+	if w, g := false, ok; w != g {
+		t.Errorf(fs, w, g)
+	}
+
 }

@@ -11,16 +11,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type UserDB struct {
-	*sql.DB
-}
-
 type User struct {
 	ID           int64
 	Name         string
 	PasswordHash string
 	Roles        string
 	DBs          string
+}
+
+type UserDB struct {
+	*sql.DB
 }
 
 func (udb UserDB) GetUserByName(name string) (User, error) {
@@ -31,7 +31,6 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 	}
 	defer tx.Commit()
 
-	//err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&qid, &qname, &qpasswordHash, &qroles, &qdbs)
 	err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name, &res.PasswordHash, &res.Roles, &res.DBs)
 	if err != nil {
 		return res, fmt.Errorf("GetUserByName failed to get user '%s' : %v", name, err)
@@ -41,18 +40,22 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 }
 
 func (udb UserDB) InsertUser(u User, password string) error {
-	// TODO add transactions
+	tx, err := udb.Begin()
+	if err != nil {
+		return fmt.Errorf("InsertUser failed to start transaction : %v", err)
+	}
+	defer tx.Commit()
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	name := strings.ToLower(u.Name)
 
-	fmt.Printf("insertUser: %s %s %s", name, password, passwordHash)
+	//fmt.Printf("insertUser: %s %s %s", name, password, passwordHash)
 
 	if err != nil {
 		return fmt.Errorf("failed to generate hash: %v", err)
 	}
-	_, err = udb.Exec("INSERT INTO user (name, password_hash, roles, dbs) VALUES (?, ?, ?, ?)", name, string(passwordHash), u.Roles, u.DBs)
+	_, err = tx.Exec("INSERT INTO user (name, password_hash, roles, dbs) VALUES (?, ?, ?, ?)", name, string(passwordHash), u.Roles, u.DBs)
 
 	if err != nil {
 		return fmt.Errorf("failed to insert user into db: %v", err)
@@ -60,6 +63,27 @@ func (udb UserDB) InsertUser(u User, password string) error {
 
 	return nil
 }
+
+func (udb UserDB) Authorized(name, password string) (bool, User, error) {
+	ok := false
+	res := User{}
+
+	res, err := udb.GetUserByName(name)
+	if err != nil {
+		return ok, res, fmt.Errorf("failed to get user '%s' from user db : %v", name, err)
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(res.PasswordHash), []byte(password)); err != nil {
+		return ok, res, fmt.Errorf("password doesn't match")
+	}
+
+	// password matches hash in db
+	ok = true
+
+	return ok, res, nil
+}
+
+//=================================================================================
 
 var userDBSchema = `CREATE TABLE IF NOT EXISTS user (
   id INTEGER PRIMARY KEY,
@@ -99,20 +123,3 @@ func InitUserDB(fName string) (UserDB, error) {
 
 	return UserDB{db}, nil
 }
-
-// func InsertUser(db *sql.DB, u User, password string) error {
-// 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
-// 	fmt.Printf("insertUser: %s %s %s", u.Name, password, passwordHash)
-
-// 	if err != nil {
-// 		return fmt.Errorf("failed to generate hash: %v", err)
-// 	}
-// 	_, err = db.Exec("INSERT INTO user (name, password_hash, roles, dbs) VALUES (?, ?, ?, ?)", u.Name, string(passwordHash), u.Roles, u.DBs)
-
-// 	if err != nil {
-// 		return fmt.Errorf("failed to insert user into db: %v", err)
-// 	}
-
-// 	return nil
-// }
