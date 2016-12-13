@@ -1,7 +1,7 @@
 /*Package symbolset is used to define symbol sets and mapping between different sets, such as NST-SAMPA to Wikispeech-SAMPA, IPA to SAMPA, and so on.
 
 Each symbol set is defined in a .tab file including each symbol's corresponding IPA representation:
-	DESCRIPTION     SYMBOL     IPA     IPA UNICODE     CATEGORY
+     DESCRIPTION          SYMBOL   IPA	 IPA UNICODE          CATEGORY
 
 Using the IPA definition, it is possible to map between symbol sets that share the same list of IPA symbols (or if the left hand symbol is a subset of the right hand symbol set).
 
