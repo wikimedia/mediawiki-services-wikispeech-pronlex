@@ -16,7 +16,7 @@ Sample lines (Swedish Wikispeech SAMPA):
      accent II            ""       ˈ̀  	 U+02C8U+0300         Stress
      secondary stress     %        ˌ  	 U+02CC               Stress
 
-Note that the header is required on the first line. As you can see in the examples, the IPA UNICODE is specified on the format U+<NUMBER> (no space between symbol sequences).
+Note that the header is required on the first line. As you can see in the examples, the IPA UNICODE is specified on the format U+<NUMBER> (no space between symbols in sequence).
 
 Legal categories (pre-defined in code):
 
