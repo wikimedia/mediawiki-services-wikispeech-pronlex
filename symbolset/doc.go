@@ -1,4 +1,4 @@
-/*
+/**
 
 Package symbolset is used to define symbol sets and mapping between different sets, such as IPA to SAMPA, and so on.
 
@@ -13,5 +13,5 @@ Sample lines (Swedish Wikispeech SAMPA):
 
 Note that the header is required on the first line. For real world examples (used for unit tests), see the test_data folder in this package.
 
-**/
+*/
 package symbolset
