@@ -10,7 +10,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
-	"github.com/stts-se/pronlex/vrules"
+	"github.com/stts-se/pronlex/validation/rules"
 )
 
 var sucTags = map[string]bool{
@@ -130,7 +130,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
 	}
-	ssRuleTo := vrules.SymbolSetRule{mapper.SymbolSet2}
+	ssRuleTo := rules.SymbolSetRule{mapper.SymbolSet2}
 
 	nstFile, err := os.Open(nstFileName)
 	defer nstFile.Close()

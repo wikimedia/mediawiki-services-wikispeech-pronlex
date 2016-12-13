@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	//"io"
 	"log"
 	"os"
 	"regexp"
@@ -12,7 +11,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
-	"github.com/stts-se/pronlex/vrules"
+	"github.com/stts-se/pronlex/validation/rules"
 )
 
 var ws, errrr = line.NewWS()
@@ -50,7 +49,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
 	}
-	ssRuleTo := vrules.SymbolSetRule{mapper.SymbolSet2}
+	ssRuleTo := rules.SymbolSetRule{mapper.SymbolSet2}
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()

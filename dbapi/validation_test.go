@@ -13,7 +13,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
-	"github.com/stts-se/pronlex/vrules"
+	"github.com/stts-se/pronlex/validation/rules"
 )
 
 var vfs = "Wanted: '%v' got: '%v'"
@@ -36,16 +36,16 @@ func createValidator() validation.Validator {
 	ss, err := symbolset.NewSymbolSet(name, symbols)
 	ff("failed to init symbols : %v", err)
 
-	primaryStressRe, err := vrules.ProcessTransRe(ss, "\"")
+	primaryStressRe, err := rules.ProcessTransRe(ss, "\"")
 	ff("%v", err)
 
-	syllabicRe, err := vrules.ProcessTransRe(ss, "^(\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*)*$")
+	syllabicRe, err := rules.ProcessTransRe(ss, "^(\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*)*$")
 	ff("%v", err)
 
 	reFrom, err := regexp2.Compile("(.)\\1[+]\\1", regexp2.None)
 	ff("%v", err)
 
-	decomp2Orth := vrules.Decomp2Orth{CompDelim: "+",
+	decomp2Orth := rules.Decomp2Orth{CompDelim: "+",
 		AcceptEmptyDecomp: true,
 		PreFilterWordPartString: func(s string) (string, error) {
 			res, err := reFrom.Replace(s, "$1+$1", 0, -1)
@@ -55,34 +55,34 @@ func createValidator() validation.Validator {
 			return res, nil
 		}}
 
-	repeatedPhnRe, err := vrules.ProcessTransRe(ss, "symbol( +[.~])? +\\1")
+	repeatedPhnRe, err := rules.ProcessTransRe(ss, "symbol( +[.~])? +\\1")
 	ff("%v", err)
 
 	var v = validation.Validator{
 		Name: ss.Name,
 		Rules: []validation.Rule{
-			vrules.MustHaveTrans{},
-			vrules.NoEmptyTrans{},
-			vrules.RequiredTransRe{
+			rules.MustHaveTrans{},
+			rules.NoEmptyTrans{},
+			rules.RequiredTransRe{
 				Name:    "primary_stress",
 				Level:   "Fatal",
 				Message: "Primary stress required",
 				Re:      primaryStressRe,
 			},
-			vrules.RequiredTransRe{
+			rules.RequiredTransRe{
 				Name:    "syllabic",
 				Level:   "Format",
 				Message: "Each syllable needs a syllabic phoneme",
 				Re:      syllabicRe,
 			},
-			vrules.IllegalTransRe{
+			rules.IllegalTransRe{
 				Name:    "repeated_phonemes",
 				Level:   "Fatal",
 				Message: "Repeated phonemes cannot be used within the same morpheme",
 				Re:      repeatedPhnRe,
 			},
 			decomp2Orth,
-			vrules.SymbolSetRule{
+			rules.SymbolSetRule{
 				SymbolSet: ss,
 			},
 		}}
