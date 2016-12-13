@@ -15,12 +15,10 @@ func Test_UserDB(t *testing.T) {
 		t.Errorf("failed to create empty db file : %v", err)
 	}
 
-	sql, err := InitUserDB(dbFile)
+	udb, err := InitUserDB(dbFile)
 	if err != nil {
 		t.Errorf("failed to initialise empty db file : %v", err)
 	}
-
-	udb := UserDB{sql}
 
 	//_ = udb
 

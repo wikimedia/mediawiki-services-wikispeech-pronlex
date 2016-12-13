@@ -80,6 +80,15 @@ func Test_InsertEntries(t *testing.T) {
 	if len(lxs) != 1 {
 		t.Errorf(fs, 1, len(lxs))
 	}
+	if lxs[0].Name != "test" {
+		t.Errorf(fs, "test", lxs[0].Name)
+	}
+	if lxs[0].ID <= 0 {
+		t.Errorf(fs, ">0", lxs[0].ID)
+	}
+	if lxs[0].SymbolSetName != "ZZ" {
+		t.Errorf(fs, "ZZ", lxs[0].SymbolSetName)
+	}
 
 	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
 	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}

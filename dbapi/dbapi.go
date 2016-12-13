@@ -64,14 +64,15 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var id int64
-		var name string
-		var symbolSetName string
-		err = rows.Scan(&id, &name, &symbolSetName)
+		l := Lexicon{}
+		// var id int64
+		// var name string
+		// var symbolSetName string
+		err = rows.Scan(&l.ID, &l.Name, &l.SymbolSetName)
 		if err != nil {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
-		l := Lexicon{ID: id, Name: name, SymbolSetName: symbolSetName}
+		//l := Lexicon{ID: id, Name: name, SymbolSetName: symbolSetName}
 		res = append(res, l)
 	}
 	err = rows.Err()

@@ -3,9 +3,10 @@ package lexserver // TODO Restructure lexserver into sub-directories
 import (
 	"database/sql"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"os"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -85,18 +86,18 @@ func CreateEmptyUserDB(fName string) error {
 	return nil
 }
 
-func InitUserDB(fName string) (*sql.DB, error) {
+func InitUserDB(fName string) (UserDB, error) {
 	if _, err := os.Stat(fName); os.IsNotExist(err) {
-		return nil, fmt.Errorf("db file doesn't exist: '%s'", fName)
+		return UserDB{}, fmt.Errorf("db file doesn't exist: '%s'", fName)
 	}
 
 	//var err error
-	userDB, err := sql.Open("sqlite3", fName)
+	db, err := sql.Open("sqlite3", fName)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open db file: '%s': %v", fName, err)
+		return UserDB{}, fmt.Errorf("failed to open db file: '%s': %v", fName, err)
 	}
 
-	return userDB, nil
+	return UserDB{db}, nil
 }
 
 // func InsertUser(db *sql.DB, u User, password string) error {
