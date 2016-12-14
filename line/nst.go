@@ -85,12 +85,12 @@ func getTranses(fs map[Field]string) []lex.Transcription {
 	return res
 }
 
-// String is used to generate an output line from a set of fields (calls underlying Format.Parse)
+// String is used to generate an output line from a set of fields (calls underlying Format.String)
 func (nst NST) String(fields map[Field]string) (string, error) {
 	return nst.format.String(fields)
 }
 
-// Entry2String is used to generate an output line from a lex.Entry (calls underlying Format.Parse)
+// Entry2String is used to generate an output line from a lex.Entry (calls underlying Format.String)
 func (nst NST) Entry2String(e lex.Entry) (string, error) {
 	fs, err := nst.fields(e)
 	if err != nil {
@@ -161,7 +161,7 @@ func (nst NST) fields(e lex.Entry) (map[Field]string, error) {
 	return fs, nil
 }
 
-// NewNST is used to create an instance of the NST line format handler
+// NewNST is used to create an instance of the NST parser
 func NewNST() (NST, error) {
 	tests := []FormatTest{
 		FormatTest{"storstaden;NN;SIN|DEF|NOM|UTR;stor+staden;JJ+NN;LEX|INFL;SWE;;;;;\"\"stu:$%s`t`A:$den;1;STD;SWE;;;;;;;;;;;;;;18174;enter_se|inflector;;INFLECTED;storstad|95522;s111n, a->ä, stad;s111;;;;;;;;;;;;;storstaden;;;88748",

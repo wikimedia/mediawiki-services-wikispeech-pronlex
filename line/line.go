@@ -168,11 +168,13 @@ func (f Format) String(fields map[Field]string) (string, error) {
 	return strings.Join(res, f.FieldSep), nil
 }
 
+// FileWriter is used for writing entries to file (using an io.Writer)
 type FileWriter struct {
 	Parser Parser
 	Writer io.Writer
 }
 
+// Write is used to write one lex.Entry at a time to a file (using an io.Writer)
 func (w FileWriter) Write(e lex.Entry) error {
 	s, err := w.Parser.Entry2String(e)
 	if err != nil {

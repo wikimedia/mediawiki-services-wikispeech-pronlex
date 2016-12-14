@@ -14,14 +14,17 @@ type WS struct {
 	format Format
 }
 
+// Format is the line.Format instance used for line parsing inside of this parser
 func (ws WS) Format() Format {
 	return ws.format
 }
 
+// Parse is used for parsing input lines (calls underlying Format.Parse)
 func (ws WS) Parse(line string) (map[Field]string, error) {
 	return ws.format.Parse(line)
 }
 
+// ParseToEntry is used for parsing input lines (calls underlying Format.Parse)
 func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 	res := lex.Entry{}
 
@@ -46,10 +49,12 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 	return res, nil
 }
 
+// String is used to generate an output line from a set of fields (calls underlying Format.String)
 func (ws WS) String(fields map[Field]string) (string, error) {
 	return ws.format.String(fields)
 }
 
+// Entry2String is used to generate an output line from a lex.Entry (calls underlying Format.String)
 func (ws WS) Entry2String(e lex.Entry) (string, error) {
 	fs, err := ws.fields(e)
 	if err != nil {
@@ -112,6 +117,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 	return fs, nil
 }
 
+// NewWS is used to create a new instance of the WS parser
 func NewWS() (WS, error) {
 	tests := []FormatTest{
 		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
