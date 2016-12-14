@@ -34,6 +34,7 @@ type Validator struct {
 	Rules []Rule
 }
 
+// IsDefined is used to check if the validator is initialized (by checking that the validator has a non-empty name).
 func (v Validator) IsDefined() bool {
 	return v.Name != ""
 }

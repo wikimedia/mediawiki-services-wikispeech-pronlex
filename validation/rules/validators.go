@@ -1,49 +1,10 @@
 package rules
 
 import (
-	"fmt"
-
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 )
-
-type ValidatorService struct {
-	Validators map[string]*validation.Validator
-}
-
-func (vs ValidatorService) ValidatorForName(symbolSetName string) (*validation.Validator, error) {
-	if vv, ok := vs.Validators[symbolSetName]; ok {
-		return vv, nil
-	}
-	return &validation.Validator{}, fmt.Errorf("no validator loaded for symbolset %s", symbolSetName)
-
-}
-
-func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error {
-	if ss, ok := symbolsets["sv-se_ws-sampa"]; ok {
-		v, err := newSvSeNstValidator(ss)
-		if err != nil {
-			return fmt.Errorf("couldn't initialize symbol set : %v", err)
-		}
-		vs.Validators[ss.Name] = &v
-	}
-	if ss, ok := symbolsets["nb-no_ws-sampa"]; ok {
-		v, err := newNbNoNstValidator(ss)
-		if err != nil {
-			return fmt.Errorf("couldn't initialize symbol set : %v", err)
-		}
-		vs.Validators[ss.Name] = &v
-	}
-	if ss, ok := symbolsets["en-us_sampa_mary"]; ok {
-		v, err := newEnUsCmuNstValidator(ss)
-		if err != nil {
-			return fmt.Errorf("couldn't initialize symbol set : %v", err)
-		}
-		vs.Validators[ss.Name] = &v
-	}
-	return nil
-}
 
 func newSvSeNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, error) {
 	primaryStressRe, err := ProcessTransRe(symbolset, "\"")

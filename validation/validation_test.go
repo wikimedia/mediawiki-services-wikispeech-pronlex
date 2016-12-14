@@ -142,8 +142,8 @@ func Test_ValidateEntry1(t *testing.T) {
 	v := createValidator()
 	es0 := createEntries()
 
-	eVals1 := make([]string, 0)
-	es := make([]lex.Entry, 0)
+	var eVals1 []string // := make([]string, 0)
+	var es []lex.Entry  // es := make([]lex.Entry, 0)
 	for _, e := range es0 {
 		e, _ = v.ValidateEntry(e)
 		for _, v := range e.EntryValidations {
@@ -155,7 +155,7 @@ func Test_ValidateEntry1(t *testing.T) {
 	if len(eVals1) < 1 {
 		t.Errorf(fs, ">1", len(eVals1))
 	}
-	eVals2 := make([]string, 0)
+	var eVals2 []string // eVals2 := make([]string, 0)
 	for _, e := range es {
 		for _, v := range e.EntryValidations {
 			eVals2 = append(eVals2, v.String())
