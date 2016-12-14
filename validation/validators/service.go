@@ -1,4 +1,4 @@
-package rules
+package validators
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["en-us_sampa_mary"]; ok {
-		v, err := newEnUsCmuNstValidator(ss)
+		v, err := newEnUsCmuValidator(ss)
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
 		}
