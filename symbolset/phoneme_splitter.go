@@ -47,9 +47,9 @@ func splitIntoPhonemes0(srted *[]string, trans string, phs []string, unk []strin
 		pre, rest, ok := consume(srted, trans)
 		if ok { // known phoneme is prefix if trans
 			return splitIntoPhonemes0(srted, rest, append(phs, pre), unk)
-		} else { // unknown prefix, chopped off first rune
-			return splitIntoPhonemes0(srted, rest, append(phs, pre), append(unk, pre))
 		}
+		// unknown prefix, chopped off first rune
+		return splitIntoPhonemes0(srted, rest, append(phs, pre), append(unk, pre))
 	}
 	return phs, unk
 }

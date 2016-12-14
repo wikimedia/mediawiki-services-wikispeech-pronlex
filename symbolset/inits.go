@@ -20,10 +20,8 @@ func symbolSetTypeFromString(ssName string) SymbolSetType {
 		return SAMPA
 	} else if strings.Contains(ssNameLC, "cmu") {
 		return CMU
-	} else {
-		return Other
 	}
-
+	return Other
 }
 
 func symbolCatFromString(s string) (SymbolCat, error) {
