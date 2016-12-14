@@ -15,6 +15,7 @@ type SymbolSetRule struct {
 	SymbolSet symbolset.SymbolSet
 }
 
+// Validate a lex.Entry
 func (r SymbolSetRule) Validate(e lex.Entry) []validation.Result {
 	var result []validation.Result
 	for _, t := range e.Transcriptions {
@@ -57,6 +58,7 @@ type IllegalTransRe struct {
 	Re      *regexp2.Regexp
 }
 
+// Validate a lex.Entry
 func (r IllegalTransRe) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
@@ -85,6 +87,7 @@ type RequiredTransRe struct {
 	Re      *regexp2.Regexp
 }
 
+// Validate a lex.Entry
 func (r RequiredTransRe) Validate(e lex.Entry) []validation.Result {
 	var result = make([]validation.Result, 0)
 	for _, t := range e.Transcriptions {
@@ -109,6 +112,7 @@ func (r RequiredTransRe) Validate(e lex.Entry) []validation.Result {
 type MustHaveTrans struct {
 }
 
+// Validate a lex.Entry
 func (r MustHaveTrans) Validate(e lex.Entry) []validation.Result {
 	name := "MustHaveTrans"
 	level := "Format"
@@ -126,6 +130,7 @@ func (r MustHaveTrans) Validate(e lex.Entry) []validation.Result {
 type NoEmptyTrans struct {
 }
 
+// Validate a lex.Entry
 func (r NoEmptyTrans) Validate(e lex.Entry) []validation.Result {
 	name := "NoEmptyTrans"
 	level := "Format"
@@ -148,6 +153,7 @@ type Decomp2Orth struct {
 	PreFilterWordPartString func(string) (string, error)
 }
 
+// Validate a lex.Entry
 func (r Decomp2Orth) Validate(e lex.Entry) []validation.Result {
 	name := "Decomp2Orth"
 	level := "Fatal"
