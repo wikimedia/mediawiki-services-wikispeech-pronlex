@@ -23,17 +23,9 @@ func (r Result) String() string {
 	return fmt.Sprintf("%s (%s): %s", r.RuleName, r.Level, r.Message)
 }
 
-// type ruleTest struct {
-// 	validEntries          []lex.Entry
-// 	invalidEntries        []lex.Entry
-// 	validTranscriptions   []lex.Transcription
-// 	invalidTranscriptions []lex.Transcription
-// }
-
 // Rule interface. To create a validation.Rule, make a struct implementing Validate(lex.Entry) []Result
 type Rule interface {
 	Validate(lex.Entry) []Result
-	//RunTests() []string
 }
 
 // Validator is a struct containing a slice of rules
