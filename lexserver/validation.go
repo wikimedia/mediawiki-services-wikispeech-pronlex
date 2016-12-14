@@ -15,16 +15,16 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
-	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/pronlex/validation/validators"
 )
 
 // The calls prefixed with '/validation/'
 
 var vMut = struct {
 	sync.RWMutex
-	service rules.ValidatorService
+	service validators.ValidatorService
 }{
-	service: rules.ValidatorService{Validators: make(map[string]*validation.Validator)},
+	service: validators.ValidatorService{Validators: make(map[string]*validation.Validator)},
 }
 
 func loadValidators(symsetDirName string) error {

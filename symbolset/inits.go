@@ -12,7 +12,7 @@ import (
 
 // inits.go Initialization functions for structs in package symbolset
 
-func symbolSetTypeFromString(ssName string) SymbolSetType {
+func symbolSetTypeFromString(ssName string) Type {
 	ssNameLC := strings.ToLower(ssName)
 	if strings.Contains(ssNameLC, "ipa") {
 		return IPA

@@ -8,13 +8,20 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-// SymbolSetType is used for accent placement, etc.
-type SymbolSetType int
+// Type is used for accent placement, etc.
+type Type int
 
 const (
-	CMU SymbolSetType = iota
+	// CMU is used for the phone set used in the CMU lexicon
+	CMU Type = iota
+
+	// SAMPA is used for SAMPA transcriptions (http://www.phon.ucl.ac.uk/home/sampa/)
 	SAMPA
+
+	// IPA is used for IPA transcriptions
 	IPA
+
+	// Other is used for symbol sets not defined in the types above
 	Other
 )
 
@@ -67,7 +74,7 @@ type Symbol struct {
 // To create a new 'SymbolSet' instance, use NewSymbolSet
 type SymbolSet struct {
 	Name    string
-	Type    SymbolSetType
+	Type    Type
 	Symbols []Symbol
 
 	// to check if the struct has been initialized properly

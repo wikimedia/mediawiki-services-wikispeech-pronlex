@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func preFilter(ss SymbolSet, trans string, fromType SymbolSetType) (string, error) {
+func preFilter(ss SymbolSet, trans string, fromType Type) (string, error) {
 	if fromType == IPA {
 		return filterBeforeMappingFromIPA(ss, trans)
 	} else if fromType == CMU {
@@ -17,7 +17,7 @@ func preFilter(ss SymbolSet, trans string, fromType SymbolSetType) (string, erro
 	return trans, nil
 }
 
-func postFilter(ss SymbolSet, trans string, toType SymbolSetType) (string, error) {
+func postFilter(ss SymbolSet, trans string, toType Type) (string, error) {
 	if toType == IPA {
 		return filterAfterMappingToIPA(ss, trans)
 	} else if toType == CMU {

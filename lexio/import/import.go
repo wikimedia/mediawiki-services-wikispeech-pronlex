@@ -8,12 +8,12 @@ import (
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
-	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/pronlex/validation/validators"
 
 	"fmt"
 )
 
-var vServ = rules.ValidatorService{Validators: make(map[string]*validation.Validator)}
+var vServ = validators.ValidatorService{Validators: make(map[string]*validation.Validator)}
 
 func loadValidators(symsetDirName string) error {
 	symbolSets, err := symbolset.LoadSymbolSetsFromDir(symsetDirName)
