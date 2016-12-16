@@ -12,11 +12,11 @@ import (
 )
 
 type User struct {
-	ID           int64
-	Name         string
-	PasswordHash string
-	Roles        string
-	DBs          string
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	PasswordHash string `json:"password_hash"` // TODO Should not be part of User?
+	Roles        string `json:"roles"`
+	DBs          string `json:"dbs"`
 }
 
 type UserDB struct {
