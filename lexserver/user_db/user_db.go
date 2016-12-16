@@ -23,6 +23,32 @@ type UserDB struct {
 	*sql.DB
 }
 
+// TODO test me
+func (udb UserDB) GetUsers() ([]User, error) {
+	var res []User
+
+	tx, err := udb.Begin()
+	if err != nil {
+		return res, fmt.Errorf("GetUsers failed to create transaction : %v", err)
+	}
+	defer tx.Commit()
+
+	rows, err := tx.Query("SELECT id, name, password_hash, roles, dbs FROM user")
+	if err != nil {
+		tx.Rollback()
+		return res, fmt.Errorf("user db query failed : %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		u := User{}
+		rows.Scan(&u.ID, &u.Name, &u.PasswordHash, &u.Roles, &u.DBs)
+		res = append(res, u)
+	}
+
+	return res, nil
+}
+
 func (udb UserDB) GetUserByName(name string) (User, error) {
 	res := User{}
 	tx, err := udb.Begin()
@@ -34,6 +60,7 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 	err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name, &res.PasswordHash, &res.Roles, &res.DBs)
 	if err != nil {
 		return res, fmt.Errorf("GetUserByName failed to get user '%s' : %v", name, err)
+		tx.Rollback()
 	}
 
 	return res, nil
@@ -59,6 +86,7 @@ func (udb UserDB) InsertUser(u User, password string) error {
 
 	if err != nil {
 		return fmt.Errorf("failed to insert user into db: %v", err)
+		tx.Rollback()
 	}
 
 	return nil
