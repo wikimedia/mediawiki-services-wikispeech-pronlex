@@ -69,8 +69,8 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 }
 
 // GetPasswordHash returns the password_hash value for userName. If no
-// such value is found, the empty string is returned (along with an
-// error value)
+// such value is found, the empty string is returned (along with a
+// non-nil error value)
 func (udb UserDB) GetPasswordHash(userName string) (string, error) {
 	name := strings.ToLower(userName)
 	var res string
