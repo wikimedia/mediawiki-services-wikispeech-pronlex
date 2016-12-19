@@ -42,7 +42,32 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDB.InsertUser(lexserver.User{Name: name}, password)
+	// These values may be empty
+	roles := r.FormValue("roles")
+	dbs := r.FormValue("dbs")
+
+	err = userDB.InsertUser(lexserver.User{Name: name, Roles: roles, DBs: dbs}, password)
+	if err != nil {
+		msg := fmt.Sprintf("failed to insert user '%s' : %v", name, err)
+		log.Printf("%s\n", msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	// TODO How do you return an 'OK'?
+	fmt.Fprintf(w, "Added user '%s'", name)
+}
+
+func deleteUser(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	err := userDB.DeleteUser(name)
+	if err != nil {
+		msg := fmt.Sprintf("failed to delete user '%s' : %v", name, err)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "Deleted user '%s'", name)
 }
 
 func listUsers(w http.ResponseWriter, r *http.Request) {
@@ -88,5 +113,14 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/admin/user_db/add_user", createUser)
+	r.HandleFunc("/admin/user_db/list_users", listUsers)
+	r.HandleFunc("/admin/user_db/delete_user", deleteUser)
+
+	port := ":8788"
+	log.Println("Starting user db test_server on port %s", port)
+	err = http.ListenAndServe(port, r)
+	if err != nil {
+		log.Fatalf("things are not working : %v", err)
+	}
 
 }

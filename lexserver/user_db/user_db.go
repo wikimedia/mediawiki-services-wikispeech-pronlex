@@ -115,6 +115,29 @@ func (udb UserDB) InsertUser(u User, password string) error {
 	return nil
 }
 
+func (udb UserDB) DeleteUser(userName string) error {
+	name := strings.ToLower(userName)
+	tx, err := udb.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to start transaction : %v", err)
+	}
+	defer tx.Commit()
+
+	rez, err := tx.Exec("DELETE FROM user WHERE name = ?", name)
+	if err != nil {
+		return fmt.Errorf("failed to delete user '%s' : ", userName, err)
+	}
+
+	ra, _ := rez.RowsAffected()
+	if ra < 1 {
+		return fmt.Errorf("could not delete user '%v' (nu such user?)", userName)
+	}
+
+	//if rez.RowsAffected
+
+	return nil
+}
+
 func (udb UserDB) Authorized(userName, password string) (bool, error) {
 	ok := false
 	//res := ""
