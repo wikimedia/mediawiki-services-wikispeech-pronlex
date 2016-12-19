@@ -26,6 +26,14 @@ func Test_UserDB(t *testing.T) {
 	u := User{Name: "KalleA", Roles: "admin:cleaner", DBs: "ankeborg"}
 	//_ = u
 
+	s1, err0 := udb.GetPasswordHash("KalleA")
+	if w, g := "", s1; w != g {
+		t.Errorf(fs, w, g)
+	}
+	if err0 == nil {
+		t.Error("expected error, got nil")
+	}
+
 	err = udb.InsertUser(u, "sekret")
 	if err != nil {
 		t.Errorf("Fail: %v", err)
@@ -47,13 +55,22 @@ func Test_UserDB(t *testing.T) {
 	if w, g := "ankeborg", u1.DBs; w != g {
 		t.Errorf(fs, w, g)
 	}
-	if u1.PasswordHash == "" {
-		t.Errorf("Expected non zero value hash: %#v", u1)
+
+	s2, err2 := udb.GetPasswordHash("KalleA")
+	if s2 == "" {
+		t.Errorf("expected password hash, got empty string")
 	}
+	if err2 != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+
+	// if u1.PasswordHash == "" {
+	// 	t.Errorf("Expected non zero value hash: %#v", u1)
+	// }
 
 	// ==================================
 
-	ok, _, err := udb.Authorized(u.Name, "sekret")
+	ok, err := udb.Authorized(u.Name, "sekret")
 
 	//fmt.Printf("User: %#v\n", user)
 
@@ -61,7 +78,7 @@ func Test_UserDB(t *testing.T) {
 		t.Errorf(fs, w, g)
 	}
 
-	ok, _, err = udb.Authorized(u.Name, "wrongily")
+	ok, err = udb.Authorized(u.Name, "wrongily")
 	if w, g := false, ok; w != g {
 		t.Errorf(fs, w, g)
 	}

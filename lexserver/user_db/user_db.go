@@ -12,11 +12,11 @@ import (
 )
 
 type User struct {
-	ID           int64  `json:"id"`
-	Name         string `json:"name"`
-	PasswordHash string `json:"password_hash"` // TODO Should not be part of User?
-	Roles        string `json:"roles"`
-	DBs          string `json:"dbs"`
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+	//PasswordHash string `json:"password_hash"` // TODO Should not be part of User?
+	Roles string `json:"roles"`
+	DBs   string `json:"dbs"`
 }
 
 type UserDB struct {
@@ -33,7 +33,8 @@ func (udb UserDB) GetUsers() ([]User, error) {
 	}
 	defer tx.Commit()
 
-	rows, err := tx.Query("SELECT id, name, password_hash, roles, dbs FROM user")
+	//rows, err := tx.Query("SELECT id, name, password_hash, roles, dbs FROM user")
+	rows, err := tx.Query("SELECT id, name, roles, dbs FROM user")
 	if err != nil {
 		tx.Rollback()
 		return res, fmt.Errorf("user db query failed : %v", err)
@@ -42,7 +43,7 @@ func (udb UserDB) GetUsers() ([]User, error) {
 
 	for rows.Next() {
 		u := User{}
-		rows.Scan(&u.ID, &u.Name, &u.PasswordHash, &u.Roles, &u.DBs)
+		rows.Scan(&u.ID, &u.Name /*&u.PasswordHash,*/, &u.Roles, &u.DBs)
 		res = append(res, u)
 	}
 
@@ -57,10 +58,32 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 	}
 	defer tx.Commit()
 
-	err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name, &res.PasswordHash, &res.Roles, &res.DBs)
+	//err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name, &res.PasswordHash, &res.Roles, &res.DBs)
+	err = tx.QueryRow("SELECT id, name, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name /*&res.PasswordHash,*/, &res.Roles, &res.DBs)
 	if err != nil {
 		return res, fmt.Errorf("GetUserByName failed to get user '%s' : %v", name, err)
 		tx.Rollback()
+	}
+
+	return res, nil
+}
+
+// GetPasswordHash returns the password_hash value for userName. If no
+// such value is found, the empty string is returned (along with an
+// error value)
+func (udb UserDB) GetPasswordHash(userName string) (string, error) {
+	name := strings.ToLower(userName)
+	var res string
+	tx, err := udb.Begin()
+	if err != nil {
+		msg := fmt.Sprintf("failed starting transaction : %v", err)
+		return res, fmt.Errorf(msg)
+	}
+	defer tx.Commit()
+
+	err = tx.QueryRow("SELECT password_hash FROM user WHERE name = ?", name).Scan(&res)
+	if err != nil || err == sql.ErrNoRows || res == "" {
+		return res, fmt.Errorf("password hash not found for user '%s'", userName)
 	}
 
 	return res, nil
@@ -92,23 +115,24 @@ func (udb UserDB) InsertUser(u User, password string) error {
 	return nil
 }
 
-func (udb UserDB) Authorized(name, password string) (bool, User, error) {
+func (udb UserDB) Authorized(userName, password string) (bool, error) {
 	ok := false
-	res := User{}
+	//res := ""
+	name := strings.ToLower(userName)
 
-	res, err := udb.GetUserByName(name)
+	res, err := udb.GetPasswordHash(name)
 	if err != nil {
-		return ok, res, fmt.Errorf("failed to get user '%s' from user db : %v", name, err)
+		return ok, fmt.Errorf("failed to get user '%s' from user db : %v", name, err)
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(res.PasswordHash), []byte(password)); err != nil {
-		return ok, res, fmt.Errorf("password doesn't match")
+	if err = bcrypt.CompareHashAndPassword([]byte(res), []byte(password)); err != nil {
+		return ok, fmt.Errorf("password doesn't match")
 	}
 
 	// password matches hash in db
 	ok = true
 
-	return ok, res, nil
+	return ok, nil
 }
 
 //=================================================================================
