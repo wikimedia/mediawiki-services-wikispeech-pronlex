@@ -8,6 +8,17 @@
     
     Hej din fiskmånglare
     
+    <table data-bind="foreach: users">
+      <tr>
+	<td data-bind="text: $data.name"></td>
+	<td data-bind="text: $data.roles"></td>
+	<td data-bind="text: $data.dbs"></td>
+
+      </tr>
+    </table>
+
+
+    
     <script src="externals/knockout-3.4.1.js"></script>
     <script src="built/user_db.js"></script>
   </body>

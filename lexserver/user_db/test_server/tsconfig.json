@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+	"watch": true,
         "outDir": "./built/",
         "sourceMap": true,
         "noImplicitAny": true,

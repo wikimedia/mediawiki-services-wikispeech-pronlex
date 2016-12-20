@@ -127,10 +127,11 @@ func main() {
 	r.HandleFunc("/admin/user_db/list_users", listUsers)
 	r.HandleFunc("/admin/user_db/delete_user", deleteUser)
 
+	// serve external js
 	r.PathPrefix("/admin/user_db/externals/").Handler(http.StripPrefix("/admin/user_db/externals/", http.FileServer(http.Dir("./externals"))))
+	// serve local js
 	r.PathPrefix("/admin/user_db/built/").Handler(http.StripPrefix("/admin/user_db/built/", http.FileServer(http.Dir("./built"))))
 
-	//r.Handle("/admin/user_db/built/", http.StripPrefix("/admin/user_db/built/", http.FileServer(http.Dir("./built"))))
 	port := ":8788"
 	log.Printf("Starting user db test_server on port %s\n", port)
 	err = http.ListenAndServe(port, r)
