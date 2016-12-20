@@ -7,18 +7,28 @@
   <body>
     <h1>User DB</h1>
     
-    Hej din fiskmånglare
     
-    <table data-bind="foreach: users">
-      <tr>
-	<td data-bind="text: $data.name"></td>
-	<td data-bind="text: $data.roles"></td>
-	<td data-bind="text: $data.dbs"></td>
-
-      </tr>
+    <table>
+      <thead>
+	<tr>
+	  <td>User</td>
+	  <td>Roles</td>
+	  <td>DBs</td>
+	  <td></td>
+	</tr>
+      </thead>
+      <tbody data-bind="foreach: users">
+	<tr>
+	  <td data-bind="text: $data.name"></td>
+	  <td data-bind="text: $data.roles"></td>
+	  <td data-bind="text: $data.dbs"></td>
+	  
+	   <td><button data-bind="click: $root.deleteUser">Delete</button></td>
+	</tr>
+      </tbody>
     </table>
-
-
+    
+    <div><button data-bind="click: addUser">Add user</button></div>
     
     <script src="externals/knockout-3.4.1.js"></script>
     <script src="built/user_db.js"></script>

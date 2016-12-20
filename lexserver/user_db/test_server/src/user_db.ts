@@ -25,12 +25,16 @@ interface User {
 class UserDB {
     //nisse = "NIZZE"
 
+    //deleteUser;
+    
     users: KnockoutObservableArray<User> = ko.observableArray<User>([]);
 
     getUsers(): void {
         //this.users.push( {name: "nils", roles: "thingy", dbs: "lexdb"})
         //this.users.push( {name: "nuls", roles: "thungy", dbs: "loxdb"} )
 
+	console.log("GETTING USER LIST");
+	
 	let itself = this;
 	let url = baseURL + "/admin/user_db/list_users"
 	let r = new XMLHttpRequest();
@@ -50,6 +54,12 @@ class UserDB {
 	r.send();
     }
 
+    deleteUser = (user: User) => {
+	console.log(user);
+    }
+    addUser() {
+	console.log("YEAH, new user");
+    }
 }
 
 let udb = new UserDB();
