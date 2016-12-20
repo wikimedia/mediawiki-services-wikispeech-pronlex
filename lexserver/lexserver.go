@@ -716,7 +716,7 @@ func main() {
 
 	// load symbol set mappers
 	err = loadSymbolSets(symbolSetFileArea)
-	ff("Failed to load symbol sets : %v", err)
+	ff("Failed to load symbol sets from dir "+symbolSetFileArea+" : %v", err)
 	log.Printf("Loaded symbol set mappers from dir %s", symbolSetFileArea)
 
 	err = loadValidators(symbolSetFileArea)

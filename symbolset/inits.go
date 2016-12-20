@@ -254,10 +254,11 @@ func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 		if strings.HasSuffix(fi.Name(), SymbolSetSuffix) {
 			symset, err := LoadSymbolSet(filepath.Join(dirName, fi.Name()))
 			if err != nil {
+				thisErr := fmt.Errorf("could't load symbol set from file %s : %v", fi.Name(), err)
 				if fErrs != nil {
-					fErrs = fmt.Errorf("%v : %v", fErrs, err)
+					fErrs = fmt.Errorf("%v : %v", fErrs, thisErr)
 				} else {
-					fErrs = err
+					fErrs = thisErr
 				}
 			} else {
 				symSets = append(symSets, symset)
@@ -266,7 +267,7 @@ func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 	}
 
 	if fErrs != nil {
-		return nil, fmt.Errorf("failed to load symbol set : %v", fErrs)
+		return nil, fErrs
 	}
 
 	var symbolSetsMap = make(map[string]SymbolSet)
