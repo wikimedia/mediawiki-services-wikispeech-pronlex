@@ -138,6 +138,33 @@ func (udb UserDB) DeleteUser(userName string) error {
 	return nil
 }
 
+// Update updates the fields of User except for User.ID and User.Name.
+// Zero valued fields (empty string) will be treated as acceptable
+// values, and updated to the empty string in the DB.
+
+func (udb UserDB) Update(user User) error {
+	name := strings.ToLower(user.Name)
+	tx, err := udb.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to sdtart transaction : %v", err)
+	}
+	defer tx.Commit()
+
+	rez, err := tx.Exec("UPDATE user SET roles = ?, dbs = ? WHERE name = ?", user.Roles, user.DBs, name)
+	if err != nil {
+		return fmt.Errorf("failed to update user '%s' : %v", name, err)
+	}
+
+	ra, _ := rez.RowsAffected()
+	if ra < 1 {
+		return fmt.Errorf("failed to update user '%s' (does the user exist?)", user.Name)
+	}
+
+	return nil
+}
+
+//TODO UpdatePassword
+
 func (udb UserDB) Authorized(userName, password string) (bool, error) {
 	ok := false
 	//res := ""

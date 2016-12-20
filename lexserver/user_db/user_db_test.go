@@ -64,6 +64,21 @@ func Test_UserDB(t *testing.T) {
 		t.Errorf("expected nil, got %v", err)
 	}
 
+	u1.Roles = "neeeewrole"
+	u1.DBs = "neeewdbz"
+
+	erru := udb.Update(u1)
+	if erru != nil {
+		t.Errorf("Expected nil, got %v", erru)
+	}
+
+	u2, erru2 := udb.GetUserByName("KalleA")
+	if erru2 != nil {
+		t.Errorf("expected nil, got %v", erru2)
+	}
+	if w, g := u1.Roles, u2.Roles; w != g {
+		t.Errorf(fs, w, g)
+	}
 	// if u1.PasswordHash == "" {
 	// 	t.Errorf("Expected non zero value hash: %#v", u1)
 	// }
