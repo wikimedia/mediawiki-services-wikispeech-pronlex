@@ -16,6 +16,7 @@ cd externals
 
 wget http://knockoutjs.com/downloads/knockout-3.4.1.js
 
+cd -
 
 -----
 
