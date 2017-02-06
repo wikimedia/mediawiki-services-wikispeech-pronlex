@@ -59,11 +59,14 @@ CREATE TABLE Entry (
     lexiconId integer not null,
     partOfSpeech varchar(128),
     morphology varchar(128),
+    preferred integer not null default 0,
 foreign key (lexiconId) references Lexicon(id));
 CREATE INDEX idx28d70584 on Entry (language);
 CREATE INDEX idx15890407 on Entry (strn);
 CREATE INDEX entrylexid ON Entry (lexiconId);
+CREATE INDEX entrypref ON Entry (preferred);
 CREATE INDEX idx4a250778 on Entry (strn,language);
+CREATE INDEX estrnpref on Entry (strn,preferred);
 CREATE INDEX idid on Entry (id, lexiconId);
 
 -- Validiation results of entries
@@ -138,4 +141,16 @@ CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 --    entryId bigint not null,
 --    surfaceFormId bigint not null,
 -- unique(surfaceFormId,entryId));
+
+-- Trigger to ensure only one preferred = 1 per orthographic word
+-- When a new entry is added, where preferred is not 0, all other entries for 
+-- the same orthographic word (entry.strn), will have the preferred field set to 0.
+CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
+  BEGIN
+    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0;
+  END;
+CREATE TRIGGER updatetPref BEFORE UPDATE ON ENTRY
+  BEGIN
+    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0;
+  END;
 `

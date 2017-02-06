@@ -230,7 +230,7 @@ WHERE entry.id = transcription.entryid AND entry.lexiconid = lexicon.id` // entr
 // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
 
 // Queries db for all entries with transcriptions and optional lemma forms.
-var baseSQLSelect = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp ` + baseSQLFrom
+var baseSQLSelect = `SELECT lexicon.id, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, entry.preferred, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp ` + baseSQLFrom
 
 var baseSQLCount = `SELECT count(distinct entry.id) ` + baseSQLFrom
 

@@ -316,7 +316,7 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 }
 
 // TODO move to function?
-var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, morphology, wordparts) values (?, ?, ?, ?, ?, ?)"
+var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
 var transAfterEntrySTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
 //var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
@@ -350,7 +350,8 @@ func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 			e.Language,
 			e.PartOfSpeech,
 			e.Morphology,
-			e.WordParts)
+			e.WordParts,
+			e.Preferred)
 		if err != nil {
 			tx.Rollback()
 			return ids, fmt.Errorf("failed exec : %v", err)
@@ -564,7 +565,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 	}
 	defer rows.Close()
 
-	var lexiconID, entryID int64
+	var lexiconID, entryID, preferred int64
 	var entryStrn, entryLanguage, partOfSpeech, morphology, wordParts string
 
 	var transcriptionID, transcriptionEntryID int64
@@ -600,6 +601,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 			&partOfSpeech,
 			&morphology,
 			&wordParts,
+			&preferred,
 
 			&transcriptionID,
 			&transcriptionEntryID,
@@ -642,6 +644,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 				PartOfSpeech: partOfSpeech,
 				Morphology:   morphology,
 				WordParts:    wordParts,
+				Preferred:    preferred,
 			}
 			// max one lemma per entry
 			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
@@ -853,7 +856,12 @@ func UpdateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 		return updated6, err
 	}
 
-	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6, err
+	updated7, err := updatePreferred(tx, e, dbEntries[0])
+	if err != nil {
+		return updated7, err
+	}
+
+	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7, err
 }
 
 func getTIDs(ts []lex.Transcription) []int64 {
@@ -907,6 +915,22 @@ func updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("failed worparts update : %v", err)
+	}
+	return true, nil
+}
+
+func updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+	if e.ID != dbE.ID {
+		tx.Rollback()
+		return false, fmt.Errorf("new and old entries have different ids")
+	}
+	if e.Preferred == dbE.Preferred {
+		return false, nil
+	}
+	_, err := tx.Exec("update entry set preferred = ? where entry.id = ?", e.Preferred, e.ID)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("failed preferred update : %v", err)
 	}
 	return true, nil
 }
@@ -973,6 +997,7 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 	return false, err
 }
 
+// TODO add DB trigger to set current = false for old statuses at update/insert
 var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = ?"
 
 //var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
