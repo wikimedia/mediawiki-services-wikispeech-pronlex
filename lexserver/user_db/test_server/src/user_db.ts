@@ -82,7 +82,7 @@ class UserDB {
 	    if(r.status == 200) {
 		//let x = new UserDB();
 		//x.getUsers();
-		this.getUsers()
+		itself.getUsers()
 	    }
 	}
 	r.send();
