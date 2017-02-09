@@ -17,13 +17,12 @@
 	  <td></td>
 	</tr>
       </thead>
-      <tbody data-bind="foreach: users">
+      <tbody data-bind="foreach:  { data: users, as: 'user' }">
 	<tr>
-	  <td data-bind="text: $data.name"></td>
-	  <td data-bind="text: $data.roles"></td>
-	  <td data-bind="text: $data.dbs"></td>
-	  
-	   <td><button data-bind="click: $root.deleteUser">Delete</button></td>
+	  <td data-bind="text: user.name"></td>
+	  <td data-bind="text: user.roles"></td>
+	  <td data-bind="text: user.dbs"></td>	  
+	  <td><button data-bind="click: $root.deleteUser.bind(user,$root)">Delete</button></td>
 	</tr>
       </tbody>
     </table>
@@ -33,5 +32,6 @@
     
     <script src="externals/knockout-3.4.1.js"></script>
     <script src="built/user_db.js"></script>
+    
   </body>
 </html>
