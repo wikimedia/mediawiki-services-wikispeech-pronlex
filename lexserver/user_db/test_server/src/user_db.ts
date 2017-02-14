@@ -25,6 +25,8 @@ interface User {
 class UserDB {
     //nisse = "NIZZE"
 
+    zelff = this;
+
     //zelf; // = this; // = null; // = this;
     //constructor() {
     // 	this.zelf = this;
@@ -71,10 +73,18 @@ class UserDB {
         r.send();
 
     };
+    
+  //  delUser = (user: User) => {
+//	//console.error(user);
+//	this.getUsers();
+  //  };
+    
+    //deleteUser(userDB: UserDB, user: User): void {
+    delUser = (user: User) => { 
 
-    deleteUser(userDB: UserDB, user: User): void {
-
-        console.log("deleteUser.userDB=", userDB);
+	let zelf = this;
+	
+        console.log("deleteUser.userDB=", zelf);
         console.log("deleteUser.user=", user);
 
         let baseURL = window.location.origin;
@@ -86,7 +96,8 @@ class UserDB {
         r.open("GET", url);
         r.onload = function () {
             if (r.status === 200) {
-                userDB.getUsers();
+                //userDB.getUsers();
+		zelf.getUsers();
             }
             else {
                 alert("ERROR\n" + r.status + "\n" + r.responseText);
