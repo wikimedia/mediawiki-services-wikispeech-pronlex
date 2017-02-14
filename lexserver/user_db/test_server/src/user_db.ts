@@ -28,11 +28,13 @@ class UserDB {
     //zelf; // = this; // = null; // = this;
     //constructor() {
     // 	this.zelf = this;
-	//zelf.getUsers = getUsers();
+    //zelf.getUsers = getUsers();
     //};
- 
-    
+
+
     //deleteUser;
+
+    userName: KnockoutObservable<string> = ko.observable("");
 
     //public itself: any = this;
 
@@ -43,13 +45,13 @@ class UserDB {
     // constructor() {
     //  	this.itself = this;
     //  }
-    
+
     getUsers(): void {
         //this.users.push( {name: "nils", roles: "thingy", dbs: "lexdb"})
         //this.users.push( {name: "nuls", roles: "thungy", dbs: "loxdb"} )
-	
+
         console.log("GETTING USER LIST");
-	let itself = this;
+        let itself = this;
 
         let url = baseURL + "/admin/user_db/list_users"
         let r = new XMLHttpRequest();
@@ -69,22 +71,22 @@ class UserDB {
         r.send();
 
     };
-    
-    deleteUser(userDB: UserDB, user: User): void {
-	
-	console.log("deleteUser.userDB=",userDB);
-	console.log("deleteUser.user=",user);
-	
-	let baseURL = window.location.origin;
 
-        let url = baseURL + "/admin/user_db/delete_user?name="+ user.name;
+    deleteUser(userDB: UserDB, user: User): void {
+
+        console.log("deleteUser.userDB=", userDB);
+        console.log("deleteUser.user=", user);
+
+        let baseURL = window.location.origin;
+
+        let url = baseURL + "/admin/user_db/delete_user?name=" + user.name;
         console.log(user.name);
 
         let r = new XMLHttpRequest();
         r.open("GET", url);
         r.onload = function () {
             if (r.status === 200) {
-		userDB.getUsers();
+                userDB.getUsers();
             }
             else {
                 alert("ERROR\n" + r.status + "\n" + r.responseText);
@@ -92,9 +94,9 @@ class UserDB {
         };
         r.send();
     }
-    
+
     addUser(): void {
-        console.log("YEAH, new user");
+        console.log("YEAH, new user " + this.userName());
     }
 }
 
