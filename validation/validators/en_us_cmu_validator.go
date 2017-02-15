@@ -7,7 +7,7 @@ import (
 )
 
 func newEnUsCmuValidator(symbolset symbolset.SymbolSet) (validation.Validator, error) {
-	exactOnePrimStressRe, err := rules.ProcessTransRe(symbolset, "^[^\"]*\"[^\"]*$")
+	exactOnePrimStressRe, err := rules.ProcessTransRe(symbolset, "^[^']*'[^']*$")
 	if err != nil {
 		return validation.Validator{}, err
 	}
