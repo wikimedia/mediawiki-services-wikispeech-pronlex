@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"strings"
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
@@ -25,6 +26,7 @@ func newNbNoNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, e
 		AcceptEmptyDecomp: true,
 		PreFilterWordPartString: func(s string) (string, error) {
 			res, err := reFrom.Replace(s, "$1+$1", 0, -1)
+			res = strings.ToLower(strings.Replace(res,"!","",-1))
 			if err != nil {
 				return s, err
 			}

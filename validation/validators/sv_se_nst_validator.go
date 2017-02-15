@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"strings"
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
@@ -30,13 +31,14 @@ func newSvSeNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, e
 		AcceptEmptyDecomp: true,
 		PreFilterWordPartString: func(s string) (string, error) {
 			res, err := reFrom.Replace(s, "$1+$1", 0, -1)
+			res = strings.ToLower(strings.Replace(res,"!","",-1))
 			if err != nil {
 				return s, err
 			}
 			return res, nil
 		}}
 
-	repeatedPhnRe, err := rules.ProcessTransRe(symbolset, "symbol( +[.~])? +\\1")
+	repeatedPhnRe, err := rules.ProcessTransRe(symbolset, "symbol( +[.~])? +\\1( |$)")
 	if err != nil {
 		return validation.Validator{}, err
 	}
