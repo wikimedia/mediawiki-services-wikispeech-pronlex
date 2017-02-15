@@ -30,11 +30,12 @@
 
   <p>
   <table>
-    <thead><tr><td><b>eId</b></td><td><b>Strn</b></td><td><b>WordParts</b></td><td><b>Lemma</b></td><td><b>Pos</b></td><td><b>Morph</b></td><td><b>Lang</b></td><td><b>Status</b></td><td><b>Transcription</b></td><td><b>IPA</b></td></tr></thead>
+    <thead><tr><td><b>eId</b></td><td><b>Preferred</b></td><td><b>Strn</b></td><td><b>WordParts</b></td><td><b>Lemma</b></td><td><b>Pos</b></td><td><b>Morph</b></td><td><b>Lang</b></td><td><b>Status</b></td><td><b>Transcription</b></td><td><b>IPA</b></td></tr></thead>
     <!-- ko foreach: { data: entries, as: 'e' } -->
     <tbody data-bind="foreach: { data: e.transcriptions, as: 't' }">
       <tr>
 	<td><span data-bind="text: e.id"></span></td>
+	<td><span data-bind="text: e.preferred"></span></td>
 	<td><span data-bind="text: e.strn"></span></td>
 	<td><span data-bind="text: e.wordParts"></span></td>
 	<td><span data-bind="text: e.lemma.strn"></span></td>
