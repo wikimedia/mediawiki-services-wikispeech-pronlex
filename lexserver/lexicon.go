@@ -229,14 +229,14 @@ func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
 	clientUUID := r.FormValue("client_uuid")
 
 	if "" == strings.TrimSpace(clientUUID) {
-		msg := "adminDoLexImportHandler got no client uuid"
+		msg := "lexiconRunValidateHandler got no client uuid"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 	conn, ok := webSocks.clients[clientUUID]
 	if !ok {
-		msg := fmt.Sprintf("adminDoLexImportHandler couldn't find connection for uuid %v", clientUUID)
+		msg := fmt.Sprintf("lexiconRunValidateHandler couldn't find connection for uuid %v", clientUUID)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
