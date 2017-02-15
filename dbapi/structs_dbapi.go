@@ -144,11 +144,20 @@ type QueryStats struct {
 	Entries int64 `json:"entries"`
 }
 
+// ValStats is used to incrementally give statistics during a validation process, or to just represent a final validation statistics.
 type ValStats struct {
-	InvalidEntries   int
+	// TotalEntries is the total entries to be validated
 	TotalEntries     int
-	TotalValidations int
+
+	// ValidatedEntries is the total validated entries so far
 	ValidatedEntries int
+
+	// TotalValidations is the total number of validation messages so far
+	TotalValidations int
+
+	// InvalidEntries is the number of invalid entries so far
+	InvalidEntries   int
+
 	Levels           map[string]int `json:levels`
 	Rules            map[string]int `json:rules`
 }
