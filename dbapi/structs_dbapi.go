@@ -148,6 +148,7 @@ type ValStats struct {
 	InvalidEntries   int
 	TotalEntries     int
 	TotalValidations int
+	ValidatedEntries int
 	Levels           map[string]int `json:levels`
 	Rules            map[string]int `json:rules`
 }

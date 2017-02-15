@@ -1252,7 +1252,8 @@ func ValidationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 	}
 
 	res.TotalEntries = entries
-
+	res.ValidatedEntries = entries
+	
 	// number of invalid entries
 	var invalidEntries int
 	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.entryid) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&invalidEntries)

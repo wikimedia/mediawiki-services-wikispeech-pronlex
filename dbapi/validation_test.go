@@ -187,6 +187,7 @@ func Test_Validation1(t *testing.T) {
 
 	expect := ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 5,
 		InvalidEntries:   3,
 		Levels: map[string]int{
@@ -210,6 +211,7 @@ func Test_Validation1(t *testing.T) {
 
 	expectFull := ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 5,
 		InvalidEntries:   3,
 		Levels: map[string]int{
@@ -240,6 +242,7 @@ func Test_Validation2(t *testing.T) {
 
 	expect := ValStats{
 		TotalEntries:     1,
+		ValidatedEntries: 1,
 		TotalValidations: 0,
 		InvalidEntries:   0,
 		Levels:           make(map[string]int),
@@ -255,6 +258,7 @@ func Test_Validation2(t *testing.T) {
 
 	expectFull := ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 0,
 		InvalidEntries:   0,
 		Levels:           make(map[string]int),
@@ -273,6 +277,7 @@ func Test_Validation2(t *testing.T) {
 
 	expect = ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 5,
 		InvalidEntries:   3,
 		Levels: map[string]int{
@@ -296,6 +301,7 @@ func Test_Validation2(t *testing.T) {
 
 	expectFull = ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 5,
 		InvalidEntries:   3,
 		Levels: map[string]int{
@@ -332,6 +338,7 @@ func Test_ValidationUpdate1(t *testing.T) {
 
 	expect := ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 5,
 		InvalidEntries:   3,
 		Levels: map[string]int{
@@ -370,6 +377,7 @@ func Test_ValidationUpdate2(t *testing.T) {
 
 	expect := ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 5,
 		InvalidEntries:   3,
 		Levels: map[string]int{
@@ -404,6 +412,7 @@ func Test_ValidationUpdate3(t *testing.T) {
 
 	expect := ValStats{
 		TotalEntries:     4,
+		ValidatedEntries: 4,
 		TotalValidations: 5,
 		InvalidEntries:   3,
 		Levels: map[string]int{

@@ -33,6 +33,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	for i, e := range w.Entries {
 		oldVal := e.EntryValidations
 		e, _ = vd.ValidateEntry(e)
+		stats.ValidatedEntries += 1
 		newVal := e.EntryValidations
 		if len(newVal) > 0 {
 			stats.InvalidEntries += 1
@@ -72,6 +73,7 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 	}
 	total := len(ids)
 	stats.TotalEntries = total
+	stats.ValidatedEntries = 0
 	stats.InvalidEntries = 0
 	stats.TotalValidations = 0
 	logger.Write(fmt.Sprintf("Found %d entries", total))
