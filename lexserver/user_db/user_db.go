@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -20,6 +21,7 @@ type User struct {
 }
 
 type UserDB struct {
+	mutex *sync.Mutex
 	*sql.DB
 }
 
@@ -223,5 +225,6 @@ func InitUserDB(fName string) (UserDB, error) {
 		return UserDB{}, fmt.Errorf("failed to open db file: '%s': %v", fName, err)
 	}
 
-	return UserDB{db}, nil
+	//var m sync.Mutex
+	return UserDB{&sync.Mutex{}, db}, nil
 }
