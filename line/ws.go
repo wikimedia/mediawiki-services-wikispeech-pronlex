@@ -5,7 +5,7 @@ package line
 import (
 	"fmt"
 	"strings"
-
+	
 	"github.com/stts-se/pronlex/lex"
 )
 
@@ -75,7 +75,8 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 	fs[Orth] = e.Strn
 	fs[Lang] = e.Language
 	fs[WordParts] = e.WordParts
-
+	fs[Preferred] = fmt.Sprintf("%d", e.Preferred)
+	
 	fs[Pos] = e.PartOfSpeech
 	fs[Morph] = e.Morphology
 
@@ -120,7 +121,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 // NewWS is used to create a new instance of the WS parser
 func NewWS() (WS, error) {
 	tests := []FormatTest{
-		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	1	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 			map[Field]string{
 				Orth:         "storstaden",
 				Pos:          "NN",
@@ -129,6 +130,7 @@ func NewWS() (WS, error) {
 				Lemma:        "storstad|95522",
 				Paradigm:     "s111n, a->ä, stad",
 				Lang:         "SWE",
+				Preferred:    "1",
 				Trans1:       "\"\"stu:$%s`t`A:$den",
 				Translang1:   "SWE",
 				Trans2:       "",
@@ -140,7 +142,7 @@ func NewWS() (WS, error) {
 				StatusName:   "imported",
 				StatusSource: "nst",
 			},
-			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	1	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 		},
 	}
 	f, err := NewFormat(
@@ -154,18 +156,19 @@ func NewWS() (WS, error) {
 			Lemma:        4,
 			Paradigm:     5,
 			Lang:         6,
-			Trans1:       7,
-			Translang1:   8,
-			Trans2:       9,
-			Translang2:   10,
-			Trans3:       11,
-			Translang3:   12,
-			Trans4:       13,
-			Translang4:   14,
-			StatusName:   15,
-			StatusSource: 16,
+			Preferred:    7,
+			Trans1:       8,
+			Translang1:   9,
+			Trans2:       10,
+			Translang2:   11,
+			Trans3:       12,
+			Translang3:   13,
+			Trans4:       14,
+			Translang4:   15,
+			StatusName:   16,
+			StatusSource: 17,
 		},
-		17,
+		18,
 		tests,
 	)
 	if err != nil {
