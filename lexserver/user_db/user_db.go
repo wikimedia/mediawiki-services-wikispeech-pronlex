@@ -20,14 +20,18 @@ type User struct {
 	DBs   string `json:"dbs"`
 }
 
+//TODO Not sure whether mutex is strictly needed, but want to try it anyway.
 type UserDB struct {
-	mutex *sync.Mutex
+	mutex *sync.RWMutex
 	*sql.DB
 }
 
 // TODO test me
 func (udb UserDB) GetUsers() ([]User, error) {
 	var res []User
+
+	udb.mutex.RLock()
+	defer udb.mutex.RUnlock()
 
 	tx, err := udb.Begin()
 	if err != nil {
@@ -53,6 +57,9 @@ func (udb UserDB) GetUsers() ([]User, error) {
 }
 
 func (udb UserDB) GetUserByName(name string) (User, error) {
+	udb.mutex.RLock()
+	defer udb.mutex.RUnlock()
+
 	res := User{}
 	tx, err := udb.Begin()
 	if err != nil {
@@ -74,6 +81,10 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 // such value is found, the empty string is returned (along with a
 // non-nil error value)
 func (udb UserDB) GetPasswordHash(userName string) (string, error) {
+
+	udb.mutex.RLock()
+	defer udb.mutex.RUnlock()
+
 	name := strings.ToLower(userName)
 	var res string
 	tx, err := udb.Begin()
@@ -92,6 +103,10 @@ func (udb UserDB) GetPasswordHash(userName string) (string, error) {
 }
 
 func (udb UserDB) InsertUser(u User, password string) error {
+
+	udb.mutex.Lock()
+	defer udb.mutex.Unlock()
+
 	tx, err := udb.Begin()
 	if err != nil {
 		return fmt.Errorf("InsertUser failed to start transaction : %v", err)
@@ -118,6 +133,10 @@ func (udb UserDB) InsertUser(u User, password string) error {
 }
 
 func (udb UserDB) DeleteUser(userName string) error {
+
+	udb.mutex.Lock()
+	defer udb.mutex.Unlock()
+
 	name := strings.ToLower(userName)
 	tx, err := udb.Begin()
 	if err != nil {
@@ -145,6 +164,10 @@ func (udb UserDB) DeleteUser(userName string) error {
 // values, and updated to the empty string in the DB.
 
 func (udb UserDB) Update(user User) error {
+
+	udb.mutex.Lock()
+	defer udb.mutex.Unlock()
+
 	name := strings.ToLower(user.Name)
 	tx, err := udb.Begin()
 	if err != nil {
@@ -168,6 +191,10 @@ func (udb UserDB) Update(user User) error {
 //TODO UpdatePassword
 
 func (udb UserDB) Authorized(userName, password string) (bool, error) {
+
+	udb.mutex.RLock()
+	defer udb.mutex.RUnlock()
+
 	ok := false
 	//res := ""
 	name := strings.ToLower(userName)
@@ -226,5 +253,5 @@ func InitUserDB(fName string) (UserDB, error) {
 	}
 
 	//var m sync.Mutex
-	return UserDB{&sync.Mutex{}, db}, nil
+	return UserDB{&sync.RWMutex{}, db}, nil
 }
