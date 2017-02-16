@@ -1,3 +1,6 @@
+// TODO list possible roles
+// TODO list available DBs
+
 const baseURL: string = window.location.origin;
 
 interface User {
@@ -23,39 +26,27 @@ interface User {
 // }
 
 class UserDB {
-    //nisse = "NIZZE"
 
-    zelff = this;
-
-    //zelf; // = this; // = null; // = this;
-    //constructor() {
-    // 	this.zelf = this;
-    //zelf.getUsers = getUsers();
-    //};
-
-
-    //deleteUser;
-
+    
+    // These are knockout.js variables tied to HTML input fields,
+    // together making up a new user
     newUserName:      KnockoutObservable<string> = ko.observable("");
     newUserPassword:  KnockoutObservable<string> = ko.observable("");
     newUserRoles:     KnockoutObservable<string> = ko.observable("");
     newUserDBs:       KnockoutObservable<string> = ko.observable("");
 
-    //public itself: any = this;
+    //message: string = "";
 
-    message: string = "";
+    
+    // List of the users in a knockout.js variable, tied to a HTML
+    // table.  The contents of the list is obtained from the DB, by
+    // calling this.getUsers() below.
 
     users: KnockoutObservableArray<User> = ko.observableArray<User>([]);
 
-    // constructor() {
-    //  	this.itself = this;
-    //  }
-
+    // The side effect of this call is to fill in this.users.
     getUsers(): void {
-        //this.users.push( {name: "nils", roles: "thingy", dbs: "lexdb"})
-        //this.users.push( {name: "nuls", roles: "thungy", dbs: "loxdb"} )
 
-        console.log("GETTING USER LIST");
         let itself = this;
 
         let url = baseURL + "/admin/user_db/list_users"
@@ -67,7 +58,7 @@ class UserDB {
                 // TODO How do you handle errors?
                 let u: User[] = <User[]>JSON.parse(r.responseText);
                 itself.users(u);
-
+		
             } else {
                 console.log("readyState: " + r.readyState);
                 console.log("statusText: " + r.statusText);
@@ -77,21 +68,21 @@ class UserDB {
 
     };
     
-  //  delUser = (user: User) => {
-//	//console.error(user);
-//	this.getUsers();
-  //  };
-    
-    //deleteUser(userDB: UserDB, user: User): void {
-    deleteUser = (user: User) => { 
 
+    // Deletes a user from the database. Forever gone.
+    deleteUser = (user: User) => { 
+	// Using the arrow syntax above, "this" appears to work in a
+	// slightly more sane way, and referes to the embedding class
+	// (UserDB).
 	let zelf = this;
 	
-        console.log("deleteUser.userDB=", zelf);
-        console.log("deleteUser.user=", user);
 
+	
+	
         let baseURL = window.location.origin;
-
+	
+	// TODO Error check user iput
+	// TODO Sanitize user input
         let url = baseURL + "/admin/user_db/delete_user?name=" + user.name;
         console.log(user.name);
 
@@ -103,6 +94,8 @@ class UserDB {
 		zelf.getUsers();
             }
             else {
+		// TODO Better error handling. For example by writing
+		// to a message text area.
                 alert("ERROR\n" + r.status + "\n" + r.responseText);
             };
         };
@@ -113,13 +106,13 @@ class UserDB {
 	
 	let zelf = this;
 	
+	// TODO Error check user iput
 	let newUser = {"name": this.newUserName(), "password": this.newUserPassword(), "roles": this.newUserRoles(), "dbs": this.newUserDBs()};
 	
         console.error("Adding new user " + JSON.stringify(newUser));
 	
 	let baseURL = window.location.origin;
-
-	// TODO Error check user iput
+	
 	
 	// TODO Sanitize user input
         let url = baseURL + "/admin/user_db/add_user?name=" + newUser.name +
