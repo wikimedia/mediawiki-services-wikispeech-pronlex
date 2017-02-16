@@ -31,6 +31,9 @@ const (
 	// Lang the word's language
 	Lang
 
+	// Preferred field to use label certain entries preferred over other ones with the same orthography
+	Preferred 
+	
 	// Trans1 the primary transcription
 	Trans1
 
