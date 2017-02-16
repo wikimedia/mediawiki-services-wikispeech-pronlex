@@ -17,18 +17,22 @@
 	  <td></td>
 	</tr>
       </thead>
-      <tbody data-bind="foreach:  { data: users, as: 'user' }">
+      <tbody data-bind="foreach: users">
 	<tr>
-	  <td data-bind="text: user.name"></td>
-	  <td data-bind="text: user.roles"></td>
-	  <td data-bind="text: user.dbs"></td>	  
-	  <td><button data-bind="click: $root.delUser">Delete</button></td>
+	  <td data-bind="text: name"></td>
+	  <td data-bind="text: roles"></td>
+	  <td data-bind="text: dbs"></td>	  
+	  <td><button data-bind="click: $root.deleteUser">Delete</button></td>
 	</tr>
       </tbody>
     </table>
 
-    <div><label>User name</label><input data-bind="textInput: userName"></input><label data-bind="text: userName"></label></div>
-    <div><button data-bind="click: addUser">Add user</button></div>
+    <br>
+    <div><label>User name</label><input data-bind="textInput: newUserName"></input><label data-bind="text: newUserName"></label></div>
+    <div><label>User password</label><input data-bind="textInput: newUserPassword"></input><label data-bind="text: newUserPassword"></label></div>
+    <div><label>User roles</label><input data-bind="textInput: newUserRoles"></input><label data-bind="text: newUserRoles"></label></div>
+    <div><label>User DBs</label><input data-bind="textInput: newUserDBs"></input><label data-bind="text: newUserDBs"></label></div>
+    <div><button data-bind="click: $root.addUser">Add user</button></div>
     
     <script src="externals/knockout-3.4.1.js"></script>
     <script src="built/user_db.js"></script>

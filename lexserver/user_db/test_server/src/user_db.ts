@@ -36,7 +36,10 @@ class UserDB {
 
     //deleteUser;
 
-    userName: KnockoutObservable<string> = ko.observable("");
+    newUserName:      KnockoutObservable<string> = ko.observable("");
+    newUserPassword:  KnockoutObservable<string> = ko.observable("");
+    newUserRoles:     KnockoutObservable<string> = ko.observable("");
+    newUserDBs:       KnockoutObservable<string> = ko.observable("");
 
     //public itself: any = this;
 
@@ -80,7 +83,7 @@ class UserDB {
   //  };
     
     //deleteUser(userDB: UserDB, user: User): void {
-    delUser = (user: User) => { 
+    deleteUser = (user: User) => { 
 
 	let zelf = this;
 	
@@ -104,11 +107,37 @@ class UserDB {
             };
         };
         r.send();
-    }
+    };
 
-    addUser(): void {
-        console.log("YEAH, new user " + this.userName());
-    }
+    addUser = (): void => {
+	
+	let zelf = this;
+	
+	let newUser = {"name": this.newUserName(), "password": this.newUserPassword(), "roles": this.newUserRoles(), "dbs": this.newUserDBs()};
+	
+        console.error("Adding new user " + JSON.stringify(newUser));
+	
+	let baseURL = window.location.origin;
+
+	// TODO Error check user iput
+	
+	// TODO Sanitize user input
+        let url = baseURL + "/admin/user_db/add_user?name=" + newUser.name +
+	    "&password="+ newUser.password +
+	    "&roles="+ newUser.roles + "&dbs="+ newUser.dbs;
+        
+	let r = new XMLHttpRequest();
+	r.open("GET", url);
+	r.onload = function() {
+	    if (r.status === 200) {
+		console.error("Added user '"+ newUser.name + "'");
+		zelf.getUsers();
+	    } else {
+		alert("ERROR\n"+ r.status + "\n"+ r.responseText);
+	    };
+	};
+	r.send();
+    };
 }
 
 let udb = new UserDB();
