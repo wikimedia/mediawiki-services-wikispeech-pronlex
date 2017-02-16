@@ -31,7 +31,7 @@ const (
 	// Lang the word's language
 	Lang
 
-	// Preferred field to use label certain entries preferred over other ones with the same orthography
+	// Preferred field to use label certain entries preferred over other ones with the same orthography; 1 = preferred, 0 = not preferred; Schema triggers only one preferred per orthographic word
 	Preferred 
 	
 	// Trans1 the primary transcription

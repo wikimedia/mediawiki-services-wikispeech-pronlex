@@ -102,6 +102,8 @@ type Entry struct {
 	Transcriptions   []Transcription   `json:"transcriptions"`
 	EntryStatus      EntryStatus       `json:"status"` // TODO Probably should be a slice of statuses?
 	EntryValidations []EntryValidation `json:"entryValidations"`
+
+	// Preferred flag: 1=true, 0=false; schema triggers only one preferred per orthographic word
 	Preferred        int64             `json:"preferred"`
 }
 

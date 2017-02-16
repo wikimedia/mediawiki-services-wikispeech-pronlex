@@ -467,75 +467,54 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 }
 
-// func Test_ImportLexiconFileInvalid(t *testing.T) {
+func Test_ImportLexiconFileInvalid(t *testing.T) {
 
-// 	ssMapper, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.tab")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.tab")
+	//ssMapper, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.tab")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	symbolSet := ssMapper.From
+	//symbolSet := ssMapper.From
 
-// 	dbFile := "./iotestlex.db"
-// 	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-// 		err := os.Remove(dbFile)
-// 		ff("failed to remove iotestlex.db : %v", err)
-// 	}
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
 
-// 	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	_, err = db.Exec("PRAGMA foreign_keys = ON")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-// 	ff("Failed to exec PRAGMA call %v", err)
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
 
-// 	defer db.Close()
+	defer db.Close()
 
-// 	_, err = execSchema(db) // Creates new lexicon database
-// 	ff("Failed to create lexicon db: %v", err)
+	_, err = execSchema(db) // Creates new lexicon database
+	ff("Failed to create lexicon db: %v", err)
 
-// 	logger := StderrLogger{}
-// 	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
+	logger := StderrLogger{}
+	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
 
-// 	l, err = InsertLexicon(db, l)
-// 	if err != nil {
-// 		t.Errorf(fs, nil, err)
-// 	}
+	l, err = InsertLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 
-// 	// actual tests start here
-// 	errs := ImportLexiconFile(db, logger, l.Name, "./sv-lextest-invalid.txt")
-// 	if len(errs) != 1 {
-// 		t.Errorf(fs, nil, errs)
-// 	}
+	// actual tests start here
+	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest-invalid-no-fields.txt", &validation.Validator{})
+	if err == nil {
+		t.Errorf("Expected errors, but got nil")
+	}
 
-// 	q := Query{Words: []string{"sprängstoff"}}
-
-// 	res, err := LookUpIntoSlice(db, q)
-// 	if len(res) != 1 {
-// 		t.Errorf(fs, "1", len(res))
-// 	}
-// 	o := res[0].Strn
-// 	if o != "sprängstoff" {
-// 		t.Errorf(fs, "sprängstoff", o)
-// 	}
-
-// 	q = Query{Words: []string{"sittriktigas"}}
-// 	res, err = LookUpIntoSlice(db, q)
-// 	if len(res) != 1 {
-// 		t.Errorf(fs, "1", len(res))
-// 		return
-// 	}
-// 	o = res[0].Strn
-// 	if o != "sittriktigas" {
-// 		t.Errorf(fs, "sittriktigas", o)
-// 	}
-
-// }
+}
 
 func Test_ImportLexiconFileGz(t *testing.T) {
 
