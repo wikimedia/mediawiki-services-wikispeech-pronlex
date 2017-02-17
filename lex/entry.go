@@ -104,7 +104,8 @@ type Entry struct {
 	EntryValidations []EntryValidation `json:"entryValidations"`
 
 	// Preferred flag: 1=true, 0=false; schema triggers only one preferred per orthographic word
-	Preferred        int64             `json:"preferred"`
+	//Preferred        int64             `json:"preferred"`
+	Preferred bool `json:"preferred"`
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.

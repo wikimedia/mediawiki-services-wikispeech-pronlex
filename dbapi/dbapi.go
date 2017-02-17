@@ -344,6 +344,11 @@ func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 	}
 
 	for _, e := range es {
+		// convert 'Preferred' into DB integer value
+		var pref int64
+		if e.Preferred {
+			pref = 1
+		}
 		res, err := tx.Stmt(stmt1).Exec(
 			l.ID,
 			strings.ToLower(e.Strn),
@@ -351,7 +356,7 @@ func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 			e.PartOfSpeech,
 			e.Morphology,
 			e.WordParts,
-			e.Preferred)
+			pref)
 		if err != nil {
 			tx.Rollback()
 			return ids, fmt.Errorf("failed exec : %v", err)
@@ -632,6 +637,10 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 		//
 		// all rows with same entryID belongs to the same entry.
 		// rows ordered by entryID
+		var pref bool // convert 'preferred' value from DB integer value
+		if preferred == 1 {
+			pref = true
+		}
 		if lastE != entryID {
 			if lastE != -1 {
 				out.Write(currE)
@@ -644,7 +653,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 				PartOfSpeech: partOfSpeech,
 				Morphology:   morphology,
 				WordParts:    wordParts,
-				Preferred:    preferred,
+				Preferred:    pref,
 			}
 			// max one lemma per entry
 			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
@@ -927,7 +936,13 @@ func updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.Preferred == dbE.Preferred {
 		return false, nil
 	}
-	_, err := tx.Exec("update entry set preferred = ? where entry.id = ?", e.Preferred, e.ID)
+
+	// convert bool into DB integer
+	var pref int64
+	if e.Preferred {
+		pref = 1
+	}
+	_, err := tx.Exec("update entry set preferred = ? where entry.id = ?", pref, e.ID)
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("failed preferred update : %v", err)
@@ -1253,7 +1268,7 @@ func ValidationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 
 	res.TotalEntries = entries
 	res.ValidatedEntries = entries
-	
+
 	// number of invalid entries
 	var invalidEntries int
 	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.entryid) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&invalidEntries)

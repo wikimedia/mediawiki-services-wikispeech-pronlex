@@ -98,7 +98,7 @@ func Test_InsertEntries(t *testing.T) {
 		Morphology:     "NEU UTR",
 		WordParts:      "apa",
 		Language:       "XYZZ",
-		Preferred:      1,
+		Preferred:      true,
 		Transcriptions: []lex.Transcription{t1, t2},
 		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
 
@@ -122,7 +122,7 @@ func Test_InsertEntries(t *testing.T) {
 	if got, want := ea.Morphology, "NEU UTR"; got != want {
 		t.Errorf(fs, got, want)
 	}
-	if got, want := ea.Preferred, int64(1); got != want {
+	if got, want := ea.Preferred, true; got != want {
 		t.Errorf(fs, got, want)
 	}
 
@@ -343,7 +343,7 @@ func Test_InsertEntries(t *testing.T) {
 		Morphology:     "NEU UTR",
 		WordParts:      "apa",
 		Language:       "XYZZ",
-		Preferred:      1,
+		Preferred:      true,
 		Transcriptions: []lex.Transcription{t1, t2},
 		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
 
@@ -366,16 +366,16 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, want, got)
 	}
 
-	if entries2[0].PartOfSpeech == "XX" && entries2[0].Preferred != 1 {
+	if entries2[0].PartOfSpeech == "XX" && !entries2[0].Preferred {
 		t.Errorf(fs, 1, entries2[0].Preferred)
 	}
-	if entries2[1].PartOfSpeech == "XX" && entries2[1].Preferred != 1 {
+	if entries2[1].PartOfSpeech == "XX" && !entries2[1].Preferred {
 		t.Errorf(fs, 1, entries2[1].Preferred)
 	}
-	if entries2[0].PartOfSpeech != "XX" && entries2[0].Preferred != 0 {
+	if entries2[0].PartOfSpeech != "XX" && entries2[0].Preferred {
 		t.Errorf(fs, 0, entries2[0].Preferred)
 	}
-	if entries2[1].PartOfSpeech != "XX" && entries2[1].Preferred != 0 {
+	if entries2[1].PartOfSpeech != "XX" && entries2[1].Preferred {
 		t.Errorf(fs, 0, entries2[1].Preferred)
 	}
 
