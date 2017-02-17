@@ -5,6 +5,7 @@ package line
 import (
 	"fmt"
 	"strings"
+	"strconv"
 	
 	"github.com/stts-se/pronlex/lex"
 )
@@ -30,7 +31,7 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 
 	fs, err := ws.Parse(line)
 	if err != nil {
-		return res, fmt.Errorf("Parse to entry failed : %v", err)
+		return res, fmt.Errorf("parse to entry failed : %v", err)
 	}
 
 	res.Strn = fs[Orth]
@@ -45,7 +46,12 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 
 	res.EntryStatus.Name = fs[StatusName]
 	res.EntryStatus.Source = fs[StatusSource]
-
+	res.Preferred, err = strconv.ParseBool(fs[Preferred])
+	if err != nil {
+		err := fmt.Errorf("couldn't convert string to boolean preferred field: %v", err)
+		return res, fmt.Errorf("parse to entry failed : %v", err)
+	}
+	
 	return res, nil
 }
 
@@ -75,7 +81,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 	fs[Orth] = e.Strn
 	fs[Lang] = e.Language
 	fs[WordParts] = e.WordParts
-	fs[Preferred] = fmt.Sprintf("%d", e.Preferred)
+	fs[Preferred] = strconv.FormatBool(e.Preferred)
 	
 	fs[Pos] = e.PartOfSpeech
 	fs[Morph] = e.Morphology
@@ -121,7 +127,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 // NewWS is used to create a new instance of the WS parser
 func NewWS() (WS, error) {
 	tests := []FormatTest{
-		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	1	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	false	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 			map[Field]string{
 				Orth:         "storstaden",
 				Pos:          "NN",
@@ -130,7 +136,7 @@ func NewWS() (WS, error) {
 				Lemma:        "storstad|95522",
 				Paradigm:     "s111n, a->ä, stad",
 				Lang:         "SWE",
-				Preferred:    "1",
+				Preferred:    "false",
 				Trans1:       "\"\"stu:$%s`t`A:$den",
 				Translang1:   "SWE",
 				Trans2:       "",
@@ -142,7 +148,30 @@ func NewWS() (WS, error) {
 				StatusName:   "imported",
 				StatusSource: "nst",
 			},
-			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	1	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	false	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+		},
+		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	true	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+			map[Field]string{
+				Orth:         "storstaden",
+				Pos:          "NN",
+				Morph:        "SIN|DEF|NOM|UTR",
+				WordParts:    "stor+staden",
+				Lemma:        "storstad|95522",
+				Paradigm:     "s111n, a->ä, stad",
+				Lang:         "SWE",
+				Preferred:    "true",
+				Trans1:       "\"\"stu:$%s`t`A:$den",
+				Translang1:   "SWE",
+				Trans2:       "",
+				Translang2:   "",
+				Trans3:       "",
+				Translang3:   "",
+				Trans4:       "",
+				Translang4:   "",
+				StatusName:   "imported",
+				StatusSource: "nst",
+			},
+			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	true	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 		},
 	}
 	f, err := NewFormat(
