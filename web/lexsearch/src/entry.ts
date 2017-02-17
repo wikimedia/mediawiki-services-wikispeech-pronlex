@@ -46,8 +46,9 @@ namespace Entry {
         transcriptions: Transcription[];
         status: Status;
         entryValidations: EntryValidation[];
-	preferred: number;
-}
+        //preferred: number;
+        preferred: boolean;
+    }
 
     function json2entry(json: JSON): Entry {
         return <Entry>(<any>json); // todo: proper parsing, error handling, etc
