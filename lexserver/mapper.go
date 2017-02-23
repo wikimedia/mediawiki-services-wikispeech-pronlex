@@ -46,6 +46,9 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fromName := r.FormValue("from")
 	toName := r.FormValue("to")
 	trans := trimTrans(r.FormValue("trans"))
+	log.Println("from", fromName)
+	log.Println("to", toName)
+	log.Println("trans", trans)
 	if len(strings.TrimSpace(fromName)) == 0 {
 		msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
 		log.Println(msg)
