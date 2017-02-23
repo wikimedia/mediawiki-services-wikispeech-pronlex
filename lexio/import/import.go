@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	//"flag"
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/symbolset"
@@ -26,6 +27,11 @@ func loadValidators(symsetDirName string) error {
 
 func main() {
 
+	// var ssFolder = flag.String("ss1", "ss2", "symbol set folder (optional)")
+	// flag.Parse()
+	// log.Println(*ssFolder)
+	
+	
 	sampleInvocation := `go run import.go pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
 
 	if len(os.Args) != 5 && len(os.Args) != 6 {

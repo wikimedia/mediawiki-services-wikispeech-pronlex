@@ -100,7 +100,8 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		deleteUploadedFile(serverPath)
 	}
-
+	log.Println("Created lexicon with name:", lexicon.Name)
+	
 	var validator *validation.Validator
 	if validate {
 		vMut.Lock()
