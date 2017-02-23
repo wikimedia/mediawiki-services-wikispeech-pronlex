@@ -11,7 +11,6 @@ You need [Sqlite3](https://www.sqlite.org/)
 # Lexicon data and database
 
 https://github.com/stts-se/lexdata/wiki/Create-lexicon-database
-```
 
 
 ---
