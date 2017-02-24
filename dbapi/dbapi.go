@@ -1238,30 +1238,24 @@ func ValidationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
 
 	// number of entries in the lexicon
-	var entries int
-	err := tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
+	err := tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&res.TotalEntries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
 
-	res.TotalEntries = entries
-	res.ValidatedEntries = entries
+	res.ValidatedEntries = res.TotalEntries
 
 	// number of invalid entries
-	var invalidEntries int
-	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.entryid) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&invalidEntries)
+	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.entryid) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&res.InvalidEntries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
-	res.InvalidEntries = invalidEntries
 
 	// number of validations
-	var validations int
-	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.id) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&validations)
+	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.id) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&res.TotalValidations)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
-	res.TotalValidations = validations
 
 	levels, err := tx.Query("select entryvalidation.level, count(entryvalidation.level) from entry, entryvalidation where entry.lexiconid = ? and entry.id = entryvalidation.entryid group by entryvalidation.level", lexiconID)
 	if err != nil {
