@@ -99,16 +99,16 @@ func createEntries() []lex.Entry {
 func createValidator() Validator {
 	name := "sampa"
 	symbols := []symbolset.Symbol{
-		symbolset.Symbol{"a", symbolset.Syllabic, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{"A:", symbolset.Syllabic, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{"b", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{"p", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{"N", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{"n", symbolset.NonSyllabic, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{" ", symbolset.PhonemeDelimiter, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{".", symbolset.SyllableDelimiter, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{"\"", symbolset.Stress, "", symbolset.IPASymbol{"", ""}},
-		symbolset.Symbol{"\"\"", symbolset.Stress, "", symbolset.IPASymbol{"", ""}},
+		symbolset.Symbol{"a", symbolset.Syllabic, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{"A:", symbolset.Syllabic, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{"b", symbolset.NonSyllabic, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{"p", symbolset.NonSyllabic, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{"N", symbolset.NonSyllabic, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{"n", symbolset.NonSyllabic, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{" ", symbolset.PhonemeDelimiter, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{".", symbolset.SyllableDelimiter, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{"\"", symbolset.Stress, "", symbolset.IPASymbol{String: "", Unicode: ""}},
+		symbolset.Symbol{"\"\"", symbolset.Stress, "", symbolset.IPASymbol{String: "", Unicode: ""}},
 	}
 	ss, err := symbolset.NewSymbolSet(name, symbols)
 	ff("failed to init symbols : %v", err)

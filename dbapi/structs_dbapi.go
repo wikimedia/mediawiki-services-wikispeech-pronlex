@@ -158,6 +158,6 @@ type ValStats struct {
 	// InvalidEntries is the number of invalid entries so far
 	InvalidEntries   int
 
-	Levels           map[string]int `json:levels`
-	Rules            map[string]int `json:rules`
+	Levels           map[string]int `json:"levels"`
+	Rules            map[string]int `json:"rules"`
 }
