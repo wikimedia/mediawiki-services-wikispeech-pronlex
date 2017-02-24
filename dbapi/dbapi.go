@@ -97,22 +97,19 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 		return res, nil
 	}
 
-	var id int64
-	var lname string
-	var symbolsetname string
-
 	rows, err := db.Query("select id, name, symbolsetname from lexicon where name in "+nQs(len(names)), convS(names)...)
 	if err != nil {
 		return res, fmt.Errorf("failed db select on lexicon table : %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&id, &lname, &symbolsetname)
+		l := Lexicon{}
+		err := rows.Scan(&l.ID, &l.Name, &l.SymbolSetName)		
 		if err != nil {
 			return res, fmt.Errorf("failed rows scan : %v", err)
 		}
-		found[strings.ToLower(lname)] = true
-		res = append(res, Lexicon{ID: id, Name: lname, SymbolSetName: symbolsetname})
+		found[strings.ToLower(l.Name)] = true
+		res = append(res, l)
 	}
 
 	err = rows.Err()
@@ -153,19 +150,13 @@ func LexiconFromID(db *sql.DB, id int64) (Lexicon, error) {
 // the lexicon table with the given id
 func LexiconFromIDTx(tx *sql.Tx, id int64) (Lexicon, error) {
 	res := Lexicon{}
-	var dbID int64
-	var name, symbolSetName string
-	err := tx.QueryRow("select id, name, symbolsetname from lexicon where id = ?", id).Scan(&dbID, &name, &symbolSetName)
+	err := tx.QueryRow("select id, name, symbolsetname from lexicon where id = ?", id).Scan(&res.ID, &res.Name, &res.SymbolSetName)
 	if err == sql.ErrNoRows {
 		return res, fmt.Errorf("no lexicon with id %d : %v", id, err)
 	}
 	if err != nil {
 		return res, fmt.Errorf("query failed %v", err)
 	}
-
-	res.ID = dbID
-	res.Name = name
-	res.SymbolSetName = symbolSetName
 
 	return res, err
 }
@@ -445,21 +436,14 @@ func InsertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
 func SetOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (lex.Lemma, error) {
 	res := lex.Lemma{}
 
-	var id int64
-	var strn0, reading0, paradigm0 string
 	sqlS := "select id, strn, reading, paradigm from lemma where strn = ? and reading = ?"
-	err := tx.QueryRow(sqlS, strn, reading).Scan(&id, &strn0, &reading0, &paradigm0)
+	err := tx.QueryRow(sqlS, strn, reading).Scan(&res.ID, &res.Strn, &res.Reading, &res.Paradigm)
 	switch {
 	case err == sql.ErrNoRows:
-		return InsertLemma(tx, lex.Lemma{ID: id, Strn: strn, Reading: reading, Paradigm: paradigm})
+		return InsertLemma(tx, lex.Lemma{Strn: strn, Reading: reading, Paradigm: paradigm})
 	case err != nil:
 		return res, fmt.Errorf("SetOrGetLemma failed querying db : %v", err)
 	}
-
-	res.ID = id
-	res.Strn = strn0
-	res.Reading = reading0
-	res.Paradigm = paradigm0
 
 	return res, err
 }
@@ -474,30 +458,24 @@ func AssociateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry) error {
 	return err
 }
 
-func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (lex.Lemma, error) {
-	res := lex.Lemma{}
-	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
-		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
-	var lID int64
-	var strn, reading, paradigm string
-	err := tx.QueryRow(sqlS, id).Scan(&lID, &strn, &reading, &paradigm)
-	switch {
-	case err == sql.ErrNoRows:
-		// TODO No row:
-		// Silently return empty lex.Lemma below
-	case err != nil:
-		//ff("getLemmaFromENtryId: %v", err)
-		return res, fmt.Errorf("QueryRow failure : %v", err)
-	}
+// NOT USED AS OF 2017-02-24
+// func getLemmaFromEntryIDTx(tx *sql.Tx, id int64) (lex.Lemma, error) {
+// 	res := lex.Lemma{}
+// 	sqlS := "select lemma.id, lemma.strn, lemma.reading, lemma.paradigm from entry, lemma, lemma2entry where " +
+// 		"entry.id = ? and entry.id = lemma2entry.entryid and lemma.id = lemma2entry.lemmaid"
+// 	err := tx.QueryRow(sqlS, id).Scan(&res.ID, &res.Strn, &res.Reading, &res.Paradigm)
+// 	switch {
+// 	case err == sql.ErrNoRows:
+// 		// TODO No row:
+// 		// Silently return empty lex.Lemma below
+// 	case err != nil:
+// 		//ff("getLemmaFromENtryId: %v", err)
+// 		return res, fmt.Errorf("QueryRow failure : %v", err)
+// 	}
 
-	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
-	res.ID = lID
-	res.Strn = strn
-	res.Reading = reading
-	res.Paradigm = paradigm
-
-	return res, nil
-}
+// 	// TODO Now silently returns empty lemma if nothing returned from db. Ok?
+// 	return res, nil
+// }
 
 // LookUpIds takes a Query struct, searches the lexicon db, and writes the result to a slice of ids
 func LookUpIds(db *sql.DB, q Query) ([]int64, error) {
