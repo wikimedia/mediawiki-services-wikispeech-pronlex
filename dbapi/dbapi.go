@@ -104,7 +104,7 @@ func GetLexicons(db *sql.DB, names []string) ([]Lexicon, error) {
 	defer rows.Close()
 	for rows.Next() {
 		l := Lexicon{}
-		err := rows.Scan(&l.ID, &l.Name, &l.SymbolSetName)		
+		err := rows.Scan(&l.ID, &l.Name, &l.SymbolSetName)
 		if err != nil {
 			return res, fmt.Errorf("failed rows scan : %v", err)
 		}
