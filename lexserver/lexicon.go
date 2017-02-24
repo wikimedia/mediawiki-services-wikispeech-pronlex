@@ -164,7 +164,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	lexiconName := r.FormValue("lexicon")
 	lexicon, err := dbapi.GetLexicon(db, lexiconName)
 	if err != nil {
-		msg := fmt.Sprintf("failed to find lexicon %s in database : %v", err)
+		msg := fmt.Sprintf("failed to find lexicon %s in database : %v", lexiconName, err)
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return

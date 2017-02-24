@@ -396,7 +396,7 @@ func keepClientsAlive() {
 			if err != nil {
 				log.Printf("keepClientsAlive got error from websocket send : %v", err)
 				delete(webSocks.clients, client)
-				log.Print("keepClientsAlive closed socket to client %s", client)
+				log.Printf("keepClientsAlive closed socket to client %s", client)
 			}
 		}
 		webSocks.Unlock()
@@ -446,7 +446,7 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
 		return
 	}
-	wsW := line.FileWriter{wsFmt, gz}
+	wsW := line.FileWriter{Parser: wsFmt, Writer: gz}
 	dbapi.LookUp(db, q, wsW)
 	defer gz.Close()
 	gz.Flush()
