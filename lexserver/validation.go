@@ -132,21 +132,21 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func validationStatsHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconIdS := r.FormValue("lexiconId")
-	if len(strings.TrimSpace(lexiconIdS)) == 0 {
+	lexiconIDString := r.FormValue("lexiconId")
+	if len(strings.TrimSpace(lexiconIDString)) == 0 {
 		msg := fmt.Sprintf("lexicon id should be specified by variable 'lexiconId'")
 		log.Println(msg)
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	lexiconId, err := strconv.ParseInt(lexiconIdS, 10, 64)
+	lexiconID, err := strconv.ParseInt(lexiconIDString, 10, 64)
 	if err != nil {
 		msg := fmt.Sprintf("lexicon id should be an integer")
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
-	stats, err := dbapi.ValidationStats(db, lexiconId)
+	stats, err := dbapi.ValidationStats(db, lexiconID)
 	if err != nil {
 		msg := fmt.Sprintf("validationStatsHandler failed to retreive validation stats : %v", err)
 		log.Println(msg)
@@ -201,7 +201,7 @@ type ValidatorNames struct {
 func validatorNames() ValidatorNames {
 	var vNames []string
 	vMut.Lock()
-	for vName, _ := range vMut.service.Validators {
+	for vName := range vMut.service.Validators {
 		vNames = append(vNames, vName)
 	}
 	vMut.Unlock()
@@ -225,19 +225,19 @@ func listValidationHandler(w http.ResponseWriter, r *http.Request) {
 func validationHelpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	validateEntryUrl_en_us := `/validation/validateentry?symbolsetname=en-us_sampa_mary&entry={%22id%22:1703348,%22lexiconId%22:3,%22strn%22:%22barn%22,%22language%22:%22en-us%22,%22partOfSpeech%22:%22%22,%22wordParts%22:%22%22,%22lemma%22:{%22id%22:0,%22strn%22:%22%22,%22reading%22:%22%22,%22paradigm%22:%22%22},%22transcriptions%22:[{%22id%22:1717337,%22entryId%22:1703348,%22strn%22:%22\%22%20b%20A%20r%20n%22,%22language%22:%22%22,%22sources%22:[]}],%22status%22:{%22id%22:1703348,%22name%22:%22imported%22,%22source%22:%22cmu%22,%22timestamp%22:%222016-09-06T13:16:07Z%22,%22current%22:true},%22entryValidations%22:[]}`
+	validateEntryURL_en_us := `/validation/validateentry?symbolsetname=en-us_sampa_mary&entry={%22id%22:1703348,%22lexiconId%22:3,%22strn%22:%22barn%22,%22language%22:%22en-us%22,%22partOfSpeech%22:%22%22,%22wordParts%22:%22%22,%22lemma%22:{%22id%22:0,%22strn%22:%22%22,%22reading%22:%22%22,%22paradigm%22:%22%22},%22transcriptions%22:[{%22id%22:1717337,%22entryId%22:1703348,%22strn%22:%22\%22%20b%20A%20r%20n%22,%22language%22:%22%22,%22sources%22:[]}],%22status%22:{%22id%22:1703348,%22name%22:%22imported%22,%22source%22:%22cmu%22,%22timestamp%22:%222016-09-06T13:16:07Z%22,%22current%22:true},%22entryValidations%22:[]}`
 
-	validateEntryUrl := `/validation/validateentry?symbolsetname=sv-se_ws-sampa&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`
+	validateEntryURL := `/validation/validateentry?symbolsetname=sv-se_ws-sampa&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`
 
-	validateEntriesUrl := "/validation/validateentries?symbolsetname=sv-se_ws-sampa&entries=..."
+	validateEntriesURL := "/validation/validateentries?symbolsetname=sv-se_ws-sampa&entries=..."
 
 	html := `<h1>Validation</h1>
 <h2>validateentry</h2> Validates an entry. Example invocation:
-<pre><a href="` + validateEntryUrl + `">` + validateEntryUrl + `</a></pre>
-<pre><a href="` + validateEntryUrl_en_us + `">` + validateEntryUrl_en_us + `</a></pre>
+<pre><a href="` + validateEntryURL + `">` + validateEntryURL + `</a></pre>
+<pre><a href="` + validateEntryURL_en_us + `">` + validateEntryURL_en_us + `</a></pre>
 
 <h2>validateentries</h2> Validates a list of entries. Example invocation:
-<pre><a href="` + validateEntriesUrl + `">` + validateEntriesUrl + `</a></pre>
+<pre><a href="` + validateEntriesURL + `">` + validateEntriesURL + `</a></pre>
 
 <h2>list</h2> Lists available validators. Example invocation:
 <pre><a href="/validation/list">/validation/list</a></pre>

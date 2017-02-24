@@ -33,14 +33,14 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	for i, e := range w.Entries {
 		oldVal := e.EntryValidations
 		e, _ = vd.ValidateEntry(e)
-		stats.ValidatedEntries += 1
+		stats.ValidatedEntries++
 		newVal := e.EntryValidations
 		if len(newVal) > 0 {
-			stats.InvalidEntries += 1
+			stats.InvalidEntries++
 			for _, v := range newVal {
-				stats.TotalValidations += 1
-				stats.Levels[strings.ToLower(v.Level)] += 1
-				stats.Rules[strings.ToLower(v.RuleName+" ("+v.Level+")")] += 1
+				stats.TotalValidations++
+				stats.Levels[strings.ToLower(v.Level)]++
+				stats.Rules[strings.ToLower(v.RuleName+" ("+v.Level+")")]++
 			}
 		}
 		w.Entries[i] = e

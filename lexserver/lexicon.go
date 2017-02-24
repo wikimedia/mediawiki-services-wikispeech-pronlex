@@ -294,16 +294,16 @@ func round(d, r time.Duration) time.Duration {
 func lexiconHelpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	addEntryUrl := "/lexicon/addentry?lexicon=&entry={...}"
+	addEntryURL := "/lexicon/addentry?lexicon=&entry={...}"
 
-	updateEntryUrl := "/lexicon/updateentry?entry={...}"
+	updateEntryURL := "/lexicon/updateentry?entry={...}"
 
 	html := `<h1>Lexicon</h1>
 <h2>addentry</h2>Add an entry to the database. Example invocation:
-<pre><a href="` + addEntryUrl + `">` + addEntryUrl + `</a></pre>
+<pre><a href="` + addEntryURL + `">` + addEntryURL + `</a></pre>
 
 <h2>updateentry</h2> Updates an entry in the database. Example invocation:
-<pre><a href="` + updateEntryUrl + `">` + updateEntryUrl + `</a></pre>
+<pre><a href="` + updateEntryURL + `">` + updateEntryURL + `</a></pre>
 
 <h2>validate</h2> Validates a list of entries.
 <pre><a href="/lexicon/validate">/lexicon/validate</a></pre>

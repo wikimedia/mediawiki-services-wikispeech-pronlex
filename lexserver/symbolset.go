@@ -17,19 +17,19 @@ import (
 	"github.com/stts-se/pronlex/symbolset"
 )
 
-type JsonSymbolSet struct {
+type JSONSymbolSet struct {
 	Name    string
-	Symbols []JsonSymbol
+	Symbols []JSONSymbol
 }
 
-type JsonSymbol struct {
+type JSONSymbol struct {
 	Symbol string
-	IPA    JsonIPA
+	IPA    JSONIPA
 	Desc   string
 	Cat    string
 }
 
-type JsonIPA struct {
+type JSONIPA struct {
 	String  string
 	Unicode string
 }
@@ -51,10 +51,10 @@ func symbolSetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	symbolset := JsonSymbolSet{Name: symbolset0.Name}
-	symbolset.Symbols = make([]JsonSymbol, 0)
+	symbolset := JSONSymbolSet{Name: symbolset0.Name}
+	symbolset.Symbols = make([]JSONSymbol, 0)
 	for _, sym := range symbolset0.Symbols {
-		symbolset.Symbols = append(symbolset.Symbols, JsonSymbol{Symbol: sym.String, IPA: JsonIPA{String: sym.IPA.String, Unicode: sym.IPA.Unicode}, Desc: sym.Desc, Cat: sym.Cat.String()})
+		symbolset.Symbols = append(symbolset.Symbols, JSONSymbol{Symbol: sym.String, IPA: JSONIPA{String: sym.IPA.String, Unicode: sym.IPA.Unicode}, Desc: sym.Desc, Cat: sym.Cat.String()})
 	}
 
 	j, err := json.Marshal(symbolset)
@@ -302,7 +302,7 @@ type SymbolSetNames struct {
 
 func symbolSetNames(sss map[string]symbolset.SymbolSet) SymbolSetNames {
 	var ssNames []string
-	for ss, _ := range sss {
+	for ss := range sss {
 		ssNames = append(ssNames, ss)
 	}
 	sort.Strings(ssNames)

@@ -491,7 +491,7 @@ func LookUpIds(db *sql.DB, q Query) ([]int64, error) {
 // LookUpIdsTx takes a Query struct, searches the lexicon db, and returns a slice of ids
 func LookUpIdsTx(tx *sql.Tx, q Query) ([]int64, error) {
 
-	sqlStmt := SelectEntryIdsSQL(q)
+	sqlStmt := selectEntryIdsSQL(q)
 
 	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
 	if err != nil {
@@ -535,7 +535,7 @@ func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 
 	//fmt.Printf("QUWRY %v\n\n", q)
 
-	sqlStmt := SelectEntriesSQL(q)
+	sqlStmt := selectEntriesSQL(q)
 
 	//fmt.Printf("SQL %v\n\n", sqlString)
 

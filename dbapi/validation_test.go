@@ -177,7 +177,7 @@ func vInsertEntries(t *testing.T, lexName string) (*sql.DB, int64) {
 }
 
 func Test_Validation1(t *testing.T) {
-	db, lexId := vInsertEntries(t, "test1")
+	db, lexID := vInsertEntries(t, "test1")
 	v := createValidator()
 
 	q := Query{}
@@ -206,7 +206,7 @@ func Test_Validation1(t *testing.T) {
 	}
 
 	// check stats saved in db
-	lexStats, err := ValidationStats(db, lexId)
+	lexStats, err := ValidationStats(db, lexID)
 	ff("validation stats failed : %v", err)
 
 	expectFull := ValStats{
@@ -231,7 +231,7 @@ func Test_Validation1(t *testing.T) {
 }
 
 func Test_Validation2(t *testing.T) {
-	db, lexId := vInsertEntries(t, "test2")
+	db, lexID := vInsertEntries(t, "test2")
 	v := createValidator()
 
 	q := Query{WordRegexp: "a$"}
@@ -253,7 +253,7 @@ func Test_Validation2(t *testing.T) {
 	}
 
 	// check stats saved in db
-	lexStats, err := ValidationStats(db, lexId)
+	lexStats, err := ValidationStats(db, lexID)
 	ff("validation stats failed : %v", err)
 
 	expectFull := ValStats{
@@ -296,7 +296,7 @@ func Test_Validation2(t *testing.T) {
 	}
 
 	// check stats saved in db
-	lexStats, err = ValidationStats(db, lexId)
+	lexStats, err = ValidationStats(db, lexID)
 	ff("validation stats failed : %v", err)
 
 	expectFull = ValStats{
@@ -321,7 +321,7 @@ func Test_Validation2(t *testing.T) {
 }
 
 func Test_ValidationUpdate1(t *testing.T) {
-	db, lexId := vInsertEntries(t, "test3")
+	db, lexID := vInsertEntries(t, "test3")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := LookUp(db, Query{}, &ew)
@@ -333,7 +333,7 @@ func Test_ValidationUpdate1(t *testing.T) {
 		ff("update validation failed : %v", err)
 	}
 
-	stats, err := ValidationStats(db, lexId)
+	stats, err := ValidationStats(db, lexID)
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{
@@ -358,7 +358,7 @@ func Test_ValidationUpdate1(t *testing.T) {
 }
 
 func Test_ValidationUpdate2(t *testing.T) {
-	db, lexId := vInsertEntries(t, "test4")
+	db, lexID := vInsertEntries(t, "test4")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := LookUp(db, Query{}, &ew)
@@ -372,7 +372,7 @@ func Test_ValidationUpdate2(t *testing.T) {
 	err = UpdateValidation(db, es)
 	ff("update validation failed : %v", err)
 
-	stats, err := ValidationStats(db, lexId)
+	stats, err := ValidationStats(db, lexID)
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{
@@ -397,7 +397,7 @@ func Test_ValidationUpdate2(t *testing.T) {
 }
 
 func Test_ValidationUpdate3(t *testing.T) {
-	db, lexId := vInsertEntries(t, "test5")
+	db, lexID := vInsertEntries(t, "test5")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := LookUp(db, Query{}, &ew)
@@ -407,7 +407,7 @@ func Test_ValidationUpdate3(t *testing.T) {
 	err = UpdateValidation(db, es)
 	ff("update validation failed : %v", err)
 
-	stats, err := ValidationStats(db, lexId)
+	stats, err := ValidationStats(db, lexID)
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{

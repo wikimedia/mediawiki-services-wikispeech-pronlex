@@ -277,7 +277,7 @@ func appendQuery(sql string, q Query) (string, []interface{}) {
 // SelectEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
-func SelectEntriesSQL(q Query) sqlStmt {
+func selectEntriesSQL(q Query) sqlStmt {
 	sqlQuery, args := appendQuery(baseSQLSelect, q)
 
 	// sort by id to make sql rows -> Entry simpler
@@ -295,7 +295,7 @@ func SelectEntriesSQL(q Query) sqlStmt {
 // SelectEntryIdsSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
-func SelectEntryIdsSQL(q Query) sqlStmt {
+func selectEntryIdsSQL(q Query) sqlStmt {
 	sqlQuery, args := appendQuery(baseSQLSelectIds, q)
 	return sqlStmt{sql: sqlQuery, values: args}
 }
@@ -303,7 +303,7 @@ func SelectEntryIdsSQL(q Query) sqlStmt {
 // CountEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
-func CountEntriesSQL(q Query) sqlStmt {
+func countEntriesSQL(q Query) sqlStmt {
 	sqlQuery, args := appendQuery(baseSQLCount, q)
 	return sqlStmt{sql: sqlQuery, values: args}
 }

@@ -28,7 +28,7 @@ var mMut = struct {
 	},
 }
 
-type JsonMapped struct {
+type JSONMapped struct {
 	From   string
 	To     string
 	Input  string
@@ -76,7 +76,7 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	result := JsonMapped{Input: trans, Result: result0, From: fromName, To: toName}
+	result := JSONMapped{Input: trans, Result: result0, From: fromName, To: toName}
 	j, err := json.Marshal(result)
 	if err != nil {
 		msg := fmt.Sprintf("json marshalling error : %v", err)
@@ -87,16 +87,16 @@ func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(j))
 }
 
-type JsonMapper struct {
+type JSONMapper struct {
 	From    string
 	To      string
-	Symbols []JsonMSymbol
+	Symbols []JSONMSymbol
 }
 
-type JsonMSymbol struct {
+type JSONMSymbol struct {
 	From string
 	To   string
-	IPA  JsonIPA
+	IPA  JSONIPA
 	Desc string
 	Cat  string
 }
@@ -125,8 +125,8 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	mapper := JsonMapper{From: mapper0.SymbolSet1.Name, To: mapper0.SymbolSet2.Name}
-	mapper.Symbols = make([]JsonMSymbol, 0)
+	mapper := JSONMapper{From: mapper0.SymbolSet1.Name, To: mapper0.SymbolSet2.Name}
+	mapper.Symbols = make([]JSONMSymbol, 0)
 	for _, from := range mapper0.SymbolSet1.Symbols {
 		to, err := mapper0.MapSymbol(from)
 		if err != nil {
@@ -135,7 +135,7 @@ func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		mapper.Symbols = append(mapper.Symbols, JsonMSymbol{From: from.String, To: to.String, IPA: JsonIPA{String: from.IPA.String, Unicode: from.IPA.Unicode}, Desc: from.Desc, Cat: from.Cat.String()})
+		mapper.Symbols = append(mapper.Symbols, JSONMSymbol{From: from.String, To: to.String, IPA: JSONIPA{String: from.IPA.String, Unicode: from.IPA.Unicode}, Desc: from.Desc, Cat: from.Cat.String()})
 	}
 
 	j, err := json.Marshal(mapper)
