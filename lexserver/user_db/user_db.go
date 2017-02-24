@@ -70,8 +70,8 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 	//err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name, &res.PasswordHash, &res.Roles, &res.DBs)
 	err = tx.QueryRow("SELECT id, name, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name /*&res.PasswordHash,*/, &res.Roles, &res.DBs)
 	if err != nil {
-		return res, fmt.Errorf("GetUserByName failed to get user '%s' : %v", name, err)
 		tx.Rollback()
+		return res, fmt.Errorf("GetUserByName failed to get user '%s' : %v", name, err)
 	}
 
 	return res, nil
@@ -125,8 +125,8 @@ func (udb UserDB) InsertUser(u User, password string) error {
 	_, err = tx.Exec("INSERT INTO user (name, password_hash, roles, dbs) VALUES (?, ?, ?, ?)", name, string(passwordHash), u.Roles, u.DBs)
 
 	if err != nil {
-		return fmt.Errorf("failed to insert user into db: %v", err)
 		tx.Rollback()
+		return fmt.Errorf("failed to insert user into db: %v", err)
 	}
 
 	return nil
@@ -146,7 +146,7 @@ func (udb UserDB) DeleteUser(userName string) error {
 
 	rez, err := tx.Exec("DELETE FROM user WHERE name = ?", name)
 	if err != nil {
-		return fmt.Errorf("failed to delete user '%s' : ", userName, err)
+		return fmt.Errorf("failed to delete user '%s' : %v", userName, err)
 	}
 
 	ra, _ := rez.RowsAffected()
