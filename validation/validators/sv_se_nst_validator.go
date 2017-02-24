@@ -18,10 +18,10 @@ func newSvSeNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, e
 		return validation.Validator{}, err
 	}
 
-	// stressFirst, err := rules.ProcessTransRe(symbolset, "[^.!+ ] *(\"\"|\"|%)")
-	// if err != nil {
-	// 	return validation.Validator{}, err
-	// }
+	stressFirst, err := rules.ProcessTransRe(symbolset, "[^.!+ ] +(\"\"|\"|%)")
+	if err != nil {
+		return validation.Validator{}, err
+	}
 
 	maxOneSyllabic, err := rules.ProcessTransRe(symbolset, "syllabic[^.+%\"-]*( +syllabic)")
 	if err != nil {
@@ -59,12 +59,12 @@ func newSvSeNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, e
 				Message: "Primary stress required",
 				Re:      primaryStressRe,
 			},
-			// rules.IllegalTransRe{
-			// 	Name:    "stress_first",
-			// 	Level:   "Fatal",
-			// 	Message: "Stress can only be used in syllable initial position",
-			// 	Re:      stressFirst,
-			// },
+			rules.IllegalTransRe{
+				Name:    "stress_first",
+				Level:   "Fatal",
+				Message: "Stress can only be used in syllable initial position",
+				Re:      stressFirst,
+			},
 			rules.RequiredTransRe{
 				Name:    "syllabic",
 				Level:   "Format",
