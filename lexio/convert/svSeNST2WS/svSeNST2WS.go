@@ -179,7 +179,7 @@ func main() {
 
 	testMapTranscriptions()
 
-	ssRuleTo := rules.SymbolSetRule{mapper.SymbolSet2}
+	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
 
 	nstFile, err := os.Open(nstFileName)
 	defer nstFile.Close()

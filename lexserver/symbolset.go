@@ -297,7 +297,7 @@ func doUploadSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type SymbolSetNames struct {
-	SymbolSetNames []string `json:symbol_set_names`
+	SymbolSetNames []string `json:"symbol_set_names"`
 }
 
 func symbolSetNames(sss map[string]symbolset.SymbolSet) SymbolSetNames {

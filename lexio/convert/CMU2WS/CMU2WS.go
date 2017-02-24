@@ -49,13 +49,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return
 	}
-	ssRuleTo := rules.SymbolSetRule{mapper.SymbolSet2}
+	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()
 	if err != nil {
 
-		log.Fatal("couldn't open input file : %v", err)
+		log.Fatalf("couldn't open input file : %v", err)
 	}
 
 	var variant = regexp.MustCompile("\\([0-9]\\)")
@@ -64,7 +64,7 @@ func main() {
 	s := bufio.NewScanner(cmuFile)
 	for s.Scan() {
 		if err = s.Err(); err != nil {
-			log.Fatal("scanner failure : %v", err)
+			log.Fatalf("scanner failure : %v", err)
 		}
 		l := s.Text()
 

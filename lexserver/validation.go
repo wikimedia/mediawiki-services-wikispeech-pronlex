@@ -195,7 +195,7 @@ func trimEntries(entries []lex.Entry) []lex.Entry {
 }
 
 type ValidatorNames struct {
-	ValidatorNames []string `json:validator_names`
+	ValidatorNames []string `json:"validator_names"`
 }
 
 func validatorNames() ValidatorNames {

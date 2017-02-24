@@ -46,7 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	writer := line.FileWriter{wsFmt, bf}
+	writer := line.FileWriter{Parser: wsFmt, Writer: bf}
 	dbapi.LookUp(db, q, writer)
 
 }
