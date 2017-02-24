@@ -65,6 +65,18 @@ func newSvSeNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, e
 				Level:   "Fatal",
 				Message: "Stress can only be used in syllable initial position",
 				Re:      stressFirst,
+				// Accept: []lex.Entry{
+				// 	lex.Entry{Transcriptions: []lex.Transcription{
+				// 		lex.Transcription{Strn: "\" A: . p a"}}},
+				// 	lex.Entry{Transcriptions: []lex.Transcription{
+				// 		lex.Transcription{Strn: "p O . \" E N"}}},
+				// },
+				// Reject: []lex.Entry{
+				// 	lex.Entry{Transcriptions: []lex.Transcription{
+				// 		lex.Transcription{Strn: "A: \" . p a"}}},
+				// 	lex.Entry{Transcriptions: []lex.Transcription{
+				// 		lex.Transcription{Strn: "s k r \" A: . p a"}}},
+				// },
 			},
 			rules.RequiredTransRe{
 				Name:    "syllabic",
