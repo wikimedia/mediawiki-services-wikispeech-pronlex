@@ -22,13 +22,12 @@ func (r SymbolSetRule) Validate(e lex.Entry) (validation.Result, error) {
 		splitted, err := r.SymbolSet.SplitTranscription(t.Strn)
 		if err != nil {
 			return validation.Result{RuleName: "SymbolSet", Level: "Fatal"}, err
-		} else {
-			for _, symbol := range splitted {
-				if !r.SymbolSet.ValidSymbol(symbol) {
-					messages = append(
-						messages,
-						fmt.Sprintf("Invalid transcription symbol '%s' in /%s/", symbol, t.Strn))
-				}
+		}
+		for _, symbol := range splitted {
+			if !r.SymbolSet.ValidSymbol(symbol) {
+				messages = append(
+					messages,
+					fmt.Sprintf("Invalid transcription symbol '%s' in /%s/", symbol, t.Strn))
 			}
 		}
 	}
@@ -69,11 +68,10 @@ func (r IllegalTransRe) Validate(e lex.Entry) (validation.Result, error) {
 		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); m {
 			if err != nil {
 				return validation.Result{RuleName: r.Name, Level: r.Level}, err
-			} else {
-				messages = append(
-					messages,
-					fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 			}
+			messages = append(
+				messages,
+				fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 		}
 	}
 	return validation.Result{RuleName: r.Name, Level: r.Level, Messages: messages}, nil
@@ -102,11 +100,10 @@ func (r RequiredTransRe) Validate(e lex.Entry) (validation.Result, error) {
 		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); !m {
 			if err != nil {
 				return validation.Result{RuleName: r.Name, Level: r.Level}, err
-			} else {
-				messages = append(
-					messages,
-					fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 			}
+			messages = append(
+				messages,
+				fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 		}
 	}
 	return validation.Result{RuleName: r.Name, Level: r.Level, Messages: messages}, nil

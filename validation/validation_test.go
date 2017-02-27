@@ -47,11 +47,10 @@ func (r RequiredTransRe) Validate(e lex.Entry) (Result, error) {
 		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); !m {
 			if err != nil {
 				return Result{RuleName: r.Name, Level: r.Level}, err
-			} else {
-				messages = append(
-					messages,
-					fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 			}
+			messages = append(
+				messages,
+				fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 		}
 	}
 	return Result{RuleName: r.Name, Level: r.Level, Messages: messages}, nil

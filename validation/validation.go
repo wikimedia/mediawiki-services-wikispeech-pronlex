@@ -45,13 +45,14 @@ func (v Validator) IsDefined() bool {
 	return v.Name != ""
 }
 
+// TestResultContainer is a container class for accept/reject/crosscheck test result
 type TestResultContainer struct {
 	AcceptErrors []TestResult
 	RejectErrors []TestResult
 	CrossErrors  []TestResult
 }
 
-// TestResult container class for accept/reject/crosscheck test result
+// TestResult holds the test result for a tested rule suite (accept, reject, or cross tests result)
 type TestResult struct {
 	RuleName string
 	Level    string
@@ -75,28 +76,26 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 			allAccept = append(allAccept, acceptExample{RuleName: res.RuleName, Level: res.Level, Entry: e})
 			if err != nil {
 				return result, err
-			} else {
-				var messages []string
-				for _, msg := range res.Messages {
-					messages = append(messages,
-						fmt.Sprintf("Accept example was reject for rule %s (%s). Message: %s", res.RuleName, res.Level, msg))
-				}
-				if len(messages) > 0 {
-					result.AcceptErrors = append(result.AcceptErrors,
-						TestResult{RuleName: res.RuleName, Level: res.Level, Messages: messages, Input: e})
-				}
+			}
+			var messages []string
+			for _, msg := range res.Messages {
+				messages = append(messages,
+					fmt.Sprintf("Accept example was reject for rule %s (%s). Message: %s", res.RuleName, res.Level, msg))
+			}
+			if len(messages) > 0 {
+				result.AcceptErrors = append(result.AcceptErrors,
+					TestResult{RuleName: res.RuleName, Level: res.Level, Messages: messages, Input: e})
 			}
 		}
 		for _, e := range rule.ShouldReject() {
 			res, err := rule.Validate(e)
 			if err != nil {
 				return result, err
-			} else {
-				if len(res.Messages) == 0 {
-					messages := []string{fmt.Sprintf("Reject example was accepted for rule %s (%s)", res.RuleName, res.Level)}
-					result.RejectErrors = append(result.RejectErrors,
-						TestResult{RuleName: res.RuleName, Level: res.Level, Messages: messages, Input: e})
-				}
+			}
+			if len(res.Messages) == 0 {
+				messages := []string{fmt.Sprintf("Reject example was accepted for rule %s (%s)", res.RuleName, res.Level)}
+				result.RejectErrors = append(result.RejectErrors,
+					TestResult{RuleName: res.RuleName, Level: res.Level, Messages: messages, Input: e})
 			}
 		}
 	}
@@ -106,16 +105,15 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 			res, err := rule.Validate(accept.Entry)
 			if err != nil {
 				return result, err
-			} else {
-				var messages []string
-				for _, msg := range res.Messages {
-					messages = append(messages,
-						fmt.Sprintf("Accept example for rule %s (%s) was rejected by rule %s (%s). Message: %s", accept.RuleName, accept.Level, res.RuleName, res.Level, msg))
-				}
-				if len(messages) > 0 {
-					result.CrossErrors = append(result.CrossErrors,
-						TestResult{RuleName: res.RuleName, Level: res.Level, Messages: messages, Input: accept.Entry})
-				}
+			}
+			var messages []string
+			for _, msg := range res.Messages {
+				messages = append(messages,
+					fmt.Sprintf("Accept example for rule %s (%s) was rejected by rule %s (%s). Message: %s", accept.RuleName, accept.Level, res.RuleName, res.Level, msg))
+			}
+			if len(messages) > 0 {
+				result.CrossErrors = append(result.CrossErrors,
+					TestResult{RuleName: res.RuleName, Level: res.Level, Messages: messages, Input: accept.Entry})
 			}
 		}
 
