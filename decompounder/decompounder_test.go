@@ -271,8 +271,8 @@ func Test_Decomp_RecursivePrefixes(t *testing.T) {
 	if w, g := 1, len(ds8); w != g {
 		t.Errorf(ts, w, g)
 	}
-
-	fmt.Println("OBS: bugg: alen -> ale+n (stockholmsfinalen)")
+	// TODO ??
+	//fmt.Println("OBS: bugg: alen -> ale+n (stockholmsfinalen)")
 }
 
 func Test_Alen(t *testing.T) {
