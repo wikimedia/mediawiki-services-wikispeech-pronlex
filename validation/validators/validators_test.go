@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stts-se/pronlex/lex"
@@ -169,6 +170,23 @@ func TestWhitespace(t *testing.T) {
 		t.Errorf("%s", err)
 		return
 	}
+	testRes, err := vali.RunTests()
+	if err != nil {
+		t.Errorf("%s", err)
+		return
+	}
+	if len(testRes.AcceptErrors) > 0 {
+		t.Errorf("%v", testRes.AcceptErrors)
+	}
+	if len(testRes.RejectErrors) > 0 {
+		t.Errorf("%v", testRes.RejectErrors)
+	}
+	if len(testRes.CrossErrors) > 0 {
+		t.Errorf("%v", testRes.CrossErrors)
+	}
+	fmt.Println(testRes.AcceptErrors)
+	fmt.Println(testRes.RejectErrors)
+	fmt.Println(testRes.CrossErrors)
 
 	var e = lex.Entry{
 		Strn:         "banen",
