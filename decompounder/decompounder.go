@@ -46,7 +46,7 @@ func (t *tNode) add(s string) *tNode {
 		if len(s) == 1 {
 			son.leaf = true
 			// This is where you could increment a frequency counter.
-			// You'd want to add a frequency field to bot tNode and arc.
+			// You'd want to add a frequency field to both tNode and arc.
 		}
 		son.add(s[l:len(s)])
 
