@@ -66,7 +66,7 @@ type acceptExample struct {
 	Entry    lex.Entry
 }
 
-// RunTests runs accept/reject tests for all individual rules, and returns accept result, reject result and an error (if any)
+// RunTests runs accept/reject tests for all individual rules, and cross checks all accept tests agains the other rules
 func (v Validator) RunTests() (TestResultContainer, error) {
 	var result TestResultContainer
 	var allAccept []acceptExample
@@ -102,6 +102,7 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 
 	for _, accept := range allAccept {
 		for _, rule := range v.Rules {
+			// TODO: no need to test the rule's own accept examples, that is already taken care of above
 			res, err := rule.Validate(accept.Entry)
 			if err != nil {
 				return result, err
