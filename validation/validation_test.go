@@ -41,24 +41,27 @@ type RequiredTransRe struct {
 	Re      *regexp2.Regexp
 }
 
-func (r RequiredTransRe) Validate(e lex.Entry) []Result {
-	var result = make([]Result, 0)
+func (r RequiredTransRe) Validate(e lex.Entry) (Result, error) {
+	var messages = make([]string, 0)
 	for _, t := range e.Transcriptions {
 		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); !m {
 			if err != nil {
-				result = append(result, Result{
-					RuleName: "System",
-					Level:    "Format",
-					Message:  fmt.Sprintf("error when validating rule %s on transcription string /%s/ : %v", r.Name, t.Strn, err)})
+				return Result{RuleName: r.Name, Level: r.Level}, err
 			} else {
-				result = append(result, Result{
-					RuleName: r.Name,
-					Level:    r.Level,
-					Message:  fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn)})
+				messages = append(
+					messages,
+					fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 			}
 		}
 	}
-	return result
+	return Result{RuleName: r.Name, Level: r.Level, Messages: messages}, nil
+}
+
+func (r RequiredTransRe) ShouldAccept() []lex.Entry {
+	return make([]lex.Entry, 0)
+}
+func (r RequiredTransRe) ShouldReject() []lex.Entry {
+	return make([]lex.Entry, 0)
 }
 
 func createEntries() []lex.Entry {

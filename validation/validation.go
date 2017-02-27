@@ -15,17 +15,23 @@ Result is a validation result with the following fields:
 type Result struct {
 	RuleName string
 	Level    string
-	Message  string
+	Messages []string
 }
 
-// String returns a simple string representation of the Result instance
-func (r Result) String() string {
-	return fmt.Sprintf("%s (%s): %s", r.RuleName, r.Level, r.Message)
+// Strings returns a slice of simple string representations of the Result
+func (r Result) Strings() []string {
+	var res = make([]string, 0)
+	for _, msg := range r.Messages {
+		res = append(res, fmt.Sprintf("%s (%s): %s", r.RuleName, r.Level, msg))
+	}
+	return res
 }
 
-// Rule interface. To create a validation.Rule, make a struct implementing Validate(lex.Entry) []Result
+// Rule interface. To create a validation.Rule, make a struct implementing Validate, ShouldAccept and ShouldReject as defined in this interface.
 type Rule interface {
-	Validate(lex.Entry) []Result
+	Validate(lex.Entry) (Result, error)
+	ShouldAccept() []lex.Entry
+	ShouldReject() []lex.Entry
 }
 
 // Validator is a struct containing a slice of rules
@@ -46,13 +52,23 @@ func (v Validator) IsDefined() bool {
 func (v Validator) ValidateEntry(e lex.Entry) (lex.Entry, bool) {
 	e.EntryValidations = make([]lex.EntryValidation, 0)
 	for _, rule := range v.Rules {
-		for _, res := range rule.Validate(e) {
+		res, err := rule.Validate(e)
+		if err != nil {
 			var ev = lex.EntryValidation{
-				RuleName: res.RuleName,
-				Level:    res.Level,
-				Message:  res.Message,
+				RuleName: "System",
+				Level:    "Error",
+				Message:  fmt.Sprintf("error when validating word '%s' with rule %s : %v", e.Strn, res.RuleName, err),
 			}
 			e.EntryValidations = append(e.EntryValidations, ev)
+		} else {
+			for _, msg := range res.Messages {
+				var ev = lex.EntryValidation{
+					RuleName: res.RuleName,
+					Level:    res.Level,
+					Message:  msg,
+				}
+				e.EntryValidations = append(e.EntryValidations, ev)
+			}
 		}
 	}
 	return e, len(e.EntryValidations) == 0

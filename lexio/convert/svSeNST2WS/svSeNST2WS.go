@@ -239,7 +239,11 @@ func main() {
 		}
 
 		if !hasError {
-			for _, r := range ssRuleTo.Validate(e) {
+			valres, err := ssRuleTo.Validate(e)
+			if err != nil {
+				panic(err) // shouldn't happen
+			}
+			for _, r := range valres.Messages {
 				panic(r) // shouldn't happen
 			}
 

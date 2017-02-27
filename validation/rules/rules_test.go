@@ -15,52 +15,64 @@ var fsExp = "Expected: '%v' got: '%v'"
 type testMustHaveTrans struct {
 }
 
-func (r testMustHaveTrans) Validate(e lex.Entry) []validation.Result {
+func (r testMustHaveTrans) Validate(e lex.Entry) (validation.Result, error) {
 	name := "MustHaveTrans"
 	level := "Format"
-	var result = make([]validation.Result, 0)
+	var messages = make([]string, 0)
 	if len(e.Transcriptions) == 0 {
-		result = append(result, validation.Result{
-			RuleName: name,
-			Level:    level,
-			Message:  "At least one transcription is required"})
+		messages = append(messages, "At least one transcription is required")
 	}
-	return result
+	return validation.Result{RuleName: name, Level: level, Messages: messages}, nil
+
+}
+func (r testMustHaveTrans) ShouldAccept() []lex.Entry {
+	return make([]lex.Entry, 0)
+}
+func (r testMustHaveTrans) ShouldReject() []lex.Entry {
+	return make([]lex.Entry, 0)
 }
 
 type testNoEmptyTrans struct {
 }
 
-func (r testNoEmptyTrans) Validate(e lex.Entry) []validation.Result {
+func (r testNoEmptyTrans) Validate(e lex.Entry) (validation.Result, error) {
 	name := "NoEmptyTrans"
 	level := "Format"
-	var result = make([]validation.Result, 0)
+	var messages = make([]string, 0)
 	for _, t := range e.Transcriptions {
 		if len(strings.TrimSpace(t.Strn)) == 0 {
-			result = append(result, validation.Result{
-				RuleName: name,
-				Level:    level,
-				Message:  "Empty transcriptions are not allowed"})
+			messages = append(messages, "Empty transcriptions are not allowed")
 		}
 	}
-	return result
+	return validation.Result{RuleName: name, Level: level, Messages: messages}, nil
+
+}
+func (r testNoEmptyTrans) ShouldAccept() []lex.Entry {
+	return make([]lex.Entry, 0)
+}
+func (r testNoEmptyTrans) ShouldReject() []lex.Entry {
+	return make([]lex.Entry, 0)
 }
 
 type testDecomp2Orth struct {
 }
 
-func (r testDecomp2Orth) Validate(e lex.Entry) []validation.Result {
+func (r testDecomp2Orth) Validate(e lex.Entry) (validation.Result, error) {
 	name := "Decomp2Orth"
 	level := "Fatal"
-	var result = make([]validation.Result, 0)
+	var messages = make([]string, 0)
 	expectOrth := strings.Replace(e.WordParts, "+", "", -1)
 	if expectOrth != e.Strn {
-		result = append(result, validation.Result{
-			RuleName: name,
-			Level:    level,
-			Message:  fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn)})
+		messages = append(messages, fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn))
 	}
-	return result
+	return validation.Result{RuleName: name, Level: level, Messages: messages}, nil
+
+}
+func (r testDecomp2Orth) ShouldAccept() []lex.Entry {
+	return make([]lex.Entry, 0)
+}
+func (r testDecomp2Orth) ShouldReject() []lex.Entry {
+	return make([]lex.Entry, 0)
 }
 
 func Test1(t *testing.T) {

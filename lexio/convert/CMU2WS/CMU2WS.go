@@ -90,7 +90,11 @@ func main() {
 				lastEntry.Transcriptions = append(lastEntry.Transcriptions, t0)
 			} else {
 				if lastEntry.Strn != "" {
-					for _, r := range ssRuleTo.Validate(lastEntry) {
+					valres, err := ssRuleTo.Validate(lastEntry)
+					if err != nil {
+						panic(err) // shouldn't happen
+					}
+					for _, r := range valres.Messages {
 						panic(r) // shouldn't happen
 					}
 					out(lastEntry)
@@ -103,7 +107,11 @@ func main() {
 	}
 	// Flush
 	if lastEntry.Strn != "" {
-		for _, r := range ssRuleTo.Validate(lastEntry) {
+		valres, err := ssRuleTo.Validate(lastEntry)
+		if err != nil {
+			panic(err) // shouldn't happen
+		}
+		for _, r := range valres.Messages {
 			panic(r) // shouldn't happen
 		}
 
