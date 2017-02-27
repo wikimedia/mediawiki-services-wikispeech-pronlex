@@ -10,7 +10,7 @@ import (
 Result is a validation result with the following fields:
 	RuleName - arbitrary string
 	Level - typically indicating severity (e.g. Info/Warning/Fatal/Format)
-	Message - arbitrary string
+	Messages - arbitrary strings representing validation messages to the user
 */
 type Result struct {
 	RuleName string
@@ -18,7 +18,7 @@ type Result struct {
 	Messages []string
 }
 
-// Strings returns a slice of simple string representations of the Result
+// Strings returns a slice of simple string representations of the messages in Result, including information on rule name and rule level
 func (r Result) Strings() []string {
 	var res = make([]string, 0)
 	for _, msg := range r.Messages {
