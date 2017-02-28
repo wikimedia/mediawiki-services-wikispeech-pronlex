@@ -74,6 +74,28 @@ func Test_Parse_02(t *testing.T) {
 
 }
 
+func Test_Parse_03(t *testing.T) {
+	var fs = map[Field]int{
+		Orth:       0,
+		Pos:        1,
+		Morph:      2,
+		WordParts:  3,
+		Lang:       6,
+		Trans1:     11,
+		Translang1: 14,
+		Lemma:      15,
+	}
+	fmt := Format{"test", "\t", fs, 16}
+
+	input := "hannas	PM	GEN	hannas	-	-	swe	-	-	-	-	\"\" h a . n a s	-	-	swe	hanna_01	-	-	EXTRA1	EXTRA2	EXTRA3"
+
+	var _, err = fmt.Parse(input)
+	if err == nil {
+		t.Errorf("Expected error here")
+	}
+
+}
+
 func Test_String_01(t *testing.T) {
 	var fs = map[Field]int{
 		Orth:       0,
