@@ -5,6 +5,7 @@ import (
 	"fmt"
 	//"io"
 	"compress/gzip"
+	"encoding/json"
 	"log"
 	"os"
 	"strings"
@@ -123,4 +124,13 @@ func main() {
 		}
 		//fmt.Println()
 	}
+
+	json, err := json.Marshal(&decomp.Prefixes)
+	if err != nil {
+		fmt.Printf("Darn! %v\n", err)
+		return
+	}
+
+	fmt.Printf("#--------------------\n%s", string(json))
+
 }
