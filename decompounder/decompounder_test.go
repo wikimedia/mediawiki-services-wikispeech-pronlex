@@ -10,6 +10,15 @@ var ts = "Wanted '%v' got '%v'\n"
 
 func spunk() { fmt.Println() }
 
+func contains(ss []string, s string) bool {
+	for _, s0 := range ss {
+		if s == s0 {
+			return true
+		}
+	}
+	return false
+}
+
 func Test_Tree(t *testing.T) {
 
 	tr := NewtNode()
@@ -21,6 +30,20 @@ func Test_Tree(t *testing.T) {
 	tr = tr.add("strut")
 	tr = tr.add("strutnos")
 	tr = tr.add("strutnosar")
+
+	all := tr.list()
+	if want, got := 3, len(all); want != got {
+		t.Errorf(ts, want, got)
+	}
+	if want, got := true, contains(all, "strut"); want != got {
+		t.Errorf(ts, want, got)
+	}
+	if want, got := true, contains(all, "strutnos"); want != got {
+		t.Errorf(ts, want, got)
+	}
+	if want, got := true, contains(all, "strutnosar"); want != got {
+		t.Errorf(ts, want, got)
+	}
 
 	cntns1 := tr.contains("strut")
 	if want, got := true, cntns1; want != got {

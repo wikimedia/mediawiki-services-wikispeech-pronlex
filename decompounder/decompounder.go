@@ -114,6 +114,28 @@ func (t *tNode) remove(s string) bool {
 	return false
 }
 
+// list returns all paths ending in a leaf, that is all strings added
+// to the top tNode (if not subsequently removed).
+func (t *tNode) list() []string {
+	var res []string
+
+	for _, s := range t.sons {
+		listAccu(s, "", &res)
+	}
+
+	return res
+}
+
+// listAccu is an accumulator helper function to list
+func listAccu(t *tNode, soFar string, accu *[]string) {
+	if t.leaf {
+		*accu = append(*accu, soFar+string(t.r))
+	}
+	for _, k := range t.sons {
+		listAccu(k, soFar+string(t.r), accu)
+	}
+}
+
 // arc represents a substring of a string, with a start and end index
 // of the string.
 type arc struct {
