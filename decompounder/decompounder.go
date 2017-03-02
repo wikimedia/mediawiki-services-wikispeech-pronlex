@@ -1,8 +1,11 @@
 package decompounder
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"sort"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -313,6 +316,32 @@ func (d Decompounder) AddInfix(s string) {
 
 func (d Decompounder) AddSuffix(s string) {
 	d.suffixes.Add(s)
+}
+
+// NewDecompounderFromFile initializes a Decompounder from a text file of the following format:
+// # line starting with '#' is ignored
+// '' empty lines are ignore
+//<PREFIX|INFIX|SUFFIX>:<lower-case string>
+func NewDecompounderFromFile(fileName string) (Decompounder, error) {
+	res := NewDecompounder()
+	fh, err := os.Open(fileName)
+	if err != nil {
+		return res, err
+	}
+	defer fh.Close()
+
+	s := bufio.NewScanner(fh)
+	for s.Scan() {
+		l := strings.TrimSpace(s.Text())
+		if l == "" || strings.HasPrefix(l, "#") {
+			continue
+		}
+		// TODO parse string and report mismatching strings
+		// 1) print failing line to STDERR
+		// 2) count nummber of failing lines and if > 0 return error
+	}
+
+	return res, nil
 }
 
 // sorting [][]string according to length
