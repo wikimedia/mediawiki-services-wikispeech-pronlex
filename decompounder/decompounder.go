@@ -126,7 +126,7 @@ func (t *tNode) list() []string {
 	return res
 }
 
-// listAccu is an accumulator helper function to list
+// listAccu is an accumulator helper function to list() above
 func listAccu(t *tNode, soFar string, accu *[]string) {
 	if t.leaf {
 		*accu = append(*accu, soFar+string(t.r))
