@@ -22,6 +22,38 @@ func Test_Tree(t *testing.T) {
 	tr = tr.add("strutnos")
 	tr = tr.add("strutnosar")
 
+	cntns1 := tr.contains("strut")
+	if want, got := true, cntns1; want != got {
+		t.Errorf(ts, want, got)
+	}
+
+	rem1 := tr.remove("strut")
+	if want, got := true, rem1; want != got {
+		t.Errorf(ts, want, got)
+	}
+
+	cntns2 := tr.contains("strut")
+	if want, got := false, cntns2; want != got {
+		t.Errorf(ts, want, got)
+	}
+
+	tr = tr.add("strut")
+
+	cntns3 := tr.contains("strutnosar")
+	if want, got := true, cntns3; want != got {
+		t.Errorf(ts, want, got)
+	}
+	rem2 := tr.remove("strutnosar")
+	if want, got := true, rem2; want != got {
+		t.Errorf(ts, want, got)
+	}
+	cntns4 := tr.contains("strutnosar")
+	if want, got := false, cntns4; want != got {
+		t.Errorf(ts, want, got)
+	}
+
+	tr = tr.add("strutnosar")
+
 	// for k, v := range tr.sons {
 	//     fmt.Printf("HOJSAN: %#v : %s\n", k, string(v.r))
 	// }

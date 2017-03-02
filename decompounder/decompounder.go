@@ -63,6 +63,57 @@ func (t *tNode) add(s string) *tNode {
 	return t
 }
 
+// contains returns true iff s is a leaf
+func (t *tNode) contains(s string) bool {
+
+	if s == "" {
+		return false
+	}
+
+	res := false
+	sons := t.sons
+	for _, r := range s {
+		v, ok := sons[r]
+		if !ok { // s not a path in t
+			return false
+		}
+		res = v.leaf
+		sons = v.sons
+	}
+
+	return res
+}
+
+// remove sets leaf = false, but does not actually remove the
+// character sequence of the string from the tree (since it may be a
+// substring of another string).
+// If the string is not in t, nothing happens.
+// Returns true if the string was 'removed' from the tree, false otherwise.
+// TODO Purge paths that do not lead to a leaf = true.
+func (t *tNode) remove(s string) bool {
+
+	if s == "" {
+		return false
+	}
+
+	sons := t.sons
+	for i, r := range s {
+		if v, ok := sons[r]; ok {
+			if i == len(s)-1 { // last rune of s
+				v.leaf = false
+				return true
+			}
+			// keep following the path
+			sons = v.sons
+
+		} else {
+			return false // s not a path in t
+		}
+	}
+
+	return false
+}
+
 // arc represents a substring of a string, with a start and end index
 // of the string.
 type arc struct {
