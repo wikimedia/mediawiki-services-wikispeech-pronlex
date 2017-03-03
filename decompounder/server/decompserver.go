@@ -1,12 +1,14 @@
 package main
 
 import (
-	"bufio"
+	//"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -21,7 +23,7 @@ type decomperMutex struct {
 	*sync.RWMutex
 }
 
-var decomper = decomperMutex{decompounder.NewDecompounder(), &sync.RWMutex{}}
+var decomper decomperMutex //= decomperMutex{decompounder.NewDecompounder(), &sync.RWMutex{}}
 
 func addPrefix(w http.ResponseWriter, r *http.Request) {
 
@@ -105,34 +107,31 @@ func decompMain(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	//TODO Hardwired decomp file name
-	var fn = "decomps.txt"
-	var fh, err = os.Open(fn)
+	if len(os.Args) != 2 {
+		fmt.Fprintf(os.Stderr, "decompserver <DECOMPFILES DIR>\n")
+		os.Exit(0)
+	}
+	var dn = os.Args[1] //"decomps.txt"
+
+	files, err := ioutil.ReadDir(dn)
 	if err != nil {
-		log.Printf("failed to load decom file : %v", err)
-		os.Exit(1)
-	}
-	defer fh.Close()
-
-	s := bufio.NewScanner(fh)
-	for s.Scan() {
-		l := s.Text()
-		fmt.Println(l)
-		parts := strings.Split(l, " +")
-		fmt.Println(parts)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(0)
 	}
 
-	decomper.AddPrefix("bil")
-	decomper.AddSuffix("skrot")
+	// TODO create map of Decomponders and create one instance for each file in decomp file dir
 
-	decomper.AddPrefix("skrot")
-	decomper.AddSuffix("bil")
+	var fn string
+	for _, f := range files {
+		fn = filepath.Join(dn, f.Name())
+		//fmt.Println(file.Name())
+	}
 
-	decomper.AddPrefix("last")
-	decomper.AddSuffix("båt")
-
-	decomper.AddPrefix("båt")
-	decomper.AddSuffix("last")
+	dc, err := decompounder.NewDecompounderFromFile(fn)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+	}
+	decomper = decomperMutex{dc, &sync.RWMutex{}}
 
 	r := mux.NewRouter().StrictSlash(true)
 
