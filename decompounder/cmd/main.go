@@ -5,7 +5,7 @@ import (
 	"fmt"
 	//"io"
 	"compress/gzip"
-	"encoding/json"
+	//"encoding/json"
 	"log"
 	"os"
 	"strings"
@@ -45,6 +45,7 @@ func decompParts(s string) []string {
 	return res
 }
 
+//TODO load Decompounder from decompounder data file instead
 func main() {
 
 	if len(os.Args) < 2 {
@@ -125,12 +126,12 @@ func main() {
 		//fmt.Println()
 	}
 
-	json, err := json.Marshal(&decomp.Prefixes)
-	if err != nil {
-		fmt.Printf("Darn! %v\n", err)
-		return
-	}
+	// json, err := json.Marshal(decomp.List())
+	// if err != nil {
+	// 	fmt.Printf("Darn! %v\n", err)
+	// 	return
+	// }
 
-	fmt.Printf("#--------------------\n%s", string(json))
+	// fmt.Printf("#--------------------\n%s", string(json))
 
 }
