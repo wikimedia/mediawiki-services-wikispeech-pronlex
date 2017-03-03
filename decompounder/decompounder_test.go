@@ -456,4 +456,10 @@ func Test_LodFromFile(t *testing.T) {
 		t.Errorf(ts, w, g)
 	}
 
+	// TODO test that saving to file works:
+	errf := d.SaveToFile("test_word_parts_out.txt")
+	if errf != nil {
+		t.Errorf("%v", errf)
+	}
+
 }

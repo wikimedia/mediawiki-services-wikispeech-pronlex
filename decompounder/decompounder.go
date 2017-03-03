@@ -169,7 +169,7 @@ func (t *tNode) prefixes(s string) []arc {
 }
 
 type PrefixTree struct {
-	tree *tNode
+	tree *tNode // TODO rename 'tree' to 'prefixes'?
 	// infixes are gluing parts that may appear once after a prefix
 	infixes *tNode
 }
@@ -338,6 +338,55 @@ func (d Decompounder) RemoveSuffix(s string) bool {
 	return d.suffixes.Remove(s)
 }
 
+// List returns all wordparts of Decompounder prefixed with type,
+// PREFIX:, INFIX: or SUFFIX:.  The strings of the different types are
+// sorted alphabetically for each category. This ordering is probably
+// different from the original insert order.
+func (d Decompounder) List() []string {
+	var res []string
+	ps := d.prefixes.tree.list()
+	sort.Strings(ps)
+	for _, p := range ps {
+		res = append(res, "PREFIX:"+p)
+	}
+
+	is := d.prefixes.infixes.list()
+	sort.Strings(is)
+	for _, i := range is {
+		res = append(res, "INFIX:"+i)
+	}
+
+	ss := d.suffixes.tree.list()
+	sort.Strings(ss)
+	for _, s := range ss {
+		res = append(res, "SUFFIX:"+reverse(s))
+	}
+
+	return res
+}
+
+func (d Decompounder) SaveToFile(fName string) error {
+	var fh *os.File
+	var err error
+
+	fh, err = os.OpenFile(fName, os.O_RDWR|os.O_CREATE, 0755)
+
+	if err != nil {
+		return err
+	}
+	defer fh.Close()
+	w := bufio.NewWriter(fh)
+	defer w.Flush()
+	// TODO sort lines alphabetically?
+	// This should be done inside d.List() ?
+	for _, s := range d.List() {
+		//fmt.Printf("%s\n", s)
+		w.WriteString(s + "\n")
+
+	}
+	return err
+}
+
 // NewDecompounderFromFile initializes a Decompounder from a text file of the following format:
 //(REMOVE:)?<PREFIX|INFIX|SUFFIX>:<lower-case string>
 //
@@ -446,9 +495,8 @@ func NewDecompounderFromFile(fileName string) (Decompounder, error) {
 		}
 	}
 
-	// TODO if verbose
+	// TODO if verbose:
 	fmt.Fprintf(os.Stderr, "Lines read: %d\nLines skipped: %d\nLines added: %d\nLines removed: %d\n", linesRead, linesSkipped, linesAdded, linesRemoved)
-
 	return res, err
 }
 
