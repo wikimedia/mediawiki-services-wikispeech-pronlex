@@ -1,0 +1,15 @@
+# Skip this line, and the next, empty one
+
+PREFIX:grus
+PREFIX:stor
+INFIX:grus	
+SUFFIX:väg	
+SUFFIX:vägs
+SUFFIX:vägen
+SUFFIX:vägens
+SUFFIX:vägar	
+SUFFIX:vägars
+SUFFIX:vägarna
+SUFFIX:vägarnas
+PREFIX:smzghx
+REMOVE:PREFIX:smzghx

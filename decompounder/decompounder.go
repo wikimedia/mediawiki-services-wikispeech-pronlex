@@ -181,8 +181,14 @@ func NewPrefixTree() PrefixTree {
 func (t PrefixTree) Add(s string) {
 	t.tree.add(s)
 }
+func (t PrefixTree) Remove(s string) bool {
+	return t.tree.remove(s)
+}
 func (t PrefixTree) AddInfix(s string) {
 	t.infixes.add(s)
+}
+func (t PrefixTree) RemoveInfix(s string) bool {
+	return t.infixes.remove(s)
 }
 
 func (t PrefixTree) Prefixes(s string) []arc {
@@ -254,6 +260,11 @@ func (t SuffixTree) Add(s string) {
 	t.tree.add(r)
 }
 
+func (t SuffixTree) Remove(s string) bool {
+	r := reverse(s)
+	return t.tree.remove(r)
+}
+
 // Suffixes returns the arc for suffixes of s in t. A suffix may not
 // span the complete s.
 func (t SuffixTree) Suffixes(s string) []arc {
@@ -309,20 +320,36 @@ func (d Decompounder) arcs(s string) []arc {
 func (d Decompounder) AddPrefix(s string) {
 	d.prefixes.Add(s)
 }
+func (d Decompounder) RemovePrefix(s string) bool {
+	return d.prefixes.Remove(s)
+}
 
 func (d Decompounder) AddInfix(s string) {
 	d.prefixes.AddInfix(s)
+}
+func (d Decompounder) RemoveInfix(s string) bool {
+	return d.prefixes.RemoveInfix(s)
 }
 
 func (d Decompounder) AddSuffix(s string) {
 	d.suffixes.Add(s)
 }
+func (d Decompounder) RemoveSuffix(s string) bool {
+	return d.suffixes.Remove(s)
+}
 
 // NewDecompounderFromFile initializes a Decompounder from a text file of the following format:
+//(REMOVE:)?<PREFIX|INFIX|SUFFIX>:<lower-case string>
+//
+// The optional REMOVE: command is used as a simple means to remove an entry,
+// by merely append the REMOVE: tagged line to the text file. The
+// REMOVE: line must occur somewhere after the original line to be removed
+// (otherwise it will be added anew).
+//
 // # line starting with '#' is ignored
 // '' empty lines are ignore
-//<PREFIX|INFIX|SUFFIX>:<lower-case string>
 func NewDecompounderFromFile(fileName string) (Decompounder, error) {
+	var err error
 	res := NewDecompounder()
 	fh, err := os.Open(fileName)
 	if err != nil {
@@ -330,18 +357,99 @@ func NewDecompounderFromFile(fileName string) (Decompounder, error) {
 	}
 	defer fh.Close()
 
+	linesRead := 0
+	linesSkipped := 0
+	linesRemoved := 0
+	linesAdded := 0
 	s := bufio.NewScanner(fh)
 	for s.Scan() {
 		l := strings.TrimSpace(s.Text())
+		linesRead++
 		if l == "" || strings.HasPrefix(l, "#") {
 			continue
 		}
 		// TODO parse string and report mismatching strings
+		// add or remove PREFIX, INFIX, SUFFIX
 		// 1) print failing line to STDERR
 		// 2) count nummber of failing lines and if > 0 return error
+		fs := strings.SplitN(l, ":", 2)
+		if len(fs) != 2 {
+			//err = fmt.Errorf("invalid line skipped: %s", l)
+			fmt.Fprintf(os.Stderr, ">>>> invalid line skipped: %s\n", l)
+			linesSkipped++
+			continue
+		}
+
+		if fs[0] == "REMOVE" {
+			fsRem := strings.SplitN(fs[1], ":", 2)
+
+			switch fsRem[0] {
+			case "PREFIX":
+
+				if res.RemovePrefix(strings.ToLower(fsRem[1])) {
+					linesRemoved++
+				}
+
+			case "INFIX":
+
+				if res.RemoveInfix(strings.ToLower(fsRem[1])) {
+					linesRemoved++
+				}
+
+			case "SUFFIX":
+
+				if res.RemoveSuffix(strings.ToLower(fsRem[1])) {
+					linesRemoved++
+				}
+
+			default:
+
+				fmt.Fprintf(os.Stderr, "invalid line skipped: %s\n", l)
+				linesSkipped++
+
+			}
+			continue // REMOVE
+		}
+
+		if fs[0] != "PREFIX" && fs[0] != "INFIX" && fs[0] != "SUFFIX" {
+			//err = fmt.Errorf("invalid line skipped: %s", l)
+			fmt.Fprintf(os.Stderr, "invalid line skipped: %s\n", l)
+			linesSkipped++
+			continue
+		}
+
+		switch fs[0] {
+		case "PREFIX":
+			res.AddPrefix(strings.ToLower(fs[1]))
+			linesAdded++
+		case "INFIX":
+			res.AddInfix(strings.ToLower(fs[1]))
+			linesAdded++
+		case "SUFFIX":
+			res.AddSuffix(strings.ToLower(fs[1]))
+			linesAdded++
+		default:
+			fmt.Fprintf(os.Stderr, "invalid line skipped: %s\n", l)
+			linesSkipped++
+		}
+
 	}
 
-	return res, nil
+	if s.Err() != nil {
+		// We've already got an error, so just append to that
+		if err != nil {
+			err = fmt.Errorf("%v : %v", err, s.Err())
+		}
+		// no previous error
+		if err == nil {
+			err = s.Err()
+		}
+	}
+
+	// TODO if verbose
+	fmt.Fprintf(os.Stderr, "Lines read: %d\nLines skipped: %d\nLines added: %d\nLines removed: %d\n", linesRead, linesSkipped, linesAdded, linesRemoved)
+
+	return res, err
 }
 
 // sorting [][]string according to length

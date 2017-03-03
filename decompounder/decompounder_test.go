@@ -433,3 +433,27 @@ func Test_InfixS(t *testing.T) {
 	}
 
 }
+
+func Test_LodFromFile(t *testing.T) {
+	d, err := NewDecompounderFromFile("test_word_parts.txt")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
+	res1 := d.Decomp("grusvägarna")
+	// One suggesting only
+	if w, g := 1, len(res1); w != g {
+		t.Errorf(ts, w, g)
+	}
+	// ... containing two word parts
+	if w, g := 2, len(res1[0]); w != g {
+		t.Errorf(ts, w, g)
+	}
+	if w, g := "grus", res1[0][0]; w != g {
+		t.Errorf(ts, w, g)
+	}
+	if w, g := "vägarna", res1[0][1]; w != g {
+		t.Errorf(ts, w, g)
+	}
+
+}
