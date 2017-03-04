@@ -139,11 +139,21 @@ func listAccu(t *tNode, soFar string, accu *[]string) {
 	}
 }
 
+// arcType, the type of an arc (long name since 'type' is a reserved word in Go)
+type arcType int
+
+const (
+	prefix arcType = iota
+	infix
+	suffix
+)
+
 // arc represents a substring of a string, with a start and end index
 // of the string.
 type arc struct {
 	start int
 	end   int
+	cat   arcType // used to eliminate unwanted sequences of arcs
 }
 
 // Returns the matching prefix substrings of s that exist in t in the
@@ -158,7 +168,7 @@ func (t *tNode) prefixes(s string) []arc {
 			sons = v.sons
 			// '&& i < len(s)-1' ensures that the prefix is shorter than s
 			if v.leaf && i < len(s)-1 {
-				res = append(res, arc{end: i + 1})
+				res = append(res, arc{end: i + 1, cat: prefix})
 			}
 		} else { // not a path in tree
 			return res
@@ -210,7 +220,7 @@ func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 	newAs := t.Prefixes(s[from:])
 
 	for _, a := range newAs {
-		newArc := arc{start: a.start + from, end: a.end + from}
+		newArc := arc{start: a.start + from, end: a.end + from, cat: prefix}
 
 		//fmt.Printf("newArc: %#v\n", newArc)
 		//fmt.Printf("s: %s %s\n", s, s[newArc.start:newArc.end])
@@ -222,7 +232,7 @@ func (t PrefixTree) recursivePrefixes(s string, from, to int, as *[]arc) {
 			// Go looking for potential infixes, and add these to prefix list
 			infixes := t.Infixes(s[newArc.end:])
 			for _, in := range infixes {
-				infix := arc{start: newArc.end, end: in.end + newArc.end}
+				infix := arc{start: newArc.end, end: in.end + newArc.end, cat: infix}
 				if infix.end < to {
 					*as = append(*as, infix)
 					// TODO Aouch... nested recursion. Fix this to have only one recursive call below.
@@ -278,7 +288,7 @@ func (t SuffixTree) Suffixes(s string) []arc {
 	l := len(r)
 	var res []arc
 	for _, a := range suffArcs {
-		res = append(res, arc{start: l - a.end, end: l - a.start})
+		res = append(res, arc{start: l - a.end, end: l - a.start, cat: suffix})
 	}
 
 	return res
@@ -571,6 +581,15 @@ func pathsAccu(as map[int][]arc, from, to int, currPath []arc, paths *[][]arc) {
 			path := currPath
 			path = append(path, arc)
 			*paths = append(*paths, path)
+		}
+
+		// A path cannot follow consecutive 'infix' arcs
+		if len(currPath) > 0 { // We are not on the first arc
+			lastArc := currPath[len(currPath)-1]
+			// Nope, cannot have two infix arcs in a row
+			if arc.cat == infix && lastArc.cat == infix {
+				continue
+			}
 		}
 		// Keep threading down the path
 		newPath := currPath

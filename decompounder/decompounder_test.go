@@ -348,7 +348,7 @@ func Test_Alen(t *testing.T) {
 	if w, g := 1, len(p1); w != g {
 		t.Errorf(ts, w, g)
 	}
-	w := arc{start: 0, end: 3}
+	w := arc{start: 0, end: 3, cat: prefix}
 	g := p1[0]
 	if w != g {
 		t.Errorf(ts, w, g)
