@@ -5,16 +5,11 @@ interface Decomp {
     parts: string[];
 }
 
-
-
-
-
-
-
 const baseURL: string = window.location.origin;
 
-
 class NIZZE {
+
+    langs: KnockoutObservableArray<string[]>;
 
     word: KnockoutObservable<string>;
 
@@ -28,19 +23,20 @@ class NIZZE {
         this.zmurf = ko.computed({
             read: () => {
 
-                this.decomp0(baseURL, this.word())
+                this.decomp0(baseURL, 'sv', this.word())
                 return "";//this.word().toUpperCase();
             }
         });
         //this.word("bilskrot");
     }
 
-    decomp0(baseURL: string, word: string): string { //Decomp[] {
+    decomp0(baseURL: string, lang: string, word: string): string { //Decomp[] {
         let itself = this;
         let res: string = "";// [{ parts: [] }];
 
         console.log("BAseURL: " + baseURL);
-        let url = baseURL + "/decomp/decomp?word=" + word
+        // TODO sanitize input data
+        let url = baseURL + "/decomp/decomp?lang=" + lang + "&word=" + word
         console.log("url: " + url);
 
 
@@ -72,7 +68,7 @@ class NIZZE {
         let decompInputElem = <HTMLInputElement>document.getElementById("decomp_word");
         let word = decompInputElem.value
 
-        this.decomp0(baseURL, word);
+        this.decomp0(baseURL, 'sv', word);
 
         console.log(word);
 
