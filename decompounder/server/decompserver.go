@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 
@@ -17,17 +18,53 @@ import (
 	"github.com/stts-se/pronlex/decompounder"
 )
 
-// TODO mutex this:
 type decomperMutex struct {
-	decompounder.Decompounder
-	*sync.RWMutex
+	// map from language name to decompounder, as read from word parts file dir.
+	// lang is used as HTTP request parameter to select a decompounder
+	decompers map[string]decompounder.Decompounder
+	// map from language name to word parts file name path.  Used
+	// for appending new word parts to the original text file, to
+	// keep the word parts text file in sync with the in-memory
+	// Decompounder. (Maybe there is a saner way to handle this?)
+	files map[string]string
+	mutex *sync.RWMutex
 }
 
-var decomper decomperMutex //= decomperMutex{decompounder.NewDecompounder(), &sync.RWMutex{}}
+var decomper = decomperMutex{
+	decompers: make(map[string]decompounder.Decompounder),
+	files:     make(map[string]string),
+	mutex:     &sync.RWMutex{},
+}
+
+// appendToWordPartsFile writes a line to a file.
+// NB that it is not thread-safe, and should be called after locking.
+func appendToWordPartsFile(fn string, line string) error {
+
+	fh, err := os.OpenFile(fn, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	defer fh.Close()
+
+	_, err = fh.WriteString(line + "\n")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func addPrefix(w http.ResponseWriter, r *http.Request) {
 
-	prefix := r.FormValue("prefix")
+	lang := r.FormValue("lang")
+	if "" == lang {
+		msg := "no value for the expected 'lang' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	prefix := strings.ToLower(r.FormValue("prefix"))
 	if "" == prefix {
 		msg := "no value for the expected 'prefix' parameter"
 		log.Println(msg)
@@ -35,13 +72,38 @@ func addPrefix(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	decomper.Lock()
-	defer decomper.Unlock()
-	decomper.AddPrefix(prefix)
+	decomper.mutex.Lock()
+	defer decomper.mutex.Unlock()
+	fn, ok := decomper.files[lang]
+	if !ok {
+		msg := "unknown 'lang': " + lang
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	//writeToWordPartsFile("PREFIX")
+	decomper.decompers[lang].AddPrefix(prefix)
+	err := appendToWordPartsFile(fn, "PREFIX:"+prefix)
+	if err != nil {
+		msg := fmt.Sprintf("decompounder: failed to append to word parts file : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
 	fmt.Fprintf(w, "added '%s'", prefix)
 }
 
 func addSuffix(w http.ResponseWriter, r *http.Request) {
+
+	lang := r.FormValue("lang")
+	if "" == lang {
+		msg := "no value for the expected 'lang' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
 
 	suffix := r.FormValue("suffix")
 	if "" == suffix {
@@ -51,9 +113,25 @@ func addSuffix(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	decomper.Lock()
-	defer decomper.Unlock()
-	decomper.AddSuffix(suffix)
+	decomper.mutex.Lock()
+	defer decomper.mutex.Unlock()
+	fn, ok := decomper.files[lang]
+	if !ok {
+		msg := "unknown 'lang': " + lang
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	decomper.decompers[lang].AddSuffix(suffix)
+	err := appendToWordPartsFile(fn, "SUFFIX:"+suffix)
+	if err != nil {
+		msg := fmt.Sprintf("decompounder: failed to append to word parts file : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
 	fmt.Fprintf(w, "added '%s'", suffix)
 }
 
@@ -61,16 +139,26 @@ type Decomp struct {
 	Parts []string `json:"parts"`
 }
 
+// langFromFilePath returns the base file name stripped from any '.txt' extension
+func langFromFilePath(p string) string {
+	b := filepath.Base(p)
+	if strings.HasSuffix(b, ".txt") {
+		b = b[0 : len(b)-4]
+	}
+	return b
+}
+
 func decompWord(w http.ResponseWriter, r *http.Request) {
 
-	word := r.FormValue("word")
-
-	// REMOVE ME:
-	if word == "ERROR" {
-		http.Error(w, "ERROR! TERROR", http.StatusInternalServerError)
+	lang := r.FormValue("lang")
+	if "" == lang {
+		msg := "no value for the expected 'lang' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 
+	word := r.FormValue("word")
 	word = strings.ToLower(word)
 	if "" == word {
 		msg := "no value for the expected 'word' parameter"
@@ -80,16 +168,47 @@ func decompWord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var res []Decomp
-	//res := fmt.Sprintf("%#v", decomper.Decomp(word))
-	decomper.RLock()
-	defer decomper.RUnlock()
+	decomper.mutex.RLock()
+	defer decomper.mutex.RUnlock()
+	_, ok := decomper.files[lang]
+	if !ok {
+		msg := "unknown 'lang': " + lang
+		var langs []string
+		for l, _ := range decomper.decompers {
+			langs = append(langs, l)
+		}
+		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
 
-	for _, d := range decomper.Decomp(word) {
+	for _, d := range decomper.decompers[lang].Decomp(word) {
 		res = append(res, Decomp{Parts: d})
 	}
 	log.Println(res)
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	j, err := json.Marshal(res)
+	if err != nil {
+		msg := fmt.Sprintf("failed json marshalling : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, string(j))
+}
+
+func listLanguages(w http.ResponseWriter, r *http.Request) {
+
+	decomper.mutex.RLock()
+	var res []string // res0 contains path to file
+	for l, _ := range decomper.decompers {
+		res = append(res, l)
+	}
+	decomper.mutex.RUnlock()
+
+	sort.Strings(res)
 	j, err := json.Marshal(res)
 	if err != nil {
 		msg := fmt.Sprintf("failed json marshalling : %v", err)
@@ -124,14 +243,27 @@ func main() {
 	var fn string
 	for _, f := range files {
 		fn = filepath.Join(dn, f.Name())
-		//fmt.Println(file.Name())
+		if !strings.HasSuffix(fn, ".txt") {
+			fmt.Fprintf(os.Stderr, "decompserver: skipping file: '%s'\n", fn)
+			continue
+		}
+
+		dc, err := decompounder.NewDecompounderFromFile(fn)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			fmt.Fprintf(os.Stderr, "decompserver: skipping file: '%s'\n", fn)
+			continue
+		}
+
+		lang := langFromFilePath(fn)
+		decomper.mutex.Lock()
+		decomper.decompers[lang] = dc
+		decomper.files[lang] = fn
+		decomper.mutex.Unlock()
+		fmt.Fprintf(os.Stderr, "decomper: loaded file '%s'\n", fn)
 	}
 
-	dc, err := decompounder.NewDecompounderFromFile(fn)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-	}
-	decomper = decomperMutex{dc, &sync.RWMutex{}}
+	//decomper = decomperMutex{dc, &sync.RWMutex{}}
 
 	r := mux.NewRouter().StrictSlash(true)
 
@@ -139,6 +271,7 @@ func main() {
 	r.HandleFunc("/decomp/decomp", decompWord).Methods("get", "post")
 	r.HandleFunc("/decomp/add_prefix", addPrefix).Methods("get", "post")
 	r.HandleFunc("/decomp/add_suffix", addSuffix).Methods("get", "post")
+	r.HandleFunc("/decomp/list_languages", listLanguages).Methods("get", "post")
 
 	r0 := http.StripPrefix("/decomp/built/", http.FileServer(http.Dir("./built/")))
 	r.PathPrefix("/decomp/built/").Handler(r0)
