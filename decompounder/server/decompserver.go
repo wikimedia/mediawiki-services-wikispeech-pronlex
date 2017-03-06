@@ -95,6 +95,48 @@ func addPrefix(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "added '%s'", prefix)
 }
 
+// TODO cut-and-paste of addPrefix
+func removePrefix(w http.ResponseWriter, r *http.Request) {
+
+	lang := r.FormValue("lang")
+	if "" == lang {
+		msg := "no value for the expected 'lang' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	prefix := strings.ToLower(r.FormValue("prefix"))
+	if "" == prefix {
+		msg := "no value for the expected 'prefix' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	decomper.mutex.Lock()
+	defer decomper.mutex.Unlock()
+	fn, ok := decomper.files[lang]
+	if !ok {
+		msg := "unknown 'lang': " + lang
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	//writeToWordPartsFile("PREFIX")
+	decomper.decompers[lang].RemovePrefix(prefix)
+	err := appendToWordPartsFile(fn, "REMOVE:PREFIX:"+prefix)
+	if err != nil {
+		msg := fmt.Sprintf("decompounder: failed to append to word parts file : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "removed '%s'", prefix)
+}
+
 func addSuffix(w http.ResponseWriter, r *http.Request) {
 
 	lang := r.FormValue("lang")
@@ -133,6 +175,47 @@ func addSuffix(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "added '%s'", suffix)
+}
+
+// TODO cut-and-paste of addSuffix
+func removeSuffix(w http.ResponseWriter, r *http.Request) {
+
+	lang := r.FormValue("lang")
+	if "" == lang {
+		msg := "no value for the expected 'lang' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	suffix := r.FormValue("suffix")
+	if "" == suffix {
+		msg := "no value for the expected 'suffix' parameter"
+		log.Println()
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	decomper.mutex.Lock()
+	defer decomper.mutex.Unlock()
+	fn, ok := decomper.files[lang]
+	if !ok {
+		msg := "unknown 'lang': " + lang
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	decomper.decompers[lang].RemoveSuffix(suffix)
+	err := appendToWordPartsFile(fn, "REMOVE:SUFFIX:"+suffix)
+	if err != nil {
+		msg := fmt.Sprintf("decompounder: failed to append to word parts file : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "removed '%s'", suffix)
 }
 
 type Decomp struct {
@@ -230,7 +313,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "decompserver <DECOMPFILES DIR>\n")
 		os.Exit(0)
 	}
-	var dn = os.Args[1] //"decomps.txt"
+
+	// word decomp file dir. Each file in dn with .txt extension
+	// is treated as a word parts file
+	var dn = os.Args[1]
 
 	files, err := ioutil.ReadDir(dn)
 	if err != nil {
@@ -238,8 +324,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	// TODO create map of Decomponders and create one instance for each file in decomp file dir
-
+	// populate map of decompounders from word parts files.
+	// The base file name minus '.txt' is the language name.
 	var fn string
 	for _, f := range files {
 		fn = filepath.Join(dn, f.Name())
@@ -263,14 +349,14 @@ func main() {
 		fmt.Fprintf(os.Stderr, "decomper: loaded file '%s'\n", fn)
 	}
 
-	//decomper = decomperMutex{dc, &sync.RWMutex{}}
-
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.HandleFunc("/decomp", decompMain).Methods("get")
 	r.HandleFunc("/decomp/decomp", decompWord).Methods("get", "post")
 	r.HandleFunc("/decomp/add_prefix", addPrefix).Methods("get", "post")
+	r.HandleFunc("/decomp/remove_prefix", removePrefix).Methods("get", "post")
 	r.HandleFunc("/decomp/add_suffix", addSuffix).Methods("get", "post")
+	r.HandleFunc("/decomp/remove_suffix", removeSuffix).Methods("get", "post")
 	r.HandleFunc("/decomp/list_languages", listLanguages).Methods("get", "post")
 
 	r0 := http.StripPrefix("/decomp/built/", http.FileServer(http.Dir("./built/")))
