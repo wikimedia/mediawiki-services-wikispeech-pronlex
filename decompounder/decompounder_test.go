@@ -189,10 +189,29 @@ func Test_Decompounder(t *testing.T) {
 
 	d := NewDecompounder()
 
+	if w, g := false, d.ContainsPrefix("sylt"); w != g {
+		t.Errorf(ts, w, g)
+	}
+
+	d.AddPrefix("sylt")
+	if w, g := true, d.ContainsPrefix("sylt"); w != g {
+		t.Errorf(ts, w, g)
+	}
+	d.RemovePrefix("sylt")
+	if w, g := false, d.ContainsPrefix("sylt"); w != g {
+		t.Errorf(ts, w, g)
+	}
 	d.AddPrefix("sylt")
 	d.AddPrefix("syl")
 
+	if w, g := false, d.ContainsSuffix("järn"); w != g {
+		t.Errorf(ts, w, g)
+	}
 	d.AddSuffix("järn")
+	if w, g := true, d.ContainsSuffix("järn"); w != g {
+		t.Errorf(ts, w, g)
+	}
+
 	d.AddSuffix("tjärn")
 
 	decomps := d.Decomp("syltjärn")

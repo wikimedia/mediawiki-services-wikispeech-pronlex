@@ -82,7 +82,11 @@ func addPrefix(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//writeToWordPartsFile("PREFIX")
+	if decomper.decompers[lang].ContainsPrefix(prefix) {
+		fmt.Fprintf(w, "prefix already found: '%s'", prefix)
+		return
+	}
+
 	decomper.decompers[lang].AddPrefix(prefix)
 	err := appendToWordPartsFile(fn, "PREFIX:"+prefix)
 	if err != nil {
@@ -125,6 +129,10 @@ func removePrefix(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//writeToWordPartsFile("PREFIX")
+	if !decomper.decompers[lang].ContainsPrefix(prefix) {
+		fmt.Fprintf(w, "prefix not found: '%s'", prefix)
+		return
+	}
 	decomper.decompers[lang].RemovePrefix(prefix)
 	err := appendToWordPartsFile(fn, "REMOVE:PREFIX:"+prefix)
 	if err != nil {
@@ -134,7 +142,7 @@ func removePrefix(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "removed '%s'", prefix)
+	fmt.Fprintf(w, "removed prefix: '%s'", prefix)
 }
 
 func addSuffix(w http.ResponseWriter, r *http.Request) {
@@ -162,6 +170,11 @@ func addSuffix(w http.ResponseWriter, r *http.Request) {
 		msg := "unknown 'lang': " + lang
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	if decomper.decompers[lang].ContainsSuffix(suffix) {
+		fmt.Fprintf(w, "sufffix already found: '%s'", suffix)
 		return
 	}
 
@@ -206,6 +219,10 @@ func removeSuffix(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !decomper.decompers[lang].ContainsSuffix(suffix) {
+		fmt.Fprintf(w, "suffix not found: '%s'", suffix)
+		return
+	}
 	decomper.decompers[lang].RemoveSuffix(suffix)
 	err := appendToWordPartsFile(fn, "REMOVE:SUFFIX:"+suffix)
 	if err != nil {

@@ -333,6 +333,9 @@ func (d Decompounder) AddPrefix(s string) {
 func (d Decompounder) RemovePrefix(s string) bool {
 	return d.prefixes.Remove(s)
 }
+func (d Decompounder) ContainsPrefix(s string) bool {
+	return d.prefixes.tree.contains(s)
+}
 
 func (d Decompounder) AddInfix(s string) {
 	d.prefixes.AddInfix(s)
@@ -340,12 +343,18 @@ func (d Decompounder) AddInfix(s string) {
 func (d Decompounder) RemoveInfix(s string) bool {
 	return d.prefixes.RemoveInfix(s)
 }
+func (d Decompounder) ContainsInfix(s string) bool {
+	return d.prefixes.infixes.contains(s)
+}
 
 func (d Decompounder) AddSuffix(s string) {
 	d.suffixes.Add(s)
 }
 func (d Decompounder) RemoveSuffix(s string) bool {
 	return d.suffixes.Remove(s)
+}
+func (d Decompounder) ContainsSuffix(s string) bool {
+	return d.suffixes.tree.contains(reverse(s))
 }
 
 // List returns all wordparts of Decompounder prefixed with type,
