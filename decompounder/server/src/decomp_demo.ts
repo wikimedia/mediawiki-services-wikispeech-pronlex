@@ -38,8 +38,10 @@ class NIZZE {
 	this.addSuffix = <KnockoutObservable<string>>ko.observable("");
 	
 	this.decomps = <KnockoutObservable<Decomp[]>>ko.observable([]);
-        this.zmurf = ko.computed({
-            read: () => {
+	
+	// Only here for side effect of calling decomp server
+	this.zmurf = ko.computed({
+            read: () => { // <-- What _is_ this...?!
 
 		if (this.selectedLang() != "" && this.word() != "") { 
                     this.decomp0(baseURL, this.selectedLang(), this.word());
@@ -47,6 +49,77 @@ class NIZZE {
                 return "";
             }
         });
+
+	// When addPrefix is updated, send this value to server
+	this.addPrefixMsg = ko.computed({
+	    read: () => { // <-- What _is_ this...?!
+		let itself = this;
+		let res = "";
+		console.error("addPrefix: "+ itself.addPrefix());
+		
+		if (itself.addPrefix() != "" && itself.selectedLang() != "") {
+		    
+		    let r = new XMLHttpRequest();
+		    let url = baseURL + "/decomp/add_prefix?lang="+ itself.selectedLang() + "&prefix="+ itself.addPrefix();
+		    r.open("GET", url);
+		    r.onload = function () {
+			if (r.status === 200) {
+
+			    console.log("added prefix: "+ r.responseText);
+			    res = r.responseText;
+			    //return r.responseText;
+			    
+			    
+			} else {
+			    //TODO error handling
+			    console.log("failed to add prefix: "+ r.responseText);
+			    //return "";
+			    res = r.responseText;
+			};
+		    };
+		    r.send();
+		};
+		
+		return res;
+	    }
+	});
+
+
+	// When addSuffix is updated, send this value to server
+	this.addSuffixMsg = ko.computed({
+	    read: () => { // <-- What _is_ this...?!
+		let itself = this;
+		let res = "";
+		console.error("addSuffix: "+ itself.addSuffix());
+		
+		if (itself.addSuffix() != "" && itself.selectedLang() != "") {
+		    
+		    let r = new XMLHttpRequest();
+		    let url = baseURL + "/decomp/add_suffix?lang="+ itself.selectedLang() + "&suffix="+ itself.addSuffix();
+		    r.open("GET", url);
+		    r.onload = function () {
+			if (r.status === 200) {
+
+			    console.log("added suffix: "+ r.responseText);
+			    res = r.responseText;
+			    //return r.responseText;
+			    
+			    
+			} else {
+			    //TODO error handling
+			    console.log("failed to add suffix: "+ r.responseText);
+			    //return "";
+			    res = r.responseText;
+			};
+		    };
+		    r.send();
+		};
+		
+		return res;
+	    }
+	});
+
+	
     }
 
     
