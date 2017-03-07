@@ -18,6 +18,9 @@ class NIZZE {
     addSuffix: KnockoutObservable<string>;
     
     zmurf: KnockoutComputed<string>;
+
+    addPrefixMsg: KnockoutComputed<string>;
+    addSuffixMsg: KnockoutComputed<string>;
     
     decomps: KnockoutObservable<Decomp[]>;
     
@@ -30,10 +33,10 @@ class NIZZE {
 
 	// TODO remove hard wired value
 	this.word = <KnockoutObservable<string>>ko.observable("");
-
+	
 	this.addPrefix = <KnockoutObservable<string>>ko.observable("");
 	this.addSuffix = <KnockoutObservable<string>>ko.observable("");
-
+	
 	this.decomps = <KnockoutObservable<Decomp[]>>ko.observable([]);
         this.zmurf = ko.computed({
             read: () => {
