@@ -1164,16 +1164,41 @@ func EntryCount(db *sql.DB, lexiconID int64) (int64, error) {
 	return entries, nil
 }
 
+func ListCurrentEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
+	var res []string
+
+	tx, err := db.Begin()
+	if err != nil {
+		return res, fmt.Errorf("dbapi.ListCurrentEntryStatuses : %v", err)
+	}
+	defer tx.Commit()
+
+	// TODO This query seems a bit slow
+	rows, err := tx.Query("SELECT DISTINCT entryStatus.name FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId AND entryStatus.current = 1", lexiconName)
+	if err != nil {
+		tx.Rollback() // ?
+		return res, fmt.Errorf("ListCurrentEntryStatuses : %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var statusName string
+		rows.Scan(&statusName)
+		res = append(res, statusName)
+	}
+
+	err = rows.Err()
+	return res, err
+}
+
 // LexiconStats calls the database a number of times, gathering different numbers, e.g. on how many entries there are in a lexicon.
 func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 	res := LexStats{LexiconID: lexiconID}
 
 	tx, err := db.Begin()
-	defer tx.Commit()
-
 	if err != nil {
 		return res, fmt.Errorf("dbapi.LexiconStats failed opening db transaction : %v", err)
 	}
+	defer tx.Commit()
 
 	t1 := time.Now()
 	// number of entries in a lexicon

@@ -379,6 +379,14 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, 0, entries2[1].Preferred)
 	}
 
+	// TODO should be in a test of its own
+	eStatsus, err := ListCurrentEntryStatuses(db, l.Name)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if w, g := 2, len(eStatsus); w != g {
+		t.Errorf(fs, w, g)
+	}
 }
 
 func Test_unique(t *testing.T) {

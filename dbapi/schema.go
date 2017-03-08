@@ -98,6 +98,7 @@ CREATE INDEX esn ON EntryStatus (name);
 CREATE INDEX ess ON EntryStatus (source);
 CREATE INDEX esc ON EntryStatus (current);
 CREATE INDEX esceid ON EntryStatus (entryId);
+CREATE INDEX entryidcurrent ON EntryStatus (entryId, current);
 CREATE UNIQUE INDEX eseii ON EntryStatus  (id, entryId);
 CREATE UNIQUE INDEX eseiicurr ON EntryStatus  (id, entryId, current);
 CREATE UNIQUE INDEX idcurr ON EntryStatus  (id, current);
