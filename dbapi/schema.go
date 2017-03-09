@@ -59,7 +59,7 @@ CREATE TABLE Entry (
     lexiconId integer not null,
     partOfSpeech varchar(128),
     morphology varchar(128),
-    preferred integer not null default 0,
+    preferred integer not null default 0, -- TODO Why doesn't it work when changing integer -> boolean? 
 foreign key (lexiconId) references Lexicon(id));
 CREATE INDEX idx28d70584 on Entry (language);
 CREATE INDEX idx15890407 on Entry (strn);
