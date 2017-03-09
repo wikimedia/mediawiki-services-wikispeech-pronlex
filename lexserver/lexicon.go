@@ -133,6 +133,9 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q, err := queryFromParams(r)
+
+	fmt.Printf("Incoming: %#v", q)
+
 	if err != nil {
 		log.Printf("failed to process query params: %v", err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
