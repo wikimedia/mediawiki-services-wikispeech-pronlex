@@ -32,6 +32,51 @@ func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsn))
 }
 
+func listCurrentEntryStatuses(w http.ResponseWriter, r *http.Request) {
+
+	lexiconName := r.FormValue("lexicon_name")
+	if "" == lexiconName {
+		http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
+		return
+	}
+
+	statuses, err := dbapi.ListCurrentEntryStatuses(db, lexiconName)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+		return
+	}
+	j, err := json.Marshal(statuses)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(j))
+}
+
+// TODO cut-n-paste from above
+func listAllEntryStatuses(w http.ResponseWriter, r *http.Request) {
+
+	lexiconName := r.FormValue("lexicon_name")
+	if "" == lexiconName {
+		http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
+		return
+	}
+
+	statuses, err := dbapi.ListAllEntryStatuses(db, lexiconName)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("listAllEntryStatuses : %v", err), http.StatusInternalServerError)
+		return
+	}
+	j, err := json.Marshal(statuses)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("listAllEntryStatuses : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(j))
+}
+
 type LexWithEntryCount struct {
 	ID            int64  `json:"id"`
 	Name          string `json:"name"`

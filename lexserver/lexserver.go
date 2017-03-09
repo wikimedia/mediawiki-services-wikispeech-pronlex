@@ -740,6 +740,8 @@ func main() {
 	// function calls
 	http.HandleFunc("/lexicon", lexiconHelpHandler)
 	http.HandleFunc("/lexicon/list", listLexsWithEntryCountHandler)
+	http.HandleFunc("/lexicon/list_current_entry_statuses", listCurrentEntryStatuses)
+	http.HandleFunc("/lexicon/list_all_entry_statuses", listAllEntryStatuses)
 	http.HandleFunc("/lexicon/info", lexInfoHandler)
 	http.HandleFunc("/listlexicons", apiChangedHandler("use /lexicon/list instead"))
 	http.HandleFunc("/lexicon/listlexicons", apiChangedHandler("use /lexicon/list instead"))
