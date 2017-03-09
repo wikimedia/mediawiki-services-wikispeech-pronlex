@@ -1164,7 +1164,18 @@ func EntryCount(db *sql.DB, lexiconID int64) (int64, error) {
 	return entries, nil
 }
 
+// ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).
 func ListCurrentEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
+	return listEntryStatuses(db, lexiconName, true)
+}
+
+// ListAllEntryStatuses returns a list of all names EntryStatuses, also those that are not 'current'  (i.e., the most recent status).
+// In other words, this list potentially includes statuses not in use, but that have been used.
+func ListAllEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
+	return listEntryStatuses(db, lexiconName, false)
+}
+
+func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error) {
 	var res []string
 
 	tx, err := db.Begin()
@@ -1173,8 +1184,14 @@ func ListCurrentEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) 
 	}
 	defer tx.Commit()
 
-	// TODO This query seems a bit slow
-	rows, err := tx.Query("SELECT DISTINCT entryStatus.name FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId AND entryStatus.current = 1", lexiconName)
+	// TODO This query seems a bit slow?
+	q := "SELECT DISTINCT entryStatus.name FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
+	qOnlyCurrent := " AND entryStatus.current = 1"
+	if onlyCurrent {
+		q = q + qOnlyCurrent
+	}
+
+	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
 		tx.Rollback() // ?
 		return res, fmt.Errorf("ListCurrentEntryStatuses : %v", err)

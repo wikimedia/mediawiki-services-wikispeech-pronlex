@@ -100,7 +100,7 @@ func Test_InsertEntries(t *testing.T) {
 		Language:       "XYZZ",
 		Preferred:      true,
 		Transcriptions: []lex.Transcription{t1, t2},
-		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
 	_, errx := InsertEntries(db, l, []lex.Entry{e1})
 	if errx != nil {
@@ -345,7 +345,7 @@ func Test_InsertEntries(t *testing.T) {
 		Language:       "XYZZ",
 		Preferred:      true,
 		Transcriptions: []lex.Transcription{t1, t2},
-		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
+		EntryStatus:    lex.EntryStatus{Name: "old2", Source: "tst"}}
 
 	_, errxb := InsertEntries(db, l, []lex.Entry{e1b})
 	if errxb != nil {
@@ -387,6 +387,14 @@ func Test_InsertEntries(t *testing.T) {
 	if w, g := 2, len(eStatsus); w != g {
 		t.Errorf(fs, w, g)
 	}
+	eStatsus2, err := ListAllEntryStatuses(db, l.Name)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if w, g := 3, len(eStatsus2); w != g {
+		t.Errorf(fs, w, g)
+	}
+
 }
 
 func Test_unique(t *testing.T) {
