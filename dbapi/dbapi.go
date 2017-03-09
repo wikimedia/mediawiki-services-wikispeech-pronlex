@@ -1188,7 +1188,7 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 	q := "SELECT DISTINCT entryStatus.name FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
 	qOnlyCurrent := " AND entryStatus.current = 1"
 	if onlyCurrent {
-		q = q + qOnlyCurrent
+		q += qOnlyCurrent
 	}
 
 	rows, err := tx.Query(q, lexiconName)

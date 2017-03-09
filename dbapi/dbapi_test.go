@@ -357,8 +357,8 @@ func Test_InsertEntries(t *testing.T) {
 
 	var entries2 []lex.Entry
 	entries2, err = LookUpIntoSlice(db, q)
-	fmt.Printf("%#v\n", entries2[0])
-	fmt.Printf("%#v\n", entries2[1])
+	//fmt.Printf("%#v\n", entries2[0])
+	//fmt.Printf("%#v\n", entries2[1])
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -392,6 +392,19 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 	if w, g := 3, len(eStatsus2); w != g {
+		t.Errorf(fs, w, g)
+	}
+
+	stat, err := LookUpIntoSlice(db, Query{EntryStatus: []string{"new"}})
+	if w, g := 1, len(stat); w != g {
+		t.Errorf(fs, w, g)
+	}
+	stat1, err := LookUpIntoSlice(db, Query{EntryStatus: []string{"dkhfkhekjeh"}})
+	if w, g := 0, len(stat1); w != g {
+		t.Errorf(fs, w, g)
+	}
+	stat2, err := LookUpIntoSlice(db, Query{EntryStatus: []string{"new", "old2"}})
+	if w, g := 2, len(stat2); w != g {
 		t.Errorf(fs, w, g)
 	}
 

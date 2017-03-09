@@ -195,6 +195,24 @@ func transcriptions(q Query) (string, []interface{}) {
 	return res, resv
 }
 
+func entryStatuses(q Query) (string, []interface{}) {
+	var res string
+	var resv []interface{}
+
+	if len(q.EntryStatus) == 0 {
+		return res, resv
+	}
+
+	// Lexicon selection should already have been taken care of
+	//res += "entry.lexiconid = lexicon.id AND lexicon.id in " + nQs(len(q.Lexicons))
+	res += "entry.id = entryStatus.entryID AND entryStatus.current = 1 AND entryStatus.name in " + nQs(len(q.EntryStatus))
+	for _, es := range q.EntryStatus {
+		resv = append(resv, es)
+	}
+
+	return res, resv
+}
+
 func filter(ss []string, f func(string) bool) []string {
 	var res []string
 	for i, s := range ss {
@@ -259,6 +277,9 @@ func appendQuery(sql string, q Query) (string, []interface{}) {
 	// Query.TranscriptionLike, Query.TranscriptionRegexp
 	t, tv := transcriptions(q) // V2 simply returns 'transkription.strn like ?' + param value
 	args = append(args, tv...)
+	// Query.EntryStatus
+	es, esv := entryStatuses(q)
+	args = append(args, esv...)
 
 	// HasEntryValidation doesn't take any argument
 	ev := ""
@@ -267,7 +288,7 @@ func appendQuery(sql string, q Query) (string, []interface{}) {
 	}
 
 	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, ev}), " AND "))
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, ev}), " AND "))
 	if "" != qRes {
 		sql += " AND " + qRes
 	}

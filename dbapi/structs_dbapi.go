@@ -38,6 +38,9 @@ type Query struct {
 	ParadigmLike   string `json:"paradigmLike"`
 	ParadigmRegexp string `json:"paradigmRegexp"`
 
+	// A list of entry statuses to match
+	EntryStatus []string `json:"entryStatus"`
+
 	// Select entries with one or more EntryValidations
 	HasEntryValidation bool `json:"hasEntryValidation"`
 
@@ -147,7 +150,7 @@ type QueryStats struct {
 // ValStats is used to incrementally give statistics during a validation process, or to just represent a final validation statistics.
 type ValStats struct {
 	// TotalEntries is the total entries to be validated
-	TotalEntries     int
+	TotalEntries int
 
 	// ValidatedEntries is the total validated entries so far
 	ValidatedEntries int
@@ -156,8 +159,8 @@ type ValStats struct {
 	TotalValidations int
 
 	// InvalidEntries is the number of invalid entries so far
-	InvalidEntries   int
+	InvalidEntries int
 
-	Levels           map[string]int `json:"levels"`
-	Rules            map[string]int `json:"rules"`
+	Levels map[string]int `json:"levels"`
+	Rules  map[string]int `json:"rules"`
 }
