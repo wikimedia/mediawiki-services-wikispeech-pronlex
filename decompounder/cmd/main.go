@@ -13,29 +13,6 @@ import (
 	"github.com/stts-se/pronlex/decompounder"
 )
 
-// func p() { fmt.Println() }
-
-// func xtractCompField(s string) string {
-// 	var res string
-// 	fs := strings.Split(s, "\t")
-
-// 	if len(fs) >= 4 {
-// 		res = fs[3]
-// 	}
-
-// 	return res
-// }
-
-// func decompParts(s string) []string {
-// 	var res []string
-
-// 	for _, s := range strings.Split(s, "+") {
-// 		res = append(res, strings.ToLower(s))
-// 	}
-
-// 	return res
-// }
-
 func main() {
 
 	if len(os.Args) < 2 {
@@ -53,11 +30,11 @@ func main() {
 
 	for _, w := range os.Args[2:] {
 		decomps := decomp.Decomp(w)
-		//fmt.Printf("%s\t", w)
-		for _, d := range decomps {
-			fmt.Printf("%s\n", strings.Join(d, "+"))
+		if len(decomps) == 0 {
+			fmt.Printf("%s\t\n", w)
 		}
-		//fmt.Println()
+		for _, d := range decomps {
+			fmt.Printf("%s\t%s\n", w, strings.Join(d, "+"))
+		}
 	}
-
 }
