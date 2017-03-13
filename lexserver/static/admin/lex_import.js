@@ -73,7 +73,7 @@ LEXIMPORT.ImportFileModel = function () {
     self.loadSymbolSetNames = function () {
 	$.getJSON(LEXIMPORT.baseURL +"/symbolset/list")
 	    .done(function (data) {
-		self.symbolSetNames(data.SymbolSetNames);
+		self.symbolSetNames(data.symbol_set_names);
 	    })
     	    .fail(function (xhr, textStatus, errorThrown) {
 		alert("loadSymbolSetNames says: "+ xhr.responseText);
