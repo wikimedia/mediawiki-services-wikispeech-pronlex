@@ -14,6 +14,8 @@ func canMatchChar(c byte) string {
 		res = "(?:a|A:)"
 	case 'b':
 		res = "b"
+	case 'd':
+		res = "d"
 	case 'f':
 		res = "f"
 	case 'p':

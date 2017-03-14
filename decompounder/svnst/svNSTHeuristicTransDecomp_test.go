@@ -20,6 +20,7 @@ func Test_t1(t *testing.T) {
 	}{
 		{"upp", "fällde", `"" u0 p . % f E l . d e`, `"" u0 p`, `% f E l . d e`},
 		{"luft", "strömningarna", `"" l u0 f t . % s t r 2 m . n I N . a . rn a`, `"" l u0 f t`, `% s t r 2 m . n I N . a . rn a`},
+		{"grad", "spår", `"" g r A: d . % s p o: r`, `"" g r A: d`, `% s p o: r`},
 	}
 
 	for _, ts := range tsts {
