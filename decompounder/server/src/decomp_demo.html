@@ -12,8 +12,15 @@
     <div>
       <input data-bind="value: word" />
       <label>Add prefix</label><input data-bind="value: addPrefix" />
+      <label>Remove prefix</label><input data-bind="value: removePrefix" /> <br>
       <label>Add suffix</label><input data-bind="value: addSuffix" />
+      <label>Remove suffix</label><input data-bind="value: removeSuffix" />
     </div>
+
+    <div>
+      Add prefix: <span data-bind="text: addPrefixMsg"></span>
+    </div>
+    
     
     <table>
       <thead></thead>
