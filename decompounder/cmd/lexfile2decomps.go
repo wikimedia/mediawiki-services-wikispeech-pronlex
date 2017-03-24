@@ -10,6 +10,66 @@ import (
 	"strings"
 )
 
+func SvNSTCharCanMatch(c rune) string {
+
+	switch c {
+	case 'a':
+		return "(A:|a)"
+	case 'b':
+		return "b"
+	default:
+		return "UNKNOWN: " + string(c)
+	}
+
+}
+
+func SvNSTSplitTrans(wordPart1 string, wordPart2 string, trans string) (string, string) {
+	//fmt.Println("'" + wordPart1)
+	wp1LastChar := wordPart1[len(wordPart1)-1]
+	wp2FirstChar := wordPart2[0]
+
+	wp1RE := SvNSTCharCanMatch(rune(wp1LastChar))
+	wp2RE := SvNSTCharCanMatch(rune(wp2FirstChar))
+
+	fmt.Println(wp1RE)
+	fmt.Println(wp2RE)
+
+	var trans1 string
+	var trans2 string
+
+	return trans1, trans2
+
+}
+
+func SvNSTTransAlign(decomps []string, trans string) []string {
+	var res []string
+
+	if len(decomps) == 0 {
+		return res
+	}
+	if len(decomps) == 1 {
+		return []string{trans}
+	}
+
+	for i := 0; i < len(decomps)-1; i++ {
+		SvNSTSplitTrans(decomps[i], decomps[i+1], trans)
+	}
+
+	return res
+}
+
+// TODO Only care about first transcription variant
+func SvNSTDecopmTransAlign(lexiconLine string) ([]string, []string) {
+	fs := strings.Split(lexiconLine, "\t")
+	decomps := strings.Split(strings.Trim(fs[3], "+"), "+")
+	fmt.Printf("%#v\n", decomps)
+	firstTrans := fs[8]
+
+	//var res []string
+	res := SvNSTTransAlign(decomps, firstTrans)
+	return decomps, res
+}
+
 func main() {
 
 	if len(os.Args) != 2 {
@@ -41,8 +101,9 @@ func main() {
 
 	for s.Scan() {
 		l := s.Text()
+		SvNSTDecopmTransAlign(l)
 		fs := strings.Split(l, "\t")
-		decomp := strings.ToLower(fs[3])
+		decomp := strings.ToLower(strings.TrimSpace(fs[3]))
 		wordParts := strings.Split(decomp, "+")
 		if len(wordParts) < 2 {
 			continue
