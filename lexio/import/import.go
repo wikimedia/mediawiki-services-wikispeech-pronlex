@@ -31,7 +31,7 @@ func main() {
 
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 
-	var validate = f.Bool("validate", false, "validate each entry when loading, and save validation in the database (default: false)")
+	var validate = f.Bool("validate", false, "validate each entry, and save the validation in the database (default: false)")
 	var force = f.Bool("force", false, "force loading of lexicon even if the symbolset is undefined (default: false)")
 	var help = f.Bool("help", false, "print help message")
 
