@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
@@ -25,6 +26,29 @@ func loadValidators(symsetDirName string) error {
 	}
 	err = vServ.Load(symbolSets)
 	return err
+}
+
+func printStats(stats dbapi.LexStats, validate bool) error {
+	var fstr = "%-16s %6d\n"
+	println("\nLEXICON STATISTICS")
+	fmt.Printf(fstr, "entries", stats.Entries)
+	for _, s2f := range stats.StatusFrequencies {
+		fs := strings.Split(s2f, "\t")
+		if len(fs) != 2 {
+			return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
+		}
+		var freq, err = strconv.ParseInt(fs[1], 10, 64)
+		if err != nil {
+			return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
+		}
+		var status = "status:" + fs[0]
+		fmt.Printf(fstr, status, freq)
+	}
+	if validate {
+		fmt.Printf(fstr, "invalid entries", stats.ValStats.InvalidEntries)
+		fmt.Printf(fstr, "validation msgs", stats.ValStats.TotalValidations)
+	}
+	return nil
 }
 
 func main() {
@@ -153,6 +177,24 @@ SAMPLE INVOCATION:
 		return
 	}
 
+	fmt.Fprintf(os.Stderr, "\n")
 	logger.Write("finished importing lexicon file")
+	logger.Write("dbFile=" + dbFile)
+	logger.Write("lexName=" + lexName)
+	logger.Write("lexFile=" + inFile)
+	logger.Write("symbolSet=" + symbolSetName)
+	logger.Write("symbolSetFolder=" + symsetDirName)
+	logger.Write("validate=" + strconv.FormatBool(*validate))
+	fmt.Fprintf(os.Stderr, "\n")
 
+	stats, err := dbapi.LexiconStats(db, lexicon.ID)
+	if err != nil {
+		logger.Write(fmt.Sprintf("failed to retreive statistics : %v", err))
+		return
+	}
+	err = printStats(stats, *validate)
+	if err != nil {
+		logger.Write(fmt.Sprintf("failed to print statistics : %v", err))
+		return
+	}
 }
