@@ -105,7 +105,12 @@ SAMPLE INVOCATION:
 
 	_, err = os.Stat(dbFile)
 	if err != nil {
-		log.Fatalf("Cannot find db file. %v", err)
+		log.Fatalf("Cannot find db file: %v", err)
+	}
+
+	_, err = os.Stat(inFile)
+	if err != nil {
+		log.Fatalf("Cannot find lexicon file: %v", err)
 	}
 
 	db, err := sql.Open("sqlite3", dbFile)
