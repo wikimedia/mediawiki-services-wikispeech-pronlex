@@ -17,7 +17,7 @@ func (vs ValidatorService) ValidatorForName(symbolSetName string) (*validation.V
 	if vv, ok := vs.Validators[symbolSetName]; ok {
 		return vv, nil
 	}
-	return &validation.Validator{}, fmt.Errorf("no validator loaded for symbolset %s", symbolSetName)
+	return &validation.Validator{}, fmt.Errorf("no validator is defined for symbolset %s", symbolSetName)
 
 }
 
