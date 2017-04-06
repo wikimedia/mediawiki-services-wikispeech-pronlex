@@ -1230,8 +1230,8 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 
 	//select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = 3 and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name
 
-	t2 := time.Now()
-	log.Printf("dbapi.LexiconStats TOTAL COUNT TOOK %v\n", t2.Sub(t1))
+	//t2 := time.Now()
+	//log.Printf("dbapi.LexiconStats TOTAL COUNT TOOK %v\n", t2.Sub(t1))
 
 	rows, err := tx.Query("select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = ? and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name", lexiconID)
 	if err != nil {
@@ -1254,13 +1254,15 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 		return res, err
 	}
 
-	t3 := time.Now()
-	log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
+	//t3 := time.Now()
+	//log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
 	valStats, err := ValidationStatsTx(tx, lexiconID)
 	res.ValStats = valStats
 
 	t4 := time.Now()
-	log.Printf("dbapi.LexiconStats VAL STATS TOOK %v\n", t4.Sub(t3))
+	//log.Printf("dbapi.LexiconStats VAL STATS TOOK %v\n", t4.Sub(t3))
+
+	log.Printf("dbapi.LexiconStats STATS TOOK %v\n", t4.Sub(t1))
 
 	return res, err
 
