@@ -39,7 +39,7 @@ func main() {
   go run import.go <FLAGS> <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
 
 FLAGS:
-   -validate bool  validate each entry when loading, and save validation in the database (default: false)
+   -validate bool  validate each entry, and save the validation in the database (default: false)
    -force    bool  force loading of lexicon even if the symbolset is undefined (default: false)
    -help     bool  print help message
 
