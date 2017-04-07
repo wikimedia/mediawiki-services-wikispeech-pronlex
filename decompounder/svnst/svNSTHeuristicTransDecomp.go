@@ -18,7 +18,7 @@ var char2phon = map[rune]string{
 	'é': "e:",
 	'f': "f",
 	'g': "[jgNx]", // -ing g -> N, gelé g -> x
-	'h': "h",
+	'h': "[hj]",   // hjort h -> j
 	'i': "(?:I|i:)",
 	'j': "[jx]", // Jeanette j -> x
 	'k': "[kC]", // kärr k -> C
@@ -41,7 +41,7 @@ var char2phon = map[rune]string{
 	'y': "(?:Y|y:)",
 	'z': "s",
 	'å': "(?:O|o:)",
-	'ä': "(?:E|\\{:)",
+	'ä': "(?:E:?|\\{:|e)",
 	'ö': "(?:2:?|9:?)",
 
 	'7': "n", // 7-eleven
@@ -57,6 +57,10 @@ type sm struct {
 var suffixMatchers = []sm{
 	sm{"ie", "I"},           // Annie
 	sm{"vue", "v (?:y:|Y)"}, //Bellevue
+	sm{"bridge", "I rd rs"},
+	sm{"frey", "E j"},
+	sm{"garage", "A: rs"},
+	sm{"geneve", "n E: v"},
 }
 
 func canMatchPrefix(p string) string {

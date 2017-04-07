@@ -64,6 +64,9 @@ func main() {
 		s = bufio.NewScanner(fh)
 	}
 
+	exitAfter := 8
+	fails := 0
+
 	for s.Scan() {
 		l := s.Text()
 		fs := strings.Split(l, "\t")
@@ -83,7 +86,10 @@ func main() {
 			rez, err := svnst.HerusticSvNSTTransDecomp(decomp, firstTrans)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "FAIL: %v : %s\t%s\t%#v\n\n", err, decomp, firstTrans, rez)
-				os.Exit(1)
+				fails++
+				if fails >= exitAfter {
+					os.Exit(1)
+				}
 			}
 			fmt.Printf("%s\t%s\n", decomp, strings.Join(rez, "	"))
 		}
