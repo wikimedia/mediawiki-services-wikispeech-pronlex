@@ -49,6 +49,37 @@ var char2phon = map[rune]string{
 
 }
 
+type sm struct {
+	suff    string
+	matcher string
+}
+
+var suffixMatchers = []sm{
+	sm{"ie", "I"},           // Annie
+	sm{"vue", "v (?:y:|Y)"}, //Bellevue
+}
+
+func canMatchPrefix(p string) string {
+	res := ""
+
+	fmt.Println(p)
+
+	if p == "anne" {
+		return "a [nN]"
+	}
+	if p == "bernadotte" {
+		return "d O t"
+	}
+
+	for _, sm := range suffixMatchers {
+		if strings.HasSuffix(p, sm.suff) {
+			return sm.matcher
+		}
+	}
+
+	return res
+}
+
 func canMatchChar(c rune) (string, error) {
 	var res string = "XXXXZZZXXX"
 	var err error
@@ -64,6 +95,27 @@ func canMatchChar(c rune) (string, error) {
 	return res, err
 }
 
+func makeRes(matchStrings ...string) string {
+	res := ""
+	res0 := []string{}
+	for _, m := range matchStrings {
+		if m != "" {
+			res0 = append(res0, m)
+		}
+	}
+
+	if len(res0) == 1 {
+		return res0[0]
+	}
+	if len(res0) > 0 {
+		res1 := strings.Join(res0, "|")
+		res = "(?:" + res1 + ")"
+	}
+
+	fmt.Println(res)
+	return res
+}
+
 func canMatchLhs(lhs string) (string, error) {
 	var res string
 	var err error
@@ -71,11 +123,15 @@ func canMatchLhs(lhs string) (string, error) {
 		return res, err
 	}
 
+	pMatcher := canMatchPrefix(lhs)
+
 	runes := []rune(lhs)
-	canMatch, err := canMatchChar(runes[len(runes)-1])
-	if canMatch != "" {
-		res = canMatch
-	}
+	charMatcher, err := canMatchChar(runes[len(runes)-1])
+	//if canMatch != "" {
+	//	res = canMatch
+	//}
+
+	res = makeRes(pMatcher, charMatcher)
 
 	return res, err
 }
@@ -103,15 +159,30 @@ func endsInPotentialRetroflex(s string) bool {
 	if strings.HasSuffix(s, "rt") {
 		return true
 	}
+	if strings.HasSuffix(s, "rts") {
+		return true
+	}
 	if strings.HasSuffix(s, "rd") {
 		return true
 	}
+	if strings.HasSuffix(s, "rds") {
+		return true
+	}
+
 	if strings.HasSuffix(s, "rn") {
 		return true
 	}
+	if strings.HasSuffix(s, "rns") {
+		return true
+	}
+
 	if strings.HasSuffix(s, "rl") {
 		return true
 	}
+	if strings.HasSuffix(s, "rls") {
+		return true
+	}
+
 	if strings.HasSuffix(s, "r") {
 		return true
 	}
@@ -229,6 +300,8 @@ func splitTrans(lhs, rhs, trans string) (string, string, error) {
 	}
 
 	reStrn := lhsM + "([ .]+)" + nonPhonemes + rhsM
+
+	fmt.Println(reStrn)
 
 	// TODO Panics on incorrect RE
 	re := regexp.MustCompile(reStrn)
