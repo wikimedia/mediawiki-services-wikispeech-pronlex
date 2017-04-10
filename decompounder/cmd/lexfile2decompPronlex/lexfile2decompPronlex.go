@@ -105,7 +105,7 @@ func main() {
 					os.Exit(1)
 				}
 			}
-			fmt.Printf("%s\t%s\n", decomp, strings.Join(rez, "	"))
+			fmt.Printf("%s\t%s\n", decomp, strings.Join(rez, "	<+>	"))
 		}
 	}
 

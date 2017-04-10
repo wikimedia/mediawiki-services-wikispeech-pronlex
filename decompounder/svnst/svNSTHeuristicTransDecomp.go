@@ -12,8 +12,7 @@ var char2phon = map[rune]string{
 	'a': "(?:a|A:)",
 	'b': "b",
 	'c': "[skxC]", // charlott c -> x, check c -> C
-	//'d': "[djr]", // 'djur' d -> j, års+dag d -> rd
-	'd': "[dj]", // 'djur' d -> j
+	'd': "[dj]",   // 'djur' d -> j
 	'e': "(?:e:?|\\}:|E)",
 	'é': "e:",
 	'f': "f",
@@ -22,7 +21,6 @@ var char2phon = map[rune]string{
 	'i': "(?:I|i:)",
 	'j': "[jx]", // Jeanette j -> x
 	'k': "[kC]", // kärr k -> C
-	//'l': "[lr]", // års+lopp, l -> rl
 	'l': "[lj]", // ljud l -> j
 	'm': "m",
 	'n': "[nN]", // nypon+gränd
@@ -30,9 +28,7 @@ var char2phon = map[rune]string{
 	'p': "p",
 	'q': "k",
 	'r': "r",
-	//'s': "[srx]", // standard+skåp rd+s -> rd + rs, måls+skytt s -> x
 	's': "[sx]", // måls+skytt s -> x
-	//'t': "[tr]", // aborr+träsk t -> rt
 	't': "[tC]", // tjänst t -> C
 	'u': "(?:\\}:|u0)",
 	'v': "v",
@@ -47,6 +43,8 @@ var char2phon = map[rune]string{
 	'7': "n", // 7-eleven
 	'4': "a", // a4
 
+	//TODO: Is this OK?
+	'-': "",
 }
 
 type sm struct {
@@ -117,6 +115,13 @@ func canMatchPrefix(p string) string {
 
 	//fmt.Println(p)
 
+	if p == "hundra" {
+		return "h u0 n . d r a"
+	}
+	if p == "åttio" {
+		return "O . t I . U"
+	}
+
 	if p == "g" { // 'g+dur'
 		return "g e:"
 	}
@@ -134,7 +139,7 @@ func canMatchPrefix(p string) string {
 	}
 
 	if p == "och" { // 'berg+och+dal+bana'
-		return "O"
+		return "O(?: k)?"
 	}
 
 	if p == "anne" {
