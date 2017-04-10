@@ -7,6 +7,7 @@ import (
 	"github.com/stts-se/pronlex/decompounder/svnst"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -42,29 +43,40 @@ func cleanUpDecomp(d string) string {
 
 func main() {
 
-	if len(os.Args) != 2 {
-		fmt.Println(filepath.Base(os.Args[0]), "<lexicon file>")
+	if len(os.Args) < 2 && len(os.Args) > 2 {
+		fmt.Fprintln(os.Stderr, filepath.Base(os.Args[0]), "<lexicon file> <N errors before exit>?")
 		os.Exit(1)
 	}
 
 	fn := os.Args[1]
 	fh, err := os.Open(fn)
 	if err != nil {
-		fmt.Printf("Mabel Tainter Memorial Building! : %v", err)
+		fmt.Fprintf(os.Stderr, "Mabel Tainter Memorial Building! : %v", err)
 	}
 
 	var s *bufio.Scanner
 	if strings.HasSuffix(fn, ".gz") {
 		gz, err := gzip.NewReader(fh)
 		if err != nil {
-			fmt.Printf("Streptomyces tsukubaensis! : %v", err)
+			fmt.Fprintf(os.Stderr, "Streptomyces tsukubaensis! : %v", err)
 		}
 		s = bufio.NewScanner(gz)
 	} else {
 		s = bufio.NewScanner(fh)
 	}
 
-	exitAfter := 8
+	exitAfter := 0
+	if len(os.Args) == 3 {
+		i, err := strconv.ParseInt(os.Args[2], 10, 64)
+		if err != nil {
+			msg := fmt.Sprintf("Second optional argument should be an integer, got '%s'", os.Args[2])
+			fmt.Fprintf(os.Stderr, "%s\n", msg)
+			os.Exit(1)
+		} //else {
+		exitAfter = int(i)
+		//}
+	}
+
 	fails := 0
 
 	for s.Scan() {

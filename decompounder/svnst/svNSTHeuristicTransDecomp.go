@@ -41,7 +41,7 @@ var char2phon = map[rune]string{
 	'y': "(?:Y|y:)",
 	'z': "s",
 	'å': "(?:O|o:)",
-	'ä': "(?:E:?|\\{:|e)",
+	'ä': "(?:E:?|\\{:?|e)",
 	'ö': "(?:2:?|9:?)",
 
 	'7': "n", // 7-eleven
@@ -55,18 +55,65 @@ type sm struct {
 }
 
 var suffixMatchers = []sm{
-	sm{"ie", "I"},           // Annie
+	sm{"ampere", "p {: r"},
+	sm{"nnie", "I"},         // Annie
 	sm{"vue", "v (?:y:|Y)"}, //Bellevue
 	sm{"bridge", "I rd rs"},
 	sm{"frey", "E j"},
-	sm{"garage", "A: rs"},
+	//sm{"arbitrage", "A: rs"},
+	//sm{"garage", "A: rs"},
+	//sm{"plantage", "A: rs"},
+	sm{"age", "A: rs"},
+	sm{"allonge", "N rs"},
 	sm{"geneve", "n E: v"},
+	sm{"gustaf", "s t A: v"},
+	sm{"hav", "h a f"},
+	sm{"horney", "rn I"},
+	sm{"ville", "v I l"},
+	sm{"jacob", "k O p"},
+	sm{"jakob", "k O p"},
+	sm{"suu", "s u:"},
+	sm{"kai", "k a j"},
+	sm{"mai", "m a j"},
+	sm{"may", "m a j"},
+	sm{"thai", "t a j"},
+	sm{"rose", "r o: s"}, // 'rose-marie'
+	sm{"konsert", "s {: r"},
+	sm{"träd", "t r E"},
+	sm{"marie", "r (?:i:|I)"},
+	sm{"ry", "r I"}, // 'mary'
+	sm{"sch", "rs"}, // 'marsch'
+	sm{"oecd", "d e:"},
+	sm{"ph", "f"},
+	sm{"renault", "n o:"},
+	sm{"service", "I s"},
+	sm{"skrid", "s k r I"},
+	sm{"svend", "s v e n"},
+	sm{"stad", "s t a"}, // 'Vrigstad'
+	sm{"zenith", "n I t"},
+	sm{"ou", "u:"},
 }
 
 func canMatchPrefix(p string) string {
 	res := ""
 
-	fmt.Println(p)
+	//fmt.Println(p)
+
+	if p == "g" { // 'g+dur'
+		return "g e:"
+	}
+	if p == "hp" { // 'hp+färg'
+		return "h o: . p e:"
+	}
+	if p == "pk" { // 'pk+banken'
+		return "p e: . k o:"
+	}
+	if p == "tt" { // 'tt+afp'
+		return "t e: . t e:"
+	}
+	if p == "tv" { // 'tv+shop'
+		return "t e: . v e:"
+	}
 
 	if p == "anne" {
 		return "a [nN]"
@@ -116,7 +163,7 @@ func makeRes(matchStrings ...string) string {
 		res = "(?:" + res1 + ")"
 	}
 
-	fmt.Println(res)
+	//fmt.Println(res)
 	return res
 }
 
@@ -198,6 +245,10 @@ func startsWithPotentialRetroflex(s string) bool {
 	if strings.HasPrefix(s, "s") {
 		return true
 	}
+	if strings.HasPrefix(s, "c") { //motor+Cykel
+		return true
+	}
+
 	if strings.HasPrefix(s, "t") {
 		return true
 	}
@@ -259,26 +310,79 @@ func deRetroflex(s string) string {
 
 var nonPhonemes = `[ .%"]*`
 
+// doubleChar returns true iff lhs ends with the same rune as rhs
+// starts with
+func doubleChar(lhs, rhs string) (rune, bool) {
+	fmt.Printf("LHS: %s\tRHS: %s\n", lhs, rhs)
+
+	var res rune
+	var isSame bool
+
+	if lhs == "" || rhs == "" {
+		return res, isSame
+	}
+
+	lhsRunes := []rune(lhs)
+	lastLhs := lhsRunes[len(lhsRunes)-1]
+
+	rhsRunes := []rune(rhs)
+	firstRhs := rhsRunes[0]
+
+	if lastLhs == firstRhs {
+		return lastLhs, true
+	}
+
+	return res, isSame
+}
+
 func splitTrans(lhs, rhs, trans string) (string, string, error) {
 
+	lhs = strings.ToLower(lhs)
+	rhs = strings.ToLower(rhs)
 	lhs0 := lhs
+
+	//TODO: Does this work? Should replace strings with []rune, to be shure that things work?
+
+	//fmt.Println("lhs: " + lhs)
+	//fmt.Println("rhs: " + rhs)
 
 	// If retroflexation spanns the compound boundary, matching is
 	// a bit more tricky
 	retro := retroflexation(lhs0, rhs)
+	//fmt.Printf("retro: %v\n", retro)
 
 	// Final -r "jumps" to rhs transcription, thus the character
 	// before final 'r' should be used for matching lhs
+	//TODO: Does this work? Should replace strings with []rune, to be shure that things work?
 	if retro && strings.HasSuffix(lhs0, "r") && !strings.HasSuffix(lhs0, "rr") && len(lhs0) > 1 {
 		lhs0 = lhs0[0 : len(lhs0)-1]
 	}
 
+	//TODO: Handling double chars over compound boundaries more complicated than I first though.
+	// One reason is that the last char of lhs is not always silent.
+
+	// Chech whether lhs ends with the same rune that rhs starts
+	// with. If so, the last char of lhs may be silent in the
+	// transcription of lhs
+	// _, isDouble := doubleChar(lhs, rhs)
+	// //fmt.Printf(">>>> %v %v\n", char, isDouble)
+	// if !retro && isDouble {
+	// 	// Knock of the last char, and hope that is enough
+	// 	lhs0 = lhs0[0 : len(lhs0)-1]
+	// }
+
 	lhsM, lErr := canMatchLhs(lhs0)
+	//fmt.Printf("lhsM: %s\n", lhsM)
+	//fmt.Printf("lErr: %v\n", lErr)
+
 	// if final -r has been removed from lhs, we still need
 	// optional matching of ' r'
 	if retro && len(lhs) > len(lhs0) {
 		lhsM = lhsM + "(?: r)?"
 	}
+	//	if !retro && isDouble && len(lhs) > len(lhs0) {
+	//		lhsM = lhsM + "(?: " + +")?"
+	//	}
 
 	rhsM, rErr := canMatchRhs(rhs)
 
@@ -305,7 +409,7 @@ func splitTrans(lhs, rhs, trans string) (string, string, error) {
 
 	reStrn := lhsM + "([ .]+)" + nonPhonemes + rhsM
 
-	fmt.Println(reStrn)
+	//fmt.Println(reStrn)
 
 	// TODO Panics on incorrect RE
 	re := regexp.MustCompile(reStrn)

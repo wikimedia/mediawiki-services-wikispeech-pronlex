@@ -46,6 +46,10 @@ func Test_t1(t *testing.T) {
 		{"abborr", "stigen", `"" a . b O r . % s t i: . g e n`, `"" a . b O r`, `% s t i: . g e n`},
 		{"alster", "lind", `"" a l . s t e . % rl I n d`, `"" a l . s t e r`, `% l I n d`},
 		{"ankar", "lindningar", `"" a N . k a r . % rl I n d . n I N . a r`, `"" a N . k a r`, `% l I n d . n I N . a r`},
+		{"marie", "helene", `m a . "" r i: . h e . % l e: n`, `m a . "" r i:`, `h e . % l e: n`},
+
+		// TODO: How to handle silent double chars...?:
+		//{"artikel", "löshet", `a . "" rt I . k e . l 2: s . % h e: t`, `a . "" rt I . k e . l 2: s . % h e: t`, `l 2: s . % h e: t`},
 	}
 
 	for _, ts := range tsts {
