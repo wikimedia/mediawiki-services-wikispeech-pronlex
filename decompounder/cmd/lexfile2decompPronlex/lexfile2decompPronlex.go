@@ -17,9 +17,11 @@ func cleanUpDecomp(d string) string {
 	res := strings.ToLower(d)
 	res = strings.Replace(res, "!", "", -1)
 	res = strings.Replace(res, "+s+", "s+", -1)
+	res = strings.Replace(res, "+i+", "i+", -1) // Nikola+i+
 	res = strings.Replace(res, "+o+", "o+", -1)
 	res = strings.Replace(res, "+a+", "a+", -1)
 	res = strings.Replace(res, "+u+", "u+", -1)
+	res = strings.Replace(res, "+g+", "g+", -1) // armerin+g+
 	res = strings.Replace(res, "+ar+", "ar+", -1)
 	res = strings.Replace(res, "+ra+", "ra+", -1)
 	res = strings.Replace(res, "+es+", "es+", -1)
@@ -107,4 +109,5 @@ func main() {
 		}
 	}
 
+	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)
 }

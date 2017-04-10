@@ -11,7 +11,7 @@ var char2phon = map[rune]string{
 
 	'a': "(?:a|A:)",
 	'b': "b",
-	'c': "[skx]", // charlott c -> x
+	'c': "[skxC]", // charlott c -> x, check c -> C
 	//'d': "[djr]", // 'djur' d -> j, års+dag d -> rd
 	'd': "[dj]", // 'djur' d -> j
 	'e': "(?:e:?|\\}:|E)",
@@ -56,9 +56,24 @@ type sm struct {
 
 var suffixMatchers = []sm{
 	sm{"ampere", "p {: r"},
-	sm{"nnie", "I"},         // Annie
+	sm{"baby", "b I"},
+	sm{"baisse", "b E: s"},
+	sm{"bearnaise", "n E: s"},
+	sm{"bayonne", "j O n"},
+	sm{"bordeaux", "rd o:"},
+	sm{"bourgogne", "g O n j"},
+	sm{"braille", "b r a j"},
+	sm{"boy", "b O j"},
+	sm{"champagne", "p a n j"},
+	sm{"college", "l I t C"},
+	sm{"collage", "l A: rs"},
+	sm{"colli", "k O [.] l I"},
+	sm{"cockney", "k n I"},
+	sm{"dessert", "s {: r"},
+	sm{"nnie", "I"}, // Annie
+	sm{"brie", "b r i:"},
 	sm{"vue", "v (?:y:|Y)"}, //Bellevue
-	sm{"bridge", "I rd rs"},
+	sm{"bridge", "I (?:r[dt] rs|t C)"},
 	sm{"frey", "E j"},
 	//sm{"arbitrage", "A: rs"},
 	//sm{"garage", "A: rs"},
@@ -79,7 +94,7 @@ var suffixMatchers = []sm{
 	sm{"thai", "t a j"},
 	sm{"rose", "r o: s"}, // 'rose-marie'
 	sm{"konsert", "s {: r"},
-	sm{"träd", "t r E"},
+	sm{"träd", "t r E:?"},
 	sm{"marie", "r (?:i:|I)"},
 	sm{"ry", "r I"}, // 'mary'
 	sm{"sch", "rs"}, // 'marsch'
@@ -89,9 +104,12 @@ var suffixMatchers = []sm{
 	sm{"service", "I s"},
 	sm{"skrid", "s k r I"},
 	sm{"svend", "s v e n"},
+	sm{"blind", "b l I n"},
+	sm{"bond", "b U n"},
 	sm{"stad", "s t a"}, // 'Vrigstad'
 	sm{"zenith", "n I t"},
 	sm{"ou", "u:"},
+	sm{"ai", "a j"}, //Nicolai
 }
 
 func canMatchPrefix(p string) string {
@@ -113,6 +131,10 @@ func canMatchPrefix(p string) string {
 	}
 	if p == "tv" { // 'tv+shop'
 		return "t e: . v e:"
+	}
+
+	if p == "och" { // 'berg+och+dal+bana'
+		return "O"
 	}
 
 	if p == "anne" {
@@ -246,6 +268,9 @@ func startsWithPotentialRetroflex(s string) bool {
 		return true
 	}
 	if strings.HasPrefix(s, "c") { //motor+Cykel
+		return true
+	}
+	if strings.HasPrefix(s, "z") { //buffert+zon
 		return true
 	}
 
