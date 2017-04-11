@@ -350,7 +350,7 @@ func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (
 func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
 	res := MoveResult{}
 	var err error
-	//fromLex := GetLexicon
+	//fromLex, err := GetLexiconTx(tx, fromLexicon)
 
 	return res, err
 }

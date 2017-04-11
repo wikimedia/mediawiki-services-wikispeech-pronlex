@@ -100,6 +100,13 @@ func Test_InsertEntries(t *testing.T) {
 	if w, g := "ZZ", lx.SymbolSetName; w != g {
 		t.Errorf("Wanted %s got %s", w, g)
 	}
+	lx, err = GetLexicon(db, "xyzzhga_skdjdj")
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+	if w, g := "", lx.Name; w != g {
+		t.Errorf("Wanted empty string, got '%s'", g)
+	}
 
 	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
 	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}
