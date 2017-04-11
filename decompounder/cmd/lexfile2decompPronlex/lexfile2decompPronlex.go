@@ -69,13 +69,13 @@ func main() {
 
 	exitAfter := 0
 	if len(os.Args) == 3 {
-		i, err := strconv.ParseInt(os.Args[2], 10, 64)
+		i, err := strconv.Atoi(os.Args[2])
 		if err != nil {
 			msg := fmt.Sprintf("Second optional argument should be an integer, got '%s'", os.Args[2])
 			fmt.Fprintf(os.Stderr, "%s\n", msg)
 			os.Exit(1)
 		} //else {
-		exitAfter = int(i)
+		exitAfter = i
 		//}
 	}
 
