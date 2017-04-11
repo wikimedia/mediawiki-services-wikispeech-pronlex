@@ -80,13 +80,14 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		}
 
 		e, err := wsFmt.ParseToEntry(l)
-		if validator.IsDefined() {
-			e, _ = validator.ValidateEntry(e)
-		}
 		if err != nil {
 			var msg = fmt.Sprintf("couldn't parse line to entry : %v", err)
 			logger.Write(msg)
 			return fmt.Errorf("%v", msg)
+		}
+
+		if validator != nil && validator.IsDefined() {
+			e, _ = validator.ValidateEntry(e)
 		}
 
 		eBuf = append(eBuf, e)
