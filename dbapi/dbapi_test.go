@@ -90,6 +90,17 @@ func Test_InsertEntries(t *testing.T) {
 		t.Errorf(fs, "ZZ", lxs[0].SymbolSetName)
 	}
 
+	lx, err := GetLexicon(db, "test")
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+	if w, g := "test", lx.Name; w != g {
+		t.Errorf("Wanted %s got %s", w, g)
+	}
+	if w, g := "ZZ", lx.SymbolSetName; w != g {
+		t.Errorf("Wanted %s got %s", w, g)
+	}
+
 	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
 	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}
 

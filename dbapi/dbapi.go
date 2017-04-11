@@ -53,7 +53,10 @@ func Sqlite3WithRegex() {
 
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., Lexicon structs corresponding to the rows of the lexicon
-// table)
+// table).
+//
+// TODO: Create a DB struct, and move functions of type
+// funcName(db *sql.DB, ...) into methods of the new struct.
 func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 	var res []Lexicon
 	sql := "select id, name, symbolsetname from lexicon"
@@ -78,14 +81,36 @@ func ListLexicons(db *sql.DB) ([]Lexicon, error) {
 // GetLexicon returns a Lexicon struct matching a lexicon name in the db.
 // Returns error if no such lexicon name in db
 func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
-	res0, err := GetLexicons(db, []string{name})
+	// res0, err := GetLexicons(db, []string{name})
+	// if err != nil {
+	// 	return Lexicon{}, fmt.Errorf("failed to retrieve lexicon %s : %v", name, err)
+	// }
+	// if len(res0) != 1 {
+	// 	return Lexicon{}, fmt.Errorf("failed to retrieve lexicon %s : %v", name, err)
+	// }
+	// return res0[0], nil
+
+	tx, err := db.Begin()
 	if err != nil {
-		return Lexicon{}, fmt.Errorf("failed to retrieve lexicon %s : %v", name, err)
+		return Lexicon{}, fmt.Errorf("failed to create transaction : %v", err)
 	}
-	if len(res0) != 1 {
-		return Lexicon{}, fmt.Errorf("failed to retrieve lexicon %s : %v", name, err)
+	defer tx.Commit()
+	return GetLexiconTx(tx, name)
+}
+
+func GetLexiconTx(tx *sql.Tx, name string) (Lexicon, error) {
+	res := Lexicon{}
+	name = strings.ToLower(name)
+	var err error
+	//err := tx.QueryRow()
+
+	err = tx.QueryRow("select id, name, symbolsetname from lexicon where name = ?", name).Scan(&res.ID, &res.Name, &res.SymbolSetName)
+	if err != nil {
+		err = fmt.Errorf("failed to find lexicon in db : %v", err)
 	}
-	return res0[0], nil
+
+	return res, err
+
 }
 
 // GetLexicons takes a list of lexicon names and returns a list of
@@ -279,9 +304,12 @@ func insertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 // InsertLexicon saves the name of a new lexicon to the db.
 func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
+	if err != nil {
+		return Lexicon{}, fmt.Errorf("failed to get db transaction : %v", err)
+	}
 	defer tx.Commit()
 	res, err := InsertLexiconTx(tx, l)
-	tx.Commit()
+	//tx.Commit()
 
 	return res, err
 }
@@ -304,6 +332,27 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 	//tx.Commit()
 
 	return Lexicon{ID: id, Name: strings.ToLower(l.Name), SymbolSetName: l.SymbolSetName}, err
+}
+
+type MoveResult struct {
+}
+
+func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
+	tx, err := db.Begin()
+	if err != nil {
+		return MoveResult{}, fmt.Errorf("failed to get db transaction : %v", err)
+	}
+	defer tx.Commit()
+
+	return MoveNewEntriesTx(tx, fromLexicon, toLexicon, source, status)
+}
+
+func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
+	res := MoveResult{}
+	var err error
+	//fromLex := GetLexicon
+
+	return res, err
 }
 
 // TODO move to function?
