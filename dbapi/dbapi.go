@@ -335,6 +335,7 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 }
 
 type MoveResult struct {
+	n int
 }
 
 func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
@@ -350,7 +351,37 @@ func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (
 func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
 	res := MoveResult{}
 	var err error
-	//fromLex, err := GetLexiconTx(tx, fromLexicon)
+	fromLex, err := GetLexiconTx(tx, fromLexicon)
+	if err != nil {
+		err := fmt.Errorf("couldn't find lexicon '%s' : %v", fromLexicon, err)
+		return res, err
+	}
+	toLex, err := GetLexiconTx(tx, toLexicon)
+	if err != nil {
+		err := fmt.Errorf("couldn't find lexicon '%s' : %v", toLexicon, err)
+		return res, err
+	}
+
+	//TODO This may be computationally expensive for large lexica?
+	query := `SELECT entry.id FROM entry a WHERE a.lexiconid = ? AND NOT EXISTS(SELECT * FROM entry b WHERE a.lexiconid = b.lexiconid AND b.lexiconid == ?)`
+
+	movable, err := tx.Query(query, fromLex.ID, toLex.ID)
+	if err != nil {
+		tx.Rollback()
+		return res, fmt.Errorf("select query failed : %v", err)
+	}
+	defer movable.Close()
+
+	var movableIDs []int64
+	for movable.Next() {
+		var id int64
+		if err := movable.Scan(&id); err != nil {
+			return res, fmt.Errorf("failed retrieving query result : %v", err)
+		}
+		movableIDs = append(movableIDs, id)
+	}
+
+	res.n = len(movableIDs)
 
 	return res, err
 }
