@@ -165,6 +165,6 @@ func main() {
 		}
 	}
 
-	fmt.Printf("%v\n", suffixLex)
+	//fmt.Printf("%v\n", suffixLex)
 	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)
 }
