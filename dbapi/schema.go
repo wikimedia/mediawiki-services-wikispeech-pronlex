@@ -143,7 +143,7 @@ CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 --    surfaceFormId bigint not null,
 -- unique(surfaceFormId,entryId));
 
--- Trigger to ensure only one preferred = 1 per orthographic word
+-- Triggers to ensure only one preferred = 1 per orthographic word
 -- When a new entry is added, where preferred is not 0, all other entries for 
 -- the same orthographic word (entry.strn), will have the preferred field set to 0.
 CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
@@ -154,4 +154,14 @@ CREATE TRIGGER updatetPref BEFORE UPDATE ON ENTRY
   BEGIN
     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0;
   END;
+
+-- Triggers to ensure that there are only one entry status per entry
+--CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS
+--  BEGIN 
+--    UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
+--  END;
+--CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
+--  BEGIN
+--    UPDATE entrystatus SET current = 0 WHERE entryis = NEW.entryid AND NEW.current <> 0;
+--  END;
 `
