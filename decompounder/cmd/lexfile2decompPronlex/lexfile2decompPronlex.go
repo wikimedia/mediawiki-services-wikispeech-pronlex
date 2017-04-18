@@ -23,6 +23,7 @@ func cleanUpDecomp(d string) string {
 	res = strings.Replace(res, "+u+", "u+", -1)
 	res = strings.Replace(res, "+g+", "g+", -1) // armerin+g+
 	res = strings.Replace(res, "+ar+", "ar+", -1)
+	res = strings.Replace(res, "+r+", "r+", -1)
 	res = strings.Replace(res, "+ra+", "ra+", -1)
 	res = strings.Replace(res, "+es+", "es+", -1)
 	res = strings.Replace(res, "+na+", "na+", -1)
@@ -43,9 +44,58 @@ func cleanUpDecomp(d string) string {
 	return res
 }
 
+type WP struct {
+	trans string
+	pos   string
+	morph string
+}
+
+var prefixLex = make(map[string]map[WP]int)
+var infixLex = make(map[string]map[WP]int)
+var suffixLex = make(map[string]map[WP]int)
+
+func add(strn, trans, pos, morph string, lex map[string]map[WP]int) {
+	if v, ok := lex[strn]; ok {
+		v[WP{trans: trans, pos: pos, morph: morph}]++
+	} else {
+		m := make(map[WP]int)
+		wp := WP{trans: trans, pos: pos, morph: morph}
+		m[wp]++
+		lex[strn] = m
+	}
+}
+
+func addWordParts(wps string, trans []string, pos, morph string) {
+	var wps0 = strings.Split(wps, "+")
+
+	if len(wps0) != len(trans) {
+		fmt.Fprintf(os.Stderr, "skipping input: different len: %v vs %v", wps0, trans)
+	}
+
+	if len(wps0) < 2 {
+		return
+	}
+
+	if len(wps0) > 1 {
+		add(wps0[0], trans[0], "", "", prefixLex)
+	}
+
+	if len(wps0) > 2 {
+		//add(wps0[0], trans[0], prefixLex)
+		for i := 1; i < len(wps0)-1; i++ {
+			add(wps0[i], trans[i], "", "", infixLex)
+		}
+	}
+
+	last := len(wps0) - 1
+	add(wps0[last], trans[last], pos, morph, suffixLex)
+
+	//fmt.Println(wps)
+}
+
 func main() {
 
-	if len(os.Args) < 2 && len(os.Args) > 2 {
+	if len(os.Args) != 2 && len(os.Args) != 3 {
 		fmt.Fprintln(os.Stderr, filepath.Base(os.Args[0]), "<lexicon file> <N errors before exit>?")
 		os.Exit(1)
 	}
@@ -91,6 +141,8 @@ func main() {
 		}
 
 		//orth := fs[0]
+		pos := strings.TrimSpace(fs[1])
+		morph := strings.TrimSpace(fs[2])
 		decomp0 := fs[3]
 		decomp := cleanUpDecomp(decomp0)
 		firstTrans := fs[8]
@@ -104,10 +156,15 @@ func main() {
 				if fails >= exitAfter {
 					os.Exit(1)
 				}
+				continue
 			}
-			fmt.Printf("%s\t%s\n", decomp, strings.Join(rez, "	<+>	"))
+
+			addWordParts(decomp, rez, pos, morph)
+
+			//fmt.Printf("%s\t%s\n", decomp, strings.Join(rez, "	<+>	"))
 		}
 	}
 
+	fmt.Printf("%v\n", suffixLex)
 	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)
 }
