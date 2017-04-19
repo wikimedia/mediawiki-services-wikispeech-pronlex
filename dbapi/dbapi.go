@@ -335,7 +335,7 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 }
 
 type MoveResult struct {
-	n int
+	n int64
 }
 
 func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
@@ -363,7 +363,7 @@ func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	}
 
 	//TODO This may be computationally expensive for large lexica?
-	query := `SELECT entry.id FROM entry a WHERE a.lexiconid = ? AND NOT EXISTS(SELECT * FROM entry b WHERE a.lexiconid = b.lexiconid AND b.lexiconid == ?)`
+	query := `SELECT a.id FROM entry a WHERE a.lexiconid = ? AND NOT EXISTS(SELECT * FROM entry b WHERE a.lexiconid = b.lexiconid AND b.lexiconid == ?)`
 
 	movable, err := tx.Query(query, fromLex.ID, toLex.ID)
 	if err != nil {
@@ -381,8 +381,35 @@ func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 		movableIDs = append(movableIDs, id)
 	}
 
-	res.n = len(movableIDs)
+	if err0 := movable.Err(); err0 != nil {
+		newErr := fmt.Errorf("MoveNewEntriesTx suffered a db mishap : %v", err0)
+		if err == nil {
+			err = newErr
+		} else {
 
+			err = fmt.Errorf("%v : %v", err, newErr)
+		}
+	}
+	// Number of entries the will be moved
+	//res.n = len(movableIDs)
+
+	var idsStrn []string
+	for _, n := range movableIDs {
+		idsStrn = append(idsStrn, strconv.Itoa(int(n)))
+	}
+
+	//TODO The moving is split up into two separate queries. These
+	//could perhaps be merged, and run in a single trip to the db.
+	query2 := "UPDATE entry SET lexiconid = ? WHERE entry.id IN (" + strings.Join(idsStrn, ", ") + ")"
+	qRez, err := tx.Exec(query2)
+	if err != nil {
+		tx.Rollback()
+		return res, fmt.Errorf("failed to update lexiconids : %v", err)
+	}
+
+	if n, err := qRez.RowsAffected(); err == nil {
+		res.n = n
+	}
 	return res, err
 }
 
