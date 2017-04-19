@@ -50,8 +50,26 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 	logger := dbapi.NewWebSockLogger(conn)
 
 	symbolSetName := r.PostFormValue("symbolset_name")
+	if strings.TrimSpace(symbolSetName) == "" {
+		msg := "input param <symbolset_name> must not be empty"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
 	lexName := r.PostFormValue("lexicon_name")
+	if strings.TrimSpace(lexName) == "" {
+		msg := "input param <lexicon_name> must not be empty"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
 	vString := r.PostFormValue("validate")
+	if strings.TrimSpace(vString) == "" {
+		msg := "input param <validate> must not be empty (should be 'true' or 'false')"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
 	validate, err := strconv.ParseBool(vString)
 	if err != nil {
 		log.Println(err)
@@ -101,7 +119,7 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		deleteUploadedFile(serverPath)
 	}
 	log.Println("Created lexicon with name:", lexicon.Name)
-	
+
 	var validator *validation.Validator
 	if validate {
 		vMut.Lock()
