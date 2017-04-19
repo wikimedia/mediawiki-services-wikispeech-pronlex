@@ -120,7 +120,7 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Created lexicon with name:", lexicon.Name)
 
-	var validator *validation.Validator
+	var validator *validation.Validator = &validation.Validator{}
 	if validate {
 		vMut.Lock()
 		validator, err = vMut.service.ValidatorForName(lexicon.SymbolSetName)
