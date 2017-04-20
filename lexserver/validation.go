@@ -209,9 +209,38 @@ func validatorNames() ValidatorNames {
 	return ValidatorNames{ValidatorNames: vNames}
 }
 
+func hasValidator(symbolSet string) bool {
+	vMut.Lock()
+	res := vMut.service.HasValidator(symbolSet)
+	vMut.Unlock()
+	return res
+}
+
 func listValidationHandler(w http.ResponseWriter, r *http.Request) {
 	vs := validatorNames()
 	j, err := json.Marshal(vs)
+	if err != nil {
+		msg := fmt.Sprintf("failed to marshal struct : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	fmt.Fprint(w, string(j))
+}
+
+func hasValidatorHandler(w http.ResponseWriter, r *http.Request) {
+	symbolSet := r.FormValue("symbolset")
+	if len(strings.TrimSpace(symbolSet)) == 0 {
+		msg := fmt.Sprintf("symbol set should be specified by variable 'symbolset'")
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	res := hasValidator(symbolSet)
+
+	j, err := json.Marshal(res)
 	if err != nil {
 		msg := fmt.Sprintf("failed to marshal struct : %v", err)
 		log.Println(msg)

@@ -21,6 +21,12 @@ func (vs ValidatorService) ValidatorForName(symbolSetName string) (*validation.V
 
 }
 
+// HasValidator is used to check whether a validator exists for the given symbol set
+func (vs ValidatorService) HasValidator(symbolSetName string) bool {
+	_, ok := vs.Validators[symbolSetName]
+	return ok
+}
+
 // Load is used to load validators for the input symbol sets
 func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error {
 	if ss, ok := symbolsets["sv-se_ws-sampa"]; ok {

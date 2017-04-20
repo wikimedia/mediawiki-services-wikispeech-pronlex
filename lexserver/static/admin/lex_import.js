@@ -54,6 +54,7 @@ LEXIMPORT.ImportFileModel = function () {
 	};
     };
     
+    self.hasValidator = ko.observable(false);
     self.validate = ko.observable(true);
     self.lexiconName = ko.observable(null);
     self.symbolSetName = ko.observable(null);
@@ -80,6 +81,28 @@ LEXIMPORT.ImportFileModel = function () {
 	    });
     };
     
+    self.hasValidatorFunc = ko.computed(function() {
+	var url = LEXIMPORT.baseURL + "/validation/has_validator";
+	var xhr = new XMLHttpRequest();
+	var fd = new FormData();
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+		var response = xhr.responseText;
+		console.log("hasValidator returned response text ", response);
+		var hasV = response == 'true';
+		self.validate(hasV);
+		self.hasValidator(hasV);
+		self.message("");
+	    } else {
+		self.message("Request failed: " + xhr.responseText + " " + xhr.readyState);
+	    };
+	};
+	fd.append("client_uuid", self.uuid);
+	fd.append("symbolset", self.symbolSetName());
+	xhr.send(fd);	    
+    });
+
     
     self.importLexiconFile = function() {
 	console.log("uploading file: ", self.selectedFile())
