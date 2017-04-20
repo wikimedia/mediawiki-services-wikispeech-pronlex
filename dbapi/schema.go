@@ -148,20 +148,20 @@ CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 -- the same orthographic word (entry.strn), will have the preferred field set to 0.
 CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
   BEGIN
-    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0;
+    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
   END;
 CREATE TRIGGER updatetPref BEFORE UPDATE ON ENTRY
   BEGIN
-    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0;
+    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
   END;
 
 -- Triggers to ensure that there are only one entry status per entry
 --CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS
 --  BEGIN 
---    UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
+--    UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0 AND lexiconid = NEW.lexiconid;
 --  END;
 --CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
 --  BEGIN
---    UPDATE entrystatus SET current = 0 WHERE entryis = NEW.entryid AND NEW.current <> 0;
+--    UPDATE entrystatus SET current = 0 WHERE entryis = NEW.entryid AND NEW.current <> 0 AND lexiconid = NEW.lexiconid;
 --  END;
 `

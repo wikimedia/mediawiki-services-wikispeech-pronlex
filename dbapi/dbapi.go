@@ -363,7 +363,8 @@ func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	}
 
 	//TODO This may be computationally expensive for large lexica?
-	query := `SELECT a.id FROM entry a WHERE a.lexiconid = ? AND NOT EXISTS(SELECT * FROM entry b WHERE a.lexiconid = b.lexiconid AND b.lexiconid == ?)`
+	query :=
+		`SELECT a.id FROM entry a WHERE a.lexiconid = ? AND  NOT EXISTS(SELECT strn FROM entry WHERE lexiconid = ? AND strn = a.strn)`
 
 	movable, err := tx.Query(query, fromLex.ID, toLex.ID)
 	if err != nil {
@@ -390,8 +391,10 @@ func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 			err = fmt.Errorf("%v : %v", err, newErr)
 		}
 	}
-	// Number of entries the will be moved
-	//res.n = len(movableIDs)
+
+	if len(movableIDs) == 0 {
+		return res, err
+	}
 
 	var idsStrn []string
 	for _, n := range movableIDs {
@@ -400,8 +403,11 @@ func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 
 	//TODO The moving is split up into two separate queries. These
 	//could perhaps be merged, and run in a single trip to the db.
-	query2 := "UPDATE entry SET lexiconid = ? WHERE entry.id IN (" + strings.Join(idsStrn, ", ") + ")"
-	qRez, err := tx.Exec(query2)
+	query2 := "UPDATE entry SET lexiconid = ? WHERE entry.id IN (" + strings.Join(idsStrn, ", ") + ") AND lexiconid = ?"
+
+	fmt.Printf("Q: %s\n", query2)
+
+	qRez, err := tx.Exec(query2, toLex.ID, fromLex.ID)
 	if err != nil {
 		tx.Rollback()
 		return res, fmt.Errorf("failed to update lexiconids : %v", err)
