@@ -156,12 +156,12 @@ CREATE TRIGGER updatetPref BEFORE UPDATE ON ENTRY
   END;
 
 -- Triggers to ensure that there are only one entry status per entry
---CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS
---  BEGIN 
---    UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0 AND lexiconid = NEW.lexiconid;
---  END;
---CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
---  BEGIN
---    UPDATE entrystatus SET current = 0 WHERE entryis = NEW.entryid AND NEW.current <> 0 AND lexiconid = NEW.lexiconid;
---  END;
+CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS
+  BEGIN 
+    UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
+  END;
+CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
+  BEGIN
+    UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
+  END;
 `
