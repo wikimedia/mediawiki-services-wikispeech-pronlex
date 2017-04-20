@@ -24,6 +24,12 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))
 	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
 
+	if _, err := os.Stat(lexiconFileName); os.IsNotExist(err) {
+		var msg = fmt.Sprintf("ImportLexionFile failed to open file : %v", err)
+		logger.Write(msg)
+		return fmt.Errorf("%v", msg)
+	}
+
 	fh, err := os.Open(lexiconFileName)
 	defer fh.Close()
 	if err != nil {

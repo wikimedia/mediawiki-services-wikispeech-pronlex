@@ -17,6 +17,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-errors/errors"
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
@@ -25,6 +26,15 @@ import (
 )
 
 // TODO Split this file into packages + main?
+
+// protect: use this call in handlers to catch 'panic' and stack traces and returning a general error to the calling client
+func protect(w http.ResponseWriter) {
+	if r := recover(); r != nil {
+		defer http.Error(w, fmt.Sprintf("%s", "Internal server error"), http.StatusInternalServerError)
+		fmt.Println(errors.Wrap(r, 2).ErrorStack())
+		// TODO: log the actual error to a server log file (but do not return to client)
+	}
+}
 
 // TODO remove calls to this, add error handling
 func ff(f string, err error) {

@@ -27,6 +27,9 @@ func deleteUploadedFile(serverPath string) {
 }
 
 func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
+
+	defer protect(w) // use this call in handlers to catch 'panic' and stack traces and returning a general error to the calling client
+
 	if r.Method != "POST" {
 		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
 		return
@@ -117,6 +120,7 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		deleteUploadedFile(serverPath)
+		return
 	}
 	log.Println("Created lexicon with name:", lexicon.Name)
 
