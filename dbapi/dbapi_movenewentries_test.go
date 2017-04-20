@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	//"time"
 
 	"github.com/stts-se/pronlex/lex"
 )
@@ -80,6 +81,34 @@ func Test_MoveNewEntries(t *testing.T) {
 
 	if w, g := int64(0), res.n; w != g {
 		t.Errorf("Wanted '%d' got '%d'", w, g)
+	}
+
+	// Add entry unique to l1, and this should be movable
+
+	//time.Sleep(20 * time.Second)
+
+	t2 := lex.Transcription{Strn: `"" f I N . e . % rl i: . k a`}
+	e2 := lex.Entry{
+		Strn:           "fingerlikas",
+		PartOfSpeech:   "JJ",
+		Morphology:     "SIN-PLU|IND-DEF|NOM|UTR-NEU|POS|GEN",
+		Language:       "sv",
+		Preferred:      true,
+		Transcriptions: []lex.Transcription{t2},
+		EntryStatus:    lex.EntryStatus{Name: "newEntry", Source: "testSource"},
+	}
+
+	_, err = InsertEntries(db, l1, []lex.Entry{e2})
+	if err != nil {
+		t.Errorf("The horror, the horror : %v", err)
+	}
+
+	res2, err := MoveNewEntries(db, l1.Name, l2.Name, "from:"+l1.Name, "moved")
+	if err != nil {
+		t.Errorf("No fun : %v", err)
+	}
+	if w, g := int64(1), res2.n; w != g {
+		t.Errorf("wanted %v got %v", w, g)
 	}
 
 }

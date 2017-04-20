@@ -363,51 +363,63 @@ func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	}
 
 	//TODO This may be computationally expensive for large lexica?
-	query :=
-		`SELECT a.id FROM entry a WHERE a.lexiconid = ? AND  NOT EXISTS(SELECT strn FROM entry WHERE lexiconid = ? AND strn = a.strn)`
+	// query :=
+	// 	`SELECT a.id FROM entry a WHERE a.lexiconid = ? AND  NOT EXISTS(SELECT strn FROM entry WHERE lexiconid = ? AND strn = a.strn)`
 
-	movable, err := tx.Query(query, fromLex.ID, toLex.ID)
+	// movable, err := tx.Query(query, fromLex.ID, toLex.ID)
+	// if err != nil {
+	// 	tx.Rollback()
+	// 	return res, fmt.Errorf("select query failed : %v", err)
+	// }
+	// defer movable.Close()
+
+	// var movableIDs []int64
+	// for movable.Next() {
+	// 	var id int64
+	// 	if err := movable.Scan(&id); err != nil {
+	// 		return res, fmt.Errorf("failed retrieving query result : %v", err)
+	// 	}
+	// 	movableIDs = append(movableIDs, id)
+	// }
+
+	// if err0 := movable.Err(); err0 != nil {
+	// 	newErr := fmt.Errorf("MoveNewEntriesTx suffered a db mishap : %v", err0)
+	// 	if err == nil {
+	// 		err = newErr
+	// 	} else {
+
+	// 		err = fmt.Errorf("%v : %v", err, newErr)
+	// 	}
+	// }
+
+	// if len(movableIDs) == 0 {
+	// 	return res, err
+	// }
+
+	// var idsStrn []string
+	// for _, n := range movableIDs {
+	// 	idsStrn = append(idsStrn, strconv.Itoa(int(n)))
+	// }
+
+	where := `WHERE entry.id IN (SELECT a.id FROM entry a WHERE a.lexiconid = ?
+                       AND NOT EXISTS(SELECT strn FROM entry WHERE lexiconid = ? AND strn = a.strn))`
+
+	insertQuery := `INSERT INTO entrystatus (name, source, entryid, current) SELECT ?, ?, entry.id, '1' FROM entry ` + where
+
+	// updateQuery0 := `UPDATE entrystatus SET current = 1 AND source = ? AND name = ? ` + where + ` AND entrystatus.entryid = entry.id`
+	q0Rez, err := tx.Exec(insertQuery, status, source, fromLex.ID, toLex.ID)
 	if err != nil {
 		tx.Rollback()
-		return res, fmt.Errorf("select query failed : %v", err)
-	}
-	defer movable.Close()
-
-	var movableIDs []int64
-	for movable.Next() {
-		var id int64
-		if err := movable.Scan(&id); err != nil {
-			return res, fmt.Errorf("failed retrieving query result : %v", err)
-		}
-		movableIDs = append(movableIDs, id)
+		return res, fmt.Errorf("failed to update entrystatus : %v", err)
 	}
 
-	if err0 := movable.Err(); err0 != nil {
-		newErr := fmt.Errorf("MoveNewEntriesTx suffered a db mishap : %v", err0)
-		if err == nil {
-			err = newErr
-		} else {
+	_ = q0Rez
 
-			err = fmt.Errorf("%v : %v", err, newErr)
-		}
-	}
+	updateQuery := `UPDATE entry SET lexiconid = ? ` + where
 
-	if len(movableIDs) == 0 {
-		return res, err
-	}
+	//fmt.Printf("Q: %s\n", updateQuery)
 
-	var idsStrn []string
-	for _, n := range movableIDs {
-		idsStrn = append(idsStrn, strconv.Itoa(int(n)))
-	}
-
-	//TODO The moving is split up into two separate queries. These
-	//could perhaps be merged, and run in a single trip to the db.
-	query2 := "UPDATE entry SET lexiconid = ? WHERE entry.id IN (" + strings.Join(idsStrn, ", ") + ") AND lexiconid = ?"
-
-	fmt.Printf("Q: %s\n", query2)
-
-	qRez, err := tx.Exec(query2, toLex.ID, fromLex.ID)
+	qRez, err := tx.Exec(updateQuery, toLex.ID, fromLex.ID, toLex.ID)
 	if err != nil {
 		tx.Rollback()
 		return res, fmt.Errorf("failed to update lexiconids : %v", err)
