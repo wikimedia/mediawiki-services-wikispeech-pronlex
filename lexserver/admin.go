@@ -153,33 +153,6 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 	f.Close()
 	deleteUploadedFile(serverPath)
 
-	// if validate {
-	// 	start := time.Now()
-	// 	logger.Write("validating lexicon ... ")
-	// 	fmt.Fprintf(w, "validating lexicon ...")
-	// 	vMut.Lock()
-	// 	v, err := vMut.service.ValidatorForName(lexicon.SymbolSetName)
-	// 	vMut.Unlock()
-	// 	if err != nil {
-	// 		msg := fmt.Sprintf("lexiconRunValidateHandler failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
-	// 		log.Println(msg)
-	// 		http.Error(w, msg, http.StatusBadRequest)
-	// 		return
-	// 	}
-
-	// 	q := dbapi.Query{Lexicons: []dbapi.Lexicon{lexicon}}
-	// 	stats, err := dbapi.Validate(db, logger, *v, q)
-	// 	if err != nil {
-	// 		msg := fmt.Sprintf("lexiconRunValidateHandler failed validate : %v", err)
-	// 		log.Println(msg)
-	// 		http.Error(w, msg, http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	dur := round(time.Since(start), time.Second)
-	// 	fmt.Fprintf(w, "\nValidation took %v\n", dur)
-	// 	fmt.Fprint(w, stats)
-	// }
-
 	entryCount, err := dbapi.EntryCount(db, lexicon.ID)
 	if err != nil {
 		msg := fmt.Sprintf("lexicon imported, but couldn't retrieve lexicon info from server : %v", err)
