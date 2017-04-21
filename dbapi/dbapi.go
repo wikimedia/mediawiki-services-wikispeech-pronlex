@@ -334,21 +334,55 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 	return Lexicon{ID: id, Name: strings.ToLower(l.Name), SymbolSetName: l.SymbolSetName}, err
 }
 
+// MoveResult is returned from the MoveNewEntries function.
+// TODO Since it only contains a single int64, this struct is probably not needed.
+// Only useful if more info is to be returned.
 type MoveResult struct {
 	n int64
 }
 
+// MoveNewEntries moves lexical entries from the lexicon named
+// fromLexicon to the lexicon named toLexicon.  The 'source' string is
+// the name of the source of the entries to be moved, and 'status' is
+// the name of the new status to set on the moved entries.  Currently,
+// source and/or status may not be the empty string. TODO: Maybe it
+// should be possible to skip source and status values?
+//
+// Only "new" entries are moved, i.e., entries with lex.Entry.Strn
+// values found in fromLexicon but *not* found in toLexicon.  The
+// rationale behind this function is to first create a small
+// additional lexicon with new entries (the fromLexicon), that can
+// later be appended to the master lexicon (the toLexicon).
 func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
+	if strings.TrimSpace(source) == "" {
+		msg := "MoveNewEntries called with the empty 'source' argument"
+		return MoveResult{}, fmt.Errorf(msg)
+	}
+	if strings.TrimSpace(status) == "" {
+		msg := "MoveNewEntries called with the empty 'status' argument"
+		return MoveResult{}, fmt.Errorf(msg)
+	}
+
 	tx, err := db.Begin()
 	if err != nil {
 		return MoveResult{}, fmt.Errorf("failed to get db transaction : %v", err)
 	}
 	defer tx.Commit()
 
-	return MoveNewEntriesTx(tx, fromLexicon, toLexicon, source, status)
+	return moveNewEntriesTx(tx, fromLexicon, toLexicon, source, status)
 }
 
-func MoveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
+// moveNewEntriesTx is documented under MoveNewEntries
+func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
+	if strings.TrimSpace(source) == "" {
+		msg := "moveNewEntriesTx called with the empty 'source' argument"
+		return MoveResult{}, fmt.Errorf(msg)
+	}
+	if strings.TrimSpace(status) == "" {
+		msg := "moveNewEntriesTx called with the empty 'status' argument"
+		return MoveResult{}, fmt.Errorf(msg)
+	}
+
 	res := MoveResult{}
 	var err error
 	fromLex, err := GetLexiconTx(tx, fromLexicon)
