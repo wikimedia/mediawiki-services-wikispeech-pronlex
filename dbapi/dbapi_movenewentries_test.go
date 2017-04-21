@@ -85,8 +85,6 @@ func Test_MoveNewEntries(t *testing.T) {
 
 	// Add entry unique to l1, and this should be movable
 
-	//time.Sleep(20 * time.Second)
-
 	t2 := lex.Transcription{Strn: `"" f I N . e . % rl i: . k a`}
 	e2 := lex.Entry{
 		Strn:           "fingerlikas",
@@ -108,6 +106,45 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("No fun : %v", err)
 	}
 	if w, g := int64(1), res2.n; w != g {
+		t.Errorf("wanted %v got %v", w, g)
+	}
+
+	statsL1, err := LexiconStats(db, l1.ID)
+	if err != nil {
+		t.Errorf("didn't expect that : %v", err)
+	}
+	if w, g := int64(1), statsL1.Entries; w != g {
+		t.Errorf("wanted %v got %v", w, g)
+	}
+	statsL2, err := LexiconStats(db, l2.ID)
+	if err != nil {
+		t.Errorf("didn't expect that : %v", err)
+	}
+	if w, g := int64(2), statsL2.Entries; w != g {
+		t.Errorf("wanted %v got %v", w, g)
+	}
+
+	// Move back again
+	res3, err := MoveNewEntries(db, l2.Name, l1.Name, "from:"+l2.Name, "moved_back")
+	if err != nil {
+		t.Errorf("No fun : %v", err)
+	}
+	if w, g := int64(1), res3.n; w != g {
+		t.Errorf("wanted %v got %v", w, g)
+	}
+
+	statsL1b, err := LexiconStats(db, l1.ID)
+	if err != nil {
+		t.Errorf("didn't expect that : %v", err)
+	}
+	if w, g := int64(2), statsL1b.Entries; w != g {
+		t.Errorf("wanted %v got %v", w, g)
+	}
+	statsL2b, err := LexiconStats(db, l2.ID)
+	if err != nil {
+		t.Errorf("didn't expect that : %v", err)
+	}
+	if w, g := int64(1), statsL2b.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
