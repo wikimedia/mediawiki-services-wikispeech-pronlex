@@ -53,6 +53,12 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("holy cow (2)! : %v", err)
 	}
 
+	l3 := Lexicon{Name: "test3", SymbolSetName: "ZZ"}
+	l3, err = InsertLexicon(db, l3)
+	if err != nil {
+		t.Errorf("holy cow (3)! : %v", err)
+	}
+
 	t1 := lex.Transcription{Strn: `"" f I N . e . % rl i: . k a`}
 	e1 := lex.Entry{
 		Strn:           "fingerlika",
@@ -101,6 +107,12 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("The horror, the horror : %v", err)
 	}
 
+	// Insert the same entry in "unrelated" third lexicon, to or from which nothing should be moved
+	_, err = InsertEntries(db, l3, []lex.Entry{e2})
+	if err != nil {
+		t.Errorf("Unbelievable! : %v", err)
+	}
+
 	res2, err := MoveNewEntries(db, l1.Name, l2.Name, "from:"+l1.Name, "moved")
 	if err != nil {
 		t.Errorf("No fun : %v", err)
@@ -145,6 +157,14 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("didn't expect that : %v", err)
 	}
 	if w, g := int64(1), statsL2b.Entries; w != g {
+		t.Errorf("wanted %v got %v", w, g)
+	}
+
+	statsL3, err := LexiconStats(db, l3.ID)
+	if err != nil {
+		t.Errorf("didn't expect that : %v", err)
+	}
+	if w, g := int64(1), statsL3.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
