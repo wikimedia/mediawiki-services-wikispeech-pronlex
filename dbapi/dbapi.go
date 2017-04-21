@@ -376,10 +376,12 @@ func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (
 func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
 	if strings.TrimSpace(source) == "" {
 		msg := "moveNewEntriesTx called with the empty 'source' argument"
+		tx.Rollback()
 		return MoveResult{}, fmt.Errorf(msg)
 	}
 	if strings.TrimSpace(status) == "" {
 		msg := "moveNewEntriesTx called with the empty 'status' argument"
+		tx.Rollback()
 		return MoveResult{}, fmt.Errorf(msg)
 	}
 
@@ -388,11 +390,13 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	fromLex, err := GetLexiconTx(tx, fromLexicon)
 	if err != nil {
 		err := fmt.Errorf("couldn't find lexicon '%s' : %v", fromLexicon, err)
+		tx.Rollback()
 		return res, err
 	}
 	toLex, err := GetLexiconTx(tx, toLexicon)
 	if err != nil {
 		err := fmt.Errorf("couldn't find lexicon '%s' : %v", toLexicon, err)
+		tx.Rollback()
 		return res, err
 	}
 
@@ -447,7 +451,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 		return res, fmt.Errorf("failed to update entrystatus : %v", err)
 	}
 
-	_ = q0Rez
+	//_ = q0Rez
 
 	updateQuery := `UPDATE entry SET lexiconid = ? ` + where
 
@@ -457,6 +461,13 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	if err != nil {
 		tx.Rollback()
 		return res, fmt.Errorf("failed to update lexiconids : %v", err)
+	}
+
+	//TODO Should this result in an error and rollback?
+	q0N, _ := q0Rez.RowsAffected()
+	qN, _ := qRez.RowsAffected()
+	if q0N != qN {
+		log.Printf("dbapi.moveNewEntriesTx: UPDATE and INSERT queries affected different number of rows: %v and %v", q0N, qN)
 	}
 
 	if n, err := qRez.RowsAffected(); err == nil {
