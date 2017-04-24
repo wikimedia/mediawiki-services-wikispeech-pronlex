@@ -273,6 +273,17 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 	return q, err
 }
 
+// Remove initial and trailing " or ' from string
+func delQuote(s string) string {
+	res := s
+	res = strings.TrimPrefix(res, `"`)
+	res = strings.TrimPrefix(res, `'`)
+	res = strings.TrimSuffix(res, `"`)
+	res = strings.TrimSuffix(res, `'`)
+
+	return strings.TrimSpace(res)
+}
+
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 	entryJSON := r.FormValue("entry")
 	//body, err := ioutil.ReadAll(r.Body)
@@ -767,6 +778,9 @@ func main() {
 
 	http.HandleFunc("/lexicon/updateentry", updateEntryHandler)
 	http.HandleFunc("/updateentry", apiChangedHandler("/lexicon/updateentry instead"))
+
+	// defined in file move_new_entries_handler.go.
+	http.HandleFunc("/lexicon/move_new_entries", moveNewEntriesHandler)
 
 	http.HandleFunc("/lexicon/validate", lexiconValidateHandler)
 	http.HandleFunc("/lexicon/do_validate", lexiconRunValidateHandler)

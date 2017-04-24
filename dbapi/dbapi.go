@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/lex"
@@ -100,14 +101,27 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 
 func GetLexiconTx(tx *sql.Tx, name string) (Lexicon, error) {
 	res := Lexicon{}
-	name = strings.ToLower(name)
-	var err error
-	//err := tx.QueryRow()
+	name0 := strings.ToLower(name)
 
-	err = tx.QueryRow("select id, name, symbolsetname from lexicon where name = ?", name).Scan(&res.ID, &res.Name, &res.SymbolSetName)
-	if err != nil {
-		err = fmt.Errorf("failed to find lexicon in db : %v", err)
+	fmt.Printf("%<<<<<<<<< %#v %v\n", tx, name)
+
+	//err := tx.QueryRow()
+	var err error
+
+	fmt.Println("XXXXXX>>>>>>>>>> " + name)
+	//fmt.Println("XXXXXX>>>>>>>>>> " + name0)
+
+	row := tx.QueryRow("select id, name, symbolsetname from lexicon where name = ? ", name0).Scan(&res.ID, &res.Name, &res.SymbolSetName)
+	if row == sql.ErrNoRows {
+		fmt.Printf("VARFÖR?!?!?! %v \n", res)
+		return res, fmt.Errorf("could'f find lexicon %s", name)
 	}
+
+	// if err0 != nil {
+	// 	err = fmt.Errorf("failed to find lexicon in db : %v", err0)
+	// }
+	// fmt.Printf("XXXXXX>>>>>>ERR %#v\n", err0)
+	fmt.Printf("XXXXXX>>>>>>>>>> %#v\n", res)
 
 	return res, err
 
@@ -338,7 +352,7 @@ func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 // TODO Since it only contains a single int64, this struct is probably not needed.
 // Only useful if more info is to be returned.
 type MoveResult struct {
-	n int64
+	N int64
 }
 
 // MoveNewEntries moves lexical entries from the lexicon named
@@ -389,13 +403,13 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	var err error
 	fromLex, err := GetLexiconTx(tx, fromLexicon)
 	if err != nil {
-		err := fmt.Errorf("couldn't find lexicon '%s' : %v", fromLexicon, err)
+		err := fmt.Errorf("couldn't find lexicon %s : %v", fromLexicon, err)
 		tx.Rollback()
 		return res, err
 	}
 	toLex, err := GetLexiconTx(tx, toLexicon)
 	if err != nil {
-		err := fmt.Errorf("couldn't find lexicon '%s' : %v", toLexicon, err)
+		err := fmt.Errorf("couldn't find lexicon %s : %v", toLexicon, err)
 		tx.Rollback()
 		return res, err
 	}
@@ -471,7 +485,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	}
 
 	if n, err := qRez.RowsAffected(); err == nil {
-		res.n = n
+		res.N = n
 	}
 	return res, err
 }

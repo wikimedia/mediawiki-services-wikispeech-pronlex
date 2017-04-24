@@ -85,7 +85,7 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("What?! : %v", err)
 	}
 
-	if w, g := int64(0), res.n; w != g {
+	if w, g := int64(0), res.N; w != g {
 		t.Errorf("Wanted '%d' got '%d'", w, g)
 	}
 
@@ -117,7 +117,7 @@ func Test_MoveNewEntries(t *testing.T) {
 	if err != nil {
 		t.Errorf("No fun : %v", err)
 	}
-	if w, g := int64(1), res2.n; w != g {
+	if w, g := int64(1), res2.N; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
@@ -141,7 +141,7 @@ func Test_MoveNewEntries(t *testing.T) {
 	if err != nil {
 		t.Errorf("No fun : %v", err)
 	}
-	if w, g := int64(1), res3.n; w != g {
+	if w, g := int64(1), res3.N; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
