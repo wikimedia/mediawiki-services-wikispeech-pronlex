@@ -102,26 +102,12 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 func GetLexiconTx(tx *sql.Tx, name string) (Lexicon, error) {
 	res := Lexicon{}
 	name0 := strings.ToLower(name)
-
-	fmt.Printf("%<<<<<<<<< %#v %v\n", tx, name)
-
-	//err := tx.QueryRow()
 	var err error
-
-	fmt.Println("XXXXXX>>>>>>>>>> " + name)
-	//fmt.Println("XXXXXX>>>>>>>>>> " + name0)
 
 	row := tx.QueryRow("select id, name, symbolsetname from lexicon where name = ? ", name0).Scan(&res.ID, &res.Name, &res.SymbolSetName)
 	if row == sql.ErrNoRows {
-		fmt.Printf("VARFÖR?!?!?! %v \n", res)
-		return res, fmt.Errorf("could'f find lexicon %s", name)
+		return res, fmt.Errorf("could'f find lexicon '%s'", name)
 	}
-
-	// if err0 != nil {
-	// 	err = fmt.Errorf("failed to find lexicon in db : %v", err0)
-	// }
-	// fmt.Printf("XXXXXX>>>>>>ERR %#v\n", err0)
-	fmt.Printf("XXXXXX>>>>>>>>>> %#v\n", res)
 
 	return res, err
 
