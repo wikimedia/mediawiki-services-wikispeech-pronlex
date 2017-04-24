@@ -1432,7 +1432,9 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 	t4 := time.Now()
 	//log.Printf("dbapi.LexiconStats VAL STATS TOOK %v\n", t4.Sub(t3))
 
-	log.Printf("dbapi.LexiconStats STATS TOOK %v\n", t4.Sub(t1))
+	_ = t1
+	_ = t4
+	//log.Printf("dbapi.LexiconStats STATS TOOK %v\n", t4.Sub(t1))
 
 	return res, err
 
