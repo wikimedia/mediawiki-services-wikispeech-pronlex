@@ -23,3 +23,17 @@ SUFFIX:skrotar
 SUFFIX:skrotars
 SUFFIX:skrotarna
 SUFFIX:skrotarnas
+PREFIX:skum
+PREFIX:skumaaa
+PREFIX:banan
+PREFIX:qwerty
+PREFIX:kanin
+PREFIX:aaaapaaa
+PREFIX:aaaapaa
+SUFFIX:kanon
+SUFFIX:kanoner
+SUFFIX:kanonerna
+SUFFIX:apor
+PREFIX:apnos
+PREFIX:gulrot
+
