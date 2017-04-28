@@ -36,12 +36,4 @@ SUFFIX:kanonerna
 SUFFIX:apor
 PREFIX:apnos
 PREFIX:gulrot
-PREFIX:knyxx
-REMOVE:PREFIX:apnos
-SUFFIX:svnitotte
-REMOVE:SUFFIX:svnitotte
-PREFIX:ghgh
-REMOVE:PREFIX:ghgh
-PREFIX:dgdgdg
-PREFIX:___
-PREFIX:hjhj
+
