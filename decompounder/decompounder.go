@@ -600,7 +600,7 @@ func pathsAccu(as map[int][]arc, from, to int, currPath []arc, paths *[][]arc) {
 				continue
 			}
 		}
-		// Keep threading down the path
+		// Keep treading down the path
 		newPath := currPath
 		newPath = append(newPath, arc)
 		pathsAccu(as, arc.end, to, newPath, paths)
