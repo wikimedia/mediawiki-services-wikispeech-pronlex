@@ -81,11 +81,16 @@ type SymbolSet struct {
 	isInit bool
 
 	// derived values computed upon initialization
-	phonemes        []Symbol
-	phoneticSymbols []Symbol
-	stressSymbols   []Symbol
-	syllabic        []Symbol
-	nonSyllabic     []Symbol
+
+	// Phonemes: actual phonemes (syllabic non-syllabic)
+	Phonemes []Symbol
+
+	// PhoneticSymbols: Phonemes and stress
+	PhoneticSymbols []Symbol
+
+	stressSymbols []Symbol
+	syllabic      []Symbol
+	nonSyllabic   []Symbol
 
 	PhonemeRe     *regexp.Regexp
 	SyllabicRe    *regexp.Regexp

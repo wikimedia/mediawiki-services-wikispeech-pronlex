@@ -152,8 +152,8 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 
 		isInit: true,
 
-		phonemes:        phonemes,
-		phoneticSymbols: phoneticSymbols,
+		Phonemes:        phonemes,
+		PhoneticSymbols: phoneticSymbols,
 		stressSymbols:   stressSymbols,
 		syllabic:        syllabic,
 		nonSyllabic:     nonSyllabic,
