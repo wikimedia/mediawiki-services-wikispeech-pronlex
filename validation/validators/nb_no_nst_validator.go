@@ -2,6 +2,7 @@ package validators
 
 import (
 	"strings"
+
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
@@ -31,7 +32,7 @@ func newNbNoNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, e
 		AcceptEmptyDecomp: true,
 		PreFilterWordPartString: func(s string) (string, error) {
 			res, err := reFrom.Replace(s, "$1+$1", 0, -1)
-			res = strings.ToLower(strings.Replace(res,"!","",-1))
+			res = strings.ToLower(strings.Replace(res, "!", "", -1))
 			if err != nil {
 				return s, err
 			}
@@ -44,22 +45,22 @@ func newNbNoNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, e
 			rules.MustHaveTrans{},
 			rules.NoEmptyTrans{},
 			rules.RequiredTransRe{
-				Name:    "primary_stress",
-				Level:   "Fatal",
-				Message: "Primary stress required",
-				Re:      primaryStressRe,
+				NameStr:  "primary_stress",
+				LevelStr: "Fatal",
+				Message:  "Primary stress required",
+				Re:       primaryStressRe,
 			},
 			rules.IllegalTransRe{
-				Name:    "stress_first",
-				Level:   "Fatal",
-				Message: "Stress can only be used in syllable initial position",
-				Re:      stressFirst,
+				NameStr:  "stress_first",
+				LevelStr: "Fatal",
+				Message:  "Stress can only be used in syllable initial position",
+				Re:       stressFirst,
 			},
 			rules.RequiredTransRe{
-				Name:    "syllabic",
-				Level:   "Format",
-				Message: "Each syllable needs a syllabic phoneme",
-				Re:      syllabicRe,
+				NameStr:  "syllabic",
+				LevelStr: "Format",
+				Message:  "Each syllable needs a syllabic phoneme",
+				Re:       syllabicRe,
 			},
 			decomp2Orth,
 			rules.SymbolSetRule{

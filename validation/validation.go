@@ -32,6 +32,8 @@ type Rule interface {
 	Validate(lex.Entry) (Result, error)
 	ShouldAccept() []lex.Entry
 	ShouldReject() []lex.Entry
+	Name() string
+	Level() string
 }
 
 // Validator is a struct containing a slice of rules

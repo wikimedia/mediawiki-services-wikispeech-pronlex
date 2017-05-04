@@ -31,6 +31,12 @@ func (r testMustHaveTrans) ShouldAccept() []lex.Entry {
 func (r testMustHaveTrans) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
+func (r testMustHaveTrans) Name() string {
+	return ""
+}
+func (r testMustHaveTrans) Level() string {
+	return ""
+}
 
 type testNoEmptyTrans struct {
 }
@@ -53,6 +59,12 @@ func (r testNoEmptyTrans) ShouldAccept() []lex.Entry {
 func (r testNoEmptyTrans) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
+func (r testNoEmptyTrans) Name() string {
+	return ""
+}
+func (r testNoEmptyTrans) Level() string {
+	return ""
+}
 
 type testDecomp2Orth struct {
 }
@@ -73,6 +85,12 @@ func (r testDecomp2Orth) ShouldAccept() []lex.Entry {
 }
 func (r testDecomp2Orth) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
+}
+func (r testDecomp2Orth) Name() string {
+	return ""
+}
+func (r testDecomp2Orth) Level() string {
+	return ""
 }
 
 func Test1(t *testing.T) {
