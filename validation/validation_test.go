@@ -35,10 +35,10 @@ func ProcessTransRe(SymbolSet symbolset.SymbolSet, Regexp string) (*regexp2.Rege
 
 // RequiredTransRe is a general rule type used to defined basic transcription requirements using regexps
 type RequiredTransRe struct {
-	Name    string
-	Level   string
-	Message string
-	Re      *regexp2.Regexp
+	NameStr  string
+	LevelStr string
+	Message  string
+	Re       *regexp2.Regexp
 }
 
 func (r RequiredTransRe) Validate(e lex.Entry) (Result, error) {
@@ -46,14 +46,14 @@ func (r RequiredTransRe) Validate(e lex.Entry) (Result, error) {
 	for _, t := range e.Transcriptions {
 		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); !m {
 			if err != nil {
-				return Result{RuleName: r.Name, Level: r.Level}, err
+				return Result{RuleName: r.Name(), Level: r.Level()}, err
 			}
 			messages = append(
 				messages,
 				fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 		}
 	}
-	return Result{RuleName: r.Name, Level: r.Level, Messages: messages}, nil
+	return Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 
 func (r RequiredTransRe) ShouldAccept() []lex.Entry {
@@ -61,6 +61,12 @@ func (r RequiredTransRe) ShouldAccept() []lex.Entry {
 }
 func (r RequiredTransRe) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
+}
+func (r RequiredTransRe) Name() string {
+	return r.NameStr
+}
+func (r RequiredTransRe) Level() string {
+	return r.LevelStr
 }
 
 func createEntries() []lex.Entry {
@@ -125,16 +131,16 @@ func createValidator() Validator {
 		Name: ss.Name,
 		Rules: []Rule{
 			RequiredTransRe{
-				Name:    "primary_stress",
-				Level:   "Fatal",
-				Message: "Primary stress required",
-				Re:      primaryStressRe,
+				NameStr:  "primary_stress",
+				LevelStr: "Fatal",
+				Message:  "Primary stress required",
+				Re:       primaryStressRe,
 			},
 			RequiredTransRe{
-				Name:    "syllabic",
-				Level:   "Format",
-				Message: "Each syllable needs a syllabic phoneme",
-				Re:      syllabicRe,
+				NameStr:  "syllabic",
+				LevelStr: "Format",
+				Message:  "Each syllable needs a syllabic phoneme",
+				Re:       syllabicRe,
 			},
 		}}
 	return v

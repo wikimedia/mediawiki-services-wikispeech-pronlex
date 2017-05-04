@@ -31,13 +31,20 @@ func (r SymbolSetRule) Validate(e lex.Entry) (validation.Result, error) {
 			}
 		}
 	}
-	return validation.Result{RuleName: "SymbolSet", Level: "Fatal", Messages: messages}, nil
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 func (r SymbolSetRule) ShouldAccept() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
 func (r SymbolSetRule) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
+}
+
+func (r SymbolSetRule) Name() string {
+	return "SymbolSet"
+}
+func (r SymbolSetRule) Level() string {
+	return "Fatal"
 }
 
 /*
@@ -53,12 +60,12 @@ func ProcessTransRe(SymbolSet symbolset.SymbolSet, Regexp string) (*regexp2.Rege
 
 // IllegalTransRe is a general rule type to check for illegal transcriptions by regexp
 type IllegalTransRe struct {
-	Name    string
-	Level   string
-	Message string
-	Re      *regexp2.Regexp
-	Accept  []lex.Entry
-	Reject  []lex.Entry
+	NameStr  string
+	LevelStr string
+	Message  string
+	Re       *regexp2.Regexp
+	Accept   []lex.Entry
+	Reject   []lex.Entry
 }
 
 // Validate a lex.Entry
@@ -67,14 +74,14 @@ func (r IllegalTransRe) Validate(e lex.Entry) (validation.Result, error) {
 	for _, t := range e.Transcriptions {
 		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); m {
 			if err != nil {
-				return validation.Result{RuleName: r.Name, Level: r.Level}, err
+				return validation.Result{RuleName: r.Name(), Level: r.Level()}, err
 			}
 			messages = append(
 				messages,
 				fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 		}
 	}
-	return validation.Result{RuleName: r.Name, Level: r.Level, Messages: messages}, nil
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 func (r IllegalTransRe) ShouldAccept() []lex.Entry {
 	return r.Accept
@@ -82,15 +89,21 @@ func (r IllegalTransRe) ShouldAccept() []lex.Entry {
 func (r IllegalTransRe) ShouldReject() []lex.Entry {
 	return r.Reject
 }
+func (r IllegalTransRe) Name() string {
+	return r.NameStr
+}
+func (r IllegalTransRe) Level() string {
+	return r.LevelStr
+}
 
 // RequiredTransRe is a general rule type used to defined basic transcription requirements using regexps
 type RequiredTransRe struct {
-	Name    string
-	Level   string
-	Message string
-	Re      *regexp2.Regexp
-	Accept  []lex.Entry
-	Reject  []lex.Entry
+	NameStr  string
+	LevelStr string
+	Message  string
+	Re       *regexp2.Regexp
+	Accept   []lex.Entry
+	Reject   []lex.Entry
 }
 
 // Validate a lex.Entry
@@ -99,20 +112,26 @@ func (r RequiredTransRe) Validate(e lex.Entry) (validation.Result, error) {
 	for _, t := range e.Transcriptions {
 		if m, err := r.Re.MatchString(strings.TrimSpace(t.Strn)); !m {
 			if err != nil {
-				return validation.Result{RuleName: r.Name, Level: r.Level}, err
+				return validation.Result{RuleName: r.Name(), Level: r.Level()}, err
 			}
 			messages = append(
 				messages,
 				fmt.Sprintf("%s. Found: /%s/", r.Message, t.Strn))
 		}
 	}
-	return validation.Result{RuleName: r.Name, Level: r.Level, Messages: messages}, nil
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 func (r RequiredTransRe) ShouldAccept() []lex.Entry {
 	return r.Accept
 }
 func (r RequiredTransRe) ShouldReject() []lex.Entry {
 	return r.Reject
+}
+func (r RequiredTransRe) Name() string {
+	return r.NameStr
+}
+func (r RequiredTransRe) Level() string {
+	return r.LevelStr
 }
 
 // MustHaveTrans is a general rule to make sure each entry has at least one transcription
@@ -121,19 +140,23 @@ type MustHaveTrans struct {
 
 // Validate a lex.Entry
 func (r MustHaveTrans) Validate(e lex.Entry) (validation.Result, error) {
-	name := "MustHaveTrans"
-	level := "Format"
 	var messages = make([]string, 0)
 	if len(e.Transcriptions) == 0 {
 		messages = append(messages, "At least one transcription is required")
 	}
-	return validation.Result{RuleName: name, Level: level, Messages: messages}, nil
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 func (r MustHaveTrans) ShouldAccept() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
 func (r MustHaveTrans) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
+}
+func (r MustHaveTrans) Name() string {
+	return "MustHaveTrans"
+}
+func (r MustHaveTrans) Level() string {
+	return "Format"
 }
 
 // NoEmptyTrans is a general rule to make sure no transcriptions are be empty
@@ -142,21 +165,25 @@ type NoEmptyTrans struct {
 
 // Validate a lex.Entry
 func (r NoEmptyTrans) Validate(e lex.Entry) (validation.Result, error) {
-	name := "NoEmptyTrans"
-	level := "Format"
 	var messages = make([]string, 0)
 	for _, t := range e.Transcriptions {
 		if len(strings.TrimSpace(t.Strn)) == 0 {
 			messages = append(messages, "Empty transcriptions are not allowed")
 		}
 	}
-	return validation.Result{RuleName: name, Level: level, Messages: messages}, nil
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 func (r NoEmptyTrans) ShouldAccept() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
 func (r NoEmptyTrans) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
+}
+func (r NoEmptyTrans) Name() string {
+	return "NoEmptyTrans"
+}
+func (r NoEmptyTrans) Level() string {
+	return "Format"
 }
 
 // Decomp2Orth is a general rule type to validate the word parts vs. the orthography. A filter is used to control the filtering, typically how to treat triple consonants at boundaries.
@@ -170,11 +197,9 @@ type Decomp2Orth struct {
 
 // Validate a lex.Entry
 func (r Decomp2Orth) Validate(e lex.Entry) (validation.Result, error) {
-	name := "Decomp2Orth"
-	level := "Fatal"
 	var messages = make([]string, 0)
 	if r.AcceptEmptyDecomp && len(strings.TrimSpace(e.WordParts)) == 0 {
-		return validation.Result{RuleName: name, Level: level, Messages: messages}, nil
+		return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 	}
 	filteredWordParts, err := r.PreFilterWordPartString(e.WordParts)
 	if err != nil {
@@ -186,7 +211,7 @@ func (r Decomp2Orth) Validate(e lex.Entry) (validation.Result, error) {
 			messages,
 			fmt.Sprintf("decomp/orth mismatch: %s/%s", e.WordParts, e.Strn))
 	}
-	return validation.Result{RuleName: name, Level: level, Messages: messages}, nil
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 
 func (r Decomp2Orth) ShouldAccept() []lex.Entry {
@@ -194,4 +219,10 @@ func (r Decomp2Orth) ShouldAccept() []lex.Entry {
 }
 func (r Decomp2Orth) ShouldReject() []lex.Entry {
 	return r.Accept
+}
+func (r Decomp2Orth) Name() string {
+	return "Decomp2Orth"
+}
+func (r Decomp2Orth) Level() string {
+	return "Fatal"
 }
