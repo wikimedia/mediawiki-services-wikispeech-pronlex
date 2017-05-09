@@ -28,6 +28,7 @@ func postFilter(ss SymbolSet, trans string, toType Type) (string, error) {
 
 var ipaAccentI = "\u02C8"
 var ipaAccentII = "\u0300"
+var ipaSecStress = "\u02CC"
 var ipaLength = "\u02D0"
 var cmuString = "cmu"
 
@@ -46,8 +47,16 @@ func filterBeforeMappingFromIPA(ss SymbolSet, trans string) (string, error) {
 
 func filterAfterMappingToIPA(ss SymbolSet, trans string) (string, error) {
 	// IPA: /ə.ba⁀ʊˈt/ => /ə.ˈba⁀ʊt/
-	s := "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")" + ipaAccentI
+	s := "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")" + ipaSecStress
 	repl, err := regexp.Compile(s)
+	if err != nil {
+		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
+	}
+	trans = repl.ReplaceAllString(trans, ipaSecStress+"$1$2")
+
+	// Move sec stress to consonant cluster before the vowel
+	s = "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")" + ipaAccentI
+	repl, err = regexp.Compile(s)
 	if err != nil {
 		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
 	}

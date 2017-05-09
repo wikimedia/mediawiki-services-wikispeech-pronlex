@@ -516,3 +516,13 @@ func Test_LoadMapperFromFile_FailIfBothHaveTheSameFile(t *testing.T) {
 		t.Errorf("LoadMapperFromFile() expected error here")
 	}
 }
+
+func Test_MapperFromFile_CMU2WS(t *testing.T) {
+	mapper, err := LoadMapperFromFile("ENU-CMU", "ENU-WS", "test_data/en-us_cmu.tab", "test_data/en-us_ws-sampa.tab")
+	if err != nil {
+		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
+		return
+	}
+
+	testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "' p l { t @ % p U s")
+}

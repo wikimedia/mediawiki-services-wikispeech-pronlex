@@ -298,8 +298,8 @@ func Test_LoadSymbolSetsFromDir(t *testing.T) {
 	for _, ss := range symbolsets {
 		ssNames = append(ssNames, ss.Name)
 	}
-	if len(symbolsets) != 7 {
-		t.Errorf("Expected 7 symbol sets in folder ./test_data, found %d", len(symbolsets))
+	if len(symbolsets) != 8 {
+		t.Errorf("Expected 8 symbol sets in folder ./test_data, found %d", len(symbolsets))
 	}
 	if !stringSliceContains(ssNames, "sv-se_nst-xsampa") {
 		t.Errorf("Expected %s in symbolsets. Found: %v", "sv-se_nst-xsampa", ssNames)
