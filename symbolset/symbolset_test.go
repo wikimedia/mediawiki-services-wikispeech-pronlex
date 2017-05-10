@@ -7,7 +7,7 @@ var fsExpTrans = "Expected: /%v/ got: /%v/"
 func testSymbolSetConvertToIPA(t *testing.T, ss SymbolSet, input string, expect string) {
 	result, err := ss.ConvertToIPA(input)
 	if err != nil {
-		t.Errorf("ConvertToIPA() error here; input=%s, expect=%s : %v", input, expect, err)
+		t.Errorf("ConvertToIPA() didn't expect error here; input=%s, expect=%s : %v", input, expect, err)
 		return
 	} else if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
@@ -298,8 +298,9 @@ func Test_LoadSymbolSetsFromDir(t *testing.T) {
 	for _, ss := range symbolsets {
 		ssNames = append(ssNames, ss.Name)
 	}
-	if len(symbolsets) != 8 {
-		t.Errorf("Expected 8 symbol sets in folder ./test_data, found %d", len(symbolsets))
+	expN := 9
+	if len(symbolsets) != expN {
+		t.Errorf("Expected %d symbol sets in folder ./test_data, found %d", expN, len(symbolsets))
 	}
 	if !stringSliceContains(ssNames, "sv-se_nst-xsampa") {
 		t.Errorf("Expected %s in symbolsets. Found: %v", "sv-se_nst-xsampa", ssNames)

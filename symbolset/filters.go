@@ -26,10 +26,12 @@ func postFilter(ss SymbolSet, trans string, toType Type) (string, error) {
 	return trans, nil
 }
 
+var ipaIndepStressRe = fmt.Sprintf("[%s%s]", ipaAccentI, ipaSecStress)
 var ipaAccentI = "\u02C8"
 var ipaAccentII = "\u0300"
 var ipaSecStress = "\u02CC"
 var ipaLength = "\u02D0"
+var ipaSyllDelim = "."
 var cmuString = "cmu"
 
 func filterBeforeMappingFromIPA(ss SymbolSet, trans string) (string, error) {
@@ -45,22 +47,62 @@ func filterBeforeMappingFromIPA(ss SymbolSet, trans string) (string, error) {
 	return res, nil
 }
 
+func canMapToIPA(ss SymbolSet, trans string) (bool, error) {
+	symbols, err := ss.SplitIPATranscription(trans)
+	if err != nil {
+		return false, err
+	}
+	nSyllabic := 0
+	foundDelim := false
+	syllabicReS := "^(" + ss.ipaSyllabicRe.String() + ")$"
+	syllabicRe, err := regexp.Compile(syllabicReS)
+	if err != nil {
+		return false, fmt.Errorf("cannot create ipa syllabic regexp from string /%s/", syllabicReS)
+	}
+	for _, sym := range symbols {
+		if syllabicRe.MatchString(sym) {
+			nSyllabic = nSyllabic + 1
+		} else if sym == ipaSyllDelim {
+			foundDelim = true
+		}
+	}
+	if foundDelim == false && nSyllabic > 1 {
+		return false, nil
+	}
+	return true, nil
+}
+
 func filterAfterMappingToIPA(ss SymbolSet, trans string) (string, error) {
+
+	// only filter stress if the symbol set has a syllable delimiter
+	// if len(filterSymbolsByCat(ss.Symbols, []SymbolCat{SyllableDelimiter})) == 0 {
+	// 	return trans, nil
+	// }
+
+	// create an error if the input transcription contains more than one syllabic, but no syllable delimiter
+	canMap, err := canMapToIPA(ss, trans)
+	if err != nil {
+		return "", err
+	}
+	if !canMap {
+		return trans, fmt.Errorf("cannot map transcription to IPA /%s/", trans)
+	}
+
 	// IPA: /ə.ba⁀ʊˈt/ => /ə.ˈba⁀ʊt/
-	s := "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")" + ipaSecStress
+	s := "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")(" + ipaIndepStressRe + ")"
 	repl, err := regexp.Compile(s)
 	if err != nil {
 		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
 	}
-	trans = repl.ReplaceAllString(trans, ipaSecStress+"$1$2")
+	trans = repl.ReplaceAllString(trans, "$3$1$2")
 
-	// Move sec stress to consonant cluster before the vowel
-	s = "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")" + ipaAccentI
+	// IPA: /ə.bˈa⁀ʊt/ => /ə.ˈba⁀ʊt/
+	s = "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ipaIndepStressRe + ")(" + ss.ipaSyllabicRe.String() + ")"
 	repl, err = regexp.Compile(s)
 	if err != nil {
 		return "", fmt.Errorf("couldn't compile regexp from string '%s' : %v", s, err)
 	}
-	trans = repl.ReplaceAllString(trans, ipaAccentI+"$1$2")
+	trans = repl.ReplaceAllString(trans, "$2$1$3")
 
 	// IPA: əs.ˈ̀̀e ...
 	// IPA: /'`pa.pa/ => /'pa`.pa/
@@ -80,11 +122,11 @@ func filterAfterMappingToIPA(ss SymbolSet, trans string) (string, error) {
 }
 
 func filterBeforeMappingFromCMU(ss SymbolSet, trans string) (string, error) {
-	re, err := regexp.Compile("(.)([012])")
+	re, err := regexp.Compile("([^ ]+)([012])")
 	if err != nil {
 		return "", err
 	}
-	trans = re.ReplaceAllString(trans, "$1 $2")
+	trans = re.ReplaceAllString(trans, "$2 $1")
 	return trans, nil
 }
 

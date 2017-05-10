@@ -2,8 +2,8 @@ package symbolset
 
 import "testing"
 
-func testMapTranscription(t *testing.T, ms Mapper, input string, expect string) {
-	result, err := ms.MapTranscription(input)
+func testMapTranscription(t *testing.T, mapper Mapper, input string, expect string) {
+	result, err := mapper.MapTranscription(input)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here; input=%s, expect=%s : %v", input, expect, err)
 		return
@@ -501,6 +501,7 @@ func Test_LoadMapperFromFile_NST2WS(t *testing.T) {
 	testMapTranscription(t, mapper, "\"tSE$kIsk", "\" t S e . k i s k")
 	testMapTranscription(t, mapper, "\"\"b9$n@r", "\"\" b 2 . n @ r")
 	testMapTranscription(t, mapper, "\"b9$n@r", "\" b 2 . n @ r")
+	testMapTranscription(t, mapper, "b\"9n", "\" b 2 n")
 }
 
 func Test_LoadMapperFromFile_FailIfBothHaveTheSameName(t *testing.T) {
@@ -517,12 +518,35 @@ func Test_LoadMapperFromFile_FailIfBothHaveTheSameFile(t *testing.T) {
 	}
 }
 
-func Test_MapperFromFile_CMU2WS(t *testing.T) {
+func Test_MapperFromFile_CMU2WS_NoSyllDelim(t *testing.T) {
+	mapper, err := LoadMapperFromFile("ENU-CMU", "ENU-WS", "test_data/en-us_cmu-nosylldelim.tab", "test_data/en-us_ws-sampa.tab")
+	if err != nil {
+		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
+		return
+	}
+
+	//testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "p l ' { t @ p % U s")
+	input := "P L AE1 T AX P UH2 S"
+
+	_, err = mapper.MapTranscription(input)
+	if err == nil {
+		t.Errorf("Expected error here!")
+	}
+
+}
+
+func Test_MapperFromFile_CMU2WS_WithSyllDelim(t *testing.T) {
 	mapper, err := LoadMapperFromFile("ENU-CMU", "ENU-WS", "test_data/en-us_cmu.tab", "test_data/en-us_ws-sampa.tab")
 	if err != nil {
 		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
 		return
 	}
 
-	testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "' p l { t @ % p U s")
+	//testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "' p l { t @ % p U s")
+	input := "P L AE1 T AX P UH2 S"
+
+	_, err = mapper.MapTranscription(input)
+	if err == nil {
+		t.Errorf("Expected error here!")
+	}
 }

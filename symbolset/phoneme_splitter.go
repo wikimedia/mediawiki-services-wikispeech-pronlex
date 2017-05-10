@@ -28,7 +28,7 @@ func splitIntoPhonemes(knownPhonemes []Symbol, transcription string) (phonemes [
 	// start by discarding any phoneme strings not substrings of transcription
 	for _, ph := range knownPhonemes {
 		if ph.Cat == PhonemeDelimiter && len(ph.String) > 0 {
-			return []string{}, []string{}, fmt.Errorf("splitIntoPhonemes should not be used for phoneme sets with empty phoneme delimiter; found /%s/", ph.String)
+			return []string{}, []string{}, fmt.Errorf("splitIntoPhonemes should not be used for phoneme sets with non-empty phoneme delimiter; found /%s/", ph.String)
 		}
 		if len(ph.String) > 0 && strings.Index(transcription, ph.String) > -1 {
 			known = append(known, ph.String)

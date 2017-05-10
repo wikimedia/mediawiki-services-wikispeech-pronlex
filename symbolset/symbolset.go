@@ -111,6 +111,22 @@ func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	return contains(ss.Symbols, symbol)
 }
 
+// ContainsSymbols checks if a transcription contains a certain phoneme symbol
+func (ss SymbolSet) ContainsSymbols(trans string, symbols []Symbol) (bool, error) {
+	splitted, err := ss.SplitTranscription(trans)
+	if err != nil {
+		return false, err
+	}
+	for _, phn := range splitted {
+		for _, symbol := range symbols {
+			if phn == symbol.String {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
 // Get searches the SymbolSet for a symbol with the given string
 func (ss SymbolSet) Get(symbol string) (Symbol, error) {
 	for _, s := range ss.Symbols {
@@ -155,20 +171,24 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 	if !ss.isInit {
 		panic("symbolSet " + ss.Name + " has not been initialized properly!")
 	}
-	symbols := []Symbol{}
-	for _, s := range ss.Symbols {
-		ipa := s
-		ipa.String = ipa.IPA.String
-		symbols = append(symbols, ipa)
+	delim := ss.phonemeDelimiter.IPA.String
+	if delim == "" {
+		symbols := []Symbol{}
+		for _, s := range ss.Symbols {
+			ipa := s
+			ipa.String = ipa.IPA.String
+			symbols = append(symbols, ipa)
+		}
+		splitted, unknown, err := splitIntoPhonemes(symbols, input)
+		if err != nil {
+			return []string{}, err
+		}
+		if len(unknown) > 0 {
+			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%s/: %v\n", input, unknown)
+		}
+		return splitted, nil
 	}
-	splitted, unknown, err := splitIntoPhonemes(symbols, input)
-	if err != nil {
-		return []string{}, err
-	}
-	if len(unknown) > 0 {
-		return []string{}, fmt.Errorf("found unknown phonemes in transcription /%s/: %v\n", input, unknown)
-	}
-	return splitted, nil
+	return strings.Split(input, delim), nil
 }
 
 // ConvertToIPA maps one input transcription string into an IPA transcription
