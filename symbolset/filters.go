@@ -75,18 +75,18 @@ func canMapToIPA(ss SymbolSet, trans string) (bool, error) {
 func filterAfterMappingToIPA(ss SymbolSet, trans string) (string, error) {
 
 	// only filter stress if the symbol set has a syllable delimiter
-	// if len(filterSymbolsByCat(ss.Symbols, []SymbolCat{SyllableDelimiter})) == 0 {
-	// 	return trans, nil
-	// }
+	if len(filterSymbolsByCat(ss.Symbols, []SymbolCat{SyllableDelimiter})) == 0 {
+		return trans, nil
+	}
 
 	// create an error if the input transcription contains more than one syllabic, but no syllable delimiter
-	canMap, err := canMapToIPA(ss, trans)
-	if err != nil {
-		return "", err
-	}
-	if !canMap {
-		return trans, fmt.Errorf("cannot map transcription to IPA /%s/", trans)
-	}
+	// canMap, err := canMapToIPA(ss, trans)
+	// if err != nil {
+	// 	return "", err
+	// }
+	// if !canMap {
+	// 	return trans, fmt.Errorf("cannot map transcription to IPA /%s/", trans)
+	// }
 
 	// IPA: /ə.ba⁀ʊˈt/ => /ə.ˈba⁀ʊt/
 	s := "(" + ss.ipaNonSyllabicRe.String() + "*)(" + ss.ipaSyllabicRe.String() + ")(" + ipaIndepStressRe + ")"
