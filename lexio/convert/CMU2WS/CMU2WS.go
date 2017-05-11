@@ -12,6 +12,8 @@ import (
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/rbg2p/syll"
+	"github.com/stts-se/rbg2p/util"
 )
 
 var ws, errrr = line.NewWS()
@@ -32,17 +34,29 @@ func out(e lex.Entry) {
 	fmt.Printf("%s\n", s)
 }
 
+func syllabify(syller syll.Syllabifier, phnSet util.PhonemeSet, trans string) (string, error) {
+	phonemes, err := phnSet.SplitTranscription(trans)
+	if err != nil {
+		return "", err
+	}
+	sylled := syller.SyllabifyFromPhonemes(phonemes)
+	return sylled, nil
+}
+
+var moveStressRe = regexp.MustCompile("([^ ]+)([012])")
+
 func main() {
 
-	if len(os.Args) != 4 {
-		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU SYMBOLSET> <WS-SAMPA SYMBOLSET>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convert.go cmudict-0.7b.utf8 en-us_cmu.tab en_us_sampa_mary.tab")
+	if len(os.Args) != 5 {
+		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU SYMBOLSET> <WS-SAMPA SYMBOLSET> <SYLLDEF FILE>")
+		fmt.Fprintln(os.Stderr, "\tsample invokation:  go run convert.go cmudict-0.7b.utf8 en-us_cmu.tab en_us_sampa_mary.tab enu_cmu_syll.g2p")
 		return
 	}
 
 	cmuFileName := os.Args[1]
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
+	syllRuleFile := os.Args[4]
 
 	mapper, err := symbolset.LoadMapperFromFile("CMU", "SYMBOL", ssFileName1, ssFileName2)
 	if err != nil {
@@ -50,6 +64,12 @@ func main() {
 		return
 	}
 	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
+
+	syller, phnSet, err := syll.LoadFile(syllRuleFile)
+	if err != nil {
+		log.Printf("couldn't load rule file %s : %s", syllRuleFile, err)
+		os.Exit(1)
+	}
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()
@@ -78,31 +98,37 @@ func main() {
 		w := strings.ToLower(fs[0])
 		t0 := strings.Replace(fs[1], "AH0", "AX", -1)
 		t0 = strings.Replace(t0, "0", "", -1)
+		t0 = moveStressRe.ReplaceAllString(t0, "$2 $1")
+
+		t0, err = syllabify(syller, phnSet, t0)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to syllabify transcription : %v\n", err)
+			continue
+		}
 
 		t, err := mapper.MapTranscription(t0)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to map transcription symbols : %v\n", err)
+			continue
+		}
+		// Variant transcription, not a new entry
+		if variant.MatchString(w) {
+			t0 := lex.Transcription{Strn: t}
+			lastEntry.Transcriptions = append(lastEntry.Transcriptions, t0)
 		} else {
-
-			// Variant transcription, not a new entry
-			if variant.MatchString(w) {
-				t0 := lex.Transcription{Strn: t}
-				lastEntry.Transcriptions = append(lastEntry.Transcriptions, t0)
-			} else {
-				if lastEntry.Strn != "" {
-					valres, err := ssRuleTo.Validate(lastEntry)
-					if err != nil {
-						panic(err) // shouldn't happen
-					}
-					for _, r := range valres.Messages {
-						panic(r) // shouldn't happen
-					}
-					out(lastEntry)
+			if lastEntry.Strn != "" {
+				valres, err := ssRuleTo.Validate(lastEntry)
+				if err != nil {
+					panic(err) // shouldn't happen
 				}
-				ts := []lex.Transcription{lex.Transcription{Strn: t}}
-				// Hard-wired (ISO 639-1 language name + ISO 3166-1 alpha 2 country)
-				lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "en-us"}
+				for _, r := range valres.Messages {
+					panic(r) // shouldn't happen
+				}
+				out(lastEntry)
 			}
+			ts := []lex.Transcription{lex.Transcription{Strn: t}}
+			// Hard-wired (ISO 639-1 language name + ISO 3166-1 alpha 2 country)
+			lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "en-us"}
 		}
 	}
 	// Flush
