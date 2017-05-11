@@ -525,13 +525,12 @@ func Test_MapperFromFile_CMU2WS_NoSyllDelim(t *testing.T) {
 		return
 	}
 
-	//testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "p l ' { t @ p % U s")
-	input := "P L AE1 T AX P UH2 S"
+	testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "p l ' { t @ p % U s")
 
-	_, err = mapper.MapTranscription(input)
-	if err == nil {
-		t.Errorf("Expected error here!")
-	}
+	//_, err = mapper.MapTranscription(input)
+	// if err == nil {
+	// 	t.Errorf("Expected error here!")
+	// }
 
 }
 
@@ -542,11 +541,11 @@ func Test_MapperFromFile_CMU2WS_WithSyllDelim(t *testing.T) {
 		return
 	}
 
-	//testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "' p l { t @ % p U s")
-	input := "P L AE1 T AX P UH2 S"
+	testMapTranscription(t, mapper, "P L AE1 T AX P UH2 S", "' p l { t @ % p U s")
 
-	_, err = mapper.MapTranscription(input)
-	if err == nil {
-		t.Errorf("Expected error here!")
-	}
+	// input := "P L AE1 T AX P UH2 S"
+	// _, err = mapper.MapTranscription(input)
+	// if err == nil {
+	// 	t.Errorf("Expected error here!")
+	// }
 }
