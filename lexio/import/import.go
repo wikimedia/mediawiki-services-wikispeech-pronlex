@@ -57,6 +57,7 @@ func main() {
 
 	var validate = f.Bool("validate", false, "validate each entry, and save the validation in the database (default: false)")
 	var force = f.Bool("force", false, "force loading of lexicon even if the symbolset is undefined (default: false)")
+	var replace = f.Bool("replace", false, "if the lexicon already exists, delete it before importing the new input data (default: false)")
 	var help = f.Bool("help", false, "print help message")
 
 	usage := `USAGE:
@@ -65,6 +66,7 @@ func main() {
 FLAGS:
    -validate bool  validate each entry, and save the validation in the database (default: false)
    -force    bool  force loading of lexicon even if the symbolset is undefined (default: false)
+   -replace  bool  if the lexicon already exists, delete it before importing the new input data (default: false)
    -help     bool  print help message
 
 SAMPLE INVOCATION:
@@ -148,17 +150,38 @@ SAMPLE INVOCATION:
 
 	defer db.Close()
 
-	_, err = dbapi.GetLexicon(db, lexName)
+	lexiconExists := false
+	lexicon, err := dbapi.GetLexicon(db, lexName)
 	if err == nil {
-		log.Fatalf("Nothing will be added. Lexicon already exists in database: %s", lexName)
-		return
+		lexiconExists = true
+		if *replace {
+			log.Printf("Running SuperDelete on lexicon %s. This may take some time. Please do not abort during deletion.\n", lexName)
+			err := dbapi.SuperDeleteLexicon(db, lexicon.ID)
+			if err != nil {
+				log.Fatalf("Couldn't super delete lexicon %s : %s", lexName, err)
+				return
+			}
+			log.Printf("Deleted lexicon %s\n", lexName)
+			lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
+			lexicon, err = dbapi.InsertLexicon(db, lexicon)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+
+		} else {
+			log.Fatalf("Nothing will be added. Lexicon already exists in database: %s. Use the -replace switch if you want to replace the old lexicon.", lexName)
+			return
+		}
 	}
 
-	lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-	lexicon, err = dbapi.InsertLexicon(db, lexicon)
-
-	if err != nil {
-		log.Fatal(err)
+	if !lexiconExists {
+		lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
+		lexicon, err = dbapi.InsertLexicon(db, lexicon)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
 	}
 
 	logger := dbapi.StderrLogger{}
