@@ -53,14 +53,14 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 
 	wsFmt, err := line.NewWS()
 	if err != nil {
-		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
+		var msg = fmt.Sprintf("ImportLexiconFile failed to instantiate lexicon line parser : %v", err)
 		logger.Write(msg)
 		return fmt.Errorf("%v", msg)
 	}
 
 	lexicon, err := GetLexicon(db, lexiconName)
 	if err != nil {
-		var msg = fmt.Sprintf("lexserver failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
+		var msg = fmt.Sprintf("ImportLexiconFile failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
 		logger.Write(msg)
 		return fmt.Errorf("%v", msg)
 	}
@@ -103,7 +103,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 			logger.Write(msg2)
 			_, err = InsertEntries(db, lexicon, eBuf)
 			if err != nil {
-				var msg = fmt.Sprintf("lexserver failed to insert entries : %v", err)
+				var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 				logger.Write(msg)
 				return fmt.Errorf("%v", msg)
 			} else {
@@ -121,7 +121,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	logger.Write(msg2)
 	_, err = InsertEntries(db, lexicon, eBuf) // flushing the buffer
 	if err != nil {
-		var msg = fmt.Sprintf("lexserver failed to insert entries : %v", err)
+		var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 		logger.Write(msg)
 		return fmt.Errorf("%v", msg)
 	} else {
@@ -142,7 +142,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	logger.Write(msg3)
 
 	if err := s.Err(); err != nil {
-		msg4 := fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
+		msg4 := fmt.Sprintf("ImportLexiconFile failed to instantiate lexicon line parser : %v", err)
 		logger.Write(msg4)
 		return fmt.Errorf("%v", msg4)
 	}
