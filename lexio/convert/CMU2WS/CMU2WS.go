@@ -12,8 +12,7 @@ import (
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation/rules"
-	"github.com/stts-se/rbg2p/syll"
-	"github.com/stts-se/rbg2p/util"
+	"github.com/stts-se/rbg2p"
 )
 
 var ws, errrr = line.NewWS()
@@ -34,7 +33,7 @@ func out(e lex.Entry) {
 	fmt.Printf("%s\n", s)
 }
 
-func syllabify(syller syll.Syllabifier, phnSet util.PhonemeSet, trans string) (string, error) {
+func syllabify(syller rbg2p.Syllabifier, phnSet rbg2p.PhonemeSet, trans string) (string, error) {
 	phonemes, err := phnSet.SplitTranscription(trans)
 	if err != nil {
 		return "", err
@@ -65,7 +64,7 @@ func main() {
 	}
 	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
 
-	syller, phnSet, err := syll.LoadFile(syllRuleFile)
+	syller, phnSet, err := rbg2p.LoadSyllFile(syllRuleFile)
 	if err != nil {
 		log.Printf("couldn't load rule file %s : %s", syllRuleFile, err)
 		os.Exit(1)
