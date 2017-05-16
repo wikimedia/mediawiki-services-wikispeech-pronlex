@@ -1,6 +1,7 @@
 package dbapi
 
 import (
+	"fmt"
 	"log"
 
 	"golang.org/x/net/websocket"
@@ -20,6 +21,17 @@ func (l StderrLogger) Write(s string) {
 	log.Println(s)
 }
 func (l StderrLogger) LogInterval() int {
+	return 10000
+}
+
+// StdoutLogger is a logger for printing messages to standard out. Implements the dbapi.Logger interface.
+type StdoutLogger struct {
+}
+
+func (l StdoutLogger) Write(s string) {
+	fmt.Println(s)
+}
+func (l StdoutLogger) LogInterval() int {
 	return 10000
 }
 
