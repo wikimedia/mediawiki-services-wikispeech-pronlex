@@ -54,6 +54,14 @@ type TestResultContainer struct {
 	CrossErrors  []TestResult
 }
 
+func (tc TestResultContainer) Size() int {
+	return len(tc.AcceptErrors) + len(tc.RejectErrors) + len(tc.CrossErrors)
+}
+
+func (tc TestResultContainer) AllErrors() []TestResult {
+	return append(append(tc.AcceptErrors, tc.RejectErrors...), tc.CrossErrors...)
+}
+
 // TestResult holds the test result for a tested rule suite (accept, reject, or cross tests result)
 type TestResult struct {
 	RuleName string
