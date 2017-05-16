@@ -162,7 +162,7 @@ const (
 // ValidateLexiconFile validates the input file and prints any validation errors to the specified logger.
 func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
 
-	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
+	log.Println(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
 
 	if _, err := os.Stat(lexiconFileName); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("ValidateLexiconFile failed to open file : %v", err)
