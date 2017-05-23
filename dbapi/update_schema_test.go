@@ -177,4 +177,30 @@ func Test_UpdateSchema(t *testing.T) {
 		t.Errorf("NOOOOOOOOOOOOOOOOOOOO: %v", err)
 	}
 
+	// rows, err := db.Query("SELECT * FROM entry limit 0") //db.Query("PRAGMA table_info('entry')")
+	// defer rows.Close()
+
+	nms, err := ListEntryTableColumnNames(db) // defined in dbapi.go
+	if err != nil {
+		fmt.Printf("APNOS! %v\n", err)
+	}
+
+	for _, n := range nms {
+		fmt.Println(">>>> " + n)
+	}
+
+	// for rows.Next() {
+	// 	var id interface{}
+	// 	var name interface{}
+	// 	var c3 interface{}
+	// 	var c4 interface{}
+	// 	var c5 interface{}
+	// 	var c6 interface{}
+
+	// 	if err := rows.Scan(&id, &name, &c3, &c4, &c5...); err == nil {
+	// 		fmt.Printf("%v %s\n", id, name)
+	// 	} else {
+	// 		fmt.Println(err)
+	// 	}
+	// }
 }
