@@ -2,6 +2,9 @@ package dbapi
 
 // Schema is a string containing the SQL definition of the lexicon database
 var Schema = `
+-- Set version of Schema
+PRAGMA user_version = 1;
+
 -- Each lexical entry belongs to a lexicon.
 -- The Lexicon table defines a lexicon through a unique name, along with the name a of symbol set
 CREATE TABLE Lexicon (
@@ -150,7 +153,7 @@ CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
   BEGIN
     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
   END;
-CREATE TRIGGER updatetPref BEFORE UPDATE ON ENTRY
+CREATE TRIGGER updatePref BEFORE UPDATE ON ENTRY
   BEGIN
     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
   END;
