@@ -180,14 +180,14 @@ func Test_UpdateSchema(t *testing.T) {
 	// rows, err := db.Query("SELECT * FROM entry limit 0") //db.Query("PRAGMA table_info('entry')")
 	// defer rows.Close()
 
-	nms, err := ListEntryTableColumnNames(db) // defined in dbapi.go
-	if err != nil {
-		fmt.Printf("APNOS! %v\n", err)
-	}
+	// nms, err := ListNamesOfTriggers(db) // defined in dbapi.go
+	// if err != nil {
+	// 	fmt.Printf("APNOS! %v\n", err)
+	// }
 
-	for _, n := range nms {
-		fmt.Println(">>>> " + n)
-	}
+	// for _, n := range nms {
+	// 	fmt.Println(">>>> " + n)
+	// }
 
 	// for rows.Next() {
 	// 	var id interface{}
