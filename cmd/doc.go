@@ -1,2 +1,2 @@
-// Package cmd contains various command line tools for the pronlex repository
+// Package cmd contains various command line tools for this repository
 package cmd
