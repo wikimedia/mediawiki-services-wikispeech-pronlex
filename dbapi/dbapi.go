@@ -53,11 +53,22 @@ func Sqlite3WithRegex() {
 }
 
 func ListNamesOfTriggers(db *sql.DB) ([]string, error) {
+	tx, err := db.Begin()
+	if err != nil {
+		return []string{}, fmt.Errorf("dbapi.ListNamesOfTriggers : %v", err)
+	}
+	defer tx.Commit()
+	return ListNamesOfTriggersTx(tx)
+}
+
+func ListNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	var res []string
 
 	q := "select name from sqlite_master where type = 'trigger'"
-	rows, err := db.Query(q)
+	rows, err := tx.Query(q)
 	if err != nil {
+		tx.Rollback()
+		fmt.Printf("dbapi.ListNamesOfTriggersTx : %v\n", err)
 		return res, fmt.Errorf("dbapi.ListNamesOfTriggers : %v", err)
 	}
 	defer rows.Close()
@@ -65,6 +76,7 @@ func ListNamesOfTriggers(db *sql.DB) ([]string, error) {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
+			tx.Rollback()
 			return res, fmt.Errorf("dbapi.ListNamesOfTriggers : %v", err)
 		}
 		res = append(res, name)

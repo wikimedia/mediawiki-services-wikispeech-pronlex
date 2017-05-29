@@ -11,6 +11,38 @@ func updateInsertPrefTrigger(tx *sql.Tx) error {
 	return nil
 }
 
+func dropTrigger(tx *sql.Tx, triggerName string) error {
+
+	triggs0, err := ListNamesOfTriggersTx(tx) // Defined in dbapi.go
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "What? : %v\n", err)
+		return fmt.Errorf("dbapi.dropTrigger : %v", err)
+	}
+	triggs := make(map[string]bool)
+	for _, t := range triggs0 {
+		fmt.Println(t)
+		triggs[t] = true
+	}
+
+	if _, ok := triggs[triggerName]; ok {
+		rez, err := tx.Exec("DROP TRIGGER " + triggerName)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("dbapi.UpdateSchema failed when dropping trigger : %v", err)
+		}
+		_, err = rez.RowsAffected()
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("dbapi.UpdateSchema failed when calling RowsAffected : %v", err)
+		}
+		fmt.Println("DROPPED TRIGGER " + triggerName)
+	} else {
+		fmt.Fprintf(os.Stderr, "dbapi.dropTrigger: No such trigger in DB: '%s'\n", triggerName)
+	}
+
+	return nil
+}
+
 // UpdateSchema migrates a 'live' pronlex db to a new schema
 // version. The dbFile argument is the path to an Sqlite db file.
 func UpdateSchema(dbFile string) error {
@@ -40,53 +72,26 @@ func UpdateSchema(dbFile string) error {
 		// Substitute faulty version of trigger
 
 		//Defined in dbapi.go
-		triggs0, err := ListNamesOfTriggers(db)
-		triggs := make(map[string]bool)
-		for _, t := range triggs0 {
-			fmt.Println(t)
-			triggs[t] = true
-		}
-		if _, ok := triggs["insertPref"]; ok {
-			rez, err := tx.Exec("DROP TRIGGER insertPref")
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("dbapi.UpdateSchema failed when dropping trigger : %v", err)
-			}
-			_, err = rez.RowsAffected()
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("dbapi.UpdateSchema failed when calling RowsAffected : %v", err)
-			}
-			fmt.Println("DROPPED TRIGGER insertPref")
+		err := dropTrigger(tx, "insertPref")
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("drop trigger insertPref failed : %v", err)
 		}
 		// Misspelled name of trigger in some version of schema
-		if _, ok := triggs["updatetPref"]; ok {
-			rez, err := tx.Exec("DROP TRIGGER updatetPref")
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("dbapi.UpdateSchema failed when dropping trigger : %v", err)
-			}
-			_, err = rez.RowsAffected()
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("dbapi.UpdateSchema failed when calling RowsAffected : %v", err)
-			}
-			fmt.Println("DROPPED TRIGGER updatetPref")
+		dropTrigger(tx, "updatetPref")
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("drop trigger updatetPref failed : %v", err)
 		}
 
-		if _, ok := triggs["updatePref"]; ok {
-			rez, err := tx.Exec("DROP TRIGGER updatePref")
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("dbapi.UpdateSchema failed when dropping trigger : %v", err)
-			}
-			_, err = rez.RowsAffected()
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("dbapi.UpdateSchema failed when calling RowsAffected : %v", err)
-			}
-			fmt.Println("DROPPED TRIGGER updatePref")
+		dropTrigger(tx, "updatePref")
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("drop trigger updatePref failed : %v", err)
 		}
+
+		dropTrigger(tx, "insertEntryStatus")
+		dropTrigger(tx, "updateEntryStatus")
 
 		fmt.Fprintf(os.Stderr, "%s: user_version %d\n", dbFile, userVersion)
 
