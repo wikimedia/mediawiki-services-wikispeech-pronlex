@@ -52,6 +52,57 @@ func Sqlite3WithRegex() {
 		})
 }
 
+func ListNamesOfTriggers(db *sql.DB) ([]string, error) {
+	tx, err := db.Begin()
+	if err != nil {
+		return []string{}, fmt.Errorf("dbapi.ListNamesOfTriggers : %v", err)
+	}
+	defer tx.Commit()
+	return ListNamesOfTriggersTx(tx)
+}
+
+func ListNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
+	var res []string
+
+	q := "select name from sqlite_master where type = 'trigger'"
+	rows, err := tx.Query(q)
+	if err != nil {
+		tx.Rollback()
+		fmt.Printf("dbapi.ListNamesOfTriggersTx : %v\n", err)
+		return res, fmt.Errorf("dbapi.ListNamesOfTriggers : %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			tx.Rollback()
+			return res, fmt.Errorf("dbapi.ListNamesOfTriggers : %v", err)
+		}
+		res = append(res, name)
+	}
+
+	return res, nil
+}
+
+// ListEntryTableColumnNames is a meta-function that returns the names of the columns of the 'entry' lexicon database table.
+// It can be used for checking that the entry table has the expected columns.
+func ListEntryTableColumnNames(db *sql.DB) ([]string, error) {
+	q := "SELECT * FROM entry LIMIT 0"
+
+	rows, err := db.Query(q)
+	if err != nil {
+		return []string{}, fmt.Errorf("ListEntryTableColumnNames : %v", err)
+	}
+	defer rows.Close()
+	colNames, err := rows.Columns()
+	if err != nil {
+		return colNames, fmt.Errorf("ListEntryTableColumnNames : %v", err)
+	}
+
+	return colNames, err
+}
+
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., Lexicon structs corresponding to the rows of the lexicon
 // table).

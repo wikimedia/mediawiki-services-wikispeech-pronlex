@@ -1,10 +1,15 @@
 package dbapi
 
-// Schema is a string containing the SQL definition of the lexicon database
-var Schema = `
--- Set version of Schema
-PRAGMA user_version = 1;
+import (
+	"database/sql"
+	"fmt"
+	"os"
+	"testing"
+	//"github.com/stts-se/pronlex/dbapi"
+)
 
+var tstSchema1 = `
+PRAGMA user_version = 0;
 -- Each lexical entry belongs to a lexicon.
 -- The Lexicon table defines a lexicon through a unique name, along with the name a of symbol set
 CREATE TABLE Lexicon (
@@ -14,20 +19,6 @@ CREATE TABLE Lexicon (
   );
 CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);
 CREATE UNIQUE INDEX namesymset on Lexicon (name, symbolSetName);
-
--- Symbol set handling moved to file based solution
--- A symbol set is the definition of allowed symbols in a lexicons phonetical transcriptions
--- CREATE TABLE Symbolset (
-    -- description varchar(128),
-    -- description text,
-    -- symbol varchar(128) not null,
-    -- id integer not null primary key autoincrement,
-    -- category varchar(128) not null,
-    -- lexiconId integer not null,
-    -- ipa varchar(128)
---   );
--- CREATE INDEX idx37380686 on Symbolset (symbol);
--- CREATE UNIQUE INDEX idx8bc90a52 on Symbolset (lexiconId,symbol);
 
 -- Lemma forms, or stems, are uninflected (theoretical, one might say) forms of words
 CREATE TABLE Lemma (
@@ -42,15 +33,6 @@ CREATE INDEX idx273f055f on Lemma (paradigm);
 CREATE INDEX idx149303e1 on Lemma (strn);
 CREATE INDEX lemidstrn on Lemma (id, strn);
 CREATE UNIQUE INDEX idx407206e8 on Lemma (strn,reading);
---CREATE TABLE SurfaceForm (
---    id integer not null primary key autoincrement,
---    strn varchar(128) not null
---  );
---CREATE UNIQUE INDEX idx35390652 on SurfaceForm (strn);
-
--- The actual lexical entries live in this table.
--- Each entry is linked to a single lexicon, and may have one or more 
--- phonetic transcriptions, found in their own table.
 CREATE TABLE Entry (
     -- wordParts varchar(128),
     wordParts text,
@@ -120,15 +102,6 @@ foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX traeid ON Transcription (entryId);
 CREATE INDEX idtraeid ON Transcription (id, entryId);
 
--- CREATE TABLE TranscriptionStatus (
---    name varchar(128) not null,
---    source varchar(128) not null,
---    timestamp timestamp not null,
---    transcriptionId integer not null,
---    id integer not null primary key autoincrement,
--- foreign key (transcriptionId) references Transcription(id) on delete cascade);
--- CREATE INDEX nizze ON TranscriptionStatus (transcriptionId); 
-
 -- Linking table between a lemma form and its different surface forms 
 CREATE TABLE Lemma2Entry (
     entryId bigint not null,
@@ -141,24 +114,26 @@ CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);
 CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);
 CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 
--- CREATE TABLE SurfaceForm2Entry (
---    entryId bigint not null,
---    surfaceFormId bigint not null,
--- unique(surfaceFormId,entryId));
 
 -- Triggers to ensure only one preferred = 1 per orthographic word
 -- When a new entry is added, where preferred is not 0, all other entries for 
 -- the same orthographic word (entry.strn), will have the preferred field set to 0.
 CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
   BEGIN
-    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
+    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0; -- BROKEN! AND lexiconid = NEW.lexiconid;
   END;
 CREATE TRIGGER updatePref BEFORE UPDATE ON ENTRY
   BEGIN
     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
   END;
+`
 
--- Triggers to ensure that there are only one entry status per entry
+var trigger1 = `CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
+  BEGIN
+    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
+  END;`
+
+var trigger2 = `-- Triggers to ensure that there are only one entry status per entry
 CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS
   BEGIN 
     UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
@@ -168,3 +143,64 @@ CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
     UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
   END;
 `
+
+func Test_UpdateSchema(t *testing.T) {
+
+	// This could be put in some set-up function
+
+	tstDBName := "/tmp/tztdb.db"
+
+	if _, err := os.Stat(tstDBName); !os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "removing old test db '%s'\n", tstDBName)
+		err := os.Remove(tstDBName)
+		if err != nil {
+			t.Errorf("Weltschmerz! : %v", err)
+		}
+	}
+
+	db, err := sql.Open("sqlite3", tstDBName)
+	defer db.Close()
+	if err != nil {
+		t.Errorf("This isn't happening! : %v", err)
+	}
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		t.Errorf("Please...! : %v", err)
+	}
+
+	_, err = db.Exec(tstSchema1)
+	if err != nil {
+		t.Errorf("No one saw this one coming : %v", err)
+	}
+
+	if err := UpdateSchema(tstDBName); err != nil {
+		t.Errorf("NOOOOOOOOOOOOOOOOOOOO: %v", err)
+	}
+
+	// rows, err := db.Query("SELECT * FROM entry limit 0") //db.Query("PRAGMA table_info('entry')")
+	// defer rows.Close()
+
+	// nms, err := ListNamesOfTriggers(db) // defined in dbapi.go
+	// if err != nil {
+	// 	fmt.Printf("APNOS! %v\n", err)
+	// }
+
+	// for _, n := range nms {
+	// 	fmt.Println(">>>> " + n)
+	// }
+
+	// for rows.Next() {
+	// 	var id interface{}
+	// 	var name interface{}
+	// 	var c3 interface{}
+	// 	var c4 interface{}
+	// 	var c5 interface{}
+	// 	var c6 interface{}
+
+	// 	if err := rows.Scan(&id, &name, &c3, &c4, &c5...); err == nil {
+	// 		fmt.Printf("%v %s\n", id, name)
+	// 	} else {
+	// 		fmt.Println(err)
+	// 	}
+	// }
+}
