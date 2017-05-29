@@ -16,7 +16,7 @@ import (
 func main() {
 
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "go run main.go <WORD PARTS FILE> <LOWER CASE word word word...>\n")
+		fmt.Fprintf(os.Stderr, "go run decompounder.go <WORD PARTS FILE> <LOWER CASE word word word...>\n")
 		return
 	}
 
