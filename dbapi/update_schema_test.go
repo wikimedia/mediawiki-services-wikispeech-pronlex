@@ -122,7 +122,7 @@ CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
   BEGIN
     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0; -- BROKEN! AND lexiconid = NEW.lexiconid;
   END;
-CREATE TRIGGER updatetPref BEFORE UPDATE ON ENTRY
+CREATE TRIGGER updatePref BEFORE UPDATE ON ENTRY
   BEGIN
     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
   END;
