@@ -15,12 +15,12 @@ func dropTrigger(tx *sql.Tx, triggerName string) error {
 
 	triggs0, err := ListNamesOfTriggersTx(tx) // Defined in dbapi.go
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "What? : %v\n", err)
+		//fmt.Fprintf(os.Stderr, "What? : %v\n", err)
 		return fmt.Errorf("dbapi.dropTrigger : %v", err)
 	}
 	triggs := make(map[string]bool)
 	for _, t := range triggs0 {
-		fmt.Println(t)
+		//fmt.Println(">>> " + t)
 		triggs[t] = true
 	}
 
@@ -35,10 +35,10 @@ func dropTrigger(tx *sql.Tx, triggerName string) error {
 			tx.Rollback()
 			return fmt.Errorf("dbapi.UpdateSchema failed when calling RowsAffected : %v", err)
 		}
-		fmt.Println("DROPPED TRIGGER " + triggerName)
-	} else {
-		fmt.Fprintf(os.Stderr, "dbapi.dropTrigger: No such trigger in DB: '%s'\n", triggerName)
-	}
+		//fmt.Println("DROPPED TRIGGER " + triggerName)
+	} //else {
+	//	fmt.Fprintf(os.Stderr, "dbapi.dropTrigger: No such trigger in DB: '%s'\n", triggerName)
+	//}
 
 	return nil
 }
@@ -66,7 +66,7 @@ func UpdateSchema(dbFile string) error {
 
 		return fmt.Errorf("UpdateSchema: %v", err)
 	}
-	fmt.Fprintf(os.Stderr, "dbapi.UpdateSchema: current user_version: %d\n", userVersion)
+	//fmt.Fprintf(os.Stderr, "dbapi.UpdateSchema: current user_version: %d\n", userVersion)
 
 	if userVersion < 1 {
 		// Substitute faulty version of trigger
@@ -93,7 +93,7 @@ func UpdateSchema(dbFile string) error {
 		dropTrigger(tx, "insertEntryStatus")
 		dropTrigger(tx, "updateEntryStatus")
 
-		fmt.Fprintf(os.Stderr, "%s: user_version %d\n", dbFile, userVersion)
+		//fmt.Fprintf(os.Stderr, "%s: user_version %d\n", dbFile, userVersion)
 
 		createTriggers := `CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
                                    BEGIN
@@ -124,15 +124,15 @@ func UpdateSchema(dbFile string) error {
 			return fmt.Errorf("failed to set user_version variable : %v", err)
 		}
 
-		fmt.Fprintf(os.Stderr, "dbapi.UpdateSchema: Created triggers\n")
+		//fmt.Fprintf(os.Stderr, "dbapi.UpdateSchema: Created triggers\n")
 	}
 
 	err = tx.QueryRow("PRAGMA user_version").Scan(&userVersion)
 	if err != nil {
 		return fmt.Errorf("UpdateSchema: %v", err)
-	} else {
-		fmt.Printf("%s user_version %d\n", dbFile, userVersion)
-	}
+	} // else {
+	// 	fmt.Printf("%s user_version %d\n", dbFile, userVersion)
+	// }
 
 	return nil
 }
