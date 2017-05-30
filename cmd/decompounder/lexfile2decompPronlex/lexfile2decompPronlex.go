@@ -7,6 +7,7 @@ import (
 	"github.com/stts-se/pronlex/decompounder/svnst"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -93,6 +94,74 @@ func addWordParts(wps string, trans []string, pos, morph string) {
 	//fmt.Println(wps)
 }
 
+type Freq struct {
+	Word WP
+	Freq int
+}
+
+func freqSort(m map[WP]int) []Freq {
+	var res []Freq
+	for k, v := range m {
+		res = append(res, Freq{k, v})
+	}
+
+	sort.Slice(res, func(i, j int) bool { return res[i].Freq > res[j].Freq })
+
+	return res
+}
+
+func totFreq(fs []Freq) int {
+	var res int
+	for _, f := range fs {
+		res += f.Freq
+	}
+	return res
+}
+
+// Filter that returns unique transcriptions over frequency min, and discards the rest.
+// Starting with the highest frequency transcription.
+func minFreqAndDifferentTrans(fs []Freq, min int) []Freq {
+	var res []Freq
+	seenTrans := make(map[string]bool)
+
+	sort.Slice(fs, func(i, j int) bool { return fs[i].Freq > fs[j].Freq })
+
+	for _, f := range fs {
+		trans := f.Word.trans
+		if f.Freq >= min && !seenTrans[trans] {
+			seenTrans[trans] = true
+			res = append(res, f)
+		}
+	}
+
+	return res
+}
+
+func saveToDB(m map[string]map[WP]int, dbFile, lexiconName string) error {
+
+	return nil
+}
+
+func dump(m map[string]map[WP]int) {
+	for k, v := range m {
+		srt := freqSort(v)
+		tot := totFreq(srt)
+		min := 4
+		if tot > 50 {
+			min = 20
+		}
+		fltr := minFreqAndDifferentTrans(srt, min)
+		if len(fltr) == 0 && len(srt) > 0 {
+			fltr = srt[0:1]
+		}
+		if tot > 5 {
+			for _, s := range fltr {
+				fmt.Printf("%d\t%s\t%v\n", tot, k, s)
+			}
+		}
+	}
+}
+
 func main() {
 
 	if len(os.Args) != 2 && len(os.Args) != 3 {
@@ -164,6 +233,8 @@ func main() {
 			//fmt.Printf("%s\t%s\n", decomp, strings.Join(rez, "	<+>	"))
 		}
 	}
+
+	dump(suffixLex)
 
 	//fmt.Printf("%v\n", suffixLex)
 	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)

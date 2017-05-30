@@ -71,6 +71,7 @@ var suffixMatchers = []sm{
 	sm{"nnie", "I"}, // Annie
 	sm{"brie", "b r i:"},
 	sm{"vue", "v (?:y:|Y)"}, //Bellevue
+	sm{"vägen", "v E: [.] g e n"},
 	sm{"bridge", "I (?:r[dt] rs|t C)"},
 	sm{"frey", "E j"},
 	//sm{"arbitrage", "A: rs"},
@@ -312,6 +313,7 @@ var nonPhoneme = map[string]bool{
 var isRetroflex = map[string]bool{
 	"rs": true,
 	"rt": true,
+	"rn": true,
 	"rd": true,
 	"rl": true,
 }
@@ -461,6 +463,7 @@ func splitTrans(lhs, rhs, trans string) (string, string, error) {
 
 		t2 = deRetroflex(t2)
 	}
+	//t2 = deRetroflex(t2)
 	return t1, t2, errr
 }
 
