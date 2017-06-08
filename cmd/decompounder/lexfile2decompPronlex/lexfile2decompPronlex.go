@@ -168,7 +168,12 @@ func dump(m map[string]map[WP]int) {
 
 func toFile(m map[string]map[WP]int, fileName string) error {
 
-	// Open fileName for writing
+	fh, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+
+		return fmt.Errorf("lexfile2decompPronlex.toFile failed : %v", err)
+	}
+	defer fh.Close()
 
 	fmt.Fprintf(os.Stderr, "printing compound parts to file '%s'\n", fileName)
 
@@ -189,7 +194,7 @@ func toFile(m map[string]map[WP]int, fileName string) error {
 			fltr = srt[0:1]
 		}
 		if tot > 5 {
-
+			// TODO: If same POS+MORPH but different trans, collapse into one lex.Entry
 			for _, s := range fltr {
 
 				t := lex.Transcription{Strn: s.Word.trans}
@@ -205,11 +210,14 @@ func toFile(m map[string]map[WP]int, fileName string) error {
 					return fmt.Errorf("lexfile2decompPronlex.toFile failed formatting : %v", err)
 				}
 
-				fmt.Printf("%d\t%s\t%s\n", tot, k, es)
+				//fmt.Printf("%d\t%s\t%s\n", tot, k, es)
+				fmt.Fprintf(fh, "%s\n", es)
 			}
 		}
 
 	}
+
+	//fh.Flush()
 
 	return nil
 }
@@ -297,7 +305,11 @@ func main() {
 
 	// TODO: File base name as command line arg instead
 	outFileName := strings.Replace(filepath.Base(fn), ".gz", "", -1) + "_sufflex.txt"
-	toFile(suffixLex, outFileName)
+	err = toFile(suffixLex, outFileName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "FAILURE: %v\n", err)
+		os.Exit(0)
+	}
 
 	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)
 }
