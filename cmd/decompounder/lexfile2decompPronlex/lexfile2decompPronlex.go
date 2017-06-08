@@ -258,20 +258,14 @@ func main() {
 			os.Exit(0)
 		}
 
-		//fmt.Printf("%#v\n\n", e)
-
-		//fs := strings.Split(l, "\t")
-		//morf := fs[2]
-
 		// disregard items withs spurious morphology:
 		if strings.Contains(e.Morphology, "|||") || strings.HasPrefix(e.Morphology, " |") {
 			continue
 		}
 
-		//orth := fs[0]
-		pos := e.PartOfSpeech  //strings.TrimSpace(fs[1])
-		morph := e.Morphology  //strings.TrimSpace(fs[2])
-		decomp0 := e.WordParts // fs[3]
+		pos := e.PartOfSpeech
+		morph := e.Morphology
+		decomp0 := e.WordParts
 		decomp := cleanUpDecomp(decomp0)
 		firstTrans := e.Transcriptions[0].Strn // fs[8]
 		if strings.Contains(decomp, "+") {
@@ -289,12 +283,10 @@ func main() {
 
 			addWordParts(decomp, rez, pos, morph)
 
-			//fmt.Printf("%s\t%s\n", decomp, strings.Join(rez, "	<+>	"))
 		}
 	}
 
 	dump(suffixLex)
 
-	//fmt.Printf("%v\n", suffixLex)
 	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)
 }
