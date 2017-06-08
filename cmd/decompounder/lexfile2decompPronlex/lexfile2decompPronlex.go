@@ -168,12 +168,14 @@ func dump(m map[string]map[WP]int) {
 
 func toFile(m map[string]map[WP]int, fileName string) error {
 
+	// Open fileName for writing
+
+	fmt.Fprintf(os.Stderr, "printing compound parts to file '%s'\n", fileName)
+
 	wsFmt, err := line.NewWS()
 	if err != nil {
 		return fmt.Errorf("lexfile2decompPronlen.toFile failed initializing : %v", err)
 	}
-
-	//_ = wsFmt
 
 	for k, v := range m {
 		srt := freqSort(v) // []Freq
@@ -190,13 +192,20 @@ func toFile(m map[string]map[WP]int, fileName string) error {
 
 			for _, s := range fltr {
 
-				e := lex.Entry{}
-				_, err := wsFmt.Entry2String(e)
+				t := lex.Transcription{Strn: s.Word.trans}
+				e := lex.Entry{
+					Strn:           k,
+					WordParts:      k,
+					PartOfSpeech:   s.Word.pos,
+					Morphology:     s.Word.morph,
+					Transcriptions: []lex.Transcription{t},
+				}
+				es, err := wsFmt.Entry2String(e)
 				if err != nil {
 					return fmt.Errorf("lexfile2decompPronlex.toFile failed formatting : %v", err)
 				}
 
-				fmt.Printf("%d\t%s\t%#v\n", tot, k, s)
+				fmt.Printf("%d\t%s\t%s\n", tot, k, es)
 			}
 		}
 
@@ -286,7 +295,9 @@ func main() {
 		}
 	}
 
-	dump(suffixLex)
+	// TODO: File base name as command line arg instead
+	outFileName := strings.Replace(filepath.Base(fn), ".gz", "", -1) + "_sufflex.txt"
+	toFile(suffixLex, outFileName)
 
 	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)
 }
