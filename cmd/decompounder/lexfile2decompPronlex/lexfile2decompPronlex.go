@@ -4,12 +4,16 @@ import (
 	"bufio"
 	"compress/gzip"
 	"fmt"
-	"github.com/stts-se/pronlex/decompounder/svnst"
+
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/stts-se/pronlex/decompounder/svnst"
+	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/line" // For formatting output file
 )
 
 // Takes a lexfile in WS format and tries to split the (first) transcription of each word into compound parts according to the word parts field, where the entry is decompounded.
@@ -137,10 +141,10 @@ func minFreqAndDifferentTrans(fs []Freq, min int) []Freq {
 	return res
 }
 
-func saveToDB(m map[string]map[WP]int, dbFile, lexiconName string) error {
+// func saveToDB(m map[string]map[WP]int, dbFile, lexiconName string) error {
 
-	return nil
-}
+// 	return nil
+// }
 
 func dump(m map[string]map[WP]int) {
 	for k, v := range m {
@@ -160,6 +164,45 @@ func dump(m map[string]map[WP]int) {
 			}
 		}
 	}
+}
+
+func toFile(m map[string]map[WP]int, fileName string) error {
+
+	wsFmt, err := line.NewWS()
+	if err != nil {
+		return fmt.Errorf("lexfile2decompPronlen.toFile failed initializing : %v", err)
+	}
+
+	//_ = wsFmt
+
+	for k, v := range m {
+		srt := freqSort(v) // []Freq
+		tot := totFreq(srt)
+		min := 4
+		if tot > 50 {
+			min = 20
+		}
+		fltr := minFreqAndDifferentTrans(srt, min)
+		if len(fltr) == 0 && len(srt) > 0 { // Nothing survived the filtering. Put back first element if any.
+			fltr = srt[0:1]
+		}
+		if tot > 5 {
+
+			for _, s := range fltr {
+
+				e := lex.Entry{}
+				_, err := wsFmt.Entry2String(e)
+				if err != nil {
+					return fmt.Errorf("lexfile2decompPronlex.toFile failed formatting : %v", err)
+				}
+
+				fmt.Printf("%d\t%s\t%#v\n", tot, k, s)
+			}
+		}
+
+	}
+
+	return nil
 }
 
 func main() {
@@ -202,19 +245,35 @@ func main() {
 
 	for s.Scan() {
 		l := s.Text()
-		fs := strings.Split(l, "\t")
-		morf := fs[2]
+
+		wsFmt, err := line.NewWS()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to initialize line formatter : %v", err)
+			os.Exit(0)
+		}
+
+		e, err := wsFmt.ParseToEntry(l)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to parse line : %v", err)
+			os.Exit(0)
+		}
+
+		//fmt.Printf("%#v\n\n", e)
+
+		//fs := strings.Split(l, "\t")
+		//morf := fs[2]
+
 		// disregard items withs spurious morphology:
-		if strings.Contains(morf, "|||") || strings.HasPrefix(morf, " |") {
+		if strings.Contains(e.Morphology, "|||") || strings.HasPrefix(e.Morphology, " |") {
 			continue
 		}
 
 		//orth := fs[0]
-		pos := strings.TrimSpace(fs[1])
-		morph := strings.TrimSpace(fs[2])
-		decomp0 := fs[3]
+		pos := e.PartOfSpeech  //strings.TrimSpace(fs[1])
+		morph := e.Morphology  //strings.TrimSpace(fs[2])
+		decomp0 := e.WordParts // fs[3]
 		decomp := cleanUpDecomp(decomp0)
-		firstTrans := fs[8]
+		firstTrans := e.Transcriptions[0].Strn // fs[8]
 		if strings.Contains(decomp, "+") {
 			//fmt.Printf("%s %s %s\n", orth, decomp, firstTrans)
 
