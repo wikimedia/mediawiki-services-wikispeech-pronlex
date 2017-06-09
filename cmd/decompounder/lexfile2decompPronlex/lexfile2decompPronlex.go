@@ -348,5 +348,5 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Fprintf(os.Stderr, "lines failed to split: %d\n", fails)
+	fmt.Fprintf(os.Stderr, "Lines failed to split: %d\n", fails)
 }
