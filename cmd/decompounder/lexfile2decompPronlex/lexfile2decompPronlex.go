@@ -1,3 +1,5 @@
+// NB: One-off hack that is not intended to be maintained.
+
 package main
 
 import (
@@ -74,7 +76,7 @@ func addWordParts(wps string, trans []string, pos, morph string) {
 	var wps0 = strings.Split(wps, "+")
 
 	if len(wps0) != len(trans) {
-		fmt.Fprintf(os.Stderr, "skipping input: different len: %v vs %v", wps0, trans)
+		fmt.Fprintf(os.Stderr, "skipping input: different len: %v vs %v\n", wps0, trans)
 	}
 
 	if len(wps0) < 2 {
@@ -141,10 +143,42 @@ func minFreqAndDifferentTrans(fs []Freq, min int) []Freq {
 	return res
 }
 
-// func saveToDB(m map[string]map[WP]int, dbFile, lexiconName string) error {
+// Filter that collapses entries of the same POS and MORPH values. The
+// most frequent transcription is placed first in a slice.
+func collapseEntriesWithSamePOS(w string, f []Freq) []lex.Entry {
+	var res []lex.Entry
 
-// 	return nil
-// }
+	// Keeps track of already seen POS+MORPH
+	seen := make(map[string]bool)
+
+	for _, s := range f {
+
+		posMorph := s.Word.pos + s.Word.morph
+
+		t := lex.Transcription{Strn: s.Word.trans}
+		e := lex.Entry{
+			Strn:           w,
+			WordParts:      w,
+			PartOfSpeech:   s.Word.pos,
+			Morphology:     s.Word.morph,
+			Transcriptions: []lex.Transcription{t},
+		}
+
+		if ok := seen[posMorph]; !ok {
+			res = append(res, e)
+			seen[posMorph] = true
+		} else { // Add transcription variant to already existing Entry
+			for i, ex := range res {
+				if ex.PartOfSpeech == s.Word.pos && ex.Morphology == s.Word.morph {
+					ts := res[i].Transcriptions
+					ts = append(ts, t)
+					res[i].Transcriptions = ts
+				}
+			}
+		}
+	}
+	return res
+}
 
 func dump(m map[string]map[WP]int) {
 	for k, v := range m {
@@ -190,21 +224,15 @@ func toFile(m map[string]map[WP]int, fileName string) error {
 			min = 20
 		}
 		fltr := minFreqAndDifferentTrans(srt, min)
+		//fltr := collapseEntriesWithSamePOS(fltr0)
 		if len(fltr) == 0 && len(srt) > 0 { // Nothing survived the filtering. Put back first element if any.
 			fltr = srt[0:1]
 		}
 		if tot > 5 {
 			// TODO: If same POS+MORPH but different trans, collapse into one lex.Entry
-			for _, s := range fltr {
+			entries := collapseEntriesWithSamePOS(k, fltr)
+			for _, e := range entries {
 
-				t := lex.Transcription{Strn: s.Word.trans}
-				e := lex.Entry{
-					Strn:           k,
-					WordParts:      k,
-					PartOfSpeech:   s.Word.pos,
-					Morphology:     s.Word.morph,
-					Transcriptions: []lex.Transcription{t},
-				}
 				es, err := wsFmt.Entry2String(e)
 				if err != nil {
 					return fmt.Errorf("lexfile2decompPronlex.toFile failed formatting : %v", err)
@@ -214,7 +242,6 @@ func toFile(m map[string]map[WP]int, fileName string) error {
 				fmt.Fprintf(fh, "%s\n", es)
 			}
 		}
-
 	}
 
 	//fh.Flush()
@@ -232,14 +259,14 @@ func main() {
 	fn := os.Args[1]
 	fh, err := os.Open(fn)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Mabel Tainter Memorial Building! : %v", err)
+		fmt.Fprintf(os.Stderr, "Mabel Tainter Memorial Building! : %v\n", err)
 	}
 
 	var s *bufio.Scanner
 	if strings.HasSuffix(fn, ".gz") {
 		gz, err := gzip.NewReader(fh)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Streptomyces tsukubaensis! : %v", err)
+			fmt.Fprintf(os.Stderr, "Streptomyces tsukubaensis! : %v\n", err)
 		}
 		s = bufio.NewScanner(gz)
 	} else {
@@ -265,13 +292,13 @@ func main() {
 
 		wsFmt, err := line.NewWS()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to initialize line formatter : %v", err)
+			fmt.Fprintf(os.Stderr, "failed to initialize line formatter : %v\n", err)
 			os.Exit(0)
 		}
 
 		e, err := wsFmt.ParseToEntry(l)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to parse line : %v", err)
+			fmt.Fprintf(os.Stderr, "failed to parse line : %v\n", err)
 			os.Exit(0)
 		}
 
@@ -290,7 +317,7 @@ func main() {
 
 			rez, err := svnst.HerusticSvNSTTransDecomp(decomp, firstTrans)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "FAIL: %v : %s\t%s\t%#v\n\n", err, decomp, firstTrans, rez)
+				fmt.Fprintf(os.Stderr, "FAIL: %v : %s\t%s\t%#v\n", err, decomp, firstTrans, rez)
 				fails++
 				if fails >= exitAfter {
 					os.Exit(1)
@@ -304,8 +331,18 @@ func main() {
 	}
 
 	// TODO: File base name as command line arg instead
-	outFileName := strings.Replace(filepath.Base(fn), ".gz", "", -1) + "_sufflex.txt"
-	err = toFile(suffixLex, outFileName)
+	outFileBaseName := strings.Replace(filepath.Base(fn), ".gz", "", -1)
+	err = toFile(suffixLex, outFileBaseName+"_sufflex.txt")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "FAILURE: %v\n", err)
+		os.Exit(0)
+	}
+	err = toFile(prefixLex, outFileBaseName+"_preflex.txt")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "FAILURE: %v\n", err)
+		os.Exit(0)
+	}
+	err = toFile(infixLex, outFileBaseName+"_infixlex.txt")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "FAILURE: %v\n", err)
 		os.Exit(0)

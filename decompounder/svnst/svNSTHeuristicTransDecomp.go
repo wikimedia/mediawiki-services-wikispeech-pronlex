@@ -422,9 +422,9 @@ func splitTrans(lhs, rhs, trans string) (string, string, error) {
 	var errr error
 	if lErr != nil {
 		if errr != nil {
-			errr = fmt.Errorf("%s : %s", errr, lErr)
+			errr = fmt.Errorf("%v : %v", errr, lErr)
 		} else {
-			errr = fmt.Errorf("%s", lErr)
+			errr = fmt.Errorf("%v", lErr)
 		}
 	}
 	if rErr != nil {
