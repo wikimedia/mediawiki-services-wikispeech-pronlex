@@ -1,3 +1,7 @@
+// NB: This one-off hack does not really belong in this
+// package. It's specific to a Swedish pronunciation dictionary
+// (file).
+
 package svnst
 
 import (
