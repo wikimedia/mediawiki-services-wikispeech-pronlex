@@ -9,22 +9,22 @@ import (
 
 func moveNewEntriesHandler(w http.ResponseWriter, r *http.Request) {
 
-	fromLexName := delQuote(r.FormValue("from_lexicon"))
+	fromLexName := delQuote(getParam("from_lexicon", r))
 	if fromLexName == "" {
 		http.Error(w, "no value for parameter 'from_lexicon'", http.StatusBadRequest)
 		return
 	}
-	toLexName := delQuote(r.FormValue("to_lexicon"))
+	toLexName := delQuote(getParam("to_lexicon", r))
 	if toLexName == "" {
 		http.Error(w, "no value for parameter 'to_lexicon'", http.StatusBadRequest)
 		return
 	}
-	sourceName := delQuote(r.FormValue("source"))
+	sourceName := delQuote(getParam("source", r))
 	if sourceName == "" {
 		http.Error(w, "no value for parameter 'source'", http.StatusBadRequest)
 		return
 	}
-	statusName := delQuote(r.FormValue("status"))
+	statusName := delQuote(getParam("status", r))
 	if statusName == "" {
 		http.Error(w, "no value for parameter 'status'", http.StatusBadRequest)
 		return

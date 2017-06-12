@@ -41,8 +41,8 @@ func loadValidators(symsetDirName string) error {
 // TODO code duplication between validateEntriesHandler and validateEntryHandler
 
 func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
-	entriesJSON := r.FormValue("entries")
-	symbolSetName := r.FormValue("symbolsetname")
+	entriesJSON := getParam("entries", r)
+	symbolSetName := getParam("symbolsetname", r)
 
 	var es []lex.Entry
 	err := json.Unmarshal([]byte(entriesJSON), &es) //TODO check if OK. NL 20161019 es -> &es
@@ -87,8 +87,8 @@ func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
 // TODO code duplication between validateEntriesHandler and validateEntryHandler
 
 func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
-	entryJSON := r.FormValue("entry")
-	symbolSetName := r.FormValue("symbolsetname")
+	entryJSON := getParam("entry", r)
+	symbolSetName := getParam("symbolsetname", r)
 
 	var e lex.Entry
 	err := json.Unmarshal([]byte(entryJSON), &e)
@@ -132,7 +132,7 @@ func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func validationStatsHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconIDString := r.FormValue("lexiconId")
+	lexiconIDString := getParam("lexiconId", r)
 	if len(strings.TrimSpace(lexiconIDString)) == 0 {
 		msg := fmt.Sprintf("lexicon id should be specified by variable 'lexiconId'")
 		log.Println(msg)
@@ -230,7 +230,7 @@ func listValidationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func hasValidatorHandler(w http.ResponseWriter, r *http.Request) {
-	symbolSet := r.FormValue("symbolset")
+	symbolSet := getParam("symbolset", r)
 	if len(strings.TrimSpace(symbolSet)) == 0 {
 		msg := fmt.Sprintf("symbol set should be specified by variable 'symbolset'")
 		log.Println(msg)

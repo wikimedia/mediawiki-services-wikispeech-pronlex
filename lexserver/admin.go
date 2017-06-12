@@ -35,7 +35,7 @@ func adminDoLexImportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clientUUID := r.FormValue("client_uuid")
+	clientUUID := getParam("client_uuid", r)
 
 	if "" == strings.TrimSpace(clientUUID) {
 		msg := "adminDoLexImportHandler got no client uuid"

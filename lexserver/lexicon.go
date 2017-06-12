@@ -34,7 +34,7 @@ func listLexsHandler(w http.ResponseWriter, r *http.Request) {
 
 func listCurrentEntryStatuses(w http.ResponseWriter, r *http.Request) {
 
-	lexiconName := r.FormValue("lexicon_name")
+	lexiconName := getParam("lexicon_name", r)
 	if "" == lexiconName {
 		http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
 		return
@@ -57,7 +57,7 @@ func listCurrentEntryStatuses(w http.ResponseWriter, r *http.Request) {
 // TODO cut-n-paste from above
 func listAllEntryStatuses(w http.ResponseWriter, r *http.Request) {
 
-	lexiconName := r.FormValue("lexicon_name")
+	lexiconName := getParam("lexicon_name", r)
 	if "" == lexiconName {
 		http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
 		return
@@ -110,7 +110,7 @@ func listLexsWithEntryCountHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func lexInfoHandler(w http.ResponseWriter, r *http.Request) {
-	lexName := r.FormValue("name")
+	lexName := getParam("name", r)
 	if len(strings.TrimSpace(lexName)) == 0 {
 		msg := fmt.Sprintf("lexicon name should be specified by variable 'name'")
 		log.Println(msg)
@@ -133,7 +133,7 @@ func lexInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconID, err := strconv.ParseInt(r.FormValue("lexiconId"), 10, 64)
+	lexiconID, err := strconv.ParseInt(getParam("lexiconId", r), 10, 64)
 	if err != nil {
 		msg := "lexiconStatsHandler got no lexicon id"
 		log.Println(msg)
@@ -207,7 +207,7 @@ func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
 // TODO add tests
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO error check parameters
-	lexiconName := r.FormValue("lexicon")
+	lexiconName := getParam("lexicon", r)
 	lexicon, err := dbapi.GetLexicon(db, lexiconName)
 	if err != nil {
 		msg := fmt.Sprintf("failed to find lexicon %s in database : %v", lexiconName, err)
@@ -215,7 +215,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	entryJSON := r.FormValue("entry")
+	entryJSON := getParam("entry", r)
 	var e lex.Entry
 	err = json.Unmarshal([]byte(entryJSON), &e)
 	if err != nil {
@@ -236,9 +236,9 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 
 func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	// if no id or not an int, simply set id to 0:
-	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
-	name := strings.TrimSpace(r.FormValue("name"))
-	symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
+	id, _ := strconv.ParseInt(getParam("id", r), 10, 64)
+	name := strings.TrimSpace(getParam("name", r))
+	symbolSetName := strings.TrimSpace(getParam("symbolsetname", r))
 
 	if name == "" || symbolSetName == "" {
 		msg := fmt.Sprint("missing parameter value, expecting value for 'name' and 'symbolsetname'")
@@ -272,7 +272,7 @@ func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
-	clientUUID := r.FormValue("client_uuid")
+	clientUUID := getParam("client_uuid", r)
 
 	if "" == strings.TrimSpace(clientUUID) {
 		msg := "lexiconRunValidateHandler got no client uuid"
@@ -289,7 +289,7 @@ func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	logger := dbapi.NewWebSockLogger(conn)
 
-	lexName := r.FormValue("lexicon_name")
+	lexName := getParam("lexicon_name", r)
 	lexicon, err := dbapi.GetLexicon(db, lexName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("couldn't retrive lexicon : %v", err), http.StatusInternalServerError)
