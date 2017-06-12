@@ -830,15 +830,14 @@ func main() {
 	rout.HandleFunc("/lexicon/validate", lexiconValidateHandler)
 	rout.HandleFunc("/lexicon/do_validate", lexiconRunValidateHandler)
 
+	rout.HandleFunc("/validation", validationHelpHandler)
 	rout.HandleFunc("/validation/validateentry", validateEntryHandler)
 	rout.HandleFunc("/validation/validateentries", validateEntriesHandler)
-	rout.HandleFunc("/validation", validationHelpHandler)
 	rout.HandleFunc("/validation/list", listValidationHandler)
 	rout.HandleFunc("/validation/has_validator", hasValidatorHandler)
 	rout.HandleFunc("/validation/stats", validationStatsHandler)
 
 	// admin pages/calls
-
 	rout.HandleFunc("/admin/lex_import", adminLexImportHandler)
 	rout.HandleFunc("/admin/lex_do_import", adminDoLexImportHandler)
 	rout.HandleFunc("/admin", adminHelpHandler)
