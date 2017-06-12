@@ -238,7 +238,7 @@ func symbolSetHelpHandler(w http.ResponseWriter, r *http.Request) {
 var symbolsetUpload = urlHandler{
 	name:     "upload",
 	url:      "/upload",
-	help:     "Upload symbol set file. Link goes to a GUI. DOESN'T WORK AS OF 2017-06-12!",
+	help:     "Upload symbol set file. Link goes to a GUI.",
 	examples: []string{"/upload"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/symbolset/upload.html")
@@ -246,8 +246,6 @@ var symbolsetUpload = urlHandler{
 }
 
 func doUploadSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("doUploadSymbolSetHandler called")
-
 	if r.Method != "POST" {
 		http.Error(w, fmt.Sprintf("symbol set upload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
 		return

@@ -858,7 +858,7 @@ func main() {
 	symbolset.addHandler(symbolsetReloadOne)
 	symbolset.addHandler(symbolsetReloadAll)
 	symbolset.addHandler(symbolsetUpload)
-	rout.HandleFunc("/symbolset/do_upload", doUploadSymbolSetHandler) // hidden
+	rout.HandleFunc("/symbolset/do_upload", doUploadSymbolSetHandler) // hidden -- not part of API
 
 	mapper := newSubRouter(rout, "/mapper")
 	mapper.addHandler(mapperList)
@@ -874,8 +874,8 @@ func main() {
 	r1 := http.StripPrefix("/lexsearch/externals/", http.FileServer(http.Dir("../web/lexsearch/externals/")))
 	rout.Handle("/lexsearch/externals/", r1)
 
-	// TODO Why this http.StripPrefix? Looks odd.
-	rout.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	// serve static folder
+	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Println("Serving urls:")
 	rout.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
