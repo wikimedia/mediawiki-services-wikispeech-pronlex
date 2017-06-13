@@ -393,8 +393,8 @@ type MoveResult struct {
 }
 
 // MoveNewEntries moves lexical entries from the lexicon named
-// fromLexicon to the lexicon named toLexicon.  The 'source' string is
-// the name of the source of the entries to be moved, and 'status' is
+// fromLexicon to the lexicon named toLexicon.  The 'newSource' string is
+// the name of the new source of the entries to be moved, and 'newStatus' is
 // the name of the new status to set on the moved entries.  Currently,
 // source and/or status may not be the empty string. TODO: Maybe it
 // should be possible to skip source and status values?
@@ -404,13 +404,13 @@ type MoveResult struct {
 // rationale behind this function is to first create a small
 // additional lexicon with new entries (the fromLexicon), that can
 // later be appended to the master lexicon (the toLexicon).
-func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
-	if strings.TrimSpace(source) == "" {
-		msg := "MoveNewEntries called with the empty 'source' argument"
+func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
+	if strings.TrimSpace(newSource) == "" {
+		msg := "MoveNewEntries called with the empty 'newSource' argument"
 		return MoveResult{}, fmt.Errorf(msg)
 	}
-	if strings.TrimSpace(status) == "" {
-		msg := "MoveNewEntries called with the empty 'status' argument"
+	if strings.TrimSpace(newStatus) == "" {
+		msg := "MoveNewEntries called with the empty 'newStatus' argument"
 		return MoveResult{}, fmt.Errorf(msg)
 	}
 
@@ -420,18 +420,18 @@ func MoveNewEntries(db *sql.DB, fromLexicon, toLexicon, source, status string) (
 	}
 	defer tx.Commit()
 
-	return moveNewEntriesTx(tx, fromLexicon, toLexicon, source, status)
+	return moveNewEntriesTx(tx, fromLexicon, toLexicon, newSource, newStatus)
 }
 
 // moveNewEntriesTx is documented under MoveNewEntries
-func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string) (MoveResult, error) {
-	if strings.TrimSpace(source) == "" {
-		msg := "moveNewEntriesTx called with the empty 'source' argument"
+func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
+	if strings.TrimSpace(newSource) == "" {
+		msg := "moveNewEntriesTx called with the empty 'newSource' argument"
 		tx.Rollback()
 		return MoveResult{}, fmt.Errorf(msg)
 	}
-	if strings.TrimSpace(status) == "" {
-		msg := "moveNewEntriesTx called with the empty 'status' argument"
+	if strings.TrimSpace(newStatus) == "" {
+		msg := "moveNewEntriesTx called with the empty 'newStatus' argument"
 		tx.Rollback()
 		return MoveResult{}, fmt.Errorf(msg)
 	}
@@ -496,7 +496,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, source, status string)
 	insertQuery := `INSERT INTO entrystatus (name, source, entryid, current) SELECT ?, ?, entry.id, '1' FROM entry ` + where
 
 	// updateQuery0 := `UPDATE entrystatus SET current = 1 AND source = ? AND name = ? ` + where + ` AND entrystatus.entryid = entry.id`
-	q0Rez, err := tx.Exec(insertQuery, status, source, fromLex.ID, toLex.ID)
+	q0Rez, err := tx.Exec(insertQuery, newStatus, newSource, fromLex.ID, toLex.ID)
 	if err != nil {
 		tx.Rollback()
 		return res, fmt.Errorf("failed to update entrystatus : %v", err)
