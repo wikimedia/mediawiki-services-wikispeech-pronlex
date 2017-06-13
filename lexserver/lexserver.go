@@ -797,9 +797,9 @@ func main() {
 			http.ServeFile(w, r, "../web/lexsearch/index.html")
 		},
 	}
-	demo.addHandler(searchDemoHandler)
 
-	//rout.HandleFunc("/search_demo", searchDemoHandler)
+	// search demo / typescript test
+	demo.addHandler(searchDemoHandler)
 	rout.PathPrefix("/lexsearch/externals/").Handler(http.StripPrefix("/lexsearch/externals/", http.FileServer(http.Dir("../web/lexsearch/externals"))))
 	rout.PathPrefix("/lexsearch/built/").Handler(http.StripPrefix("/lexsearch/built/", http.FileServer(http.Dir("../web/lexsearch/built"))))
 
