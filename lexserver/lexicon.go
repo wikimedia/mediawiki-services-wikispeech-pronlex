@@ -356,7 +356,7 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 
 var lexiconMoveNewEntries = urlHandler{
 	name:     "move_new_entries",
-	url:      "/move_new_entries/{from_lexicon}/{to_lexicon}/{source}/{status}",
+	url:      "/move_new_entries/{from_lexicon}/{to_lexicon}/{new_source}/{new_status}",
 	help:     "Move entries from one lexicon to another.",
 	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
@@ -370,12 +370,12 @@ var lexiconMoveNewEntries = urlHandler{
 			http.Error(w, "no value for parameter 'to_lexicon'", http.StatusBadRequest)
 			return
 		}
-		sourceName := delQuote(getParam("source", r))
+		sourceName := delQuote(getParam("new_source", r))
 		if sourceName == "" {
 			http.Error(w, "no value for parameter 'source'", http.StatusBadRequest)
 			return
 		}
-		statusName := delQuote(getParam("status", r))
+		statusName := delQuote(getParam("new_status", r))
 		if statusName == "" {
 			http.Error(w, "no value for parameter 'status'", http.StatusBadRequest)
 			return
