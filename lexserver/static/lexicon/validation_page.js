@@ -73,8 +73,8 @@ LEXVDATE.VdateModel = function () {
     
     
     self.runValidation = function() {
-	console.log("validating lexicon: ", self.selectedLexicon())
-	var url = LEXVDATE.baseURL + "/lexicon/do_validate"
+	console.log("validating lexicon: ", self.selectedLexicon());
+	var url = LEXVDATE.baseURL + "/lexicon/validation/" + self.selectedLexicon().name;
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);
@@ -88,7 +88,7 @@ LEXVDATE.VdateModel = function () {
 	    };
 	};
 	fd.append("client_uuid", self.uuid);
-	fd.append("lexicon_name", self.selectedLexicon().name);
+	//fd.append("lexicon_name", self.selectedLexicon().name);
 	self.message("Validating, please wait ...");
 	xhr.send(fd);
     };

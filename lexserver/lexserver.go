@@ -48,27 +48,7 @@ type subRouter struct {
 	handlers []urlHandler
 }
 
-var initialSlashRe = regexp.MustCompile("^/")
-
-func newSubRouter(rout *mux.Router, root string) *subRouter {
-	var res = subRouter{
-		router: rout.PathPrefix(root).Subrouter(),
-		root:   root,
-	}
-
-	helpHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-		html := "<h1>" + initialSlashRe.ReplaceAllString(res.root, "") + "</h1>"
-		for _, handler := range res.handlers {
-			html = html + handler.helpHtml(res.root)
-		}
-		fmt.Fprint(w, html)
-	}
-
-	res.router.HandleFunc("/", helpHandler)
-	return &res
-}
+var subRouters []*subRouter
 
 type urlHandler struct {
 	name     string
@@ -80,11 +60,59 @@ type urlHandler struct {
 
 func (h urlHandler) helpHtml(root string) string {
 	s := "<h2>" + h.name + "</h2> " + h.help
-	for _, x := range h.examples {
-		url := root + x
-		s = s + `<pre><a href="` + url + `">` + url + `</a></pre>`
+	if strings.Contains(h.url, "{") {
+		s = s + `<p>API URL: <code>` + h.url + `</code></p>`
+	}
+	if len(h.examples) > 0 {
+		//s = s + `<p>Example invocation:`
+		for _, x := range h.examples {
+			urlPretty := root + x
+			url := root + strings.Replace(strings.Replace(strings.Replace(x, " ", "%20", -1), "\n", "", -1), `"`, "%22", -1) // TODO: Neat urlenc...
+			s = s + `<pre><a href="` + url + `">` + urlPretty + `</a></pre>`
+		}
+		//s = s + "</p>"
 	}
 	return s
+}
+func isHandeledPage(url string) bool {
+	for _, sub := range subRouters {
+		if sub.root == url || sub.root+"/" == url {
+			return true
+		}
+		for _, handler := range sub.handlers {
+			if sub.root+handler.url == url {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+var initialSlashRe = regexp.MustCompile("^/")
+
+func removeInitialSlash(url string) string {
+	return initialSlashRe.ReplaceAllString(url, "")
+}
+
+func newSubRouter(rout *mux.Router, root string) *subRouter {
+	var res = subRouter{
+		router: rout.PathPrefix(root).Subrouter(),
+		root:   root,
+	}
+
+	helpHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+		html := "<h1>" + removeInitialSlash(res.root) + "</h1>"
+		for _, handler := range res.handlers {
+			html = html + handler.helpHtml(res.root)
+		}
+		fmt.Fprint(w, html)
+	}
+
+	res.router.HandleFunc("/", helpHandler)
+	subRouters = append(subRouters, &res)
+	return &res
 }
 
 // protect: use this call in handlers to catch 'panic' and stack traces and returning a general error to the calling client
@@ -161,63 +189,19 @@ func marshal(v interface{}, r *http.Request) ([]byte, error) {
 	return json.Marshal(v)
 }
 
-func ipaTableHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/ipa_table.txt")
-}
-
-func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/favicon.ico")
-}
-
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Serving index file for '%v'\n", r.URL.Path)
-	http.ServeFile(w, r, "./static/index.html")
-}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	html := `<h1>Lexserver</h1>`
 
-func deleteLexHandler(w http.ResponseWriter, r *http.Request) {
+	for _, subRouter := range subRouters {
+		html = html + `<h3><a href="` + subRouter.root + `">` + removeInitialSlash(subRouter.root) + `</a></h3>`
 
-	idS := getParam("id", r)
-	if idS == "" {
-		msg := "deleteLexHander expected a lexicon id defined by 'id'"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
 	}
 
-	id, _ := strconv.ParseInt(idS, 10, 64)
-
-	err := dbapi.DeleteLexicon(db, id)
-	if err != nil {
-		log.Printf("lexserver.deleteLexHandler got error : %v\n", err)
-		http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusExpectationFailed)
-		return
-	}
-}
-
-func superDeleteLexHandler(w http.ResponseWriter, r *http.Request) {
-	// Aha! Turns out that Go treats POST and GET the same way, as I understand it.
-	// No need for checking whether GET or POST, as far as I understand.
-	idS := getParam("id", r)
-	if idS == "" {
-		msg := "deleteLexHander expected a lexicon id defined by 'id'"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	id, _ := strconv.ParseInt(idS, 10, 64)
-
-	uuid := getParam("client_uuid", r)
-	log.Println("lexserver.superDeleteLexHandler was called")
-	messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon id %d", id))
-	err := dbapi.SuperDeleteLexicon(db, id)
-	if err != nil {
-
-		http.Error(w, fmt.Sprintf("failed super deleting lexicon : %v", err), http.StatusExpectationFailed)
-		return
-	}
-
-	messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon with id %d", id))
+	html = html + `<hr/><h2>Create db and start server</h2>
+Instructions on how to create a lexicon database and start the server is available from the <a target="blank" href="https://github.com/stts-se/lexdata/wiki/Create-lexicon-database">Lexdata git Wiki</a>.
+`
+	fmt.Fprint(w, html)
 }
 
 func sqlite3AnalyzeHandler(w http.ResponseWriter, r *http.Request) {
@@ -342,63 +326,6 @@ func delQuote(s string) string {
 	res = strings.TrimSuffix(res, `'`)
 
 	return strings.TrimSpace(res)
-}
-
-func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
-	entryJSON := getParam("entry", r)
-	//body, err := ioutil.ReadAll(r.Body)
-	var e lex.Entry
-	err := json.Unmarshal([]byte(entryJSON), &e)
-	if err != nil {
-		log.Printf("lexserver: Failed to unmarshal json: %v", err)
-		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	// Underscore below matches bool indicating if any update has taken place. Return this info?
-	res, _, err2 := dbapi.UpdateEntry(db, e)
-	if err2 != nil {
-		log.Printf("lexserver: Failed to update entry : %v", err2)
-		http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
-		return
-	}
-
-	res0, err3 := json.Marshal(res)
-	if err3 != nil {
-		log.Printf("lexserver: Failed to marshal entry : %v", err3)
-		http.Error(w, fmt.Sprintf("failed return updated Entry : %v", err3), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(res0))
-}
-
-func adminAdminHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin/admin.html")
-}
-
-func adminHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin/index.html")
-}
-
-func adminLexDefinitionHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin_lex_definition.html")
-}
-
-func adminLexImportHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin/lex_import.html")
-}
-
-func lexiconValidateHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/lexicon/validate.html")
-}
-
-func adminCreateLexHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin/create_lex.html")
-}
-
-func adminEditSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/admin/edit_symbolset.html")
 }
 
 var wsChan = make(chan string)
@@ -751,12 +678,12 @@ func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func searchDemoHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "../web/lexsearch/index.html")
-}
-
 func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
 	return symbolset.LoadSymbolSet(fName)
+}
+
+func isStaticPage(url string) bool {
+	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt"
 }
 
 func main() {
@@ -811,46 +738,27 @@ func main() {
 	ff("Failed to load validators : %v", err)
 	log.Printf("lexserver: Loaded validators : %v", validatorNames())
 
-	// static
 	rout.HandleFunc("/", indexHandler)
-	rout.HandleFunc("/favicon.ico", faviconHandler)
-	rout.HandleFunc("/ipa_table.txt", ipaTableHandler)
 
-	// function calls
-	rout.HandleFunc("/lexicon", lexiconHelpHandler)
-	rout.HandleFunc("/lexicon/list", listLexsWithEntryCountHandler)
-	rout.HandleFunc("/lexicon/list_current_entry_statuses", listCurrentEntryStatuses)
-	rout.HandleFunc("/lexicon/list_all_entry_statuses", listAllEntryStatuses)
-	rout.HandleFunc("/lexicon/info", lexInfoHandler)
-	rout.HandleFunc("/lexicon/stats", lexiconStatsHandler)
-	rout.HandleFunc("/lexicon/lookup", lexLookUpHandler)
-	rout.HandleFunc("/lexicon/addentry", addEntryHandler)
-	rout.HandleFunc("/lexicon/updateentry", updateEntryHandler)
+	lexicon := newSubRouter(rout, "/lexicon")
+	lexicon.addHandler(lexiconLookup) // has its own index page
+	lexicon.addHandler(lexiconList)
+	lexicon.addHandler(lexiconInfo)
+	lexicon.addHandler(lexiconStats)
+	lexicon.addHandler(lexiconListCurrentEntryStatuses)
+	lexicon.addHandler(lexiconListAllEntryStatuses)
+	lexicon.addHandler(lexiconAddEntry)
+	lexicon.addHandler(lexiconUpdateEntry)
+	lexicon.addHandler(lexiconMoveNewEntries)
+	lexicon.addHandler(lexiconValidationPage)
+	lexicon.addHandler(lexiconValidation)
 
-	// defined in file move_new_entries_handler.go.
-	rout.HandleFunc("/lexicon/move_new_entries", moveNewEntriesHandler)
-	rout.HandleFunc("/lexicon/validate", lexiconValidateHandler)       // => validation_page
-	rout.HandleFunc("/lexicon/do_validate", lexiconRunValidateHandler) // => validation
-
-	rout.HandleFunc("/validation", validationHelpHandler)
-	rout.HandleFunc("/validation/validateentry", validateEntryHandler)
-	rout.HandleFunc("/validation/validateentries", validateEntriesHandler)
-	rout.HandleFunc("/validation/list", listValidationHandler)
-	rout.HandleFunc("/validation/has_validator", hasValidatorHandler)
-	rout.HandleFunc("/validation/stats", validationStatsHandler)
-
-	// admin pages/calls
-	rout.HandleFunc("/admin/lex_import", adminLexImportHandler)      // => lex_import_page
-	rout.HandleFunc("/admin/lex_do_import", adminDoLexImportHandler) // => lex_import
-	rout.HandleFunc("/admin", adminHelpHandler)
-	rout.HandleFunc("/admin/deletelexicon", deleteLexHandler)
-	rout.HandleFunc("/admin/superdeletelexicon", superDeleteLexHandler)
-
-	// Sqlite3 ANALYZE command in some instances make search quicker,
-	// but it takes a while to perform
-	//rout.HandleFunc("/admin/sqlite3_analyze", sqlite3AnalyzeHandler)
-
-	rout.Handle("/websockreg", websocket.Handler(webSockRegHandler))
+	validation := newSubRouter(rout, "/validation")
+	validation.addHandler(validationValidateEntry)
+	validation.addHandler(validationValidateEntries)
+	validation.addHandler(validationListValidators)
+	validation.addHandler(validationStats)
+	validation.addHandler(validationHasValidator)
 
 	symbolset := newSubRouter(rout, "/symbolset")
 	symbolset.addHandler(symbolsetList)
@@ -866,25 +774,52 @@ func main() {
 	mapper.addHandler(mapperMap)
 	mapper.addHandler(mapperMaptable)
 
+	admin := newSubRouter(rout, "/admin")
+	admin.addHandler(adminLexImportPage)
+	admin.addHandler(adminLexImport)
+	admin.addHandler(adminDeleteLex)
+	admin.addHandler(adminSuperDeleteLex)
+
+	// Sqlite3 ANALYZE command in some instances make search quicker,
+	// but it takes a while to perform. TODO: Re-add this call?
+	//rout.HandleFunc("/admin/sqlite3_analyze", sqlite3AnalyzeHandler)
+
+	rout.Handle("/websockreg", websocket.Handler(webSockRegHandler))
+
 	// typescript experiments
-	rout.HandleFunc("/search_demo", searchDemoHandler)
+	demo := newSubRouter(rout, "/demo")
+	var searchDemoHandler = urlHandler{
+		name:     "search demo page",
+		url:      "/search",
+		help:     "Typescript search demo.",
+		examples: []string{"/search"},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "../web/lexsearch/index.html")
+		},
+	}
+	demo.addHandler(searchDemoHandler)
 
-	r0 := http.StripPrefix("/lexsearch/built/", http.FileServer(http.Dir("../web/lexsearch/built/")))
-	rout.Handle("/lexsearch/built/", r0)
+	//rout.HandleFunc("/search_demo", searchDemoHandler)
+	rout.PathPrefix("/lexsearch/externals/").Handler(http.StripPrefix("/lexsearch/externals/", http.FileServer(http.Dir("../web/lexsearch/externals"))))
+	rout.PathPrefix("/lexsearch/built/").Handler(http.StripPrefix("/lexsearch/built/", http.FileServer(http.Dir("../web/lexsearch/built"))))
 
-	r1 := http.StripPrefix("/lexsearch/externals/", http.FileServer(http.Dir("../web/lexsearch/externals/")))
-	rout.Handle("/lexsearch/externals/", r1)
-
-	// serve static folder
+	// static
+	rout.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/favicon.ico")
+	})
+	rout.HandleFunc("/ipa_table.txt", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/ipa_table.txt")
+	})
 	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
-	fmt.Println("Serving urls:")
 	rout.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		t, err := route.GetPathTemplate()
 		if err != nil {
 			return err
 		}
-		fmt.Println(t)
+		if !isStaticPage(t) && !isHandeledPage(t) {
+			log.Print("Unhandeled url: ", t)
+		}
 		return nil
 	})
 

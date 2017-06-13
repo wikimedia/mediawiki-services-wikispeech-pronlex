@@ -39,129 +39,159 @@ func loadValidators(symsetDirName string) error {
 }
 
 // TODO code duplication between validateEntriesHandler and validateEntryHandler
+var validationValidateEntry = urlHandler{
+	name: "validateentry",
+	url:  "/validateentry",
+	help: "Validates one entry.",
+	examples: []string{`/validateentry?symbolsetname=en-us_ws-sampa&entry={%22id%22:1703348,%22lexiconId%22:3,%22strn%22:%22barn%22,%22language%22:%22en-us%22,%22partOfSpeech%22:%22%22,%22wordParts%22:%22%22,%22lemma%22:{%22id%22:0,%22strn%22:%22%22,%22reading%22:%22%22,%22paradigm%22:%22%22},%22transcriptions%22:[{%22id%22:1717337,%22entryId%22:1703348,%22strn%22:%22\%22%20b%20A%20r%20n%22,%22language%22:%22%22,%22sources%22:[]}],%22status%22:{%22id%22:1703348,%22name%22:%22imported%22,%22source%22:%22cmu%22,%22timestamp%22:%222016-09-06T13:16:07Z%22,%22current%22:true},%22entryValidations%22:[]}`,
+		`/validateentry?symbolsetname=sv-se_ws-sampa&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		entryJSON := getParam("entry", r)
+		if entryJSON == "" {
+			msg := "validateentry expected param entry"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
 
-func validateEntriesHandler(w http.ResponseWriter, r *http.Request) {
-	entriesJSON := getParam("entries", r)
-	symbolSetName := getParam("symbolsetname", r)
+		symbolSetName := getParam("symbolsetname", r)
 
-	var es []lex.Entry
-	err := json.Unmarshal([]byte(entriesJSON), &es) //TODO check if OK. NL 20161019 es -> &es
-	if err != nil {
-		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entriesJSON, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
+		var e lex.Entry
+		err := json.Unmarshal([]byte(entryJSON), &e)
+		if err != nil {
+			msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entryJSON, err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
 
-	if symbolSetName == "" {
-		msg := "validateEntryHandler expected a symbol set name"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
+		if symbolSetName == "" {
+			msg := "validateentry expected a symbol set name"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
 
-	vMut.Lock()
-	vdator, err := vMut.service.ValidatorForName(symbolSetName)
-	vMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
+		// TODO Hardwired stuff below!!!!
+		vMut.Lock()
+		vdator, err := vMut.service.ValidatorForName(symbolSetName)
+		vMut.Unlock()
+		if err != nil {
+			msg := fmt.Sprintf("validateentry failed to get validator for symbol set %v : %v", symbolSetName, err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
 
-	es = trimEntries(es)
-	es, _ = vdator.ValidateEntries(es)
+		e = trimEntry(e)
+		e, _ = vdator.ValidateEntry(e)
 
-	res0, err3 := json.Marshal(es)
-	if err3 != nil {
-		msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(res0))
+		res0, err3 := json.Marshal(e)
+		if err3 != nil {
+			msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(res0))
+	},
 }
 
-// TODO code duplication between validateEntriesHandler and validateEntryHandler
-
-func validateEntryHandler(w http.ResponseWriter, r *http.Request) {
-	entryJSON := getParam("entry", r)
-	symbolSetName := getParam("symbolsetname", r)
-
-	var e lex.Entry
-	err := json.Unmarshal([]byte(entryJSON), &e)
-	if err != nil {
-		msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entryJSON, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	if symbolSetName == "" {
-		msg := "validateEntryHandler expected a symbol set name"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	// TODO Hardwired stuff below!!!!
-	vMut.Lock()
-	vdator, err := vMut.service.ValidatorForName(symbolSetName)
-	vMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("validateEntryHandler failed to get validator for symbol set %v : %v", symbolSetName, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	e = trimEntry(e)
-	e, _ = vdator.ValidateEntry(e)
-
-	res0, err3 := json.Marshal(e)
-	if err3 != nil {
-		msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(res0))
+var validationStats = urlHandler{
+	name:     "stats",
+	url:      "/stats/{lexiconId}",
+	help:     "Lists validation stats.",
+	examples: []string{"/stats/1"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexiconIDString := getParam("lexiconId", r)
+		if len(strings.TrimSpace(lexiconIDString)) == 0 {
+			msg := fmt.Sprintf("lexicon id should be specified by variable 'lexiconId'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		lexiconID, err := strconv.ParseInt(lexiconIDString, 10, 64)
+		if err != nil {
+			msg := fmt.Sprintf("lexicon id should be an integer")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+		stats, err := dbapi.ValidationStats(db, lexiconID)
+		if err != nil {
+			msg := fmt.Sprintf("validationStatsHandler failed to retreive validation stats : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+		j, err := json.Marshal(stats)
+		if err != nil {
+			msg := fmt.Sprintf("lexserver: Failed to marshal stats : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(j))
+	},
 }
 
-func validationStatsHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconIDString := getParam("lexiconId", r)
-	if len(strings.TrimSpace(lexiconIDString)) == 0 {
-		msg := fmt.Sprintf("lexicon id should be specified by variable 'lexiconId'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	lexiconID, err := strconv.ParseInt(lexiconIDString, 10, 64)
-	if err != nil {
-		msg := fmt.Sprintf("lexicon id should be an integer")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-	stats, err := dbapi.ValidationStats(db, lexiconID)
-	if err != nil {
-		msg := fmt.Sprintf("validationStatsHandler failed to retreive validation stats : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-	j, err := json.Marshal(stats)
-	if err != nil {
-		msg := fmt.Sprintf("lexserver: Failed to marshal stats : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(j))
+// TODO code duplication between validateEntries and validateEntry
+var validationValidateEntries = urlHandler{
+	name:     "validateentries",
+	url:      "/validateentries",
+	help:     "Validates a list of entries.",
+	examples: []string{`/validateentries?symbolsetname=sv-se_ws-sampa&entries=[{%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}},{%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22host%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22host%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20U%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}]`},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		entriesJSON := getParam("entries", r)
+		if entriesJSON == "" {
+			msg := "validateentry expected param entries"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+		symbolSetName := getParam("symbolsetname", r)
+
+		var es []lex.Entry
+		err := json.Unmarshal([]byte(entriesJSON), &es) //TODO check if OK. NL 20161019 es -> &es
+		if err != nil {
+			msg := fmt.Sprintf("lexserver: Failed to unmarshal json: %v : %v", entriesJSON, err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
+		if symbolSetName == "" {
+			msg := "validateentries expected a symbol set name"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+
+		vMut.Lock()
+		vdator, err := vMut.service.ValidatorForName(symbolSetName)
+		vMut.Unlock()
+		if err != nil {
+			msg := fmt.Sprintf("validateentries failed to get validator for symbol set %v : %v", symbolSetName, err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+
+		es = trimEntries(es)
+		es, _ = vdator.ValidateEntries(es)
+
+		res0, err3 := json.Marshal(es)
+		if err3 != nil {
+			msg := fmt.Sprintf("lexserver: Failed to marshal entry : %v", err3)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(res0))
+	},
 }
 
 var trimWhitespaceRe = regexp.MustCompile("[\\s]+")
@@ -216,64 +246,57 @@ func hasValidator(symbolSet string) bool {
 	return res
 }
 
-func listValidationHandler(w http.ResponseWriter, r *http.Request) {
-	vs := validatorNames()
-	j, err := json.Marshal(vs)
-	if err != nil {
-		msg := fmt.Sprintf("failed to marshal struct : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(j))
+var validationListValidators = urlHandler{
+	name:     "list",
+	url:      "/list",
+	help:     "Lists available validators.",
+	examples: []string{"/list"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		vs := validatorNames()
+		j, err := json.Marshal(vs)
+		if err != nil {
+			msg := fmt.Sprintf("failed to marshal struct : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(j))
+	},
 }
 
-func hasValidatorHandler(w http.ResponseWriter, r *http.Request) {
-	symbolSet := getParam("symbolset", r)
-	if len(strings.TrimSpace(symbolSet)) == 0 {
-		msg := fmt.Sprintf("symbol set should be specified by variable 'symbolset'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
+var validationHasValidator = urlHandler{
+	name:     "has_validator",
+	url:      "/has_validator/{symbolset}",
+	help:     "Checks if a symbol set has an associated validator.",
+	examples: []string{"/has_validator/sv-se_ws-sampa", "/has_validator/ar_ws-sampa"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		symbolSet := getParam("symbolset", r)
+		if len(strings.TrimSpace(symbolSet)) == 0 {
+			msg := fmt.Sprintf("symbol set should be specified by variable 'symbolset'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
 
-	res := hasValidator(symbolSet)
+		res := hasValidator(symbolSet)
 
-	j, err := json.Marshal(res)
-	if err != nil {
-		msg := fmt.Sprintf("failed to marshal struct : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(j))
+		j, err := json.Marshal(res)
+		if err != nil {
+			msg := fmt.Sprintf("failed to marshal struct : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(j))
+	},
 }
 
 func validationHelpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	validateEntryURL_en_us := `/validation/validateentry?symbolsetname=en-us_sampa_mary&entry={%22id%22:1703348,%22lexiconId%22:3,%22strn%22:%22barn%22,%22language%22:%22en-us%22,%22partOfSpeech%22:%22%22,%22wordParts%22:%22%22,%22lemma%22:{%22id%22:0,%22strn%22:%22%22,%22reading%22:%22%22,%22paradigm%22:%22%22},%22transcriptions%22:[{%22id%22:1717337,%22entryId%22:1703348,%22strn%22:%22\%22%20b%20A%20r%20n%22,%22language%22:%22%22,%22sources%22:[]}],%22status%22:{%22id%22:1703348,%22name%22:%22imported%22,%22source%22:%22cmu%22,%22timestamp%22:%222016-09-06T13:16:07Z%22,%22current%22:true},%22entryValidations%22:[]}`
-
-	validateEntryURL := `/validation/validateentry?symbolsetname=sv-se_ws-sampa&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`
-
-	validateEntriesURL := "/validation/validateentries?symbolsetname=sv-se_ws-sampa&entries=..."
-
-	html := `<h1>Validation</h1>
-<h2>validateentry</h2> Validates an entry. Example invocation:
-<pre><a href="` + validateEntryURL + `">` + validateEntryURL + `</a></pre>
-<pre><a href="` + validateEntryURL_en_us + `">` + validateEntryURL_en_us + `</a></pre>
-
-<h2>validateentries</h2> Validates a list of entries. Example invocation:
-<pre><a href="` + validateEntriesURL + `">` + validateEntriesURL + `</a></pre>
-
-<h2>list</h2> Lists available validators. Example invocation:
-<pre><a href="/validation/list">/validation/list</a></pre>
-
-<h2>stats</h2> Lists validation stats. Example invocation:
-<pre><a href="/validation/stats?lexiconId=1">/validation/stats?lexiconId=1</a></pre>
-		`
+	html := `<h1>Validation</h1>`
 
 	fmt.Fprint(w, html)
 }
