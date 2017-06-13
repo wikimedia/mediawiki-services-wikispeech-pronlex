@@ -235,84 +235,90 @@ func symbolSetHelpHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, html)
 }
 
-var symbolsetUpload = urlHandler{
-	name:     "upload",
-	url:      "/upload",
-	help:     "Upload symbol set file. Link goes to a GUI.",
-	examples: []string{"/upload"},
+var symbolsetUploadPage = urlHandler{
+	name:     "upload (page)",
+	url:      "/upload_page",
+	help:     "Upload symbol set file (GUI)",
+	examples: []string{"/upload_page"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/symbolset/upload.html")
+		http.ServeFile(w, r, "./static/symbolset/upload_page.html")
 	},
 }
 
-func doUploadSymbolSetHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, fmt.Sprintf("symbol set upload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
-		return
-	}
-
-	clientUUID := getParam("client_uuid", r)
-
-	if "" == strings.TrimSpace(clientUUID) {
-		msg := "doUploadSymbolSetHandler got no client uuid"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
-
-	r.ParseMultipartForm(32 << 20)
-	file, handler, err := r.FormFile("upload_file")
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("doUploadSymbolSetHandler failed reading file : %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-	serverPath := filepath.Join(symbolSetFileArea, handler.Filename)
-	if _, err := os.Stat(serverPath); err == nil {
-		msg := fmt.Sprintf("symbol set already exists on server in file: %s", handler.Filename)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("doUploadSymbolSetHandler failed opening local output file : %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer f.Close()
-	_, err = io.Copy(f, file)
-	if err != nil {
-		msg := fmt.Sprintf("doUploadSymbolSetHandler failed copying local output file : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	ss, err := loadSymbolSetFile(serverPath)
-	if err != nil {
-		msg := fmt.Sprintf("couldn't load symbol set file : %v", err)
-		err = os.Remove(serverPath)
-		if err != nil {
-			msg = fmt.Sprintf("%v (couldn't delete file from server)", msg)
-		} else {
-			msg = fmt.Sprintf("%v (the uploaded file has been deleted from server)", msg)
+var symbolsetUpload = urlHandler{
+	name:     "upload (api)",
+	url:      "/upload",
+	help:     "Upload symbol set file (API)",
+	examples: []string{"/upload"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, fmt.Sprintf("symbol set upload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+			return
 		}
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
 
-	f.Close()
+		clientUUID := getParam("client_uuid", r)
 
-	mMut.Lock()
-	mMut.service.SymbolSets[ss.Name] = ss
-	mMut.Unlock()
+		if "" == strings.TrimSpace(clientUUID) {
+			msg := "doUploadSymbolSetHandler got no client uuid"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
 
-	fmt.Fprintf(w, "%v", handler.Header)
+		// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
+
+		r.ParseMultipartForm(32 << 20)
+		file, handler, err := r.FormFile("upload_file")
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("doUploadSymbolSetHandler failed reading file : %v", err), http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+		serverPath := filepath.Join(symbolSetFileArea, handler.Filename)
+		if _, err := os.Stat(serverPath); err == nil {
+			msg := fmt.Sprintf("symbol set already exists on server in file: %s", handler.Filename)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
+		f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0755)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("doUploadSymbolSetHandler failed opening local output file : %v", err), http.StatusInternalServerError)
+			return
+		}
+		defer f.Close()
+		_, err = io.Copy(f, file)
+		if err != nil {
+			msg := fmt.Sprintf("doUploadSymbolSetHandler failed copying local output file : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		ss, err := loadSymbolSetFile(serverPath)
+		if err != nil {
+			msg := fmt.Sprintf("couldn't load symbol set file : %v", err)
+			err = os.Remove(serverPath)
+			if err != nil {
+				msg = fmt.Sprintf("%v (couldn't delete file from server)", msg)
+			} else {
+				msg = fmt.Sprintf("%v (the uploaded file has been deleted from server)", msg)
+			}
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
+		f.Close()
+
+		mMut.Lock()
+		mMut.service.SymbolSets[ss.Name] = ss
+		mMut.Unlock()
+
+		fmt.Fprintf(w, "%v", handler.Header)
+	},
 }
 
 type SymbolSetNames struct {

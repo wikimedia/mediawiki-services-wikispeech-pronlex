@@ -48,6 +48,8 @@ type subRouter struct {
 	handlers []urlHandler
 }
 
+var initialSlashRe = regexp.MustCompile("^/")
+
 func newSubRouter(rout *mux.Router, root string) *subRouter {
 	var res = subRouter{
 		router: rout.PathPrefix(root).Subrouter(),
@@ -57,7 +59,7 @@ func newSubRouter(rout *mux.Router, root string) *subRouter {
 	helpHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		html := "<h1>" + res.root + "</h1>"
+		html := "<h1>" + initialSlashRe.ReplaceAllString(res.root, "") + "</h1>"
 		for _, handler := range res.handlers {
 			html = html + handler.helpHtml(res.root)
 		}
@@ -827,8 +829,8 @@ func main() {
 
 	// defined in file move_new_entries_handler.go.
 	rout.HandleFunc("/lexicon/move_new_entries", moveNewEntriesHandler)
-	rout.HandleFunc("/lexicon/validate", lexiconValidateHandler)
-	rout.HandleFunc("/lexicon/do_validate", lexiconRunValidateHandler)
+	rout.HandleFunc("/lexicon/validate", lexiconValidateHandler)       // => validation_page
+	rout.HandleFunc("/lexicon/do_validate", lexiconRunValidateHandler) // => validation
 
 	rout.HandleFunc("/validation", validationHelpHandler)
 	rout.HandleFunc("/validation/validateentry", validateEntryHandler)
@@ -838,8 +840,8 @@ func main() {
 	rout.HandleFunc("/validation/stats", validationStatsHandler)
 
 	// admin pages/calls
-	rout.HandleFunc("/admin/lex_import", adminLexImportHandler)
-	rout.HandleFunc("/admin/lex_do_import", adminDoLexImportHandler)
+	rout.HandleFunc("/admin/lex_import", adminLexImportHandler)      // => lex_import_page
+	rout.HandleFunc("/admin/lex_do_import", adminDoLexImportHandler) // => lex_import
 	rout.HandleFunc("/admin", adminHelpHandler)
 	rout.HandleFunc("/admin/deletelexicon", deleteLexHandler)
 	rout.HandleFunc("/admin/superdeletelexicon", superDeleteLexHandler)
@@ -856,8 +858,8 @@ func main() {
 	symbolset.addHandler(symbolsetContent)
 	symbolset.addHandler(symbolsetReloadOne)
 	symbolset.addHandler(symbolsetReloadAll)
+	symbolset.addHandler(symbolsetUploadPage)
 	symbolset.addHandler(symbolsetUpload)
-	rout.HandleFunc("/symbolset/do_upload", doUploadSymbolSetHandler) // hidden -- not part of API
 
 	mapper := newSubRouter(rout, "/mapper")
 	mapper.addHandler(mapperList)
