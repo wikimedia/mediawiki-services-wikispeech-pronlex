@@ -58,7 +58,7 @@ type urlHandler struct {
 	examples []string
 }
 
-func (h urlHandler) helpHtml(root string) string {
+func (h urlHandler) helpHTML(root string) string {
 	s := "<h2>" + h.name + "</h2> " + h.help
 	if strings.Contains(h.url, "{") {
 		s = s + `<p>API URL: <code>` + root + h.url + `</code></p>`
@@ -105,7 +105,7 @@ func newSubRouter(rout *mux.Router, root string) *subRouter {
 
 		html := "<h1>" + removeInitialSlash(res.root) + "</h1>"
 		for _, handler := range res.handlers {
-			html = html + handler.helpHtml(res.root)
+			html = html + handler.helpHTML(res.root)
 		}
 		fmt.Fprint(w, html)
 	}
