@@ -61,7 +61,7 @@ type urlHandler struct {
 func (h urlHandler) helpHtml(root string) string {
 	s := "<h2>" + h.name + "</h2> " + h.help
 	if strings.Contains(h.url, "{") {
-		s = s + `<p>API URL: <code>` + h.url + `</code></p>`
+		s = s + `<p>API URL: <code>` + root + h.url + `</code></p>`
 	}
 	if len(h.examples) > 0 {
 		//s = s + `<p>Example invocation:`
