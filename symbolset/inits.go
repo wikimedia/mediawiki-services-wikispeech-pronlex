@@ -171,6 +171,7 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		phonemeDelimiterRe:        phonemeDelimiterRe,
 		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}
+	//testSymbolSet(res, nil)
 	return res, nil
 
 }
