@@ -7,3 +7,7 @@ lexserver/pronlex.db.ORIG
 dbapi/*.db-journal
 lexserver/pronlex.db-shm
 lexserver/pronlex.db-wal
+
+OLDdecompounder/test_word_parts_out.txt
+lexserver/user_db/test_server/node_modules/
+lexserver/user_db/test_server/package.json
