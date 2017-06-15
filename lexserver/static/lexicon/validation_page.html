@@ -1,18 +1,21 @@
 <html>
   <head>
-    <title>Upload symbol set</title>    
+    <title>Validate lexicon</title>    
   </head>
 
   <body>
 
-    <h1>Upload symbol set</h1>
+    <h1>Validate lexicon</h1>
     
     <p>
       <span>
 
-	Select symbol set file:	<form data-bind="submit: $root.uploadFile">
-	  <input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/>
-	  <button data-bind="enable: $root.hasSelectedFile()" type="submit">Submit</button>
+	<form data-bind="submit: $root.runValidation">
+	  <table>
+	    <tr><td>Lexicon: </td><td><select data-bind="options: $root.availableLexicons, optionsCaption: 'Select lexicon', optionsText: 'name', value: $root.selectedLexicon"></select></td></tr>
+
+	    <tr><td colspan="2"><button data-bind="enable: $root.validForm" type="submit">Run validation</button></td></tr>
+	  </table>
 	</form>
 
       </span>
@@ -27,7 +30,7 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
     
-    <script type="text/javascript" src="/static/symbolset/upload.js"></script>
+    <script type="text/javascript" src="/static/lexicon/validation_page.js"></script>
     
 
   </body>

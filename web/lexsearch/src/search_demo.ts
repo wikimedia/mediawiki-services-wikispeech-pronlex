@@ -61,7 +61,8 @@ class SearchModel {
             return;
         };
         let r = new XMLHttpRequest();
-        let url = base_url + "/mapper/map?from=" + encodeURIComponent(symbolSetName) + "&to=ipa&trans=" + encodeURIComponent(transcription);
+        //let url = base_url + "/mapper/map?from=" + encodeURIComponent(symbolSetName) + "&to=ipa&trans=" + encodeURIComponent(transcription);
+	let url = base_url + "/mapper/map/" + encodeURIComponent(symbolSetName) + "/ipa/" + encodeURIComponent(transcription);	
         r.open("GET", url, false);
         r.onload = function () {
             if (r.status === 200) {

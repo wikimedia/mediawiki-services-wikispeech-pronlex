@@ -106,7 +106,7 @@ LEXIMPORT.ImportFileModel = function () {
     
     self.importLexiconFile = function() {
 	console.log("uploading file: ", self.selectedFile())
-	var url = LEXIMPORT.baseURL + "/admin/lex_do_import"
+	var url = LEXIMPORT.baseURL + "/admin/lex_import"
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);
@@ -123,7 +123,7 @@ LEXIMPORT.ImportFileModel = function () {
 	fd.append("symbolset_name", self.symbolSetName());
 	fd.append("lexicon_name", self.lexiconName());
 	fd.append("validate", self.validate());
-	fd.append("upload_file", self.selectedFile());
+	fd.append("file", self.selectedFile());
 	self.message("Importing, please wait ...");
 	xhr.send(fd);
     };

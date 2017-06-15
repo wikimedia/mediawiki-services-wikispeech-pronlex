@@ -2,17 +2,14 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"sync"
 
 	"github.com/stts-se/pronlex/symbolset"
 	//"os"
 	"encoding/json"
-	"path/filepath"
 	"strings"
 )
 
@@ -42,49 +39,52 @@ func trimTrans(trans string) string {
 	return trans
 }
 
-func mapMapperHandler(w http.ResponseWriter, r *http.Request) {
-	fromName := r.FormValue("from")
-	toName := r.FormValue("to")
-	trans := trimTrans(r.FormValue("trans"))
-	// log.Println("mapMapperHandler.from=", fromName)
-	// log.Println("mapMapperHandler.to=", toName)
-	// log.Println("mapMapperHandler.trans=", trans)
-	if len(strings.TrimSpace(fromName)) == 0 {
-		msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	if len(strings.TrimSpace(toName)) == 0 {
-		msg := fmt.Sprintf("output symbol set should be specified by variable 'to'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	if len(strings.TrimSpace(trans)) == 0 {
-		msg := fmt.Sprintf("input trans should be specified by variable 'trans'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	mMut.Lock()
-	result0, err := mMut.service.Map(fromName, toName, trans)
-	mMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("failed mapping transcription : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	result := JSONMapped{Input: trans, Result: result0, From: fromName, To: toName}
-	j, err := json.Marshal(result)
-	if err != nil {
-		msg := fmt.Sprintf("json marshalling error : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprint(w, string(j))
+var mapperMap = urlHandler{
+	name:     "map",
+	url:      "/map/{from}/{to}/{trans}",
+	help:     "Maps a transcription from one symbolset to another.",
+	examples: []string{"/map/sv-se_ws-sampa/sv-se_sampa_mary/%22%22%20p%20O%20j%20.%20k%20@"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		fromName := getParam("from", r)
+		toName := getParam("to", r)
+		trans := trimTrans(getParam("trans", r))
+		if len(strings.TrimSpace(fromName)) == 0 {
+			msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		if len(strings.TrimSpace(toName)) == 0 {
+			msg := fmt.Sprintf("output symbol set should be specified by variable 'to'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		if len(strings.TrimSpace(trans)) == 0 {
+			msg := fmt.Sprintf("input trans should be specified by variable 'trans'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		mMut.Lock()
+		result0, err := mMut.service.Map(fromName, toName, trans)
+		mMut.Unlock()
+		if err != nil {
+			msg := fmt.Sprintf("failed mapping transcription : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		result := JSONMapped{Input: trans, Result: result0, From: fromName, To: toName}
+		j, err := json.Marshal(result)
+		if err != nil {
+			msg := fmt.Sprintf("json marshalling error : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprint(w, string(j))
+	},
 }
 
 type JSONMapper struct {
@@ -101,151 +101,76 @@ type JSONMSymbol struct {
 	Cat  string
 }
 
-func mapTableMapperHandler(w http.ResponseWriter, r *http.Request) {
-	fromName := r.FormValue("from")
-	toName := r.FormValue("to")
-	if len(strings.TrimSpace(fromName)) == 0 {
-		msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	if len(strings.TrimSpace(toName)) == 0 {
-		msg := fmt.Sprintf("output symbol set should be specified by variable 'to'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	mMut.Lock()
-	mapper0, err := mMut.service.GetMapTable(fromName, toName)
-	mMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("failed getting map table : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	mapper := JSONMapper{From: mapper0.SymbolSet1.Name, To: mapper0.SymbolSet2.Name}
-	mapper.Symbols = make([]JSONMSymbol, 0)
-	for _, from := range mapper0.SymbolSet1.Symbols {
-		to, err := mapper0.MapSymbol(from)
+var mapperMaptable = urlHandler{
+	name:     "maptable",
+	url:      "/maptable/{from}/{to}",
+	help:     "Lists content of a maptable given two symbolset names.",
+	examples: []string{"/maptable/sv-se_ws-sampa/sv-se_sampa_mary"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		fromName := getParam("from", r)
+		toName := getParam("to", r)
+		if len(strings.TrimSpace(fromName)) == 0 {
+			msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		if len(strings.TrimSpace(toName)) == 0 {
+			msg := fmt.Sprintf("output symbol set should be specified by variable 'to'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		mMut.Lock()
+		mapper0, err := mMut.service.GetMapTable(fromName, toName)
+		mMut.Unlock()
 		if err != nil {
 			msg := fmt.Sprintf("failed getting map table : %v", err)
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		mapper.Symbols = append(mapper.Symbols, JSONMSymbol{From: from.String, To: to.String, IPA: JSONIPA{String: from.IPA.String, Unicode: from.IPA.Unicode}, Desc: from.Desc, Cat: from.Cat.String()})
-	}
-
-	j, err := json.Marshal(mapper)
-	if err != nil {
-		msg := fmt.Sprintf("json marshalling error : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprint(w, string(j))
-}
-
-func listMappersHandler(w http.ResponseWriter, r *http.Request) {
-	mMut.Lock()
-	ms := mMut.service.MapperNames()
-	mMut.Unlock()
-	j, err := json.Marshal(ms)
-	if err != nil {
-		msg := fmt.Sprintf("failed to marshal struct : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(j))
-}
-
-func mapperHelpHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	html := `<h1>Mapper</h1>
-<h2>map</h2> Maps a transcription from one symbolset to another. Example invocation:
-<pre><a href="/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@">/mapper/map?from=sv-se_ws-sampa&to=sv-se_sampa_mary&trans=%22%22%20p%20O%20j%20.%20k%20@</a></pre>
-
-<h2>list</h2> Lists cached mappers. Example invocation:
-<pre><a href="/mapper/list">/mapper/list</a></pre>
-
-<h2>maptable</h2> Lists content of a maptable given two symbolset names. Example invocation:
-<pre><a href="/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary">/mapper/maptable?from=sv-se_ws-sampa&to=sv-se_sampa_mary</a></pre>
-		`
-
-	fmt.Fprint(w, html)
-}
-
-func uploadMapperHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/mapper_upload_symbolset.html")
-}
-
-func doUploadMapperHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, fmt.Sprintf("symbol set upload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
-		return
-	}
-
-	clientUUID := r.FormValue("client_uuid")
-
-	if "" == strings.TrimSpace(clientUUID) {
-		msg := "doUploadMapperHandler got no client uuid"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
-
-	r.ParseMultipartForm(32 << 20)
-	file, handler, err := r.FormFile("upload_file")
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("doUploadMapperHandler failed reading file : %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-	serverPath := filepath.Join(symbolSetFileArea, handler.Filename)
-	if _, err := os.Stat(serverPath); err == nil {
-		msg := fmt.Sprintf("symbol set already exists on server in file: %s", handler.Filename)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("doUploadMapperHandler failed opening local output file : %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer f.Close()
-	_, err = io.Copy(f, file)
-	if err != nil {
-		msg := fmt.Sprintf("doUploadMapperHandler failed copying local output file : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	_, err = loadSymbolSetFile(serverPath)
-	if err != nil {
-		msg := fmt.Sprintf("couldn't load symbol set file : %v", err)
-		err = os.Remove(serverPath)
-		if err != nil {
-			msg = fmt.Sprintf("%v (couldn't delete file from server)", msg)
-		} else {
-			msg = fmt.Sprintf("%v (the uploaded file has been deleted from server)", msg)
+		mapper := JSONMapper{From: mapper0.SymbolSet1.Name, To: mapper0.SymbolSet2.Name}
+		mapper.Symbols = make([]JSONMSymbol, 0)
+		for _, from := range mapper0.SymbolSet1.Symbols {
+			to, err := mapper0.MapSymbol(from)
+			if err != nil {
+				msg := fmt.Sprintf("failed getting map table : %v", err)
+				log.Println(msg)
+				http.Error(w, msg, http.StatusInternalServerError)
+				return
+			}
+			mapper.Symbols = append(mapper.Symbols, JSONMSymbol{From: from.String, To: to.String, IPA: JSONIPA{String: from.IPA.String, Unicode: from.IPA.Unicode}, Desc: from.Desc, Cat: from.Cat.String()})
 		}
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
 
-	f.Close()
+		j, err := json.Marshal(mapper)
+		if err != nil {
+			msg := fmt.Sprintf("json marshalling error : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprint(w, string(j))
+	},
+}
 
-	fmt.Fprintf(w, "%v", handler.Header)
+var mapperList = urlHandler{
+	name:     "list",
+	url:      "/list",
+	help:     "Lists cached mappers.",
+	examples: []string{"/list"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		mMut.Lock()
+		ms := mMut.service.MapperNames()
+		mMut.Unlock()
+		j, err := json.Marshal(ms)
+		if err != nil {
+			msg := fmt.Sprintf("failed to marshal struct : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(j))
+	},
 }

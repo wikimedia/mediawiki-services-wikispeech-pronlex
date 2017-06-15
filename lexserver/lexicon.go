@@ -16,65 +16,50 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-func listLexsHandler(w http.ResponseWriter, r *http.Request) {
-
-	lexs, err := dbapi.ListLexicons(db) // TODO error handling
-	if err != nil {
-		http.Error(w, fmt.Sprintf("list lexicons failed : %v", err), http.StatusInternalServerError)
-		return
-	}
-	jsn, err := marshal(lexs, r)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
+var lexiconValidationPage = urlHandler{
+	name:     "validation (page)",
+	url:      "/validation_page",
+	help:     "Validate lexicon (GUI).",
+	examples: []string{"/validation_page"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/lexicon/validation_page.html")
+	},
 }
+var lexiconUpdateEntryURL = "/lexicon/updateentry?entry={...}"
 
-func listCurrentEntryStatuses(w http.ResponseWriter, r *http.Request) {
+var lexiconUpdateEntry = urlHandler{
+	name:     "updateentry",
+	url:      "/updateentry",
+	help:     " Updates an entry in the database.",
+	examples: []string{lexiconUpdateEntryURL},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		entryJSON := getParam("entry", r)
+		//body, err := ioutil.ReadAll(r.Body)
+		var e lex.Entry
+		err := json.Unmarshal([]byte(entryJSON), &e)
+		if err != nil {
+			log.Printf("lexserver: Failed to unmarshal json: %v", err)
+			http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
+			return
+		}
 
-	lexiconName := r.FormValue("lexicon_name")
-	if "" == lexiconName {
-		http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
-		return
-	}
+		// Underscore below matches bool indicating if any update has taken place. Return this info?
+		res, _, err2 := dbapi.UpdateEntry(db, e)
+		if err2 != nil {
+			log.Printf("lexserver: Failed to update entry : %v", err2)
+			http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
+			return
+		}
 
-	statuses, err := dbapi.ListCurrentEntryStatuses(db, lexiconName)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
-		return
-	}
-	j, err := json.Marshal(statuses)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprintf(w, string(j))
-}
-
-// TODO cut-n-paste from above
-func listAllEntryStatuses(w http.ResponseWriter, r *http.Request) {
-
-	lexiconName := r.FormValue("lexicon_name")
-	if "" == lexiconName {
-		http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
-		return
-	}
-
-	statuses, err := dbapi.ListAllEntryStatuses(db, lexiconName)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("listAllEntryStatuses : %v", err), http.StatusInternalServerError)
-		return
-	}
-	j, err := json.Marshal(statuses)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("listAllEntryStatuses : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprintf(w, string(j))
+		res0, err3 := json.Marshal(res)
+		if err3 != nil {
+			log.Printf("lexserver: Failed to marshal entry : %v", err3)
+			http.Error(w, fmt.Sprintf("failed return updated Entry : %v", err3), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(res0))
+	},
 }
 
 type LexWithEntryCount struct {
@@ -84,161 +69,266 @@ type LexWithEntryCount struct {
 	EntryCount    int64  `json:"entryCount"`
 }
 
-func listLexsWithEntryCountHandler(w http.ResponseWriter, r *http.Request) {
-
-	lexs0, err := dbapi.ListLexicons(db) // TODO error handling
-	if err != nil {
-		http.Error(w, fmt.Sprintf("list lexicons failed : %v", err), http.StatusInternalServerError)
-		return
-	}
-	var lexs []LexWithEntryCount
-	for _, lex := range lexs0 {
-		entryCount, err := dbapi.EntryCount(db, lex.ID)
+var lexiconList = urlHandler{
+	name:     "list",
+	url:      "/list",
+	help:     "Lists available lexicons along with some basic info.",
+	examples: []string{"/list"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexs0, err := dbapi.ListLexicons(db) // TODO error handling
 		if err != nil {
-			http.Error(w, fmt.Sprintf("lexicon stats failed : %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("list lexicons failed : %v", err), http.StatusInternalServerError)
 			return
 		}
-		lexs = append(lexs, LexWithEntryCount{ID: lex.ID, Name: lex.Name, SymbolSetName: lex.SymbolSetName, EntryCount: entryCount})
-	}
-	jsn, err := marshal(lexs, r)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
-}
-
-func lexInfoHandler(w http.ResponseWriter, r *http.Request) {
-	lexName := r.FormValue("name")
-	if len(strings.TrimSpace(lexName)) == 0 {
-		msg := fmt.Sprintf("lexicon name should be specified by variable 'name'")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	lex, err := dbapi.GetLexicon(db, lexName) // TODO error handling
-	if err != nil {
-		http.Error(w, fmt.Sprintf("get lexicon failed : %v", err), http.StatusInternalServerError)
-		return
-	}
-	jsn, err := marshal(lex, r)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
-}
-
-func lexiconStatsHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconID, err := strconv.ParseInt(r.FormValue("lexiconId"), 10, 64)
-	if err != nil {
-		msg := "lexiconStatsHandler got no lexicon id"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-
-	stats, err := dbapi.LexiconStats(db, lexiconID)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("lexiconStatsHandler: call to  dbapi.LexiconStats failed : %v", err), http.StatusInternalServerError)
-		return
-	}
-	res, err := json.Marshal(stats)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("lexiconStatsHandler: failed to marshal struct : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprint(w, string(res))
-}
-
-func lexLookUpHandler(w http.ResponseWriter, r *http.Request) {
-
-	// TODO check r.Method?
-
-	var err error
-	// TODO Felhantering?
-
-	// TODO report unknown params to client
-	u, err := url.Parse(r.URL.String())
-	ff("lexLookUpHandler failed to get params: %v", err)
-	params := u.Query()
-	if len(params) == 0 {
-		log.Print("lexLookUpHandler: zero params, serving lexlookup.html")
-		http.ServeFile(w, r, "./static/lexlookup.html")
-	}
-	for k, v := range params {
-		if _, ok := knownParams[k]; !ok {
-			log.Printf("lexLookUpHandler: unknown URL parameter: '%s': '%s'", k, v)
+		var lexs []LexWithEntryCount
+		for _, lex := range lexs0 {
+			entryCount, err := dbapi.EntryCount(db, lex.ID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("lexicon stats failed : %v", err), http.StatusInternalServerError)
+				return
+			}
+			lexs = append(lexs, LexWithEntryCount{ID: lex.ID, Name: lex.Name, SymbolSetName: lex.SymbolSetName, EntryCount: entryCount})
 		}
-	}
-
-	q, err := queryFromParams(r)
-
-	if err != nil {
-		log.Printf("failed to process query params: %v", err)
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
-		return
-	}
-
-	//res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
-	res, err := dbapi.LookUpIntoSlice(db, q) // GetEntries(db, q)
-	if err != nil {
-		log.Printf("lexserver: Failed to get entries: %v", err)
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-		return
-	}
-
-	jsn, err := marshal(res, r)
-	if err != nil {
-		log.Printf("lexserver: Failed to marshal json: %v", err)
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
+		jsn, err := marshal(lexs, r)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(jsn))
+	},
 }
+
+var lexiconListCurrentEntryStatuses = urlHandler{
+	name:     "list_current_entry_statuses",
+	url:      "/list_current_entry_statuses/{lexicon_name}",
+	help:     "List current entry statuses.",
+	examples: []string{"/list_current_entry_statuses/sv-se.nst"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexiconName := getParam("lexicon_name", r)
+		if "" == lexiconName {
+			http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
+			return
+		}
+
+		statuses, err := dbapi.ListCurrentEntryStatuses(db, lexiconName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+			return
+		}
+		j, err := json.Marshal(statuses)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, string(j))
+	},
+}
+
+// TODO cut-n-paste from above
+var lexiconListAllEntryStatuses = urlHandler{
+	name:     "list_all_entry_statuses",
+	url:      "/list_all_entry_statuses/{lexicon_name}",
+	help:     "List all entry statuses.",
+	examples: []string{"/list_all_entry_statuses/sv-se.nst"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexiconName := getParam("lexicon_name", r)
+		if "" == lexiconName {
+			http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
+			return
+		}
+
+		statuses, err := dbapi.ListAllEntryStatuses(db, lexiconName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listAllEntryStatuses : %v", err), http.StatusInternalServerError)
+			return
+		}
+		j, err := json.Marshal(statuses)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listAllEntryStatuses : %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, string(j))
+	},
+}
+
+var lexiconInfo = urlHandler{
+	name:     "info",
+	url:      "/info/{lexicon_name}",
+	help:     "Get some basic lexicon info.",
+	examples: []string{"/info/sv-se.nst"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexName := getParam("lexicon_name", r)
+		if len(strings.TrimSpace(lexName)) == 0 {
+			msg := fmt.Sprintf("lexicon name should be specified by variable 'lexicon_name'")
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
+		lex, err := dbapi.GetLexicon(db, lexName) // TODO error handling
+		if err != nil {
+			http.Error(w, fmt.Sprintf("get lexicon failed : %v", err), http.StatusInternalServerError)
+			return
+		}
+		jsn, err := marshal(lex, r)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(jsn))
+	},
+}
+
+var lexiconStats = urlHandler{
+	name:     "stats",
+	url:      "/stats/{lexiconId}",
+	help:     "Lists lexicon stats.",
+	examples: []string{"/stats/1"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexiconID, err := strconv.ParseInt(getParam("lexiconId", r), 10, 64)
+		if err != nil {
+			msg := "lexiconStatsHandler got no lexicon id"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+
+		stats, err := dbapi.LexiconStats(db, lexiconID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("lexiconStatsHandler: call to  dbapi.LexiconStats failed : %v", err), http.StatusInternalServerError)
+			return
+		}
+		res, err := json.Marshal(stats)
+
+		if err != nil {
+			http.Error(w, fmt.Sprintf("lexiconStatsHandler: failed to marshal struct : %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprint(w, string(res))
+	},
+}
+
+var lexiconLookup = urlHandler{
+	name:     "lookup",
+	url:      "/lookup",
+	help:     "Lookup in lexicon.",
+	examples: []string{"/lookup"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+
+		// TODO check r.Method?
+
+		var err error
+		// TODO Felhantering?
+
+		// TODO report unknown params to client
+		u, err := url.Parse(r.URL.String())
+		ff("lexLookUpHandler failed to get params: %v", err)
+		params := u.Query()
+		if len(params) == 0 {
+			log.Print("lexLookUpHandler: zero params, serving lexlookup.html")
+			http.ServeFile(w, r, "./static/lexlookup.html")
+		}
+		for k, v := range params {
+			if _, ok := knownParams[k]; !ok {
+				log.Printf("lexLookUpHandler: unknown URL parameter: '%s': '%s'", k, v)
+			}
+		}
+
+		q, err := queryFromParams(r)
+
+		if err != nil {
+			log.Printf("failed to process query params: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+			return
+		}
+
+		//res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
+		res, err := dbapi.LookUpIntoSlice(db, q) // GetEntries(db, q)
+		if err != nil {
+			log.Printf("lexserver: Failed to get entries: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		jsn, err := marshal(res, r)
+		if err != nil {
+			log.Printf("lexserver: Failed to marshal json: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(jsn))
+	},
+}
+
+var lexiconAddEntryURL = `/addentry?lexicon=sv-se.nst&entry={
+    "strn": "flesk",
+    "language": "sv-se",
+    "partOfSpeech": "NN",
+    "morphology": "SIN-PLU|IND|NOM|NEU",
+    "wordParts": "flesk",
+    "lemma": {
+	"strn": "flesk",
+	"reading": "",
+	"paradigm": "s7n-övriga ex träd"
+    },
+    "transcriptions": [
+	{
+	    
+	    "strn": "\" f l E s k",
+	    "language": "sv-se"
+	}
+    ]
+}
+`
 
 // TODO add tests
-func addEntryHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO error check parameters
-	lexiconName := r.FormValue("lexicon")
-	lexicon, err := dbapi.GetLexicon(db, lexiconName)
-	if err != nil {
-		msg := fmt.Sprintf("failed to find lexicon %s in database : %v", lexiconName, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	entryJSON := r.FormValue("entry")
-	var e lex.Entry
-	err = json.Unmarshal([]byte(entryJSON), &e)
-	if err != nil {
-		log.Printf("lexserver: Failed to unmarshal json: %v", err)
-		http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
-		return
-	}
+var lexiconAddEntry = urlHandler{
+	name:     "addentry",
+	url:      "/addentry",
+	help:     "Add an entry to the database.",
+	examples: []string{lexiconAddEntryURL},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		// TODO error check parameters
+		lexiconName := getParam("lexicon", r)
+		lexicon, err := dbapi.GetLexicon(db, lexiconName)
+		if err != nil {
+			msg := fmt.Sprintf("failed to find lexicon %s in database : %v", lexiconName, err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		entryJSON := getParam("entry", r)
+		var e lex.Entry
+		err = json.Unmarshal([]byte(entryJSON), &e)
+		if err != nil {
+			log.Printf("lexserver: Failed to unmarshal json: %v", err)
+			http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
+			return
+		}
 
-	ids, err := dbapi.InsertEntries(db, lexicon, []lex.Entry{e})
-	if err != nil {
-		msg := fmt.Sprintf("lexserver failed to update entry : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprint(w, ids)
+		ids, err := dbapi.InsertEntries(db, lexicon, []lex.Entry{e})
+		if err != nil {
+			msg := fmt.Sprintf("lexserver failed to update entry : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprint(w, ids)
+	},
 }
 
 func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	// if no id or not an int, simply set id to 0:
-	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
-	name := strings.TrimSpace(r.FormValue("name"))
-	symbolSetName := strings.TrimSpace(r.FormValue("symbolsetname"))
+	id, _ := strconv.ParseInt(getParam("id", r), 10, 64)
+	name := strings.TrimSpace(getParam("name", r))
+	symbolSetName := strings.TrimSpace(getParam("symbolsetname", r))
 
 	if name == "" || symbolSetName == "" {
 		msg := fmt.Sprint("missing parameter value, expecting value for 'name' and 'symbolsetname'")
@@ -264,58 +354,101 @@ func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Fprint(w, jsn)
 }
 
-func lexiconRunValidateHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
-		return
-	}
+var lexiconMoveNewEntries = urlHandler{
+	name:     "move_new_entries",
+	url:      "/move_new_entries/{from_lexicon}/{to_lexicon}/{new_source}/{new_status}",
+	help:     "Move entries from one lexicon to another.",
+	examples: []string{},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		fromLexName := delQuote(getParam("from_lexicon", r))
+		if fromLexName == "" {
+			http.Error(w, "no value for parameter 'from_lexicon'", http.StatusBadRequest)
+			return
+		}
+		toLexName := delQuote(getParam("to_lexicon", r))
+		if toLexName == "" {
+			http.Error(w, "no value for parameter 'to_lexicon'", http.StatusBadRequest)
+			return
+		}
+		sourceName := delQuote(getParam("new_source", r))
+		if sourceName == "" {
+			http.Error(w, "no value for parameter 'source'", http.StatusBadRequest)
+			return
+		}
+		statusName := delQuote(getParam("new_status", r))
+		if statusName == "" {
+			http.Error(w, "no value for parameter 'status'", http.StatusBadRequest)
+			return
+		}
 
-	start := time.Now()
+		moveRes, err := dbapi.MoveNewEntries(db, fromLexName, toLexName, sourceName, statusName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
+			return
+		}
 
-	clientUUID := r.FormValue("client_uuid")
+		fmt.Fprintf(w, "number of entries moved from '%s' to '%s': %d", fromLexName, toLexName, moveRes.N)
+	},
+}
 
-	if "" == strings.TrimSpace(clientUUID) {
-		msg := "lexiconRunValidateHandler got no client uuid"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-	conn, ok := webSocks.clients[clientUUID]
-	if !ok {
-		msg := fmt.Sprintf("lexiconRunValidateHandler couldn't find connection for uuid %v", clientUUID)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-	logger := dbapi.NewWebSockLogger(conn)
+var lexiconValidation = urlHandler{
+	name:     "validation (api)",
+	url:      "/validation/{lexicon_name}",
+	help:     "Validate lexicon (API). Requires POST request.",
+	examples: []string{"/validation/en-us.cmu"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+			return
+		}
 
-	lexName := r.FormValue("lexicon_name")
-	lexicon, err := dbapi.GetLexicon(db, lexName)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("couldn't retrive lexicon : %v", err), http.StatusInternalServerError)
-		return
-	}
-	vMut.Lock()
-	v, err := vMut.service.ValidatorForName(lexicon.SymbolSetName)
-	vMut.Unlock()
-	if err != nil {
-		msg := fmt.Sprintf("lexiconRunValidateHandler failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
+		start := time.Now()
 
-	q := dbapi.Query{Lexicons: []dbapi.Lexicon{lexicon}}
-	stats, err := dbapi.Validate(db, logger, *v, q)
-	if err != nil {
-		msg := fmt.Sprintf("lexiconRunValidateHandler failed validate : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-	dur := round(time.Since(start), time.Second)
-	fmt.Fprintf(w, "\nDuration %v\n", dur)
-	fmt.Fprint(w, stats)
+		clientUUID := getParam("client_uuid", r)
+
+		if "" == strings.TrimSpace(clientUUID) {
+			msg := "lexiconValidation got no client uuid"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+		conn, ok := webSocks.clients[clientUUID]
+		if !ok {
+			msg := fmt.Sprintf("lexiconValidation couldn't find connection for uuid %v", clientUUID)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+		logger := dbapi.NewWebSockLogger(conn)
+
+		lexName := getParam("lexicon_name", r)
+		lexicon, err := dbapi.GetLexicon(db, lexName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("couldn't retrive lexicon : %v", err), http.StatusInternalServerError)
+			return
+		}
+		vMut.Lock()
+		v, err := vMut.service.ValidatorForName(lexicon.SymbolSetName)
+		vMut.Unlock()
+		if err != nil {
+			msg := fmt.Sprintf("lexiconValidation failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+
+		q := dbapi.Query{Lexicons: []dbapi.Lexicon{lexicon}}
+		stats, err := dbapi.Validate(db, logger, *v, q)
+		if err != nil {
+			msg := fmt.Sprintf("lexiconValidation failed validate : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		}
+		dur := round(time.Since(start), time.Second)
+		fmt.Fprintf(w, "\nDuration %v\n", dur)
+		fmt.Fprint(w, stats)
+	},
 }
 
 func round(d, r time.Duration) time.Duration {
@@ -335,53 +468,4 @@ func round(d, r time.Duration) time.Duration {
 		return -d
 	}
 	return d
-}
-
-func lexiconHelpHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	addEntryURL := `/lexicon/addentry?lexicon=sv-se.nst&entry={
-    "strn": "flesk",
-    "language": "sv-se",
-    "partOfSpeech": "NN",
-    "morphology": "SIN-PLU|IND|NOM|NEU",
-    "wordParts": "flesk",
-    "lemma": {
-	"strn": "flesk",
-	"reading": "",
-	"paradigm": "s7n-övriga ex träd"
-    },
-    "transcriptions": [
-	{
-	    
-	    "strn": "\" f l E s k",
-	    "language": "sv-se"
-	}
-    ]
-}
-`
-
-	updateEntryURL := "/lexicon/updateentry?entry={...}"
-
-	html := `<h1>Lexicon</h1>
-<h2>addentry</h2>Add an entry to the database. Example invocation:
-<pre><a href="` + strings.Replace(addEntryURL, "\n", "", -1) + `">` + addEntryURL + `</a></pre>
-
-<h2>updateentry</h2> Updates an entry in the database. Example invocation:
-<pre><a href="` + updateEntryURL + `">` + updateEntryURL + `</a></pre>
-
-<h2>validate</h2> Validates a list of entries.
-<pre><a href="/lexicon/validate">/lexicon/validate</a></pre>
-
-<h2>list</h2> Lists available lexicons.
-<pre><a href="/lexicon/list">/lexicon/list</a></pre>
-
-<h2>list</h2> Display lexicon info.
-<pre><a href="/lexicon/info?name=sv-se.nst">/lexicon/info?name=sv-se.nst</a></pre>
-
-<h2>stats</h2> Lists lexicon stats. Example invocation:
-<pre><a href="/lexicon/stats?lexiconId=1">/lexicon/stats?lexiconId=1</a></pre>
-		`
-
-	fmt.Fprint(w, html)
 }
