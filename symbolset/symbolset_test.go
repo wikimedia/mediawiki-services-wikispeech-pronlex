@@ -17,7 +17,7 @@ func testSymbolSetConvertToIPA(t *testing.T, ss SymbolSet, input string, expect 
 func testSymbolSetConvertFromIPA(t *testing.T, ss SymbolSet, input string, expect string) {
 	result, err := ss.ConvertFromIPA(input)
 	if err != nil {
-		t.Errorf("ConvertFromIPA() error here; input=%s, expect=%s : %v", input, expect, err)
+		t.Errorf("ConvertFromIPA() didn't expect error here; input=%s, expect=%s : %v", input, expect, err)
 		return
 	} else if result != expect {
 		t.Errorf(fsExpTrans, expect, result)
@@ -83,7 +83,61 @@ func Test_SplitTranscription_Normal1(t *testing.T) {
 	expect := []string{"a", "t", "s", "t_s", "s"}
 	result, err := ss.SplitTranscription(input)
 	if err != nil {
-		t.Errorf("SplitTranscription() didn't expect error here")
+		t.Errorf("SplitIPATranscription() didn't expect error here: %s ", err)
+		return
+	}
+	testEqStrings(t, expect, result)
+}
+
+func Test_SplitIPATranscription_Normal1(t *testing.T) {
+	name := "ss"
+	symbols := []Symbol{
+		Symbol{"a", Syllabic, "", IPASymbol{"a", "U+0061"}},
+		Symbol{"t", NonSyllabic, "", IPASymbol{"t", "U+0074"}},
+		Symbol{"s", NonSyllabic, "", IPASymbol{"s", "U+0073"}},
+		Symbol{"t_s", NonSyllabic, "", IPASymbol{"tS", "U+0074U+0053"}},
+		Symbol{" ", PhonemeDelimiter, "phn delim", IPASymbol{"", ""}},
+	}
+	ss, err := NewSymbolSet(name, symbols)
+	if err != nil {
+		t.Errorf("SplitTranscription() didn't expect error here : %v", err)
+		return
+	}
+
+	input := "atstSs"
+	expect := []string{"a", "t", "s", "tS", "s"}
+	result, err := ss.SplitIPATranscription(input)
+	if err != nil {
+		t.Errorf("SplitIPATranscription() didn't expect error here: %s ", err)
+		return
+	}
+	testEqStrings(t, expect, result)
+}
+
+func Test_SplitIPATranscription_AccentII(t *testing.T) {
+	name := "ss"
+	symbols := []Symbol{
+		Symbol{"b", Syllabic, "", IPASymbol{"b", "U+0062"}},
+		Symbol{"r", NonSyllabic, "", IPASymbol{"r", "U+0072"}},
+		Symbol{"ɑ:", NonSyllabic, "", IPASymbol{"ɑː", "U+0251U+02D0"}},
+		Symbol{"k", NonSyllabic, "", IPASymbol{"k", "U+006B"}},
+		Symbol{"a", NonSyllabic, "", IPASymbol{"a", "U+0061"}},
+		Symbol{"\"\"", NonSyllabic, "", IPASymbol{"ˈ̀", "U+02C8U+0300"}},
+		Symbol{" ", PhonemeDelimiter, "phn delim", IPASymbol{"", ""}},
+		Symbol{".", SyllableDelimiter, "syll delim", IPASymbol{".", "U+002E"}},
+	}
+	ss, err := NewSymbolSet(name, symbols)
+	if err != nil {
+		t.Errorf("SplitTranscription() didn't expect error here : %s", err)
+		return
+	}
+
+	input := "ˈbrɑ̀ː.ka"
+	expect := []string{"ˈ̀", "b", "r", "ɑː", ".", "k", "a"}
+	result, err := ss.SplitIPATranscription(input)
+	if err != nil {
+		t.Errorf("SplitIPATranscription() didn't expect error here: %s ", err)
+		return
 	}
 	testEqStrings(t, expect, result)
 }
@@ -360,7 +414,8 @@ func Test_loadSymbolSet_WS2IPA(t *testing.T) {
 	fName := "test_data/sv-se_ws-sampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
-		t.Errorf("LoadSymbolSet() error here : %v", err)
+		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
+		return
 	}
 	testSymbolSetConvertToIPA(t, ss, "\" b O rt", "\u02C8bɔʈ")
 	testSymbolSetConvertToIPA(t, ss, "\" k u0 r d s", "\u02C8kɵrds")
@@ -371,7 +426,8 @@ func Test_loadSymbolSet_CMU2IPA(t *testing.T) {
 	fName := "test_data/en-us_cmu.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
-		t.Errorf("LoadSymbolSet() error here : %v", err)
+		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
+		return
 	}
 	testSymbolSetConvertToIPA(t, ss, "AX $ B AW1 T", "ə.\u02C8ba⁀ʊt")
 }
@@ -381,7 +437,8 @@ func Test_loadSymbolSet_MARY2IPA(t *testing.T) {
 	fName := "test_data/en-us_sampa_mary.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
-		t.Errorf("LoadSymbolSet() error here : %v", err)
+		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
+		return
 	}
 	testSymbolSetConvertToIPA(t, ss, "@ - ' b aU t", "ə.\u02C8ba⁀ʊt")
 }
@@ -391,7 +448,8 @@ func Test_loadSymbolSet_NST2IPA_NB(t *testing.T) {
 	fName := "test_data/nb-no_nst-xsampa.tab"
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
-		t.Errorf("LoadSymbolSet() error here : %v", err)
+		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
+		return
 	}
 	if ss.Type != SAMPA {
 		t.Errorf("Expected symbol set type %#v, got %#v", SAMPA.String(), ss.Type.String())
@@ -409,6 +467,7 @@ func Test_loadSymbolSet_IPA2WS(t *testing.T) {
 	ss, err := loadSymbolSet0(name, fName)
 	if err != nil {
 		t.Errorf("LoadSymbolSet() didn't expect error here : %v", err)
+		return
 	}
 	if ss.Type != SAMPA {
 		t.Errorf("Expected symbol set type %#v, got %#v", SAMPA.String(), ss.Type.String())

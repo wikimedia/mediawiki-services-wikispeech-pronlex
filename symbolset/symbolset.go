@@ -111,6 +111,16 @@ func (ss SymbolSet) ValidSymbol(symbol string) bool {
 	return contains(ss.Symbols, symbol)
 }
 
+// ValidIPASymbol checks if a string is a valid symbol or not
+func (ss SymbolSet) ValidIPASymbol(symbol string) bool {
+	for _, s := range ss.Symbols {
+		if s.IPA.String == symbol {
+			return true
+		}
+	}
+	return false
+}
+
 // ContainsSymbols checks if a transcription contains a certain phoneme symbol
 func (ss SymbolSet) ContainsSymbols(trans string, symbols []Symbol) (bool, error) {
 	splitted, err := ss.SplitTranscription(trans)
@@ -171,6 +181,10 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 	if !ss.isInit {
 		panic("symbolSet " + ss.Name + " has not been initialized properly!")
 	}
+	input, err := preFilter(ss, input, IPA)
+	if err != nil {
+		return []string{}, err
+	}
 	delim := ss.phonemeDelimiter.IPA.String
 	if delim == "" {
 		symbols := []Symbol{}
@@ -222,10 +236,6 @@ func (ss SymbolSet) ConvertToIPA(trans string) (string, error) {
 // ConvertFromIPA maps one input IPA transcription into the current symbol set
 func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 	res := trans
-	res, err := preFilter(ss, trans, IPA)
-	if err != nil {
-		return "", err
-	}
 	splitted, err := ss.SplitIPATranscription(res)
 	if err != nil {
 		return "", err

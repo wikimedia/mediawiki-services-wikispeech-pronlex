@@ -51,11 +51,11 @@ func symbolCatFromString(s string) (SymbolCat, error) {
 
 // NewSymbolSet is a constructor for 'symbols' with built-in error checks
 func NewSymbolSet(name string, symbols []Symbol) (SymbolSet, error) {
-	return NewSymbolSetWithTests(name, symbols, true)
+	return NewSymbolSetWithTests(name, symbols, []string{}, true)
 }
 
 // NewSymbolSetWithTests is a constructor for 'symbols' with built-in error checks
-func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (SymbolSet, error) {
+func NewSymbolSetWithTests(name string, symbols []Symbol, testLines []string, checkForDups bool) (SymbolSet, error) {
 	var nilRes SymbolSet
 
 	// filtered lists
@@ -171,7 +171,13 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, checkForDups bool) (Sy
 		phonemeDelimiterRe:        phonemeDelimiterRe,
 		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}
-	//testSymbolSet(res, nil)
+	ok, testRes, err := testSymbolSet(res, testLines)
+	if err != nil {
+		return nilRes, fmt.Errorf("couldn't test symbol set %s : %v", res.Name, err)
+	}
+	if !ok {
+		return nilRes, fmt.Errorf("tests failed for %s : %v", res.Name, testRes)
+	}
 	return res, nil
 
 }
@@ -202,6 +208,7 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 	var ipaUnicodeIndex = 3
 	var symCatIndex = 4
 	var symbols = make([]Symbol, 0)
+	var testLines = make([]string, 0)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			return nilRes, err
@@ -213,6 +220,8 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 				if l != header {
 					return nilRes, fmt.Errorf("expected header '%s', found '%s'", header, l)
 				}
+			} else if isTestLine(l) {
+				testLines = append(testLines, l)
 			} else {
 				fs := strings.Split(l, "\t")
 				symbol := trimIfNeeded(fs[symbolIndex])
@@ -235,11 +244,11 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 		}
 	}
 
-	m, err := NewSymbolSet(name, symbols)
+	ss, err := NewSymbolSetWithTests(name, symbols, testLines, true)
 	if err != nil {
-		return nilRes, fmt.Errorf("couldn't load mapper from file %v : %v", fName, err)
+		return nilRes, fmt.Errorf("couldn't load symbol set from file %v : %v", fName, err)
 	}
-	return m, nil
+	return ss, nil
 }
 
 // LoadSymbolSetsFromDir loads a all symbol sets from the specified folder (all files with .tab extension)
