@@ -17,7 +17,8 @@ func (DBManager) New() DBManager {
 }
 
 func (dmb DBManager) AddDB(name string, db *sql.DB) error {
-	if "" == strings.TrimSpace(name) {
+	name = strings.TrimSpace(name)
+	if "" == name {
 		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not be empty")
 	}
 	if strings.Contains(name, ":") {
@@ -40,6 +41,7 @@ func (dmb DBManager) AddDB(name string, db *sql.DB) error {
 }
 
 func (dmb DBManager) RemoveDB(name string) error {
+	name = strings.TrimSpace(name)
 	dmb.Lock()
 	defer dmb.Unlock()
 
@@ -71,14 +73,19 @@ func (dbm DBManager) ListLexicons() ([]string, error) {
 	dbm.RLock()
 	defer dbm.RUnlock()
 
-	for name, db := range dbm.dbs {
+	for dbName, db := range dbm.dbs {
 		lexs, err := ListLexicons(db)
 		if err != nil {
 			return res, fmt.Errorf("DBManager.ListLexicons : %v", err)
 		}
 
+		// l is a dbapi.Lexicon struct
 		for _, l := range lexs {
-			res = append(res, name+":"+l.Name)
+			// A full lexicon name consists of the name of
+			// the db and the name of the lexicon in the
+			// db joined by ':'
+			fullName := dbName + ":" + strings.TrimSpace(l.Name)
+			res = append(res, fullName)
 		}
 	}
 
