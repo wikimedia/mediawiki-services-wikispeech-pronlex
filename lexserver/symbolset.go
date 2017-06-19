@@ -85,7 +85,9 @@ func loadSymbolSets(dirName string) error {
 	mMut.Lock()
 	mMut.service.SymbolSets = symbolSets
 	mMut.Unlock()
-	return nil
+
+	mappersDef := filepath.Join(dirName, "mappers.txt")
+	return testMappers(mappersDef)
 }
 
 func symbolsetReloadAllHandler(w http.ResponseWriter, r *http.Request) {

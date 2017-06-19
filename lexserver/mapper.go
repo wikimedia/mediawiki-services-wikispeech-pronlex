@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"sync"
 
@@ -125,7 +127,7 @@ var mapperMaptable = urlHandler{
 		mapper0, err := mMut.service.GetMapTable(fromName, toName)
 		mMut.Unlock()
 		if err != nil {
-			msg := fmt.Sprintf("failed getting map table : %v", err)
+			msg := fmt.Sprintf("failed getting map table: %v", err)
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
@@ -135,7 +137,7 @@ var mapperMaptable = urlHandler{
 		for _, from := range mapper0.SymbolSet1.Symbols {
 			to, err := mapper0.MapSymbol(from)
 			if err != nil {
-				msg := fmt.Sprintf("failed getting map table : %v", err)
+				msg := fmt.Sprintf("failed getting map table: %v", err)
 				log.Println(msg)
 				http.Error(w, msg, http.StatusInternalServerError)
 				return
@@ -173,4 +175,166 @@ var mapperList = urlHandler{
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		fmt.Fprint(w, string(j))
 	},
+}
+
+/// MAPPER INIT TESTS
+
+type mapperTests struct {
+	fromName string
+	toName   string
+	tests    []mapperTest
+}
+
+type mapperTest struct {
+	from string
+	to   string
+}
+
+func parseMapperTestLine(l string) (mapperTest, error) {
+	fs := strings.Split(l, "\t")
+	if fs[0] != "TEST" {
+		return mapperTest{}, fmt.Errorf("mapper test line must start with TEST; found %s", l)
+	}
+	if len(fs) != 3 {
+		return mapperTest{}, fmt.Errorf("mapper test line must have 3 fields, found %s", l)
+	}
+	from := fs[1]
+	to := fs[2]
+	return mapperTest{
+		from: from,
+		to:   to}, nil
+}
+
+func parseMapperTest(l string) (mapperTest, error) {
+	fs := strings.Split(l, "\t")
+	if fs[0] != "TEST" {
+		return mapperTest{}, fmt.Errorf("mapper test line must start with TEST; found %s", l)
+	}
+	if len(fs) != 3 {
+		return mapperTest{}, fmt.Errorf("mapper test line must have 3 fields, found %s", l)
+	}
+	from := fs[1]
+	to := fs[2]
+	return mapperTest{
+		from: from,
+		to:   to}, nil
+
+}
+
+func parseMapperTests(mapperLine string, testLines []string) (mapperTests, error) {
+	fs := strings.Split(mapperLine, "\t")
+	if fs[0] != "MAPPER" {
+		return mapperTests{}, fmt.Errorf("mapper definition line must start with MAPPER; found %s", mapperLine)
+	}
+	if len(fs) != 3 {
+		return mapperTests{}, fmt.Errorf("mapper definition line must have 3 fields, found %s", mapperLine)
+	}
+	from := fs[1]
+	to := fs[2]
+	tests := []mapperTest{}
+	for _, l := range testLines {
+		t, err := parseMapperTest(l)
+		if err != nil {
+			return mapperTests{}, err
+		}
+		tests = append(tests, t)
+	}
+	return mapperTests{
+		fromName: from,
+		toName:   to,
+		tests:    tests}, nil
+}
+
+func loadMapperTestsFromFile(fName string) ([]mapperTests, error) {
+	var res []mapperTests
+	fh, err := os.Open(fName)
+	defer fh.Close()
+	if err != nil {
+		return []mapperTests{}, err
+	}
+	s := bufio.NewScanner(fh)
+	n := 0
+	prevMapper := ""
+	cachedTests := []string{}
+	for s.Scan() {
+		if err := s.Err(); err != nil {
+			return []mapperTests{}, err
+		}
+		n++
+		l := s.Text()
+		if len(strings.TrimSpace(l)) == 0 {
+			// empty line
+		} else if strings.HasPrefix(l, "#") {
+			// comment line
+		} else if strings.HasPrefix(l, "TEST\t") {
+			cachedTests = append(cachedTests, l)
+		} else if strings.HasPrefix(l, "MAPPER\t") {
+			if prevMapper != "" {
+				mTests, err := parseMapperTests(prevMapper, cachedTests)
+				if err != nil {
+					return []mapperTests{}, err
+				}
+				res = append(res, mTests)
+			}
+			cachedTests = []string{}
+			prevMapper = l
+		}
+	}
+	if prevMapper != "" {
+		mTests, err := parseMapperTests(prevMapper, cachedTests)
+		if err != nil {
+			return []mapperTests{}, err
+		}
+		res = append(res, mTests)
+	}
+	return res, nil
+}
+
+func testMappers(mDefFile string) error {
+	errs := []string{}
+	if _, err := os.Stat(mDefFile); !os.IsNotExist(err) {
+		log.Println("lexserver: loading mapper definitions from file", mDefFile)
+		mTests, err := loadMapperTestsFromFile(mDefFile)
+		if err != nil {
+			return nil
+		}
+		for _, mt := range mTests {
+			log.Println("lexserver: initializing mapper", mt)
+			mMut.Lock()
+			mtab, err := mMut.service.GetMapTable(mt.fromName, mt.toName)
+			mMut.Unlock()
+			if err != nil {
+				msg := fmt.Sprintf("failed getting map table : %v", err)
+				log.Println(msg)
+				return err
+			}
+			for _, from := range mtab.SymbolSet1.Symbols {
+				_, err := mtab.MapSymbol(from)
+				if err != nil {
+					mMut.service.DeleteMapper(mt.fromName, mt.toName)
+					msg := fmt.Sprintf("failed getting map table : %v", err)
+					log.Println(msg)
+					return err
+				}
+			}
+
+			for _, t := range mt.tests {
+				mMut.Lock()
+				mapped, err := mMut.service.Map(mt.fromName, mt.toName, t.from)
+				mMut.Unlock()
+				if err != nil {
+					return err
+				}
+				if mapped != t.to {
+					msg := fmt.Sprintf("from /%s/ expected /%s/, found /%s/", t.from, t.to, mapped)
+					log.Println(msg)
+					errs = append(errs, msg)
+				}
+			}
+		}
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf(strings.Join(errs, "; "))
+	}
+	return nil
 }

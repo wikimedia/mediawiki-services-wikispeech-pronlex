@@ -732,7 +732,7 @@ func main() {
 	// load symbol set mappers
 	err = loadSymbolSets(symbolSetFileArea)
 	ff("Failed to load symbol sets from dir "+symbolSetFileArea+" : %v", err)
-	log.Printf("lexserver: Loaded symbol set mappers from dir %s", symbolSetFileArea)
+	log.Printf("lexserver: Loaded symbol sets from dir %s", symbolSetFileArea)
 
 	err = loadValidators(symbolSetFileArea)
 	ff("Failed to load validators : %v", err)
