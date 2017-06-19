@@ -9,16 +9,21 @@ func isTestLine(l string) bool {
 	return strings.HasPrefix(l, "TEST	")
 }
 
+/// SYMBOL SET TESTS
+
 type ssTest struct {
 	testType   string
 	symbolType string
 	trans      string
 }
 
-func parseTestLine(l string) (ssTest, error) {
+func parseSSTestLine(l string) (ssTest, error) {
 	fs := strings.Split(l, "\t")
 	if fs[0] != "TEST" {
 		return ssTest{}, fmt.Errorf("symbol set test line must start with TEST; found %s", l)
+	}
+	if len(fs) != 4 {
+		return ssTest{}, fmt.Errorf("mapper test line must have 4 fields, found %s", l)
 	}
 	tType := fs[1]
 	symType := fs[2]
@@ -74,10 +79,14 @@ func validateIPATranscription(ss SymbolSet, trans string) ([]string, error) {
 	return messages, nil
 }
 
+// returns
+// * main test result: true/false
+// * []string failed tests
+// * error, if any
 func testSymbolSet(ss SymbolSet, tests []string) (bool, []string, error) {
 	res := []string{}
 	for _, test := range tests {
-		t, err := parseTestLine(test)
+		t, err := parseSSTestLine(test)
 		if err != nil {
 			return false, res, err
 		}

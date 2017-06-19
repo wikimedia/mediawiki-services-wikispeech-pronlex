@@ -41,6 +41,18 @@ func (m MapperService) Delete(ssName string) error {
 	return nil
 }
 
+// DeleteMapper is used to delete a mapper the cache.
+func (m MapperService) DeleteMapper(fromName string, toName string) error {
+	name := fromName + " to " + toName
+	for mName := range m.Mappers {
+		if mName == name {
+			delete(m.Mappers, mName)
+			log.Printf("Deleted mapper %v from cache", mName)
+		}
+	}
+	return nil
+}
+
 // Load is used to load a symbol set from file
 func (m MapperService) Load(symbolSetFile string) error {
 	ss, err := LoadSymbolSet(symbolSetFile)
