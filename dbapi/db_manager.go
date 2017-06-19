@@ -40,16 +40,16 @@ func (dmb DBManager) AddDB(name string, db *sql.DB) error {
 	return nil
 }
 
-func (dmb DBManager) RemoveDB(name string) error {
+func (dbm DBManager) RemoveDB(name string) error {
 	name = strings.TrimSpace(name)
-	dmb.Lock()
-	defer dmb.Unlock()
+	dbm.Lock()
+	defer dbm.Unlock()
 
-	if _, ok := dmb.dbs[name]; !ok {
+	if _, ok := dbm.dbs[name]; !ok {
 		return fmt.Errorf("DBManager.RemoveDB: no such db '%s'", name)
 	}
 
-	delete(dmb.dbs, name)
+	delete(dbm.dbs, name)
 
 	return nil
 }
