@@ -27,10 +27,23 @@ func (dmb DBManager) AddDB(name string, db *sql.DB) error {
 	dmb.Lock()
 	defer dmb.Unlock()
 	if _, ok := dmb.dbs[name]; ok {
-		return fmt.Errorf("DBManager.AddDB: db '%s' has already been added (use RemoveDB to remove it)", name)
+		return fmt.Errorf("DBManager.AddDB: db already exists (use RemoveDB to remove it): '%s'", name)
 	}
 
 	dmb.dbs[name] = db
+
+	return nil
+}
+
+func (dmb DBManager) RemoveDB(name string) error {
+	dmb.Lock()
+	defer dmb.Unlock()
+
+	if _, ok := dmb.dbs[name]; !ok {
+		return fmt.Errorf("DBManager.RemoveDB: no such db '%s'", name)
+	}
+
+	delete(dmb.dbs, name)
 
 	return nil
 }
