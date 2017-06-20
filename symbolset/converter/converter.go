@@ -24,12 +24,12 @@ func (c Converter) Convert(trans string) (string, error) {
 			return "", err
 		}
 	}
-	invalid, err := c.getInvalidPhonemes(res, c.From)
+	invalid, err := c.getInvalidSymbols(res, c.To)
 	if err != nil {
 		return "", err
 	}
 	if len(invalid) > 0 {
-		return res, fmt.Errorf("Invalid symbols in output transcription /%s/: %v", trans, invalid)
+		return res, fmt.Errorf("Invalid symbols in output transcription /%s/: %v", res, invalid)
 	}
 	return res, nil
 }
@@ -44,14 +44,15 @@ type TestResult struct {
 	Errors []string
 }
 
-func (c Converter) getInvalidPhonemes(trans string, symbolset symbolset.SymbolSet) ([]string, error) {
+func (c Converter) getInvalidSymbols(trans string, symbolset symbolset.SymbolSet) ([]string, error) {
 	invalid := []string{}
 	splitted, err := symbolset.SplitTranscription(trans)
 	if err != nil {
 		return invalid, err
 	}
 	for _, phn := range splitted {
-		if !c.To.ValidSymbol(phn) {
+		//fmt.Printf("/%s/\n", phn)
+		if !symbolset.ValidSymbol(phn) {
 			invalid = append(invalid, phn)
 		}
 	}
@@ -86,12 +87,12 @@ func (c Converter) testExamples(tests []test) (TestResult, error) {
 			msg := fmt.Sprintf("From /%s/ expected /%s/, but got /%s/", test.from, test.to, result)
 			errors = append(errors, msg)
 		}
-		invalid, err := c.getInvalidPhonemes(result, c.To)
+		invalid, err := c.getInvalidSymbols(result, c.To)
 		if err != nil {
 			return TestResult{}, err
 		}
 		if len(invalid) > 0 {
-			errors = append(errors, fmt.Sprintf("Invalid symbols in output transcription: %v", invalid))
+			errors = append(errors, fmt.Sprintf("Invalid symbols in output transcription for test /%s/: %v", test, invalid))
 		}
 	}
 	ok := (len(errors) == 0)
@@ -109,7 +110,7 @@ func (c Converter) testInternals() (TestResult, error) {
 			//return TestResult{}, err
 		}
 		// check that all output symbols are valid as defined in c.To
-		invalid, err := c.getInvalidPhonemes(res, c.To)
+		invalid, err := c.getInvalidSymbols(res, c.To)
 		if err != nil {
 			return TestResult{}, err
 		}
@@ -121,14 +122,14 @@ func (c Converter) testInternals() (TestResult, error) {
 	for _, rule := range c.Rules {
 		if reflect.TypeOf(rule).Name() == "SymbolRule" {
 			var sr SymbolRule = rule.(SymbolRule)
-			invalid, err := c.getInvalidPhonemes(sr.From, c.From)
+			invalid, err := c.getInvalidSymbols(sr.From, c.From)
 			if err != nil {
 				return TestResult{}, err
 			}
 			if len(invalid) > 0 {
 				errors = append(errors, fmt.Sprintf("Invalid symbols in input transcription for rule %s: %v", rule, invalid))
 			}
-			invalid, err = c.getInvalidPhonemes(sr.To, c.To)
+			invalid, err = c.getInvalidSymbols(sr.To, c.To)
 			if err != nil {
 				return TestResult{}, err
 			}
@@ -137,7 +138,7 @@ func (c Converter) testInternals() (TestResult, error) {
 			}
 		} else if reflect.TypeOf(rule).Name() == "RegexpRule" {
 			var rr RegexpRule = rule.(RegexpRule)
-			invalid, err := c.getInvalidPhonemes(rr.To, c.To)
+			invalid, err := c.getInvalidSymbols(rr.To, c.To)
 			if err != nil {
 				return TestResult{}, err
 			}

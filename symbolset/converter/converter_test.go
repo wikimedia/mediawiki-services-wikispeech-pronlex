@@ -7,7 +7,7 @@ import (
 	"github.com/stts-se/pronlex/symbolset"
 )
 
-func TestMe(t *testing.T) {
+func TestLoadFromDir(t *testing.T) {
 	sSets, err := symbolset.LoadSymbolSetsFromDir("../test_data")
 	if err != nil {
 		t.Errorf("LoadSymbolSetsFromDir() didn't expect error here : %v", err)
