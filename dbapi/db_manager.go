@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 type DBManager struct {
@@ -88,6 +90,34 @@ func (dbm DBManager) ListDBNames() []string {
 	}
 
 	return res
+}
+
+// TODO This turned out somewhat ugly: the Query.Lexicon field is
+// overwritten by the full (DB+lexicon name) lexicon names. The Query
+// will be copied and instantiated with the Lexicon field for each DB.
+// ??? How to handle this in a neater way ???
+func (dbm DBManager) LookUp(fullLexiconNames []string, q Query) (map[string][]lex.Entry, error) {
+	var res = make(map[string][]lex.Entry)
+
+	dbz := make(map[string][]string)
+	for _, n := range fullLexiconNames {
+		nameSplit := strings.SplitN(n, ":", 2)
+		if len(nameSplit) == 2 {
+			return res, fmt.Errorf("DBManager.LookUp: failed to split full lexicon name into two colon separated parts: '%s'", n)
+		}
+		// TODO: error check (for empty string, etc)
+		db := nameSplit[0]
+		lex := nameSplit[1]
+		lexList := dbz[db]
+		dbz[db] = append(lexList, lex)
+	}
+
+	dbm.RLock()
+	defer dbm.RUnlock()
+
+	// TODO: Concurrent dbap.LookUp loop
+
+	return res, nil
 }
 
 type lexRes struct {

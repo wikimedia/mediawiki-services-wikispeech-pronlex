@@ -101,7 +101,22 @@ func Test_ListLexicon(t *testing.T) {
 	if w := "db1:zuperlex1"; !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
+	if w := "db1:zuperlex2"; !lexsM[w] {
+		t.Errorf("expected db not found: '%s'", w)
+	}
+
+	if w := "db1:zuperlex3"; !lexsM[w] {
+		t.Errorf("expected db not found: '%s'", w)
+	}
+
 	if w := "db2:zuperlex1"; !lexsM[w] {
+		t.Errorf("expected db not found: '%s'", w)
+	}
+	if w := "db2:zuperlex2"; !lexsM[w] {
+		t.Errorf("expected db not found: '%s'", w)
+	}
+
+	if w := "db2:zuperduperlex"; !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
 
