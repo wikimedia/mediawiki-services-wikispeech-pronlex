@@ -171,12 +171,12 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, testLines []string, ch
 		phonemeDelimiterRe:        phonemeDelimiterRe,
 		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}
-	ok, testRes, err := testSymbolSet(res, testLines)
+	testRes, err := testSymbolSet(res, testLines)
 	if err != nil {
 		return nilRes, fmt.Errorf("couldn't test symbol set %s : %v", res.Name, err)
 	}
-	if !ok {
-		return nilRes, fmt.Errorf("tests failed for %s : %v", res.Name, testRes)
+	if !testRes.ok {
+		return nilRes, fmt.Errorf("tests failed for %s : %v", res.Name, testRes.errors)
 	}
 	return res, nil
 

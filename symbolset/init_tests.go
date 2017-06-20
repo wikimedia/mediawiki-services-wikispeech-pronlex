@@ -79,40 +79,40 @@ func validateIPATranscription(ss SymbolSet, trans string) ([]string, error) {
 	return messages, nil
 }
 
-// returns
-// * main test result: true/false
-// * []string failed tests
-// * error, if any
-func testSymbolSet(ss SymbolSet, tests []string) (bool, []string, error) {
-	res := []string{}
+type testResult struct {
+	ok     bool
+	errors []string
+}
+
+func testSymbolSet(ss SymbolSet, tests []string) (testResult, error) {
 	for _, test := range tests {
 		t, err := parseSSTestLine(test)
 		if err != nil {
-			return false, res, err
+			return testResult{}, err
 		}
 		if t.symbolType == "IPA" {
 			res, err := validateIPATranscription(ss, t.trans)
 			if err != nil {
-				return false, res, err
+				return testResult{ok: false}, err
 			}
 			if t.testType == "ACCEPT" && len(res) > 0 {
-				return false, []string{fmt.Sprintf("accept test failed: /%s/ : %v", t.trans, res)}, nil
+				return testResult{ok: false, errors: []string{fmt.Sprintf("accept test failed: /%s/ : %v", t.trans, res)}}, nil
 			}
 			if t.testType == "REJECT" && len(res) == 0 {
-				return false, []string{fmt.Sprintf("reject test failed: /%s/ : %v", t.trans, res)}, nil
+				return testResult{ok: false, errors: []string{fmt.Sprintf("reject test failed: /%s/ : %v", t.trans, res)}}, nil
 			}
 		} else if t.symbolType == "SYMBOLS" {
 			res, err := validateTranscription(ss, t.trans)
 			if err != nil {
-				return false, res, err
+				return testResult{ok: false}, err
 			}
 			if t.testType == "ACCEPT" && len(res) > 0 {
-				return false, []string{fmt.Sprintf("accept test failed: /%s/ : %v", t.trans, res)}, nil
+				return testResult{ok: false, errors: []string{fmt.Sprintf("accept test failed: /%s/ : %v", t.trans, res)}}, nil
 			}
 			if t.testType == "REJECT" && len(res) == 0 {
-				return false, []string{fmt.Sprintf("reject test failed: /%s/ : %v", t.trans, res)}, nil
+				return testResult{ok: false, errors: []string{fmt.Sprintf("reject test failed: /%s/ : %v", t.trans, res)}}, nil
 			}
 		}
 	}
-	return true, []string{}, nil
+	return testResult{ok: true}, nil
 }

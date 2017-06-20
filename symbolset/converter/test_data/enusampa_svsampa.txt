@@ -1,0 +1,9 @@
+FROM	en-us_ws-sampa
+TO	sv-se_ws-sampa
+
+SYMBOL	dZ	d j
+SYMBOL	tS	t S
+RE	^T	t
+
+TEST	T i s	t I s
+TEST	D i s	d I s
