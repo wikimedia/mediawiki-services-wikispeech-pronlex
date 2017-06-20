@@ -1,6 +1,8 @@
 FROM	en-us_ws-sampa
 TO	sv-se_ws-sampa
 
+RE	^T	t
+
 SYMBOL	dZ	d j
 SYMBOL	tS	t rs
 SYMBOL	i	I
@@ -20,9 +22,8 @@ SYMBOL	@U	u:
 SYMBOL	EI	e j
 SYMBOL	AI	a j
 SYMBOL	'	"
-SYMBOL	 	 
+SYMBOL	T	t
 
-RE	^T	t
 
 
 TEST	T i s	t I s

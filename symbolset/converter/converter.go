@@ -29,7 +29,7 @@ func (c Converter) Convert(trans string) (string, error) {
 		return "", err
 	}
 	if len(invalid) > 0 {
-		return res, fmt.Errorf("Invalid symbols in output transcription /%s/: %v", res, invalid)
+		return res, fmt.Errorf("Invalid symbol(s) in output transcription /%s/: %v", res, invalid)
 	}
 	return res, nil
 }
@@ -45,13 +45,15 @@ type TestResult struct {
 }
 
 func (c Converter) getInvalidSymbols(trans string, symbolset symbolset.SymbolSet) ([]string, error) {
+	if trans == symbolset.PhonemeDelimiter.String {
+		return []string{}, nil
+	}
 	invalid := []string{}
 	splitted, err := symbolset.SplitTranscription(trans)
 	if err != nil {
 		return invalid, err
 	}
 	for _, phn := range splitted {
-		//fmt.Printf("/%s/\n", phn)
 		if !symbolset.ValidSymbol(phn) {
 			invalid = append(invalid, phn)
 		}
@@ -69,7 +71,7 @@ func (c Converter) Test(tests []test) (TestResult, error) {
 		return TestResult{}, err
 	}
 	if res1.OK && res2.OK {
-		return TestResult{}, nil
+		return TestResult{OK: true}, nil
 	}
 	return TestResult{OK: false, Errors: append(res1.Errors, res2.Errors...)}, nil
 }
@@ -92,7 +94,7 @@ func (c Converter) testExamples(tests []test) (TestResult, error) {
 			return TestResult{}, err
 		}
 		if len(invalid) > 0 {
-			errors = append(errors, fmt.Sprintf("Invalid symbols in output transcription for test /%s/: %v", test, invalid))
+			errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription for test /%s/: %v", test, invalid))
 		}
 	}
 	ok := (len(errors) == 0)
@@ -102,6 +104,7 @@ func (c Converter) testExamples(tests []test) (TestResult, error) {
 // runs internal tests
 func (c Converter) testInternals() (TestResult, error) {
 	errors := []string{}
+	var symbolsThatNeedARule []string
 	for _, phn := range c.From.Symbols {
 		// check that all input symbols can be converted without errors
 		res, err := c.Convert(phn.String)
@@ -115,9 +118,29 @@ func (c Converter) testInternals() (TestResult, error) {
 			return TestResult{}, err
 		}
 		if len(invalid) > 0 {
-			errors = append(errors, fmt.Sprintf("Invalid symbols in output transcription: %v", invalid))
+			errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription /%s/: %v", res, invalid))
+		}
+		if !c.To.ValidSymbol(phn.String) {
+			symbolsThatNeedARule = append(symbolsThatNeedARule, phn.String)
 		}
 	}
+
+	// check that all input symbols that are not also part of the output symbol set, have a fallback rule
+	for _, symbol := range symbolsThatNeedARule {
+		var hasSymbolRule = false
+		for _, rule := range c.Rules {
+			if reflect.TypeOf(rule).Name() == "SymbolRule" {
+				var sr SymbolRule = rule.(SymbolRule)
+				if sr.From == symbol {
+					hasSymbolRule = true
+				}
+			}
+		}
+		if !hasSymbolRule {
+			errors = append(errors, fmt.Sprintf("Symbol rule needed for input phoneme /%s/", symbol))
+		}
+	}
+
 	// for each symbol rule, check that input is defined in c.From, and output is defined in c.To
 	for _, rule := range c.Rules {
 		if reflect.TypeOf(rule).Name() == "SymbolRule" {
@@ -127,14 +150,14 @@ func (c Converter) testInternals() (TestResult, error) {
 				return TestResult{}, err
 			}
 			if len(invalid) > 0 {
-				errors = append(errors, fmt.Sprintf("Invalid symbols in input transcription for rule %s: %v", rule, invalid))
+				errors = append(errors, fmt.Sprintf("Invalid symbol(s) in input transcription for rule %s: %v", rule, invalid))
 			}
 			invalid, err = c.getInvalidSymbols(sr.To, c.To)
 			if err != nil {
 				return TestResult{}, err
 			}
 			if len(invalid) > 0 {
-				errors = append(errors, fmt.Sprintf("Invalid symbols in output transcription rule %s: %v", rule, invalid))
+				errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription for rule %s: %v", rule, invalid))
 			}
 		} else if reflect.TypeOf(rule).Name() == "RegexpRule" {
 			var rr RegexpRule = rule.(RegexpRule)
@@ -143,7 +166,7 @@ func (c Converter) testInternals() (TestResult, error) {
 				return TestResult{}, err
 			}
 			if len(invalid) > 0 {
-				errors = append(errors, fmt.Sprintf("Invalid symbols in output transcription for rule %s: %v", rule, invalid))
+				errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription for rule %s: %v", rule, invalid))
 			}
 		}
 	}

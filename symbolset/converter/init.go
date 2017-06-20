@@ -173,7 +173,7 @@ func LoadFromDir(symbolSets map[string]symbolset.SymbolSet, dirName string) (map
 		return nil, TestResult{}, fmt.Errorf("failed reading symbol set dir : %v", err)
 	}
 	var fErrs error
-	var testResult = TestResult{}
+	var testResult = TestResult{OK: true}
 	var convs []Converter
 	for _, fi := range fileInfos {
 		if strings.HasSuffix(fi.Name(), Suffix) {
