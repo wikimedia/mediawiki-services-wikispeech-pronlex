@@ -57,6 +57,10 @@ func (dbm DBManager) RemoveDB(name string) error {
 func (dbm DBManager) DefineLexicon(dbName string, lexes ...string) error {
 	dbName = strings.TrimSpace(dbName)
 	dbName = strings.ToLower(dbName)
+
+	dbm.RLock()
+	defer dbm.RUnlock()
+
 	for _, l := range lexes {
 		db, ok := dbm.dbs[dbName]
 		if !ok {

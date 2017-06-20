@@ -2,14 +2,13 @@ package dbapi
 
 import (
 	"database/sql"
-	"fmt"
+	//"fmt"
 	"log"
 	"os"
 	"testing"
 )
 
 func Test_ListLexicon(t *testing.T) {
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
 	dbPath1 := "./testlex_listlex1.db"
 	dbPath2 := "./testlex_listlex2.db"
@@ -78,8 +77,33 @@ func Test_ListLexicon(t *testing.T) {
 	l2_3 := "zuperduperlex"
 
 	err = dbm.DefineLexicon("db1", l1_1, l1_2, l1_3)
+	if err != nil {
+		t.Errorf("Quack! %v", err)
+	}
 	err = dbm.DefineLexicon("db2", l2_1, l2_2, l2_3)
+	if err != nil {
+		t.Errorf("Quack! %v", err)
+	}
 
 	lexs, err := dbm.ListLexicons()
-	fmt.Printf("%v\n", lexs)
+	if err != nil {
+		t.Errorf("Quack! %v", err)
+	}
+
+	if w, g := 6, len(lexs); w != g {
+		t.Errorf("wanted %v got %v", w, g)
+	}
+
+	lexsM := make(map[string]bool)
+	for _, l := range lexs {
+		lexsM[l] = true
+	}
+	if w := "db1:zuperlex1"; !lexsM[w] {
+		t.Errorf("expected db not found: '%s'", w)
+	}
+	if w := "db2:zuperlex1"; !lexsM[w] {
+		t.Errorf("expected db not found: '%s'", w)
+	}
+
+	//fmt.Printf("%v\n", lexs)
 }
