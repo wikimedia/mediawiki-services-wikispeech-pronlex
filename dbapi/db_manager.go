@@ -55,11 +55,15 @@ func (dbm DBManager) RemoveDB(name string) error {
 }
 
 func (dbm DBManager) DefineLexicon(dbName string, lexes ...string) error {
+	dbName = strings.TrimSpace(dbName)
+	dbName = strings.ToLower(dbName)
 	for _, l := range lexes {
 		db, ok := dbm.dbs[dbName]
 		if !ok {
 			return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", dbName)
 		}
+		l = strings.TrimSpace(l)
+		l = strings.ToLower(l)
 		_, err := InsertLexicon(db, Lexicon{Name: l})
 		if err != nil {
 			return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s:%s' : %v", dbName, l, err)
