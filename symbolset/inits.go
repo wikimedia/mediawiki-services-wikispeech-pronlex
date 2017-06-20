@@ -167,7 +167,7 @@ func NewSymbolSetWithTests(name string, symbols []Symbol, testLines []string, ch
 		ipaNonSyllabicRe: ipaNonSyllabicRe,
 		ipaPhonemeRe:     ipaPhonemeRe,
 
-		phonemeDelimiter:          phonemeDelimiter,
+		PhonemeDelimiter:          phonemeDelimiter,
 		phonemeDelimiterRe:        phonemeDelimiterRe,
 		repeatedPhonemeDelimiters: repeatedPhonemeDelimiters,
 	}

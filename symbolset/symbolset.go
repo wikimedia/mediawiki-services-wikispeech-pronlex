@@ -101,7 +101,7 @@ type SymbolSet struct {
 	ipaSyllabicRe    *regexp.Regexp
 	ipaNonSyllabicRe *regexp.Regexp
 
-	phonemeDelimiter          Symbol
+	PhonemeDelimiter          Symbol
 	phonemeDelimiterRe        *regexp.Regexp
 	repeatedPhonemeDelimiters *regexp.Regexp
 }
@@ -185,7 +185,7 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	delim := ss.phonemeDelimiter.IPA.String
+	delim := ss.PhonemeDelimiter.IPA.String
 	if delim == "" {
 		symbols := []Symbol{}
 		for _, s := range ss.Symbols {
@@ -227,7 +227,7 @@ func (ss SymbolSet) ConvertToIPA(trans string) (string, error) {
 			mapped = append(mapped, to)
 		}
 	}
-	res = strings.Join(mapped, ss.phonemeDelimiter.IPA.String)
+	res = strings.Join(mapped, ss.PhonemeDelimiter.IPA.String)
 
 	res, err = postFilter(ss, res, IPA)
 	return res, err
@@ -251,10 +251,10 @@ func (ss SymbolSet) ConvertFromIPA(trans string) (string, error) {
 			mapped = append(mapped, to)
 		}
 	}
-	res = strings.Join(mapped, ss.phonemeDelimiter.String)
+	res = strings.Join(mapped, ss.PhonemeDelimiter.String)
 
 	// remove repeated phoneme delimiters, if any
-	res = ss.repeatedPhonemeDelimiters.ReplaceAllString(res, ss.phonemeDelimiter.String)
+	res = ss.repeatedPhonemeDelimiters.ReplaceAllString(res, ss.PhonemeDelimiter.String)
 	res, err = postFilter(ss, res, ss.Type)
 	return res, err
 }
