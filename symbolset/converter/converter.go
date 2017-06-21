@@ -86,18 +86,22 @@ type SymbolRule struct {
 	To   string
 }
 
+// String returns a tab separated string representation of the rule
 func (r SymbolRule) String() string {
 	return fmt.Sprintf("%s\t%s\t%s", "SYMBOL", r.From, r.To)
 }
 
+// FromString returns a string representation of the rule's input field
 func (r SymbolRule) FromString() string {
 	return r.From
 }
 
+// ToString returns a string representation of the rule's output field
 func (r SymbolRule) ToString() string {
 	return r.To
 }
 
+// Type returns the rule type (SYMBOL or RE)
 func (r SymbolRule) Type() string {
 	return "SYMBOL"
 }
@@ -125,17 +129,22 @@ type RegexpRule struct {
 	To   string
 }
 
+// String returns a tab separated string representation of the rule
 func (r RegexpRule) String() string {
 	return fmt.Sprintf("%s\t%s\t%s", "RE", r.From, r.To)
 }
 
+// FromString returns a string representation of the rule's input field
 func (r RegexpRule) FromString() string {
 	return r.From.String()
 }
 
+// ToString returns a string representation of the rule's output field
 func (r RegexpRule) ToString() string {
 	return r.To
 }
+
+// Type returns the rule type (SYMBOL or RE)
 func (r RegexpRule) Type() string {
 	return "RE"
 }
