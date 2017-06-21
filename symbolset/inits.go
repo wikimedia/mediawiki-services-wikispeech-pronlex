@@ -251,7 +251,7 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 	return ss, nil
 }
 
-// LoadSymbolSetsFromDir loads a all symbol sets from the specified folder (all files with .tab extension)
+// LoadSymbolSetsFromDir loads a all symbol sets from the specified folder (all files with .sym extension)
 func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 	// list files in symbol set dir
 	fileInfos, err := ioutil.ReadDir(dirName)
