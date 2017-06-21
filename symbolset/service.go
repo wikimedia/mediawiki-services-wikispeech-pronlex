@@ -43,7 +43,7 @@ func (m MapperService) Delete(ssName string) error {
 
 // DeleteMapper is used to delete a mapper the cache.
 func (m MapperService) DeleteMapper(fromName string, toName string) error {
-	name := fromName + " to " + toName
+	name := fromName + " - " + toName
 	for mName := range m.Mappers {
 		if mName == name {
 			delete(m.Mappers, mName)
@@ -72,7 +72,7 @@ func (m MapperService) Clear() {
 }
 
 func (m MapperService) getOrCreateMapper(fromName string, toName string) (Mapper, error) {
-	name := fromName + " to " + toName
+	name := fromName + " - " + toName
 	mapper, ok := m.Mappers[name]
 	if ok {
 		return mapper, nil

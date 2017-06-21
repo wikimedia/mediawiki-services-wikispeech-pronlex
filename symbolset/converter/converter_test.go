@@ -2,6 +2,7 @@ package converter
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stts-se/pronlex/symbolset"
@@ -18,10 +19,14 @@ func TestLoadFromDir(t *testing.T) {
 		t.Errorf("LoadSymbolSetsFromDir() didn't expect error here : %v", err)
 		return
 	}
-	if !testRes.OK {
-		for _, err := range testRes.Errors {
-			fmt.Println(err)
+	for name, res := range testRes {
+		fmt.Println(name, res.OK)
+		if !res.OK && !strings.Contains(name, "FAIL") {
+			for _, err := range res.Errors {
+				t.Errorf("%s: %s", name, err)
+			}
+		} else if strings.Contains(name, "FAIL") && res.OK {
+			t.Errorf("EXPECTED FAIL FOR CONVERTER %s", name)
 		}
-		t.Errorf("FAIL")
 	}
 }

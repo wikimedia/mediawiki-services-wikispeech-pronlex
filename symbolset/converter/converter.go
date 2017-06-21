@@ -2,7 +2,6 @@ package converter
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/dlclark/regexp2"
@@ -10,6 +9,7 @@ import (
 )
 
 type Converter struct {
+	Name  string
 	From  symbolset.SymbolSet
 	To    symbolset.SymbolSet
 	Rules []Rule
@@ -59,119 +59,6 @@ func (c Converter) getInvalidSymbols(trans string, symbolset symbolset.SymbolSet
 		}
 	}
 	return invalid, nil
-}
-
-func (c Converter) Test(tests []test) (TestResult, error) {
-	res1, err := c.testExamples(tests)
-	if err != nil {
-		return TestResult{}, err
-	}
-	res2, err := c.testInternals()
-	if err != nil {
-		return TestResult{}, err
-	}
-	if res1.OK && res2.OK {
-		return TestResult{OK: true}, nil
-	}
-	return TestResult{OK: false, Errors: append(res1.Errors, res2.Errors...)}, nil
-}
-
-// runs pre-defined tests (defined in the input file)
-func (c Converter) testExamples(tests []test) (TestResult, error) {
-	errors := []string{}
-	for _, test := range tests {
-		result, err := c.Convert(test.from)
-		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s", err))
-			//return TestResult{}, err
-		}
-		if result != test.to {
-			msg := fmt.Sprintf("From /%s/ expected /%s/, but got /%s/", test.from, test.to, result)
-			errors = append(errors, msg)
-		}
-		invalid, err := c.getInvalidSymbols(result, c.To)
-		if err != nil {
-			return TestResult{}, err
-		}
-		if len(invalid) > 0 {
-			errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription for test /%s/: %v", test, invalid))
-		}
-	}
-	ok := (len(errors) == 0)
-	return TestResult{OK: ok, Errors: errors}, nil
-}
-
-// runs internal tests
-func (c Converter) testInternals() (TestResult, error) {
-	errors := []string{}
-	var symbolsThatNeedARule []string
-	for _, phn := range c.From.Symbols {
-		// check that all input symbols can be converted without errors
-		res, err := c.Convert(phn.String)
-		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s", err))
-			//return TestResult{}, err
-		}
-		// check that all output symbols are valid as defined in c.To
-		invalid, err := c.getInvalidSymbols(res, c.To)
-		if err != nil {
-			return TestResult{}, err
-		}
-		if len(invalid) > 0 {
-			errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription /%s/: %v", res, invalid))
-		}
-		if !c.To.ValidSymbol(phn.String) {
-			symbolsThatNeedARule = append(symbolsThatNeedARule, phn.String)
-		}
-	}
-
-	// check that all input symbols that are not also part of the output symbol set, have a fallback rule
-	for _, symbol := range symbolsThatNeedARule {
-		var hasSymbolRule = false
-		for _, rule := range c.Rules {
-			if reflect.TypeOf(rule).Name() == "SymbolRule" {
-				var sr SymbolRule = rule.(SymbolRule)
-				if sr.From == symbol {
-					hasSymbolRule = true
-				}
-			}
-		}
-		if !hasSymbolRule {
-			errors = append(errors, fmt.Sprintf("Symbol rule needed for input phoneme /%s/", symbol))
-		}
-	}
-
-	// for each symbol rule, check that input is defined in c.From, and output is defined in c.To
-	for _, rule := range c.Rules {
-		if reflect.TypeOf(rule).Name() == "SymbolRule" {
-			var sr SymbolRule = rule.(SymbolRule)
-			invalid, err := c.getInvalidSymbols(sr.From, c.From)
-			if err != nil {
-				return TestResult{}, err
-			}
-			if len(invalid) > 0 {
-				errors = append(errors, fmt.Sprintf("Invalid symbol(s) in input transcription for rule %s: %v", rule, invalid))
-			}
-			invalid, err = c.getInvalidSymbols(sr.To, c.To)
-			if err != nil {
-				return TestResult{}, err
-			}
-			if len(invalid) > 0 {
-				errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription for rule %s: %v", rule, invalid))
-			}
-		} else if reflect.TypeOf(rule).Name() == "RegexpRule" {
-			var rr RegexpRule = rule.(RegexpRule)
-			invalid, err := c.getInvalidSymbols(rr.To, c.To)
-			if err != nil {
-				return TestResult{}, err
-			}
-			if len(invalid) > 0 {
-				errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription for rule %s: %v", rule, invalid))
-			}
-		}
-	}
-	ok := (len(errors) == 0)
-	return TestResult{OK: ok, Errors: errors}, nil
 }
 
 type Rule interface {
