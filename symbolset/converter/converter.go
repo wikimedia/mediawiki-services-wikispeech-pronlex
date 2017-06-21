@@ -62,6 +62,9 @@ func (c Converter) getInvalidSymbols(trans string, symbolset symbolset.SymbolSet
 }
 
 type Rule interface {
+	FromString() string
+	ToString() string
+	Type() string
 	Convert(trans string, symbolset symbolset.SymbolSet) (string, error)
 	String() string
 }
@@ -73,6 +76,16 @@ type SymbolRule struct {
 
 func (r SymbolRule) String() string {
 	return fmt.Sprintf("%s\t%s\t%s", "SYMBOL", r.From, r.To)
+}
+
+func (r SymbolRule) FromString() string {
+	return r.From
+}
+func (r SymbolRule) ToString() string {
+	return r.To
+}
+func (r SymbolRule) Type() string {
+	return "SYMBOL"
 }
 
 func (r SymbolRule) Convert(trans string, symbolset symbolset.SymbolSet) (string, error) {
@@ -99,6 +112,16 @@ type RegexpRule struct {
 
 func (r RegexpRule) String() string {
 	return fmt.Sprintf("%s\t%s\t%s", "RE", r.From, r.To)
+}
+
+func (r RegexpRule) FromString() string {
+	return r.From.String()
+}
+func (r RegexpRule) ToString() string {
+	return r.To
+}
+func (r RegexpRule) Type() string {
+	return "RE"
 }
 
 func (r RegexpRule) Convert(trans string, symbolset symbolset.SymbolSet) (string, error) {

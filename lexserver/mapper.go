@@ -15,8 +15,6 @@ import (
 	"strings"
 )
 
-// The calls prefixed with '/mapper/'
-
 var mMut = struct {
 	sync.RWMutex
 	service symbolset.MapperService

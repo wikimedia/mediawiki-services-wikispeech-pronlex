@@ -734,6 +734,10 @@ func main() {
 	ff("Failed to load symbol sets from dir "+symbolSetFileArea+" : %v", err)
 	log.Printf("lexserver: Loaded symbol sets from dir %s", symbolSetFileArea)
 
+	err = loadConverters(symbolSetFileArea)
+	ff("Failed to load converters from dir "+symbolSetFileArea+" : %v", err)
+	log.Printf("lexserver: Loaded converters from dir %s", symbolSetFileArea)
+
 	err = loadValidators(symbolSetFileArea)
 	ff("Failed to load validators : %v", err)
 	log.Printf("lexserver: Loaded validators : %v", validatorNames())
@@ -774,10 +778,10 @@ func main() {
 	mapper.addHandler(mapperMap)
 	mapper.addHandler(mapperMaptable)
 
-	//converter := newSubRouter(rout, "/converter")
-	//converter.addHandler(converterConvert)
-	//converter.addHandler(converterList)
-	//converter.addHandler(converterMaptable)
+	converter := newSubRouter(rout, "/converter")
+	converter.addHandler(converterConvert)
+	converter.addHandler(converterList)
+	converter.addHandler(converterTable)
 
 	admin := newSubRouter(rout, "/admin")
 	admin.addHandler(adminLexImportPage)
