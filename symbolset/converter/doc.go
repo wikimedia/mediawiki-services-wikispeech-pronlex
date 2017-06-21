@@ -8,7 +8,7 @@ Tests can also be added to verify how the conversion works.
 Fields are separated by tab.
 
 
-Sample file for US English Sampa to Swedish Sampa enusampa_svsampa.cnv:
+Sample file for US English Sampa to Swedish Sampa (defined in test_data/enusampa_svsampa.cnv):
 
      FROM	en-us_ws-sampa
      TO	sv-se_ws-sampa
