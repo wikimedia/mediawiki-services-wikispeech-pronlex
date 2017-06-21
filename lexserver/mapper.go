@@ -43,7 +43,7 @@ var mapperMap = urlHandler{
 	name:     "map",
 	url:      "/map/{from}/{to}/{trans}",
 	help:     "Maps a transcription from one symbolset to another.",
-	examples: []string{"/map/sv-se_ws-sampa/sv-se_sampa_mary/%22%22%20p%20O%20j%20.%20k%20@"},
+	examples: []string{"/map/sv-se_ws-sampa/sv-se_sampa_mary/%22%22 p O j . k @"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		fromName := getParam("from", r)
 		toName := getParam("to", r)

@@ -20,7 +20,7 @@ func (a symbolSlice) Less(i, j int) bool {
 }
 
 // SymbolSetSuffix defines the filename extension for symbol sets
-var SymbolSetSuffix = ".tab"
+var SymbolSetSuffix = ".sym"
 
 func trimIfNeeded(s string) string {
 	trimmed := strings.TrimSpace(s)

@@ -280,7 +280,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name := "NST-XSAMPA"
 // 	fromColumn := "SAMPA"
 // 	toColumn := "IPA"
-// 	fName := "test_data/sv-se_nst-xsampa.tab"
+// 	fName := "test_data/sv-se_nst-xsampa.sym"
 // 	ssmNST, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -289,7 +289,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name = "WS-SAMPA"
 // 	fromColumn = "IPA"
 // 	toColumn = "SYMBOL"
-// 	fName = "test_data/sv-se_ws-sampa.tab"
+// 	fName = "test_data/sv-se_ws-sampa.sym"
 // 	ssmWS, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -319,7 +319,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name := "CMU2IPA"
 // 	fromColumn := "CMU"
 // 	toColumn := "IPA"
-// 	fName := "test_data/en-us_cmu.tab"
+// 	fName := "test_data/en-us_cmu.sym"
 // 	ssmCMU, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -329,7 +329,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name = "IPA2MARY"
 // 	fromColumn = "IPA"
 // 	toColumn = "SYMBOL"
-// 	fName = "test_data/en-us_sampa_mary.tab"
+// 	fName = "test_data/en-us_sampa_mary.sym"
 // 	ssmMARY, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -345,7 +345,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name := "SAMPA2IPA"
 // 	fromColumn := "SYMBOL"
 // 	toColumn := "IPA"
-// 	fName := "test_data/sv-se_ws-sampa.tab"
+// 	fName := "test_data/sv-se_ws-sampa.sym"
 // 	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -355,7 +355,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name = "IPA2MARY"
 // 	fromColumn = "IPA"
 // 	toColumn = "SAMPA"
-// 	fName = "test_data/sv-se_sampa_mary.tab"
+// 	fName = "test_data/sv-se_sampa_mary.sym"
 // 	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -370,7 +370,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name := "MARY2IPA"
 // 	fromColumn := "SAMPA"
 // 	toColumn := "IPA"
-// 	fName := "test_data/sv-se_sampa_mary.tab"
+// 	fName := "test_data/sv-se_sampa_mary.sym"
 // 	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -380,7 +380,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name = "IPA2SAMPA"
 // 	fromColumn = "IPA"
 // 	toColumn = "SYMBOL"
-// 	fName = "test_data/sv-se_ws-sampa.tab"
+// 	fName = "test_data/sv-se_ws-sampa.sym"
 // 	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -392,7 +392,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	testMapTranscriptionX(t, mappers, "\" e: - p a", "\"\" e: . p a")
 // 	testMapTranscriptionX(t, mappers, "\" A: - p a", "\"\" A: . p a")
 
-// 	mapper, err := LoadMapperFromFile("SAMPA", "SYMBOL", "test_data/sv-se_sampa_mary.tab", "test_data/sv-se_ws-sampa.tab")
+// 	mapper, err := LoadMapperFromFile("SAMPA", "SYMBOL", "test_data/sv-se_sampa_mary.sym", "test_data/sv-se_ws-sampa.sym")
 // 	if err != nil {
 // 		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
 // 		return
@@ -406,7 +406,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name := "NST2IPA"
 // 	fromColumn := "SAMPA"
 // 	toColumn := "IPA"
-// 	fName := "test_data/sv-se_nst-xsampa.tab"
+// 	fName := "test_data/sv-se_nst-xsampa.sym"
 // 	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -416,7 +416,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name = "IPA2MARY"
 // 	fromColumn = "IPA"
 // 	toColumn = "SAMPA"
-// 	fName = "test_data/sv-se_sampa_mary.tab"
+// 	fName = "test_data/sv-se_sampa_mary.sym"
 // 	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -430,7 +430,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name := "NST2IPA"
 // 	fromColumn := "SAMPA"
 // 	toColumn := "IPA"
-// 	fName := "test_data/sv-se_nst-xsampa.tab"
+// 	fName := "test_data/sv-se_nst-xsampa.sym"
 // 	ssm1, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -440,7 +440,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name = "IPA2SAMPA"
 // 	fromColumn = "IPA"
 // 	toColumn = "SYMBOL"
-// 	fName = "test_data/sv-se_ws-sampa.tab"
+// 	fName = "test_data/sv-se_ws-sampa.sym"
 // 	ssm2, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -456,7 +456,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name := "MARY2IPA"
 // 	fromColumn := "SYMBOL"
 // 	toColumn := "IPA"
-// 	fName := "test_data/en-us_sampa_mary.tab"
+// 	fName := "test_data/en-us_sampa_mary.sym"
 // 	ssmMARY, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -466,7 +466,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	name = "IPA2CMU"
 // 	fromColumn = "IPA"
 // 	toColumn = "CMU"
-// 	fName = "test_data/en-us_cmu.tab"
+// 	fName = "test_data/en-us_cmu.sym"
 // 	ssmCMU, err := loadSymbolSet_(name, fName, fromColumn, toColumn)
 // 	if err != nil {
 // 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
@@ -480,7 +480,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // }
 
 // func Test_LoadMapperFromFile_MARY2CMU(t *testing.T) {
-// 	mappers, err := LoadMapperFromFile("SYMBOL", "CMU", "test_data/en-us_sampa_mary.tab", "test_data/en-us_cmu.tab")
+// 	mappers, err := LoadMapperFromFile("SYMBOL", "CMU", "test_data/en-us_sampa_mary.sym", "test_data/en-us_cmu.sym")
 // 	if err != nil {
 // 		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
 // 		return
@@ -491,7 +491,7 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // }
 
 func Test_LoadMapperFromFile_NST2WS(t *testing.T) {
-	mapper, err := LoadMapperFromFile("SAMPA", "SYMBOL", "test_data/nb-no_nst-xsampa.tab", "test_data/nb-no_ws-sampa.tab")
+	mapper, err := LoadMapperFromFile("SAMPA", "SYMBOL", "test_data/nb-no_nst-xsampa.sym", "test_data/nb-no_ws-sampa.sym")
 	if err != nil {
 		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
 		return
@@ -505,21 +505,21 @@ func Test_LoadMapperFromFile_NST2WS(t *testing.T) {
 }
 
 func Test_LoadMapperFromFile_FailIfBothHaveTheSameName(t *testing.T) {
-	_, err := LoadMapperFromFile("SAMPA", "SAMPA", "test_data/nb-no_nst-xsampa.tab", "test_data/nb-no_ws-sampa.tab")
+	_, err := LoadMapperFromFile("SAMPA", "SAMPA", "test_data/nb-no_nst-xsampa.sym", "test_data/nb-no_ws-sampa.sym")
 	if err == nil {
 		t.Errorf("LoadMapperFromFile() expected error here")
 	}
 }
 
 func Test_LoadMapperFromFile_FailIfBothHaveTheSameFile(t *testing.T) {
-	_, err := LoadMapperFromFile("XSAMPA", "SAMPA", "test_data/nb-no_nst-xsampa.tab", "test_data/nb-no_nst-xsampa.tab")
+	_, err := LoadMapperFromFile("XSAMPA", "SAMPA", "test_data/nb-no_nst-xsampa.sym", "test_data/nb-no_nst-xsampa.sym")
 	if err == nil {
 		t.Errorf("LoadMapperFromFile() expected error here")
 	}
 }
 
 func Test_MapperFromFile_CMU2WS_NoSyllDelim(t *testing.T) {
-	mapper, err := LoadMapperFromFile("ENU-CMU", "ENU-WS", "test_data/en-us_cmu-nosylldelim.tab", "test_data/en-us_ws-sampa.tab")
+	mapper, err := LoadMapperFromFile("ENU-CMU", "ENU-WS", "test_data/en-us_cmu-nosylldelim.sym", "test_data/en-us_ws-sampa.sym")
 	if err != nil {
 		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
 		return
@@ -535,7 +535,7 @@ func Test_MapperFromFile_CMU2WS_NoSyllDelim(t *testing.T) {
 }
 
 func Test_MapperFromFile_CMU2WS_WithSyllDelim(t *testing.T) {
-	mapper, err := LoadMapperFromFile("ENU-CMU", "ENU-WS", "test_data/en-us_cmu.tab", "test_data/en-us_ws-sampa.tab")
+	mapper, err := LoadMapperFromFile("ENU-CMU", "ENU-WS", "test_data/en-us_cmu.sym", "test_data/en-us_ws-sampa.sym")
 	if err != nil {
 		t.Errorf("Test_LoadMapperFromFile() didn't expect error here : %v", err)
 		return
