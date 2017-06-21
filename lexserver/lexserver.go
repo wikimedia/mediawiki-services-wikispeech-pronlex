@@ -46,6 +46,7 @@ type subRouter struct {
 	root     string
 	router   *mux.Router
 	handlers []urlHandler
+	desc     string
 }
 
 var subRouters []*subRouter
@@ -94,16 +95,17 @@ func removeInitialSlash(url string) string {
 	return initialSlashRe.ReplaceAllString(url, "")
 }
 
-func newSubRouter(rout *mux.Router, root string) *subRouter {
+func newSubRouter(rout *mux.Router, root string, description string) *subRouter {
 	var res = subRouter{
 		router: rout.PathPrefix(root).Subrouter(),
 		root:   root,
+		desc:   description,
 	}
 
 	helpHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		html := "<h1>" + removeInitialSlash(res.root) + "</h1>"
+		html := "<h1>" + removeInitialSlash(res.root) + "</h1> <em>" + res.desc + "</em>"
 		for _, handler := range res.handlers {
 			html = html + handler.helpHTML(res.root)
 		}
@@ -194,7 +196,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	html := `<h1>Lexserver</h1>`
 
 	for _, subRouter := range subRouters {
-		html = html + `<h3><a href="` + subRouter.root + `">` + removeInitialSlash(subRouter.root) + `</a></h3>`
+		html = html + `<p><a href="` + subRouter.root + `"><b>` + removeInitialSlash(subRouter.root) + `</b></a>`
+		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
 
@@ -744,27 +747,27 @@ func main() {
 
 	rout.HandleFunc("/", indexHandler)
 
-	lexicon := newSubRouter(rout, "/lexicon")
+	lexicon := newSubRouter(rout, "/lexicon", "Lexicon management")
 	lexicon.addHandler(lexiconLookup) // has its own index page
 	lexicon.addHandler(lexiconList)
 	lexicon.addHandler(lexiconInfo)
 	lexicon.addHandler(lexiconStats)
 	lexicon.addHandler(lexiconListCurrentEntryStatuses)
 	lexicon.addHandler(lexiconListAllEntryStatuses)
-	lexicon.addHandler(lexiconAddEntry)
 	lexicon.addHandler(lexiconUpdateEntry)
 	lexicon.addHandler(lexiconMoveNewEntries)
 	lexicon.addHandler(lexiconValidationPage)
 	lexicon.addHandler(lexiconValidation)
+	lexicon.addHandler(lexiconAddEntry)
 
-	validation := newSubRouter(rout, "/validation")
+	validation := newSubRouter(rout, "/validation", "Transcription validation")
 	validation.addHandler(validationValidateEntry)
 	validation.addHandler(validationValidateEntries)
 	validation.addHandler(validationListValidators)
 	validation.addHandler(validationStats)
 	validation.addHandler(validationHasValidator)
 
-	symbolset := newSubRouter(rout, "/symbolset")
+	symbolset := newSubRouter(rout, "/symbolset", "Handle transcription symbol sets")
 	symbolset.addHandler(symbolsetList)
 	symbolset.addHandler(symbolsetDelete)
 	symbolset.addHandler(symbolsetContent)
@@ -773,17 +776,17 @@ func main() {
 	symbolset.addHandler(symbolsetUploadPage)
 	symbolset.addHandler(symbolsetUpload)
 
-	mapper := newSubRouter(rout, "/mapper")
+	mapper := newSubRouter(rout, "/mapper", "Map transcriptions between different symbol sets")
 	mapper.addHandler(mapperList)
 	mapper.addHandler(mapperMap)
 	mapper.addHandler(mapperMaptable)
 
-	converter := newSubRouter(rout, "/converter")
+	converter := newSubRouter(rout, "/converter", "Convert transcriptions between languages")
 	converter.addHandler(converterConvert)
 	converter.addHandler(converterList)
 	converter.addHandler(converterTable)
 
-	admin := newSubRouter(rout, "/admin")
+	admin := newSubRouter(rout, "/admin", "Misc admin tools")
 	admin.addHandler(adminLexImportPage)
 	admin.addHandler(adminLexImport)
 	admin.addHandler(adminDeleteLex)
@@ -796,7 +799,7 @@ func main() {
 	rout.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
 	// typescript experiments
-	demo := newSubRouter(rout, "/demo")
+	demo := newSubRouter(rout, "/demo", "Search demo for testing (using typesscript)")
 	var searchDemoHandler = urlHandler{
 		name:     "search demo page",
 		url:      "/search",
