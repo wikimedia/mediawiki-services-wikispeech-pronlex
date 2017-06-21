@@ -1,10 +1,11 @@
-/*Package converter is used to convert between symbol sets from different languages. Simple mapping tables and conversion rules.
+/*Package converter is used to convert between symbol sets from different languages.
 
 Each converter is defined in a .cnv file including symbol set names and conversion rules. The rules are either
 (1) simple symbol mapping
-(2) regexp rules
+(2) regular expression rules (using the https://github.com/dlclark/regexp2 implementation)
 
 Tests can also be added to verify how the conversion works.
+Fields are separated by tab.
 
 
 Sample file for US English Sampa to Swedish Sampa enusampa_svsampa.cnv:
