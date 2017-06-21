@@ -8,6 +8,7 @@ import (
 	"github.com/stts-se/pronlex/symbolset"
 )
 
+// Converter is used to convert between symbol sets from different languages.
 type Converter struct {
 	Name  string
 	From  symbolset.SymbolSet
@@ -62,13 +63,24 @@ func (c Converter) getInvalidSymbols(trans string, symbolset symbolset.SymbolSet
 }
 
 type Rule interface {
+
+	// FromString returns a string representation of the rule's input field
 	FromString() string
+
+	// ToString returns a string representation of the rule's output field
 	ToString() string
+
+	// Type returns the rule type (SYMBOL or RE)
 	Type() string
+
+	// Convert is used to execute the conversion for this rule
 	Convert(trans string, symbolset symbolset.SymbolSet) (string, error)
+
+	// String returns a tab separated string representation of the rule
 	String() string
 }
 
+// SymbolRule is a simple rule that maps from one phoneme symbol to another
 type SymbolRule struct {
 	From string
 	To   string
@@ -81,9 +93,11 @@ func (r SymbolRule) String() string {
 func (r SymbolRule) FromString() string {
 	return r.From
 }
+
 func (r SymbolRule) ToString() string {
 	return r.To
 }
+
 func (r SymbolRule) Type() string {
 	return "SYMBOL"
 }
@@ -105,6 +119,7 @@ func (r SymbolRule) Convert(trans string, symbolset symbolset.SymbolSet) (string
 	return strings.Join(res, symbolset.PhonemeDelimiter.String), nil
 }
 
+// RegexpRule is used to convert from one symbol set to another using regular expressions
 type RegexpRule struct {
 	From *regexp2.Regexp
 	To   string
@@ -117,6 +132,7 @@ func (r RegexpRule) String() string {
 func (r RegexpRule) FromString() string {
 	return r.From.String()
 }
+
 func (r RegexpRule) ToString() string {
 	return r.To
 }

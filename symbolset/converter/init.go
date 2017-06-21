@@ -280,7 +280,7 @@ func (c Converter) testInternals() (TestResult, error) {
 		var hasSymbolRule = false
 		for _, rule := range c.Rules {
 			if reflect.TypeOf(rule).Name() == "SymbolRule" {
-				var sr SymbolRule = rule.(SymbolRule)
+				var sr = rule.(SymbolRule)
 				if sr.From == symbol {
 					hasSymbolRule = true
 				}
@@ -294,7 +294,7 @@ func (c Converter) testInternals() (TestResult, error) {
 	// for each symbol rule, check that input is defined in c.From, and output is defined in c.To
 	for _, rule := range c.Rules {
 		if reflect.TypeOf(rule).Name() == "SymbolRule" {
-			var sr SymbolRule = rule.(SymbolRule)
+			var sr = rule.(SymbolRule)
 			invalid, err := c.getInvalidSymbols(sr.From, c.From)
 			if err != nil {
 				return TestResult{}, err
@@ -310,7 +310,7 @@ func (c Converter) testInternals() (TestResult, error) {
 				errors = append(errors, fmt.Sprintf("Invalid symbol(s) in output transcription for rule %s: %v", rule, invalid))
 			}
 		} else if reflect.TypeOf(rule).Name() == "RegexpRule" {
-			var rr RegexpRule = rule.(RegexpRule)
+			var rr = rule.(RegexpRule)
 			invalid, err := c.getInvalidSymbols(rr.To, c.To)
 			if err != nil {
 				return TestResult{}, err
