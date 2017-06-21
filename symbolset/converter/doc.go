@@ -1,7 +1,7 @@
 /*Package converter is used to convert between symbol sets from different languages.
 
 Each converter is defined in a .cnv file including symbol set names and conversion rules. The rules are either
-(1) simple symbol mapping
+(1) simple symbol mapping; or
 (2) regular expression rules (using the https://github.com/dlclark/regexp2 implementation)
 
 Tests can also be added to verify how the conversion works.
