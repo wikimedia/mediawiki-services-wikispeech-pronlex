@@ -774,8 +774,8 @@ func main() {
 	mapper.addHandler(mapperMap)
 	mapper.addHandler(mapperMaptable)
 
-	converter := newSubRouter(rout, "/converter")
-	converter.addHandler(converterConvert)
+	//converter := newSubRouter(rout, "/converter")
+	//converter.addHandler(converterConvert)
 	//converter.addHandler(converterList)
 	//converter.addHandler(converterMaptable)
 
