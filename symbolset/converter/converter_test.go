@@ -1,7 +1,6 @@
 package converter
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -20,7 +19,6 @@ func TestLoadFromDir(t *testing.T) {
 		return
 	}
 	for name, res := range testRes {
-		fmt.Println(name, res.OK)
 		if !res.OK && !strings.Contains(name, "FAIL") {
 			for _, err := range res.Errors {
 				t.Errorf("%s: %s", name, err)
