@@ -169,7 +169,7 @@ func LoadFile(symbolSets map[string]symbolset.SymbolSet, fName string) (Converte
 	return converter, testRes, nil
 }
 
-var Suffix = ".txt"
+var Suffix = ".cnv"
 
 // LoadFromDir loads a all symbol sets from the specified folder (all files with .tab extension)
 func LoadFromDir(symbolSets map[string]symbolset.SymbolSet, dirName string) (map[string]Converter, map[string]TestResult, error) {

@@ -774,6 +774,11 @@ func main() {
 	mapper.addHandler(mapperMap)
 	mapper.addHandler(mapperMaptable)
 
+	converter := newSubRouter(rout, "/converter")
+	converter.addHandler(converterConvert)
+	//converter.addHandler(converterList)
+	//converter.addHandler(converterMaptable)
+
 	admin := newSubRouter(rout, "/admin")
 	admin.addHandler(adminLexImportPage)
 	admin.addHandler(adminLexImport)
