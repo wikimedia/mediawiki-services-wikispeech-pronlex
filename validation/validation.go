@@ -133,6 +133,40 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 	return result, nil
 }
 
+// HL test 20170622
+func (v Validator) ValidateEntryConcurrent(e lex.Entry) (lex.Entry, bool) {
+	e.EntryValidations = make([]lex.EntryValidation, 0)
+
+	resCh := make(chan Result)
+	defer close(resCh)
+
+	for _, rule := range v.Rules {
+		go func(rule Rule, e0 lex.Entry, ch chan Result) {
+			res, err := rule.Validate(e0)
+			if err != nil {
+				ch <- Result{
+					RuleName: "System",
+					Level:    "Error",
+					Messages: []string{fmt.Sprintf("error when validating word '%s' with rule %s : %v", e0.Strn, res.RuleName, err)},
+				}
+			}
+			ch <- res
+		}(rule, e, resCh)
+	}
+	for i := 0; i < len(v.Rules); i++ {
+		r := <-resCh
+		for _, msg := range r.Messages {
+			var ev = lex.EntryValidation{
+				RuleName: r.RuleName,
+				Level:    r.Level,
+				Message:  msg,
+			}
+			e.EntryValidations = append(e.EntryValidations, ev)
+		}
+	}
+	return e, len(e.EntryValidations) == 0
+}
+
 // ValidateEntry is used to validate single entries. Any validation
 // errors are added to the entry's EntryValidations field. The
 // function returns true if the entry is valid (i.e., no validation

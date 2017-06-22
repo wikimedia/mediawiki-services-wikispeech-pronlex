@@ -305,3 +305,37 @@ func Test_TestSuite_Invalid(t *testing.T) {
 		t.Errorf("Didn't expect validator suite to test without errors. Found %#v", res)
 	}
 }
+
+func Test_ValidateEntryConcurrent(t *testing.T) {
+	v := test_createValidator()
+	es0 := test_createEntries()
+
+	var eVals1 []string
+	var es []lex.Entry
+	for _, e := range es0 {
+		for i := 0; i < 100000; i++ {
+			//e, _ = v.ValidateEntryConcurrent(e)
+			e, _ = v.ValidateEntry(e)
+			for _, v := range e.EntryValidations {
+				eVals1 = append(eVals1, v.String())
+			}
+			es = append(es, e)
+		}
+	}
+	sort.Strings(eVals1)
+	if len(eVals1) < 1 {
+		t.Errorf(fs, ">1", len(eVals1))
+	}
+	var eVals2 []string // eVals2 := make([]string, 0)
+	for _, e := range es {
+		for _, v := range e.EntryValidations {
+			eVals2 = append(eVals2, v.String())
+		}
+	}
+	sort.Strings(eVals2)
+
+	if !reflect.DeepEqual(eVals1, eVals2) {
+		t.Errorf(fs, eVals1, eVals2)
+	}
+
+}

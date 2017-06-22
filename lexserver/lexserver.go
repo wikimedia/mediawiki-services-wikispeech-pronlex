@@ -747,7 +747,7 @@ func main() {
 
 	rout.HandleFunc("/", indexHandler)
 
-	lexicon := newSubRouter(rout, "/lexicon", "Lexicon management")
+	lexicon := newSubRouter(rout, "/lexicon", "Lexicon management/admin, including full validation")
 	lexicon.addHandler(lexiconLookup) // has its own index page
 	lexicon.addHandler(lexiconList)
 	lexicon.addHandler(lexiconInfo)
@@ -760,7 +760,7 @@ func main() {
 	lexicon.addHandler(lexiconValidation)
 	lexicon.addHandler(lexiconAddEntry)
 
-	validation := newSubRouter(rout, "/validation", "Transcription validation")
+	validation := newSubRouter(rout, "/validation", "Transcription/entry validation")
 	validation.addHandler(validationValidateEntry)
 	validation.addHandler(validationValidateEntries)
 	validation.addHandler(validationListValidators)
