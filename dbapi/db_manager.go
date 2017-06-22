@@ -56,7 +56,7 @@ func (dbm DBManager) RemoveDB(name string) error {
 	return nil
 }
 
-func (dbm DBManager) DefineLexicon(dbName string, lexes ...string) error {
+func (dbm DBManager) DefineLexicon(dbName string, symbolSetName string, lexes ...string) error {
 	dbName = strings.TrimSpace(dbName)
 	dbName = strings.ToLower(dbName)
 
@@ -70,7 +70,7 @@ func (dbm DBManager) DefineLexicon(dbName string, lexes ...string) error {
 		}
 		l = strings.TrimSpace(l)
 		l = strings.ToLower(l)
-		_, err := InsertLexicon(db, Lexicon{Name: l})
+		_, err := InsertLexicon(db, Lexicon{Name: l, SymbolSetName: symbolSetName})
 		if err != nil {
 			return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s:%s' : %v", dbName, l, err)
 		}
@@ -154,10 +154,10 @@ func (dbm DBManager) ListLexicons() ([]string, error) {
 	dbs := dbm.dbs
 	// Go ask each db instance in its own Go-routine
 	for dbName, db := range dbs {
-		go func(dbName string, db *sql.DB, ch chan lexRes) {
+		go func(dbName string, db *sql.DB, ch0 chan lexRes) {
 			lexs, err := ListLexicons(db)
 			r := lexRes{dbName: dbName, lexs: lexs, err: err}
-			ch <- r
+			ch0 <- r
 		}(dbName, db, ch)
 	}
 
@@ -186,7 +186,7 @@ func (dbm DBManager) ListLexicons() ([]string, error) {
 	return res, nil
 }
 
-func (dbm DBManager) InsertEntries(fullLexiconName string, entries ...[]lex.Entry) ([]int64, error) {
+func (dbm DBManager) InsertEntries(fullLexiconName string, entries []lex.Entry) ([]int64, error) {
 
 	var res []int64
 
@@ -203,7 +203,17 @@ func (dbm DBManager) InsertEntries(fullLexiconName string, entries ...[]lex.Entr
 		return res, fmt.Errorf("DBManager.InsertEntries: unknown db '%s'", dbName)
 	}
 
-	_ = db
-	_ = lexName
-	return res, nil // InsertEntries(db, entries)
+	//_ = db
+	//_ = lexName
+	l, err := GetLexicons(db, []string{lexName})
+	fmt.Printf("%v\n", l[0])
+	if err != nil {
+		return res, fmt.Errorf("DBManager.InsertEntries failed call to GetLexicons : %v", err)
+	}
+	fmt.Println(lexName)
+	res, err = InsertEntries(db, l[0], entries)
+	if err != nil {
+		return res, fmt.Errorf("DBManager.InsertEntries failed: %v", err)
+	}
+	return res, err
 }

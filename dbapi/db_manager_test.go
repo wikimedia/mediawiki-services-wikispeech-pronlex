@@ -120,11 +120,11 @@ func Test_DBManager(t *testing.T) {
 	l2_2 := "zuperlex2"
 	l2_3 := "zuperduperlex"
 
-	err = dbm.DefineLexicon("db1", l1_1, l1_2, l1_3)
+	err = dbm.DefineLexicon("db1", "sv_sampa", l1_1, l1_2, l1_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}
-	err = dbm.DefineLexicon("db2", l2_1, l2_2, l2_3)
+	err = dbm.DefineLexicon("db2", "sv_sampa", l2_1, l2_2, l2_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}
@@ -164,7 +164,18 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("expected db not found: '%s'", w)
 	}
 
-	e1 := lex.Entry{Strn: "hus", Transcriptions: []lex.Transcription{lex.Transcription{Strn: `" h u: s`}}}
+	//e1 := lex.Entry{Strn: "hus", Transcriptions: []lex.Transcription{lex.Transcription{Strn: `" h u: s`}}}
+	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
+	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}
+
+	e1 := lex.Entry{Strn: "apa",
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apa",
+		Language:       "XYZZ",
+		Preferred:      true,
+		Transcriptions: []lex.Transcription{t1, t2},
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
 	ids, err := dbm.InsertEntries("db2:zuperduperlex", []lex.Entry{e1})
 	if w, g := 1, len(ids); w != g {
