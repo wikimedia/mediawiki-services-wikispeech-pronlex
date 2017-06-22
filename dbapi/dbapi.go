@@ -535,6 +535,7 @@ var transAfterEntrySTMT = "insert into transcription (entryid, strn, language, s
 var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
+// TODO: Change second input argument to string (lexicon name) instead of Lexicon struct.
 // TODO change input arg to sql.Tx
 func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 
