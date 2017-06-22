@@ -6,9 +6,11 @@ import (
 	"log"
 	"os"
 	"testing"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
-func Test_ListLexicon(t *testing.T) {
+func Test_DBManager(t *testing.T) {
 
 	dbPath1 := "./testlex_listlex1.db"
 	dbPath2 := "./testlex_listlex2.db"
@@ -118,6 +120,16 @@ func Test_ListLexicon(t *testing.T) {
 
 	if w := "db2:zuperduperlex"; !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
+	}
+
+	e1 := lex.Entry{Strn: "hus", Transcriptions: []lex.Transcription{lex.Transcription{Strn: `" h u: s`}}}
+
+	ids, err := dbm.InsertEntries("db2:zuperduperlex", []lex.Entry{e1})
+	if w, g := 1, len(ids); w != g {
+		t.Errorf("Wanted %v got %v", w, g)
+	}
+	if err != nil {
+		t.Errorf("dbm.InsertEntries: %v", err)
 	}
 
 	//fmt.Printf("%v\n", lexs)

@@ -92,6 +92,23 @@ func (dbm DBManager) ListDBNames() []string {
 	return res
 }
 
+func splitFullLexiconName(fullLexName string) (string, string, error) {
+	nameSplit := strings.SplitN(strings.TrimSpace(fullLexName), ":", 2)
+	if len(nameSplit) == 2 {
+		return "", "", fmt.Errorf("DBManager.splitFullLexiconName: failed to split full lexicon name into two colon separated parts: '%s'", fullLexName)
+	}
+	db := nameSplit[0]
+	if "" == db {
+		return "", "", fmt.Errorf("DBManager.splitFullLexiconName: db part of lexicon name empty: '%s'", fullLexName)
+	}
+	lex := nameSplit[1]
+	if "" == lex {
+		return "", "", fmt.Errorf("DBManager.splitFullLexiconName: lexicon part of full lexicon name empty: '%s'", fullLexName)
+	}
+
+	return db, lex, nil
+}
+
 // TODO This turned out somewhat ugly: the Query.Lexicon field is
 // overwritten by the full (DB+lexicon name) lexicon names. The Query
 // will be copied and instantiated with the Lexicon field for each DB.
@@ -101,13 +118,11 @@ func (dbm DBManager) LookUp(fullLexiconNames []string, q Query) (map[string][]le
 
 	dbz := make(map[string][]string)
 	for _, n := range fullLexiconNames {
-		nameSplit := strings.SplitN(n, ":", 2)
-		if len(nameSplit) == 2 {
-			return res, fmt.Errorf("DBManager.LookUp: failed to split full lexicon name into two colon separated parts: '%s'", n)
-		}
 		// TODO: error check (for empty string, etc)
-		db := nameSplit[0]
-		lex := nameSplit[1]
+		db, lex, err := splitFullLexiconName(n)
+		if err != nil {
+			return res, fmt.Errorf("DBManager.LookUp: invalid db name '%s' : %v", n, err)
+		}
 		lexList := dbz[db]
 		dbz[db] = append(lexList, lex)
 	}
@@ -171,27 +186,18 @@ func (dbm DBManager) ListLexicons() ([]string, error) {
 	return res, nil
 }
 
-// func (dbm DBManager) ListLexicons0() ([]string, error) {
-// 	var res []string
+func (dbm DBManager) InsertEntries(fullLexiconName string, entries ...[]lex.Entry) ([]int64, error) {
 
-// 	dbm.RLock()
-// 	defer dbm.RUnlock()
+	var res []int64
 
-// 	for dbName, db := range dbm.dbs {
-// 		lexs, err := ListLexicons(db)
-// 		if err != nil {
-// 			return res, fmt.Errorf("DBManager.ListLexicons : %v", err)
-// 		}
+	dbm.Lock()
+	defer dbm.Unlock()
 
-// 		// l is a dbapi.Lexicon struct
-// 		for _, l := range lexs {
-// 			// A full lexicon name consists of the name of
-// 			// the db and the name of the lexicon in the
-// 			// db joined by ':'
-// 			fullName := dbName + ":" + strings.TrimSpace(l.Name)
-// 			res = append(res, fullName)
-// 		}
-// 	}
+	dbName, lexName, err := splitFullLexiconName(fullLexiconName)
+	db, ok := dbm.dbs[dbName]
+	if !ok {
+		return res, fmt.Errorf("DBManager.InsertEntries: unknown db '%s'", dbName)
+	}
 
-// 	return res, nil
-// }
+	return InsertEntries(db, entries)
+}
