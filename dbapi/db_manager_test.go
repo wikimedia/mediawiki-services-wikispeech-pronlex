@@ -2,7 +2,7 @@ package dbapi
 
 import (
 	"database/sql"
-	//"fmt"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -183,6 +183,17 @@ func Test_DBManager(t *testing.T) {
 	}
 	if err != nil {
 		t.Errorf("dbm.InsertEntries: %v", err)
+	}
+
+	q := Query{Words: []string{"apa"}}
+	lookRes, err := dbm.LookUp([]string{"db2:zuperduperlex"}, q)
+	if w, g := 1, len(lookRes); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+	ents := lookRes["db2"]
+	//fmt.Printf("%v\n", ents)
+	if w, g := 1, len(ents); w != g {
+		t.Errorf("wanted %d got %d", w, g)
 	}
 
 	//fmt.Printf("%v\n", lexs)

@@ -131,6 +131,21 @@ func (dbm DBManager) LookUp(fullLexiconNames []string, q Query) (map[string][]le
 	defer dbm.RUnlock()
 
 	// TODO: Concurrent dbap.LookUp loop
+	for dbN, lexs := range dbz {
+		db, ok := dbm.dbs[dbN]
+		if !ok {
+			return res, fmt.Errorf("DBManager.LookUp: no db of name '%s'", dbN)
+		}
+		lexs0, err := GetLexicons(db, lexs)
+		if err != nil {
+			return res, fmt.Errorf("DBManager.LookUp: failed db query : %v", err)
+		}
+		q.Lexicons = lexs0
+		ew := lex.EntrySliceWriter{}
+
+		err = LookUp(db, q, &ew)
+		res[dbN] = ew.Entries
+	}
 
 	return res, nil
 }
@@ -205,13 +220,13 @@ func (dbm DBManager) InsertEntries(fullLexiconName string, entries []lex.Entry) 
 
 	//_ = db
 	//_ = lexName
-	l, err := GetLexicons(db, []string{lexName})
-	fmt.Printf("%v\n", l[0])
+	l, err := GetLexicon(db, lexName)
+	fmt.Printf("%v\n", l)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries failed call to GetLexicons : %v", err)
 	}
 	fmt.Println(lexName)
-	res, err = InsertEntries(db, l[0], entries)
+	res, err = InsertEntries(db, l, entries)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries failed: %v", err)
 	}
