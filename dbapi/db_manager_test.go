@@ -222,6 +222,50 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("wanted %d got %d", w, g)
 	}
 
+	t2_1 := lex.Transcription{Strn: "u: p a", Language: "Svetsko"}
+	t2_2 := lex.Transcription{Strn: "u pp a", Language: "svinspråket"}
+
+	e2 := lex.Entry{Strn: "upa",
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apa",
+		Language:       "XYZZ",
+		Preferred:      true,
+		Transcriptions: []lex.Transcription{t2_1, t2_2},
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+	e3 := lex.Entry{Strn: "uppa",
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apa",
+		Language:       "XYZZ",
+		Preferred:      true,
+		Transcriptions: []lex.Transcription{t2_1, t2_2},
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+
+	idz, err := dbm.InsertEntries("db1:zuperlex3", []lex.Entry{e2, e3})
+	if len(idz) != 2 {
+		t.Errorf("Freaky!")
+	}
+	if err != nil {
+		t.Errorf("gah! : %v", err)
+	}
+
+	lookRez, err := dbm.LookUp([]string{"db2:zuperduperlex", "db1:zuperlex1", "db1:zuperlex3"}, Query{WordRegexp: "."})
+	//fmt.Printf("%v\n", lookRez)
+	if err != nil {
+		t.Errorf("geh! : %v", err)
+	}
+	if w, g := 2, len(lookRez); w != g {
+		t.Errorf("wated %d got %d", w, g)
+	}
+
+	if w, g := 3, len(lookRez["db1"]); w != g {
+		t.Errorf("wated %d got %d", w, g)
+	}
+	if w, g := 1, len(lookRez["db2"]); w != g {
+		t.Errorf("wated %d got %d", w, g)
+	}
+
 	fmt.Printf("")
 	//fmt.Printf("%v\n", lexs)
 }

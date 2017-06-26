@@ -13,28 +13,39 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"reflect"
+	"regexp"
+	"strconv"
+	"strings"
+	"sync"
 	"time"
 
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/lex"
 	//"github.com/stts-se/pronlex/validation"
-	"reflect"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
-var remem = make(map[string]*regexp.Regexp)
+var remem = struct {
+	sync.Mutex
+	re map[string]*regexp.Regexp
+}{
+	re: make(map[string]*regexp.Regexp),
+}
+
 var regexMem = func(re, s string) (bool, error) {
-	if r, ok := remem[re]; ok {
+
+	remem.Lock()
+	defer remem.Unlock()
+	if r, ok := remem.re[re]; ok {
 		return r.MatchString(s), nil
 	}
+
 	r, err := regexp.Compile(re)
 	if err != nil {
 		return false, err
 	}
-	remem[re] = r
+	remem.re[re] = r
 	return r.MatchString(s), nil
 }
 
