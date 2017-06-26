@@ -109,6 +109,12 @@ func splitFullLexiconName(fullLexName string) (string, string, error) {
 	return db, lex, nil
 }
 
+type lookUp struct {
+	dbName  string
+	entries []lex.Entry
+	err     error
+}
+
 // TODO This turned out somewhat ugly: the Query.Lexicon field is
 // overwritten by the full (DB+lexicon name) lexicon names. The Query
 // will be copied and instantiated with the Lexicon field for each DB.
@@ -131,20 +137,46 @@ func (dbm DBManager) LookUp(fullLexiconNames []string, q Query) (map[string][]le
 	defer dbm.RUnlock()
 
 	// TODO: Concurrent dbap.LookUp loop
+	ch := make(chan lookUp)
 	for dbN, lexs := range dbz {
 		db, ok := dbm.dbs[dbN]
 		if !ok {
 			return res, fmt.Errorf("DBManager.LookUp: no db of name '%s'", dbN)
 		}
-		lexs0, err := GetLexicons(db, lexs)
-		if err != nil {
-			return res, fmt.Errorf("DBManager.LookUp: failed db query : %v", err)
-		}
-		q.Lexicons = lexs0
-		ew := lex.EntrySliceWriter{}
 
-		err = LookUp(db, q, &ew)
-		res[dbN] = ew.Entries
+		go func(db0 *sql.DB, dbName string, lexNames []string) {
+			rez := lookUp{}
+			rez.dbName = dbName
+			lexs0, err := GetLexicons(db0, lexNames)
+			if err != nil {
+				rez.err = fmt.Errorf("DBManager.LookUp: failed db query : %v", err)
+				ch <- rez
+				return
+			}
+			q.Lexicons = lexs0
+			ew := lex.EntrySliceWriter{}
+			err = LookUp(db, q, &ew)
+			if err != nil {
+				rez.err = fmt.Errorf("DBManager.LookUp dbapi.LookUp failed : %v", err)
+				ch <- rez
+				return
+			}
+			rez.entries = ew.Entries
+			ch <- rez
+			//res[dbN] = ew.Entries
+		}(db, dbN, lexs)
+	}
+
+	for i := 0; i < len(dbz); i++ {
+		lkUp := <-ch
+		if lkUp.err != nil {
+			return res, fmt.Errorf("DBManager.LookUp failed : %v", lkUp.err)
+		}
+
+		if _, ok := res[lkUp.dbName]; ok {
+			return res, fmt.Errorf("DBManage.LookUp: returned several result for single DB '%s'", lkUp.dbName)
+		}
+		res[lkUp.dbName] = lkUp.entries
 	}
 
 	return res, nil
