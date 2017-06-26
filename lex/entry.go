@@ -94,7 +94,8 @@ type Lemma struct {
 // the entry db table, since it contains data also from associated
 // tables (Lemma, Transcription)
 type Entry struct {
-	ID               int64             `json:"id"`
+	ID int64 `json:"id"`
+	// TODO Change LexiconID into LexiconName string
 	LexiconID        int64             `json:"lexiconId"`
 	Strn             string            `json:"strn"`
 	Language         string            `json:"language"`
