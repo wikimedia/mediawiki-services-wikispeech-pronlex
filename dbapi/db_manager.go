@@ -221,11 +221,11 @@ func (dbm DBManager) InsertEntries(fullLexiconName string, entries []lex.Entry) 
 	//_ = db
 	//_ = lexName
 	l, err := GetLexicon(db, lexName)
-	fmt.Printf("%v\n", l)
+	//fmt.Printf("%v\n", l)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries failed call to GetLexicons : %v", err)
 	}
-	fmt.Println(lexName)
+	//fmt.Println(lexName)
 	res, err = InsertEntries(db, l, entries)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries failed: %v", err)

@@ -196,5 +196,32 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("wanted %d got %d", w, g)
 	}
 
+	ids, err = dbm.InsertEntries("db1:zuperlex1", []lex.Entry{e1})
+	if w, g := 1, len(ids); w != g {
+		t.Errorf("Wanted %v got %v", w, g)
+	}
+	if err != nil {
+		t.Errorf("dbm.InsertEntries: %v", err)
+	}
+
+	lookRes, err = dbm.LookUp([]string{"db2:zuperduperlex", "db1:zuperlex1"}, q)
+	if w, g := 2, len(lookRes); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+	if err != nil {
+		t.Errorf("dbm.InsertEntries: %v", err)
+	}
+	ents = lookRes["db2"]
+	//fmt.Printf("%v\n", ents)
+	if w, g := 1, len(ents); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+	ents = lookRes["db1"]
+	//fmt.Printf("%v\n", ents)
+	if w, g := 1, len(ents); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+
+	fmt.Printf("")
 	//fmt.Printf("%v\n", lexs)
 }
