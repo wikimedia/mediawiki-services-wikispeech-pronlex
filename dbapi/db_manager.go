@@ -136,7 +136,6 @@ func (dbm DBManager) LookUp(fullLexiconNames []string, q Query) (map[string][]le
 	dbm.RLock()
 	defer dbm.RUnlock()
 
-	// TODO: Concurrent dbap.LookUp loop
 	ch := make(chan lookUp)
 	for dbN, lexs := range dbz {
 		db, ok := dbm.dbs[dbN]
