@@ -32,8 +32,8 @@ const (
 	Lang
 
 	// Preferred field to use label certain entries preferred over other ones with the same orthography; 1 = preferred, 0 = not preferred; Schema triggers only one preferred per orthographic word
-	Preferred 
-	
+	Preferred
+
 	// Trans1 the primary transcription
 	Trans1
 
@@ -135,7 +135,7 @@ func NewFormat(name string, fieldSep string, fields map[Field]int, nFields int, 
 		}
 	}
 	if len(errs) > 0 {
-		return Format{}, fmt.Errorf(strings.Join(errs, " : "))
+		return Format{}, fmt.Errorf("%s", strings.Join(errs, " : "))
 	}
 	return f, nil
 }
@@ -144,7 +144,7 @@ func NewFormat(name string, fieldSep string, fields map[Field]int, nFields int, 
 func (f Format) Parse(line string) (map[Field]string, error) {
 	inputFields := strings.Split(line, f.FieldSep)
 	if len(inputFields) != f.NFields {
-		return make(map[Field]string), fmt.Errorf("expected %v fields, found %v, %s", f.NFields, len(inputFields), line)
+		return make(map[Field]string), fmt.Errorf("expected %v fields, found %v:\t%s", f.NFields, len(inputFields), line)
 	}
 	var res = make(map[Field]string)
 	for field, i := range f.Fields {

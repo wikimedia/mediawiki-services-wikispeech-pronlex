@@ -4,9 +4,9 @@ package line
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
-	
+	"strings"
+
 	"github.com/stts-se/pronlex/lex"
 )
 
@@ -51,7 +51,7 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 		err := fmt.Errorf("couldn't convert string to boolean preferred field: %v", err)
 		return res, fmt.Errorf("parse to entry failed : %v", err)
 	}
-	
+
 	return res, nil
 }
 
@@ -82,7 +82,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 	fs[Lang] = e.Language
 	fs[WordParts] = e.WordParts
 	fs[Preferred] = strconv.FormatBool(e.Preferred)
-	
+
 	fs[Pos] = e.PartOfSpeech
 	fs[Morph] = e.Morphology
 
