@@ -13,28 +13,39 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"reflect"
+	"regexp"
+	"strconv"
+	"strings"
+	"sync"
 	"time"
 
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/lex"
 	//"github.com/stts-se/pronlex/validation"
-	"reflect"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
-var remem = make(map[string]*regexp.Regexp)
+var remem = struct {
+	sync.Mutex
+	re map[string]*regexp.Regexp
+}{
+	re: make(map[string]*regexp.Regexp),
+}
+
 var regexMem = func(re, s string) (bool, error) {
-	if r, ok := remem[re]; ok {
+
+	remem.Lock()
+	defer remem.Unlock()
+	if r, ok := remem.re[re]; ok {
 		return r.MatchString(s), nil
 	}
+
 	r, err := regexp.Compile(re)
 	if err != nil {
 		return false, err
 	}
-	remem[re] = r
+	remem.re[re] = r
 	return r.MatchString(s), nil
 }
 
@@ -535,6 +546,7 @@ var transAfterEntrySTMT = "insert into transcription (entryid, strn, language, s
 var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
+// TODO: Change second input argument to string (lexicon name) instead of Lexicon struct.
 // TODO change input arg to sql.Tx
 func InsertEntries(db *sql.DB, l Lexicon, es []lex.Entry) ([]int64, error) {
 

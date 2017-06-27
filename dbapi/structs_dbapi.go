@@ -12,6 +12,7 @@ import (
 // TODO add boolean for include/exclude (i.e., "NOT" in the generated SQL).
 type Query struct {
 	// Lexicons to be searched. Empty means 'all' (TODO I think)
+	// TODO Change []Lexicon into []string
 	Lexicons []Lexicon `json:"lexicons"`
 	// list of words to get corresponding entries for
 	Words []string `json:"words"`
