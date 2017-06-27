@@ -824,15 +824,30 @@ func main() {
 	})
 	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
+	var urls = []string{}
 	rout.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-		t, err := route.GetPathTemplate()
+		url, err := route.GetPathTemplate()
 		if err != nil {
 			return err
 		}
-		if !isStaticPage(t) && !isHandeledPage(t) {
-			log.Print("Unhandeled url: ", t)
+		urls = append(urls, url)
+		if !isStaticPage(url) && !isHandeledPage(url) {
+			log.Print("Unhandeled url: ", url)
 		}
 		return nil
+	})
+
+	meta := newSubRouter(rout, "/meta", "Meta API calls (list served URLs, etc)")
+	meta.addHandler(urlHandler{
+		name:     "API URLs",
+		url:      "/urls",
+		help:     "Lists all API urls.",
+		examples: []string{"/urls"},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			fmt.Fprint(w, "Served URLS:\n\n")
+			fmt.Fprint(w, strings.Join(urls, "\n"))
+		},
 	})
 
 	// Pinging connected websocket clients
