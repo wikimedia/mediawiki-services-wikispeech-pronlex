@@ -38,6 +38,145 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run()) // should be here
 }
 
+func Test_SuperDeleteLexicon(t *testing.T) {
+
+	dbPath := "./testlex_superdelete.db"
+
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		err := os.Remove(dbPath)
+		ff("failed to remove "+dbPath+" : %v", err)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	defer db.Close()
+
+	_, err = execSchema(db) // Creates new lexicon database
+
+	ff("Failed to create lexicon db: %v", err)
+
+	// TODO Borde returnera error
+	//CreateTables(db, cmds)
+
+	l := Lexicon{Name: "test", SymbolSetName: "ZZ"}
+
+	l, err = DefineLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	lxs, err := ListLexicons(db)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(lxs) != 1 {
+		t.Errorf(fs, 1, len(lxs))
+	}
+	if lxs[0].Name != "test" {
+		t.Errorf(fs, "test", lxs[0].Name)
+	}
+	if lxs[0].ID <= 0 {
+		t.Errorf(fs, ">0", lxs[0].ID)
+	}
+	if lxs[0].SymbolSetName != "ZZ" {
+		t.Errorf(fs, "ZZ", lxs[0].SymbolSetName)
+	}
+
+	lx, err := GetLexicon(db, "test")
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+	if w, g := "test", lx.Name; w != g {
+		t.Errorf("Wanted %s got %s", w, g)
+	}
+	if w, g := "ZZ", lx.SymbolSetName; w != g {
+		t.Errorf("Wanted %s got %s", w, g)
+	}
+	lx, err = GetLexicon(db, "xyzzhga_skdjdj")
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+	if w, g := "", lx.Name; w != g {
+		t.Errorf("Wanted empty string, got '%s'", g)
+	}
+
+	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
+	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}
+
+	e1 := lex.Entry{Strn: "apa",
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apa",
+		Language:       "XYZZ",
+		Preferred:      true,
+		Transcriptions: []lex.Transcription{t1, t2},
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+
+	t1 = lex.Transcription{Strn: "A: p a n", Language: "Svetsko"}
+	t2 = lex.Transcription{Strn: "a pp a n", Language: "svinspråket"}
+
+	e2 := lex.Entry{Strn: "apan",
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apa",
+		Language:       "XYZZ",
+		Preferred:      true,
+		Transcriptions: []lex.Transcription{t1, t2},
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+
+	_, errx := InsertEntries(db, l, []lex.Entry{e1, e2})
+	if errx != nil {
+		t.Errorf(fs, "nil", errx)
+	}
+
+	// Check that there are things in db:
+	q := Query{Page: 0, PageLength: 25}
+
+	entries, err := LookUpIntoMap(db, q) // GetEntries(db, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if got, want := len(entries), 2; got != want {
+		t.Errorf(fs, got, want)
+	}
+	lexes, err := ListLexicons(db)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if got, want := len(lexes), 1; got != want {
+		t.Errorf(fs, got, want)
+	}
+
+	SuperDeleteLexicon(db, "test")
+
+	entries, err = LookUpIntoMap(db, q) // GetEntries(db, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if got, want := len(entries), 0; got != want {
+		t.Errorf(fs, got, want)
+	}
+
+	lexes, err = ListLexicons(db)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if got, want := len(lexes), 0; got != want {
+		t.Errorf(fs, got, want)
+	}
+
+}
+
 func Test_InsertEntries(t *testing.T) {
 
 	dbPath := "./testlex.db"
@@ -70,7 +209,7 @@ func Test_InsertEntries(t *testing.T) {
 
 	l := Lexicon{Name: "test", SymbolSetName: "ZZ"}
 
-	l, err = InsertLexicon(db, l)
+	l, err = DefineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -482,7 +621,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 	logger := StderrLogger{}
 	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
 
-	l, err = InsertLexicon(db, l)
+	l, err = DefineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -552,7 +691,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 	logger := StderrLogger{}
 	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
 
-	l, err = InsertLexicon(db, l)
+	l, err = DefineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -598,7 +737,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	logger := StderrLogger{}
 	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
 
-	l, err = InsertLexicon(db, l)
+	l, err = DefineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}

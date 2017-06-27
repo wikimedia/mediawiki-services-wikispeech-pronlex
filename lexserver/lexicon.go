@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -185,19 +184,19 @@ var lexiconInfo = urlHandler{
 
 var lexiconStats = urlHandler{
 	name:     "stats",
-	url:      "/stats/{lexiconId}",
+	url:      "/stats/{lexicon_name}",
 	help:     "Lists lexicon stats.",
-	examples: []string{"/stats/1"},
+	examples: []string{"/stats/sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexiconID, err := strconv.ParseInt(getParam("lexiconId", r), 10, 64)
-		if err != nil {
-			msg := "lexiconStatsHandler got no lexicon id"
+		lexName := getParam("lexicon_name", r)
+		if len(strings.TrimSpace(lexName)) == 0 {
+			msg := fmt.Sprintf("lexicon name should be specified by variable 'lexicon_name'")
 			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
+			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 
-		stats, err := dbapi.LexiconStats(db, lexiconID)
+		stats, err := dbapi.LexiconStats(db, lexName)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("lexiconStatsHandler: call to  dbapi.LexiconStats failed : %v", err), http.StatusInternalServerError)
 			return
@@ -322,36 +321,6 @@ var lexiconAddEntry = urlHandler{
 		}
 		fmt.Fprint(w, ids)
 	},
-}
-
-func insertOrUpdateLexHandler(w http.ResponseWriter, r *http.Request) {
-	// if no id or not an int, simply set id to 0:
-	id, _ := strconv.ParseInt(getParam("id", r), 10, 64)
-	name := strings.TrimSpace(getParam("name", r))
-	symbolSetName := strings.TrimSpace(getParam("symbolsetname", r))
-
-	if name == "" || symbolSetName == "" {
-		msg := fmt.Sprint("missing parameter value, expecting value for 'name' and 'symbolsetname'")
-		log.Printf("%s", msg)
-		http.Error(w, msg, http.StatusExpectationFailed)
-		return
-	}
-
-	res, err := dbapi.InsertOrUpdateLexicon(db, dbapi.Lexicon{ID: id, Name: name, SymbolSetName: symbolSetName})
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed database call : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	jsn, err := marshal(res, r)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(jsn))
-	//fmt.Fprint(w, jsn)
 }
 
 var lexiconMoveNewEntries = urlHandler{

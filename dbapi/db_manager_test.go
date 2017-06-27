@@ -112,19 +112,19 @@ func Test_DBManager(t *testing.T) {
 	dbm.AddDB("db1", db1)
 	dbm.AddDB("db2", db2)
 
-	l1_1 := "zuperlex1"
-	l1_2 := "zuperlex2"
-	l1_3 := "zuperlex3"
+	l1_1 := LexName("zuperlex1")
+	l1_2 := LexName("zuperlex2")
+	l1_3 := LexName("zuperlex3")
 
-	l2_1 := "zuperlex1"
-	l2_2 := "zuperlex2"
-	l2_3 := "zuperduperlex"
+	l2_1 := LexName("zuperlex1")
+	l2_2 := LexName("zuperlex2")
+	l2_3 := LexName("zuperduperlex")
 
-	err = dbm.DefineLexicon("db1", "sv_sampa", l1_1, l1_2, l1_3)
+	err = dbm.DefineLexicon(DBRef("db1"), "sv_sampa", l1_1, l1_2, l1_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}
-	err = dbm.DefineLexicon("db2", "sv_sampa", l2_1, l2_2, l2_3)
+	err = dbm.DefineLexicon(DBRef("db2"), "sv_sampa", l2_1, l2_2, l2_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}
@@ -138,29 +138,30 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	lexsM := make(map[string]bool)
+	lexsM := make(map[LexRef]bool)
 	for _, l := range lexs {
 		lexsM[l] = true
 	}
-	if w := "db1:zuperlex1"; !lexsM[w] {
+
+	if w := NewLexRef("db1", "zuperlex1"); !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
-	if w := "db1:zuperlex2"; !lexsM[w] {
+	if w := NewLexRef("db1", "zuperlex2"); !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
 
-	if w := "db1:zuperlex3"; !lexsM[w] {
+	if w := NewLexRef("db1", "zuperlex3"); !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
 
-	if w := "db2:zuperlex1"; !lexsM[w] {
+	if w := NewLexRef("db2", "zuperlex1"); !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
-	if w := "db2:zuperlex2"; !lexsM[w] {
+	if w := NewLexRef("db2", "zuperlex2"); !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
 
-	if w := "db2:zuperduperlex"; !lexsM[w] {
+	if w := NewLexRef("db2", "zuperduperlex"); !lexsM[w] {
 		t.Errorf("expected db not found: '%s'", w)
 	}
 
@@ -177,7 +178,7 @@ func Test_DBManager(t *testing.T) {
 		Transcriptions: []lex.Transcription{t1, t2},
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	ids, err := dbm.InsertEntries("db2:zuperduperlex", []lex.Entry{e1})
+	ids, err := dbm.InsertEntries(NewLexRef("db2", "zuperduperlex"), []lex.Entry{e1})
 	if w, g := 1, len(ids); w != g {
 		t.Errorf("Wanted %v got %v", w, g)
 	}
@@ -186,7 +187,7 @@ func Test_DBManager(t *testing.T) {
 	}
 
 	q := Query{Words: []string{"apa"}}
-	lookRes, err := dbm.LookUp([]string{"db2:zuperduperlex"}, q)
+	lookRes, err := dbm.LookUp([]LexRef{NewLexRef("db2", "zuperduperlex")}, q)
 	if w, g := 1, len(lookRes); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}
@@ -196,7 +197,7 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("wanted %d got %d", w, g)
 	}
 
-	ids, err = dbm.InsertEntries("db1:zuperlex1", []lex.Entry{e1})
+	ids, err = dbm.InsertEntries(NewLexRef("db1", "zuperlex1"), []lex.Entry{e1})
 	if w, g := 1, len(ids); w != g {
 		t.Errorf("Wanted %v got %v", w, g)
 	}
@@ -204,7 +205,7 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("dbm.InsertEntries: %v", err)
 	}
 
-	lookRes, err = dbm.LookUp([]string{"db2:zuperduperlex", "db1:zuperlex1"}, q)
+	lookRes, err = dbm.LookUp([]LexRef{NewLexRef("db2", "zuperduperlex"), NewLexRef("db1", "zuperlex1")}, q)
 	if w, g := 2, len(lookRes); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}
@@ -242,7 +243,7 @@ func Test_DBManager(t *testing.T) {
 		Transcriptions: []lex.Transcription{t2_1, t2_2},
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	idz, err := dbm.InsertEntries("db1:zuperlex3", []lex.Entry{e2, e3})
+	idz, err := dbm.InsertEntries(NewLexRef("db1", "zuperlex3"), []lex.Entry{e2, e3})
 	if len(idz) != 2 {
 		t.Errorf("Freaky!")
 	}
@@ -250,7 +251,7 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("gah! : %v", err)
 	}
 
-	lookRez, err := dbm.LookUp([]string{"db2:zuperduperlex", "db1:zuperlex1", "db1:zuperlex3"}, Query{WordRegexp: "."})
+	lookRez, err := dbm.LookUp([]LexRef{NewLexRef("db2", "zuperduperlex"), NewLexRef("db1", "zuperlex1"), NewLexRef("db1", "zuperlex3")}, Query{WordRegexp: "."})
 	//fmt.Printf("%v\n", lookRez)
 	if err != nil {
 		t.Errorf("geh! : %v", err)
@@ -267,7 +268,7 @@ func Test_DBManager(t *testing.T) {
 	}
 
 	// Update a DB entry
-	lookUpApa, err := dbm.LookUp([]string{"db1:zuperlex1"}, Query{Words: []string{"apa"}})
+	lookUpApa, err := dbm.LookUp([]LexRef{NewLexRef("db1", "zuperlex1")}, Query{Words: []string{"apa"}})
 	if err != nil {
 		t.Errorf("LookUp failed : %v", err)
 	}
@@ -277,12 +278,12 @@ func Test_DBManager(t *testing.T) {
 	w2 := "Svetzzz"
 	apaE.Transcriptions = []lex.Transcription{lex.Transcription{Strn: w1, Language: w2}}
 
-	_, _, err = dbm.UpdateEntry("db1:zzzykkz", apaE)
+	_, _, err = dbm.UpdateEntry(DBRef("db1"), apaE)
 	if err != nil {
 		t.Errorf("serious! : %v", err)
 	}
 
-	lookUpApa, err = dbm.LookUp([]string{"db1:zuperlex1"}, Query{Words: []string{"apa"}})
+	lookUpApa, err = dbm.LookUp([]LexRef{NewLexRef("db1", "zuperlex1")}, Query{Words: []string{"apa"}})
 	if err != nil {
 		t.Errorf("LookUp failed : %v", err)
 	}

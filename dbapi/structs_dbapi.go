@@ -128,9 +128,8 @@ type Symbol struct {
 }
 
 // LexStats holds the result of a call to the dbapi.LexiconStats function.
-// TODO add fields for additional stats
 type LexStats struct {
-	LexiconID int64 `json:"lexiconId"`
+	Lexicon string `json:"lexicon"`
 	// The number of entries in the lexicon corresponding to database id LexiconID
 	Entries int64 `json:"entries"`
 

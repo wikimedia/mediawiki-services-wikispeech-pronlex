@@ -9,17 +9,31 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
+type DBRef string
+type LexName string
+
+type LexRef struct {
+	DBRef   DBRef
+	LexName LexName
+}
+
+func NewLexRef(lexDB string, lexName string) LexRef {
+	return LexRef{DBRef: DBRef(strings.ToLower(strings.TrimSpace(lexDB))),
+		LexName: LexName(strings.ToLower(strings.TrimSpace(lexName))),
+	}
+}
+
 type DBManager struct {
 	sync.RWMutex
-	dbs map[string]*sql.DB
+	dbs map[DBRef]*sql.DB
 }
 
 func NewDBManager() DBManager {
-	return DBManager{dbs: make(map[string]*sql.DB)}
+	return DBManager{dbs: make(map[DBRef]*sql.DB)}
 }
 
-func (dmb DBManager) AddDB(name string, db *sql.DB) error {
-	name = strings.TrimSpace(name)
+func (dmb DBManager) AddDB(dbRef DBRef, db *sql.DB) error {
+	name := string(dbRef)
 	if "" == name {
 		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not be empty")
 	}
@@ -33,54 +47,50 @@ func (dmb DBManager) AddDB(name string, db *sql.DB) error {
 	dmb.Lock()
 	defer dmb.Unlock()
 
-	if _, ok := dmb.dbs[name]; ok {
+	if _, ok := dmb.dbs[dbRef]; ok {
 		return fmt.Errorf("DBManager.AddDB: db already exists: '%s'", name)
 	}
 
-	dmb.dbs[name] = db
+	dmb.dbs[dbRef] = db
 
 	return nil
 }
 
-func (dbm DBManager) RemoveDB(name string) error {
-	name = strings.TrimSpace(name)
+func (dbm DBManager) RemoveDB(dbRef DBRef) error {
+	name := string(dbRef)
 	dbm.Lock()
 	defer dbm.Unlock()
 
-	if _, ok := dbm.dbs[name]; !ok {
+	if _, ok := dbm.dbs[dbRef]; !ok {
 		return fmt.Errorf("DBManager.RemoveDB: no such db '%s'", name)
 	}
 
-	delete(dbm.dbs, name)
+	delete(dbm.dbs, dbRef)
 
 	return nil
 }
 
-func (dbm DBManager) DefineLexicon(dbName string, symbolSetName string, lexes ...string) error {
-	dbName = strings.TrimSpace(dbName)
-	dbName = strings.ToLower(dbName)
+func (dbm DBManager) DefineLexicon(dbRef DBRef, symbolSetName string, lexes ...LexName) error {
 
 	dbm.RLock()
 	defer dbm.RUnlock()
 
 	for _, l := range lexes {
-		db, ok := dbm.dbs[dbName]
+		db, ok := dbm.dbs[dbRef]
 		if !ok {
-			return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", dbName)
+			return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", dbRef)
 		}
-		l = strings.TrimSpace(l)
-		l = strings.ToLower(l)
-		_, err := InsertLexicon(db, Lexicon{Name: l, SymbolSetName: symbolSetName})
+		_, err := DefineLexicon(db, Lexicon{Name: string(l), SymbolSetName: symbolSetName}) // TODO LexName
 		if err != nil {
-			return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s:%s' : %v", dbName, l, err)
+			return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s:%s' : %v", dbRef, l, err)
 		}
 	}
 
 	return nil
 }
 
-func (dbm DBManager) ListDBNames() []string {
-	var res []string
+func (dbm DBManager) ListDBNames() []DBRef {
+	var res []DBRef
 
 	dbm.RLock()
 	defer dbm.RUnlock()
@@ -109,8 +119,8 @@ func splitFullLexiconName(fullLexName string) (string, string, error) {
 	return db, lex, nil
 }
 
-type lookUp struct {
-	dbName  string
+type lookUpRes struct {
+	dbRef   DBRef // TODO: move to lex.Entry!!
 	entries []lex.Entry
 	err     error
 }
@@ -119,34 +129,33 @@ type lookUp struct {
 // overwritten by the full (DB+lexicon name) lexicon names. The Query
 // will be copied and instantiated with the Lexicon field for each DB.
 // ??? How to handle this in a neater way ???
-func (dbm DBManager) LookUp(fullLexiconNames []string, q Query) (map[string][]lex.Entry, error) {
-	var res = make(map[string][]lex.Entry)
+func (dbm DBManager) LookUp(lexRefs []LexRef, q Query) (map[DBRef][]lex.Entry, error) {
+	var res = make(map[DBRef][]lex.Entry)
 
-	dbz := make(map[string][]string)
-	for _, n := range fullLexiconNames {
-		// TODO: error check (for empty string, etc)
-		db, lex, err := splitFullLexiconName(n)
-		if err != nil {
-			return res, fmt.Errorf("DBManager.LookUp: invalid db name '%s' : %v", n, err)
-		}
-		lexList := dbz[db]
-		dbz[db] = append(lexList, lex)
+	dbz := make(map[DBRef][]LexName)
+	for _, l := range lexRefs {
+		lexList := dbz[l.DBRef]
+		dbz[l.DBRef] = append(lexList, l.LexName)
 	}
 
 	dbm.RLock()
 	defer dbm.RUnlock()
 
-	ch := make(chan lookUp)
+	ch := make(chan lookUpRes)
 	for dbN, lexs := range dbz {
 		db, ok := dbm.dbs[dbN]
 		if !ok {
 			return res, fmt.Errorf("DBManager.LookUp: no db of name '%s'", dbN)
 		}
 
-		go func(db0 *sql.DB, dbName string, lexNames []string) {
-			rez := lookUp{}
-			rez.dbName = dbName
-			lexs0, err := GetLexicons(db0, lexNames)
+		go func(db0 *sql.DB, dbRef DBRef, lexNames []LexName) {
+			lexNameStrings := []string{}
+			for _, ln := range lexNames {
+				lexNameStrings = append(lexNameStrings, string(ln)) // TODO: LexName
+			}
+			rez := lookUpRes{}
+			rez.dbRef = dbRef
+			lexs0, err := GetLexicons(db0, lexNameStrings)
 			if err != nil {
 				rez.err = fmt.Errorf("DBManager.LookUp: failed db query : %v", err)
 				ch <- rez
@@ -172,25 +181,25 @@ func (dbm DBManager) LookUp(fullLexiconNames []string, q Query) (map[string][]le
 			return res, fmt.Errorf("DBManager.LookUp failed : %v", lkUp.err)
 		}
 
-		if _, ok := res[lkUp.dbName]; ok {
-			return res, fmt.Errorf("DBManage.LookUp: returned several result for single DB '%s'", lkUp.dbName)
+		if _, ok := res[lkUp.dbRef]; ok {
+			return res, fmt.Errorf("DBManage.LookUp: returned several result for single DB '%s'", lkUp.dbRef)
 		}
-		res[lkUp.dbName] = lkUp.entries
+		res[lkUp.dbRef] = lkUp.entries
 	}
 
 	return res, nil
 }
 
 type lexRes struct {
-	dbName string
-	lexs   []Lexicon
-	err    error
+	dbRef DBRef
+	lexs  []LexName
+	err   error
 }
 
 // Warning: this is maybe my first attempt at concurrency using a channel in Go
 
-func (dbm DBManager) ListLexicons() ([]string, error) {
-	var res []string
+func (dbm DBManager) ListLexicons() ([]LexRef, error) {
+	var res []LexRef
 
 	dbm.RLock()
 	defer dbm.RUnlock()
@@ -199,12 +208,16 @@ func (dbm DBManager) ListLexicons() ([]string, error) {
 	defer close(ch) // ?
 	dbs := dbm.dbs
 	// Go ask each db instance in its own Go-routine
-	for dbName, db := range dbs {
-		go func(dbName string, db *sql.DB, ch0 chan lexRes) {
-			lexs, err := ListLexicons(db)
-			r := lexRes{dbName: dbName, lexs: lexs, err: err}
+	for dbRef, db := range dbs {
+		go func(dbRef DBRef, db *sql.DB, ch0 chan lexRes) {
+			lexNames, err := ListLexicons(db)
+			lexs := []LexName{}
+			for _, ln := range lexNames {
+				lexs = append(lexs, LexName(ln.Name))
+			}
+			r := lexRes{dbRef: dbRef, lexs: lexs, err: err}
 			ch0 <- r
-		}(dbName, db, ch)
+		}(dbRef, db, ch)
 	}
 
 	// Read result from channel
@@ -224,34 +237,28 @@ func (dbm DBManager) ListLexicons() ([]string, error) {
 		// the db and the name of the lexicon in the
 		// db joined by ':'
 		for _, l := range r.lexs {
-			fullName := r.dbName + ":" + strings.TrimSpace(l.Name)
-			res = append(res, fullName)
+			res = append(res, LexRef{r.dbRef, l})
 		}
 	}
 
 	return res, nil
 }
 
-func (dbm DBManager) InsertEntries(fullLexiconName string, entries []lex.Entry) ([]int64, error) {
+func (dbm DBManager) InsertEntries(lexRef LexRef, entries []lex.Entry) ([]int64, error) {
 
 	var res []int64
-
-	dbName, lexName, err := splitFullLexiconName(fullLexiconName)
-	if err != nil {
-		return res, fmt.Errorf("DBManager.InsertEntries: %v", err)
-	}
 
 	dbm.Lock()
 	defer dbm.Unlock()
 
-	db, ok := dbm.dbs[dbName]
+	db, ok := dbm.dbs[lexRef.DBRef]
 	if !ok {
-		return res, fmt.Errorf("DBManager.InsertEntries: unknown db '%s'", dbName)
+		return res, fmt.Errorf("DBManager.InsertEntries: unknown db '%s'", lexRef.DBRef)
 	}
 
 	//_ = db
 	//_ = lexName
-	l, err := GetLexicon(db, lexName)
+	l, err := GetLexicon(db, string(lexRef.LexName))
 	//fmt.Printf("%v\n", l)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries failed call to GetLexicons : %v", err)
@@ -264,25 +271,15 @@ func (dbm DBManager) InsertEntries(fullLexiconName string, entries []lex.Entry) 
 	return res, err
 }
 
-func (dbm DBManager) UpdateEntry(fullLexiconName string, e lex.Entry) (lex.Entry, bool, error) {
+func (dbm DBManager) UpdateEntry(dbRef DBRef, e lex.Entry) (lex.Entry, bool, error) {
 	var res lex.Entry
-
-	dbName, lexName, err := splitFullLexiconName(fullLexiconName)
-	if err != nil {
-		return res, false, fmt.Errorf("DBManager.UpdateEntry: %v", err)
-	}
 
 	dbm.Lock()
 	defer dbm.Unlock()
-	db, ok := dbm.dbs[dbName]
+	db, ok := dbm.dbs[dbRef]
 	if !ok {
-		return res, false, fmt.Errorf("DBManager.UpdateEntry: no such db '%s'", dbName)
+		return res, false, fmt.Errorf("DBManager.UpdateEntry: no such db '%s'", dbRef)
 	}
-
-	// TODO: What to do about lexicon name? Should not be hidden in lex.Entry?
-	// Or, at least, should be double checked against lexName above
-
-	_ = lexName
 
 	return UpdateEntry(db, e)
 }

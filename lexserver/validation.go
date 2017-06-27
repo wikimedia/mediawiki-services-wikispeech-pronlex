@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -100,25 +99,18 @@ var validationValidateEntry = urlHandler{
 
 var validationStats = urlHandler{
 	name:     "stats",
-	url:      "/stats/{lexiconId}",
+	url:      "/stats/{lexicon_name}",
 	help:     "Lists validation stats.",
 	examples: []string{"/stats/1"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexiconIDString := getParam("lexiconId", r)
-		if len(strings.TrimSpace(lexiconIDString)) == 0 {
-			msg := fmt.Sprintf("lexicon id should be specified by variable 'lexiconId'")
+		lexiconName := getParam("lexicon_name", r)
+		if len(strings.TrimSpace(lexiconName)) == 0 {
+			msg := fmt.Sprintf("lexicon name should be specified by variable 'lexicon_name'")
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		lexiconID, err := strconv.ParseInt(lexiconIDString, 10, 64)
-		if err != nil {
-			msg := fmt.Sprintf("lexicon id should be an integer")
-			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
-			return
-		}
-		stats, err := dbapi.ValidationStats(db, lexiconID)
+		stats, err := dbapi.ValidationStats(db, lexiconName)
 		if err != nil {
 			msg := fmt.Sprintf("validationStatsHandler failed to retreive validation stats : %v", err)
 			log.Println(msg)

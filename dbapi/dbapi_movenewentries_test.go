@@ -42,19 +42,19 @@ func Test_MoveNewEntries(t *testing.T) {
 	}
 
 	l1 := Lexicon{Name: "test1", SymbolSetName: "ZZ"}
-	l1, err = InsertLexicon(db, l1)
+	l1, err = DefineLexicon(db, l1)
 	if err != nil {
 		t.Errorf("holy cow (1)! : %v", err)
 	}
 
 	l2 := Lexicon{Name: "test2", SymbolSetName: "ZZ"}
-	l2, err = InsertLexicon(db, l2)
+	l2, err = DefineLexicon(db, l2)
 	if err != nil {
 		t.Errorf("holy cow (2)! : %v", err)
 	}
 
 	l3 := Lexicon{Name: "test3", SymbolSetName: "ZZ"}
-	l3, err = InsertLexicon(db, l3)
+	l3, err = DefineLexicon(db, l3)
 	if err != nil {
 		t.Errorf("holy cow (3)! : %v", err)
 	}
@@ -121,14 +121,14 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL1, err := LexiconStats(db, l1.ID)
+	statsL1, err := LexiconStats(db, l1.Name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
 	if w, g := int64(1), statsL1.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
-	statsL2, err := LexiconStats(db, l2.ID)
+	statsL2, err := LexiconStats(db, l2.Name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
@@ -145,14 +145,14 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL1b, err := LexiconStats(db, l1.ID)
+	statsL1b, err := LexiconStats(db, l1.Name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
 	if w, g := int64(2), statsL1b.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
-	statsL2b, err := LexiconStats(db, l2.ID)
+	statsL2b, err := LexiconStats(db, l2.Name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
@@ -160,7 +160,7 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL3, err := LexiconStats(db, l3.ID)
+	statsL3, err := LexiconStats(db, l3.Name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}

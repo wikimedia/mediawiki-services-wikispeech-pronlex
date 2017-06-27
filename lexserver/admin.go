@@ -130,7 +130,7 @@ var adminLexImport = urlHandler{
 		}
 
 		lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-		lexicon, err = dbapi.InsertLexicon(db, lexicon)
+		lexicon, err = dbapi.DefineLexicon(db, lexicon)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -188,21 +188,19 @@ var adminLexImport = urlHandler{
 
 var adminDeleteLex = urlHandler{
 	name:     "deletelexicon",
-	url:      "/deletelexicon",
+	url:      "/deletelexicon/{lexicon_name}",
 	help:     "Delete a lexicon reference from the database without removing associated entries.",
-	examples: []string{"/deletelexicon/{id}"},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		idS := getParam("id", r)
-		if idS == "" {
-			msg := "adminDeleteLex expected a lexicon id defined by 'id'"
+		lexName := getParam("lexicon_name", r)
+		if lexName == "" {
+			msg := "adminDeleteLex expected a lexicon name defined by 'lexicon_name'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusBadRequest)
 			return
 		}
 
-		id, _ := strconv.ParseInt(idS, 10, 64)
-
-		err := dbapi.DeleteLexicon(db, id)
+		err := dbapi.DeleteLexicon(db, lexName)
 		if err != nil {
 			log.Printf("adminDeleteLex got error : %v\n", err)
 			http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusExpectationFailed)
@@ -213,30 +211,28 @@ var adminDeleteLex = urlHandler{
 
 var adminSuperDeleteLex = urlHandler{
 	name:     "superdeletelexicon",
-	url:      "/superdeletelexicon",
+	url:      "/superdeletelexicon/{lexicon_name}",
 	help:     "Delete a complete lexicon from the database, including associated entries. This make take some time.",
-	examples: []string{"/superdeletelexicon/{id}"},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		idS := getParam("id", r)
-		if idS == "" {
-			msg := "deleteLexHander expected a lexicon id defined by 'id'"
+		lexName := getParam("lexicon_name", r)
+		if lexName == "" {
+			msg := "adminDeleteLex expected a lexicon name defined by 'lexicon_name'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusBadRequest)
 			return
 		}
 
-		id, _ := strconv.ParseInt(idS, 10, 64)
-
 		uuid := getParam("client_uuid", r)
 		log.Println("adminSuperDeleteLex was called")
-		messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon id %d", id))
-		err := dbapi.SuperDeleteLexicon(db, id)
+		messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon name %s", lexName))
+		err := dbapi.SuperDeleteLexicon(db, lexName)
 		if err != nil {
 
 			http.Error(w, fmt.Sprintf("failed super deleting lexicon : %v", err), http.StatusExpectationFailed)
 			return
 		}
 
-		messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon with id %d", id))
+		messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon with name %s", lexName))
 	},
 }

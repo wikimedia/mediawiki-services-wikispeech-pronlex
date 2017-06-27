@@ -156,14 +156,14 @@ SAMPLE INVOCATION:
 		lexiconExists = true
 		if *replace {
 			log.Printf("Running SuperDelete on lexicon %s. This may take some time. Please do not abort during deletion.\n", lexName)
-			err := dbapi.SuperDeleteLexicon(db, lexicon.ID)
+			err := dbapi.SuperDeleteLexicon(db, lexicon.Name)
 			if err != nil {
 				log.Fatalf("Couldn't super delete lexicon %s : %s", lexName, err)
 				return
 			}
 			log.Printf("Deleted lexicon %s\n", lexName)
 			lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-			lexicon, err = dbapi.InsertLexicon(db, lexicon)
+			lexicon, err = dbapi.DefineLexicon(db, lexicon)
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -177,7 +177,7 @@ SAMPLE INVOCATION:
 
 	if !lexiconExists {
 		lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-		lexicon, err = dbapi.InsertLexicon(db, lexicon)
+		lexicon, err = dbapi.DefineLexicon(db, lexicon)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -210,7 +210,7 @@ SAMPLE INVOCATION:
 	logger.Write("validate=" + strconv.FormatBool(*validate))
 	fmt.Fprintf(os.Stderr, "\n")
 
-	stats, err := dbapi.LexiconStats(db, lexicon.ID)
+	stats, err := dbapi.LexiconStats(db, lexicon.Name)
 	if err != nil {
 		logger.Write(fmt.Sprintf("failed to retreive statistics : %v", err))
 		return

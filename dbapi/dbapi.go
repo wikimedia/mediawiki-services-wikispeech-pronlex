@@ -167,7 +167,7 @@ func GetLexiconTx(tx *sql.Tx, name string) (Lexicon, error) {
 
 	row := tx.QueryRow("select id, name, symbolsetname from lexicon where name = ? ", name0).Scan(&res.ID, &res.Name, &res.SymbolSetName)
 	if row == sql.ErrNoRows {
-		return res, fmt.Errorf("could'f find lexicon '%s'", name)
+		return res, fmt.Errorf("couldn't find lexicon '%s'", name)
 	}
 
 	return res, err
@@ -250,27 +250,51 @@ func LexiconFromIDTx(tx *sql.Tx, id int64) (Lexicon, error) {
 // DeleteLexicon deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
 // It should be impossible to delete the Lexicon table entry if associated to any entries.
-func DeleteLexicon(db *sql.DB, id int64) error {
-	fmt.Printf("DeleteLexicon called with id %d\n", id)
+func DeleteLexicon(db *sql.DB, lexName string) error {
+	fmt.Printf("DeleteLexicon called with lexicon name %s\n", lexName)
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
 		return err
 	}
-	return DeleteLexiconTx(tx, id)
+	return DeleteLexiconTx(tx, lexName)
 }
 
 // DeleteLexiconTx deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
 // It should be impossible to delete the Lexicon table entry if associated to any entries.
-func DeleteLexiconTx(tx *sql.Tx, id int64) error {
-	var n int
-	err := tx.QueryRow("select count(*) from entry where entry.lexiconid = ?", id).Scan(&n)
+func DeleteLexiconTx(tx *sql.Tx, lexName string) error {
+	// does it exist?
+	rows, err := tx.Query("SELECT * FROM lexicon WHERE name = ?", lexName)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("db query failed : %v", err)
+	}
+	defer rows.Close()
+
+	n := 0
+	for rows.Next() {
+		rows.Scan()
+		n = n + 1
+	}
+	err = rows.Err()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("scanning row failed : %v", err)
+	}
+
+	if n != 1 {
+		tx.Rollback()
+		return fmt.Errorf("dbapi.DeleteLexiconTx : no lexicon exists with name : %s", lexName)
+	}
+
+	n = 0
+	err = tx.QueryRow("select count(*) from entry, lexicon where lexicon.name = ? and entry.lexiconid = lexicon.id", lexName).Scan(&n)
 	// must always return a row, no need to check for empty row
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("HEJ DIN FAN")
-			return fmt.Errorf("The was no lexicon with id %d : %v", id, err)
+			return fmt.Errorf("The was no lexicon with name %s : %v", lexName, err)
 		}
 		return err
 	}
@@ -279,7 +303,7 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 		return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: " + strconv.Itoa(n) + ")")
 	}
 
-	_, err = tx.Exec("delete from lexicon where id = ?", id)
+	_, err = tx.Exec("delete from lexicon where name = ?", lexName)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to delete lexicon : %v", err)
@@ -291,30 +315,56 @@ func DeleteLexiconTx(tx *sql.Tx, id int64) error {
 // SuperDeleteLexicon deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
 // TODO Send progress message to client over websocket
-func SuperDeleteLexicon(db *sql.DB, id int64) error {
+func SuperDeleteLexicon(db *sql.DB, lexName string) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
 		return fmt.Errorf("SuperDeleteLexicon failed to initiate transaction : %v", err)
 	}
-	return SuperDeleteLexiconTx(tx, id)
+	return SuperDeleteLexiconTx(tx, lexName)
 }
 
 // SuperDeleteLexiconTx deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
-func SuperDeleteLexiconTx(tx *sql.Tx, id int64) error {
+func SuperDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 
 	fmt.Println("dbapi.superDeleteLexiconTX was called")
 
-	_, err := tx.Exec("DELETE FROM entry WHERE lexiconid = ?", id)
+	// does it exist?
+	rows, err := tx.Query("SELECT * FROM lexicon WHERE name = ?", lexName)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("db query failed : %v", err)
+	}
+	defer rows.Close()
+
+	n := 0
+	for rows.Next() {
+		rows.Scan()
+		n = n + 1
+	}
+	err = rows.Err()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("scanning row failed : %v", err)
+	}
+
+	if n != 1 {
+		tx.Rollback()
+		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : no lexicon exists with name : %s", lexName)
+	}
+
+	// delete entries
+	_, err = tx.Exec("DELETE FROM entry WHERE lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", lexName)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete entries : %v", err)
 	}
-
 	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
 
-	_, err = tx.Exec("DELETE FROM lexicon WHERE id = ?", id)
+	// delete lexicon
+	_, err = tx.Exec("DELETE FROM lexicon WHERE name = ?", lexName)
+
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : failed to delete lexicon : %v", err)
@@ -322,61 +372,26 @@ func SuperDeleteLexiconTx(tx *sql.Tx, id int64) error {
 
 	fmt.Println("dbapi.superDeleteLexiconTX finished deleting from lexicon set")
 
-	fmt.Printf("Deleted lexicon %d\n", id)
+	fmt.Printf("Deleted lexicon named %s\n", lexName)
 
 	return nil
 }
 
-// InsertOrUpdateLexicon takes a Lexicon struct and either inserts it into the db, if its id = 0, or updates its string fields if the id is greater than 0.
-func InsertOrUpdateLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		return Lexicon{}, fmt.Errorf("failed begin transaction %v", err)
-	}
-	return insertOrUpdateLexiconTx(tx, l)
-}
-
-func insertOrUpdateLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
-
-	res := Lexicon{}
-
-	if l.ID <= 0 {
-		return InsertLexiconTx(tx, l)
-	}
-
-	// else if l.ID > 0
-	res, err := LexiconFromIDTx(tx, l.ID)
-
-	if err != nil {
-		return res, fmt.Errorf("faild get lexicon : %v", err)
-	}
-	if l != res {
-		_, err := tx.Exec("update lexicon set name = ?, symbolsetname = ? where id = ?", strings.ToLower(l.Name), l.SymbolSetName, res.ID)
-		if err != nil {
-			tx.Rollback()
-			return res, fmt.Errorf("failed to update lex : %v", err)
-		}
-	}
-
-	return res, nil
-}
-
-// InsertLexicon saves the name of a new lexicon to the db.
-func InsertLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
+// DefineLexicon saves the name of a new lexicon to the db.
+func DefineLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return Lexicon{}, fmt.Errorf("failed to get db transaction : %v", err)
 	}
 	defer tx.Commit()
-	res, err := InsertLexiconTx(tx, l)
+	res, err := DefineLexiconTx(tx, l)
 	//tx.Commit()
 
 	return res, err
 }
 
-// InsertLexiconTx saves the name of a new lexicon to the db.
-func InsertLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
+// DefineLexiconTx saves the name of a new lexicon to the db.
+func DefineLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	res, err := tx.Exec("insert into lexicon (name, symbolsetname) values (?, ?)", strings.ToLower(l.Name), l.SymbolSetName)
 	if err != nil {
@@ -1441,8 +1456,14 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 }
 
 // LexiconStats calls the database a number of times, gathering different numbers, e.g. on how many entries there are in a lexicon.
-func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
-	res := LexStats{LexiconID: lexiconID}
+func LexiconStats(db *sql.DB, lexName string) (LexStats, error) {
+	res := LexStats{Lexicon: lexName}
+
+	lex, err := GetLexicon(db, lexName)
+	if err != nil {
+		return res, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
+	}
+	lexiconID := lex.ID
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -1503,17 +1524,23 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 
 }
 
-func ValidationStats(db *sql.DB, lexiconID int64) (ValStats, error) {
+func ValidationStats(db *sql.DB, lexName string) (ValStats, error) {
+	lex, err := GetLexicon(db, lexName)
+	if err != nil {
+		return ValStats{}, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
+	}
+	lexID := lex.ID
 	tx, err := db.Begin()
 	defer tx.Commit()
 
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
 	}
-	return ValidationStatsTx(tx, lexiconID)
+	return ValidationStatsTx(tx, lexID)
 }
 
 func ValidationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
+
 	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
 
 	// number of entries in the lexicon
