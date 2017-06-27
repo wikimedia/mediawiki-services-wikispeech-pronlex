@@ -1010,6 +1010,7 @@ func GetEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
 // TODO Consider how to handle inconsistent input entries
+// TODO Full name of DB as input param?
 func UpdateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err error) {
 	tx, err := db.Begin()
 	defer tx.Commit()

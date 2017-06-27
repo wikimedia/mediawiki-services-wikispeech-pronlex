@@ -266,6 +266,38 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("wated %d got %d", w, g)
 	}
 
+	// Update a DB entry
+	lookUpApa, err := dbm.LookUp([]string{"db1:zuperlex1"}, Query{Words: []string{"apa"}})
+	if err != nil {
+		t.Errorf("LookUp failed : %v", err)
+	}
+
+	apaE := lookUpApa["db1"][0]
+	w1 := "zzzu: p a"
+	w2 := "Svetzzz"
+	apaE.Transcriptions = []lex.Transcription{lex.Transcription{Strn: w1, Language: w2}}
+
+	_, _, err = dbm.UpdateEntry("db1:zzzykkz", apaE)
+	if err != nil {
+		t.Errorf("serious! : %v", err)
+	}
+
+	lookUpApa, err = dbm.LookUp([]string{"db1:zuperlex1"}, Query{Words: []string{"apa"}})
+	if err != nil {
+		t.Errorf("LookUp failed : %v", err)
+	}
+
+	apaE = lookUpApa["db1"][0]
+	if w, g := 1, len(apaE.Transcriptions); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+	if w, g := w1, apaE.Transcriptions[0].Strn; w != g {
+		t.Errorf("wanted %s got %s", w, g)
+	}
+	if w, g := w2, apaE.Transcriptions[0].Language; w != g {
+		t.Errorf("wanted %s got %s", w, g)
+	}
+
 	fmt.Printf("")
 	//fmt.Printf("%v\n", lexs)
 }
