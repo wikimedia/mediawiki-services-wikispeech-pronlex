@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
@@ -158,6 +159,8 @@ const (
 // ValidateLexiconFile validates the input file and prints any validation errors to the specified logger.
 func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
 
+	start := time.Now()
+
 	var wg sync.WaitGroup
 	log.Println(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
 
@@ -259,6 +262,9 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 	log.Printf("Lines read:\t%d", n)
 	log.Printf("Lines printed:\t%d", nPrinted)
 	log.Printf("Lines valid:\t%d", nValid)
+
+	end := time.Now()
+	log.Printf("dbapi/io.go ValidateLexiconFile took %v\n", end.Sub(start))
 
 	if err := s.Err(); err != nil {
 		msg = fmt.Sprintf("ValidateLexiconFile failed to instantiate lexicon line parser : %v", err)
