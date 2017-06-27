@@ -236,13 +236,13 @@ func (dbm DBManager) InsertEntries(fullLexiconName string, entries []lex.Entry) 
 
 	var res []int64
 
-	dbm.Lock()
-	defer dbm.Unlock()
-
 	dbName, lexName, err := splitFullLexiconName(fullLexiconName)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries: %v", err)
 	}
+
+	dbm.Lock()
+	defer dbm.Unlock()
 
 	db, ok := dbm.dbs[dbName]
 	if !ok {
@@ -262,4 +262,27 @@ func (dbm DBManager) InsertEntries(fullLexiconName string, entries []lex.Entry) 
 		return res, fmt.Errorf("DBManager.InsertEntries failed: %v", err)
 	}
 	return res, err
+}
+
+func (dbm DBManager) UpdateEntry(fullLexiconName string, e lex.Entry) (lex.Entry, bool, error) {
+	var res lex.Entry
+
+	dbName, lexName, err := splitFullLexiconName(fullLexiconName)
+	if err != nil {
+		return res, false, fmt.Errorf("DBManager.UpdateEntry: %v", err)
+	}
+
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[dbName]
+	if !ok {
+		return res, false, fmt.Errorf("DBManager.UpdateEntry: no such db '%s'", dbName)
+	}
+
+	// TODO: What to do about lexicon name? Should not be hidden in lex.Entry?
+	// Or, at least, should be double checked against lexName above
+
+	_ = lexName
+
+	return UpdateEntry(db, e)
 }
