@@ -18,7 +18,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	// installs sqlite3 driver
 	"github.com/mattn/go-sqlite3"
@@ -1450,7 +1449,8 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 	}
 	defer tx.Commit()
 
-	t1 := time.Now()
+	// t1 := time.Now()
+
 	// number of entries in a lexicon
 	var entries int64
 	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
@@ -1461,10 +1461,8 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 
 	// number of each type of entry status
 
-	//select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = 3 and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name
-
-	//t2 := time.Now()
-	//log.Printf("dbapi.LexiconStats TOTAL COUNT TOOK %v\n", t2.Sub(t1))
+	// t2 := time.Now()
+	// log.Printf("dbapi.LexiconStats TOTAL COUNT TOOK %v\n", t2.Sub(t1))
 
 	rows, err := tx.Query("select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = ? and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name", lexiconID)
 	if err != nil {
@@ -1487,17 +1485,18 @@ func LexiconStats(db *sql.DB, lexiconID int64) (LexStats, error) {
 		return res, err
 	}
 
-	//t3 := time.Now()
-	//log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
+	// t3 := time.Now()
+	// log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
+
 	valStats, err := ValidationStatsTx(tx, lexiconID)
 	res.ValStats = valStats
 
-	t4 := time.Now()
-	//log.Printf("dbapi.LexiconStats VAL STATS TOOK %v\n", t4.Sub(t3))
+	// t4 := time.Now()
+	// log.Printf("dbapi.LexiconStats VAL STATS TOOK %v\n", t4.Sub(t3))
 
-	_ = t1
-	_ = t4
-	//log.Printf("dbapi.LexiconStats STATS TOOK %v\n", t4.Sub(t1))
+	// _ = t1
+	// _ = t4
+	// log.Printf("dbapi.LexiconStats STATS TOOK %v\n", t4.Sub(t1))
 
 	return res, err
 
