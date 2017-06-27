@@ -46,32 +46,6 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		}
 	}
 
-	// updated := []lex.Entry{}
-	// var wg sync.WaitGroup
-	// for i, e := range w.Entries {
-	// 	wg.Add(1)
-	// 	go func(ee lex.Entry) {
-	// 		defer wg.Done()
-	// 		oldVal := ee.EntryValidations
-	// 		vd.ValidateEntry(&ee)
-	// 		stats.ValidatedEntries++
-	// 		newVal := ee.EntryValidations
-	// 		if len(newVal) > 0 {
-	// 			stats.InvalidEntries++
-	// 			for _, v := range newVal {
-	// 				stats.TotalValidations++
-	// 				stats.Levels[strings.ToLower(v.Level)]++
-	// 				stats.Rules[strings.ToLower(v.RuleName+" ("+v.Level+")")]++
-	// 			}
-	// 		}
-	// 		w.Entries[i] = ee
-	// 		if len(oldVal) > 0 || len(newVal) > 0 {
-	// 			updated = append(updated, ee)
-	// 		}
-	// 	}(e)
-	// }
-	// wg.Wait()
-
 	err = UpdateValidationTx(tx, updated)
 	if err != nil {
 		tx.Rollback()
