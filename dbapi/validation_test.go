@@ -328,7 +328,7 @@ func Test_ValidationUpdate1(t *testing.T) {
 	ff("lookup failed : %v", err)
 
 	for _, e := range ew.Entries {
-		e, _ = v.ValidateEntry(e)
+		v.ValidateEntry(&e)
 		err = UpdateValidation(db, []lex.Entry{e})
 		ff("update validation failed : %v", err)
 	}
@@ -366,7 +366,7 @@ func Test_ValidationUpdate2(t *testing.T) {
 
 	var es []lex.Entry
 	for _, e := range ew.Entries {
-		e, _ = v.ValidateEntry(e)
+		v.ValidateEntry(&e)
 		es = append(es, e)
 	}
 	err = UpdateValidation(db, es)

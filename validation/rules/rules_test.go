@@ -129,7 +129,7 @@ func Test2(t *testing.T) {
 		Transcriptions: []lex.Transcription{},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
@@ -166,7 +166,7 @@ func Test3(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
@@ -202,7 +202,7 @@ func Test4(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}

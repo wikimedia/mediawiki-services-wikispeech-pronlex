@@ -201,7 +201,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -224,7 +224,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -252,7 +252,7 @@ func TestWhitespace(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -294,7 +294,7 @@ func TestRepeated(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -317,7 +317,7 @@ func TestRepeated(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -358,7 +358,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{}
@@ -381,7 +381,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -405,7 +405,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -429,7 +429,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{}
@@ -453,7 +453,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
@@ -482,7 +482,7 @@ func TestNst1(t *testing.T) {
 		},
 	}
 
-	e, _ = vali.ValidateEntry(e)
+	vali.ValidateEntry(&e)
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{

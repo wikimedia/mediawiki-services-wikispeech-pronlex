@@ -6,7 +6,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
+	"time"
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/validation"
@@ -29,10 +31,9 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		return stats, fmt.Errorf("couldn't lookup from ids : %s", err)
 	}
 
-	updated := []lex.Entry{}
-	for i, e := range w.Entries {
-		oldVal := e.EntryValidations
-		e, _ = vd.ValidateEntry(e)
+	validated, _ := vd.ValidateEntries(w.Entries)
+	updated := validated // TODO: proper updated container to just update db for the updated validations? needed?
+	for _, e := range validated {
 		stats.ValidatedEntries++
 		newVal := e.EntryValidations
 		if len(newVal) > 0 {
@@ -43,11 +44,34 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 				stats.Rules[strings.ToLower(v.RuleName+" ("+v.Level+")")]++
 			}
 		}
-		w.Entries[i] = e
-		if len(oldVal) > 0 || len(newVal) > 0 {
-			updated = append(updated, e)
-		}
 	}
+
+	// updated := []lex.Entry{}
+	// var wg sync.WaitGroup
+	// for i, e := range w.Entries {
+	// 	wg.Add(1)
+	// 	go func(ee lex.Entry) {
+	// 		defer wg.Done()
+	// 		oldVal := ee.EntryValidations
+	// 		vd.ValidateEntry(&ee)
+	// 		stats.ValidatedEntries++
+	// 		newVal := ee.EntryValidations
+	// 		if len(newVal) > 0 {
+	// 			stats.InvalidEntries++
+	// 			for _, v := range newVal {
+	// 				stats.TotalValidations++
+	// 				stats.Levels[strings.ToLower(v.Level)]++
+	// 				stats.Rules[strings.ToLower(v.RuleName+" ("+v.Level+")")]++
+	// 			}
+	// 		}
+	// 		w.Entries[i] = ee
+	// 		if len(oldVal) > 0 || len(newVal) > 0 {
+	// 			updated = append(updated, ee)
+	// 		}
+	// 	}(e)
+	// }
+	// wg.Wait()
+
 	err = UpdateValidationTx(tx, updated)
 	if err != nil {
 		tx.Rollback()
@@ -58,6 +82,8 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 }
 
 func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
+
+	start := time.Now()
 
 	stats := ValStats{Levels: make(map[string]int), Rules: make(map[string]int)}
 
@@ -93,7 +119,6 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 				return stats, err
 			}
 			chunk = []int64{}
-
 		}
 
 		if n%10 == 0 {
@@ -112,6 +137,8 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 		}
 		chunk = []int64{}
 	}
+	end := time.Now()
+	log.Printf("dbapi/validation.go Validate took %v\n", end.Sub(start))
 
 	return stats, nil
 }

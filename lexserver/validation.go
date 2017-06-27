@@ -84,7 +84,7 @@ var validationValidateEntry = urlHandler{
 		}
 
 		e = trimEntry(e)
-		e, _ = vdator.ValidateEntry(e)
+		vdator.ValidateEntry(&e)
 
 		res0, err3 := json.Marshal(e)
 		if err3 != nil {
