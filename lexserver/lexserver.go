@@ -830,9 +830,11 @@ func main() {
 		if err != nil {
 			return err
 		}
-		urls = append(urls, url)
 		if !isStaticPage(url) && !isHandeledPage(url) {
 			log.Print("Unhandeled url: ", url)
+			urls = append(urls, url+" (UNHANDELED)")
+		} else {
+			urls = append(urls, url)
 		}
 		return nil
 	})
