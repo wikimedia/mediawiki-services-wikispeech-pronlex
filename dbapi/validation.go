@@ -29,10 +29,10 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		return stats, fmt.Errorf("couldn't lookup from ids : %s", err)
 	}
 
-	updated := []lex.Entry{}
-	for i, e := range w.Entries {
-		oldVal := e.EntryValidations
-		e, _ = vd.ValidateEntry(e)
+	validated, _ := vd.ValidateEntries(w.Entries)
+	//updated := []lex.Entry{}
+	updated := validated // TODO: proper updated container to just update db for the updated validations? needed?
+	for _, e := range validated {
 		stats.ValidatedEntries++
 		newVal := e.EntryValidations
 		if len(newVal) > 0 {
@@ -43,11 +43,32 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 				stats.Rules[strings.ToLower(v.RuleName+" ("+v.Level+")")]++
 			}
 		}
-		w.Entries[i] = e
-		if len(oldVal) > 0 || len(newVal) > 0 {
-			updated = append(updated, e)
-		}
 	}
+
+	// updated := []lex.Entry{}
+	// for i, e := range w.Entries {
+	// 	oldVal := e.EntryValidations
+	// 	wg.Add(1)
+	// 	go func() {
+	// 		defer wg.Done()
+	// 		vd.ValidateEntryWithPointer(&e)
+	// 		stats.ValidatedEntries++
+	// 		newVal := e.EntryValidations
+	// 		if len(newVal) > 0 {
+	// 			stats.InvalidEntries++
+	// 			for _, v := range newVal {
+	// 				stats.TotalValidations++
+	// 				stats.Levels[strings.ToLower(v.Level)]++
+	// 				stats.Rules[strings.ToLower(v.RuleName+" ("+v.Level+")")]++
+	// 			}
+	// 		}
+	// 		w.Entries[i] = e
+	// 		if len(oldVal) > 0 || len(newVal) > 0 {
+	// 			updated = append(updated, e)
+	// 		}
+	// 	}()
+	// }
+
 	err = UpdateValidationTx(tx, updated)
 	if err != nil {
 		tx.Rollback()
@@ -112,6 +133,5 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 		}
 		chunk = []int64{}
 	}
-
 	return stats, nil
 }

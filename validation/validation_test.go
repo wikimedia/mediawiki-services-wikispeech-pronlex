@@ -172,7 +172,7 @@ func Test_ValidateEntry1(t *testing.T) {
 	var eVals1 []string // := make([]string, 0)
 	var es []lex.Entry  // es := make([]lex.Entry, 0)
 	for _, e := range es0 {
-		e, _ = v.ValidateEntry(e)
+		v.ValidateEntry(&e)
 		for _, v := range e.EntryValidations {
 			eVals1 = append(eVals1, v.String())
 		}
@@ -306,36 +306,68 @@ func Test_TestSuite_Invalid(t *testing.T) {
 	}
 }
 
-func Test_ValidateEntryConcurrent(t *testing.T) {
+func test_createInvalidEntries() []lex.Entry {
+	t1a := lex.Transcription{Strn: "\" A: p a", Language: "sv-se"}
+	t1b := lex.Transcription{Strn: "\" a p a", Language: "sv-se"}
+
+	e1 := lex.Entry{Strn: "apa",
+		ID:             1,
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apa",
+		Language:       "XYZZ",
+		Transcriptions: []lex.Transcription{t1a, t1b},
+		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
+
+	t2a := lex.Transcription{Strn: "\" A: p a n", Language: "sv-se"}
+	t2b := lex.Transcription{Strn: "A p a n", Language: "sv-se"}
+
+	e2 := lex.Entry{Strn: "apan",
+		ID:             2,
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apan",
+		Language:       "XYZZ",
+		Transcriptions: []lex.Transcription{t2a, t2b},
+		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
+
+	t3a := lex.Transcription{Strn: "\" . p a n", Language: "sv-se"}
+	e3 := lex.Entry{Strn: "appan",
+		ID:             3,
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "appan",
+		Language:       "XYZZ",
+		Transcriptions: []lex.Transcription{t3a},
+		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
+
+	return []lex.Entry{e1, e2, e3}
+}
+
+func Test_ValidateEntriesWithPointer(t *testing.T) {
 	v := test_createValidator()
-	es0 := test_createEntries()
+	es := test_createInvalidEntries()
 
-	var eVals1 []string
-	var es []lex.Entry
-	for _, e := range es0 {
-		for i := 0; i < 100000; i++ {
-			//e, _ = v.ValidateEntryConcurrent(e)
-			e, _ = v.ValidateEntry(e)
-			for _, v := range e.EntryValidations {
-				eVals1 = append(eVals1, v.String())
-			}
-			es = append(es, e)
-		}
-	}
-	sort.Strings(eVals1)
-	if len(eVals1) < 1 {
-		t.Errorf(fs, ">1", len(eVals1))
-	}
-	var eVals2 []string // eVals2 := make([]string, 0)
-	for _, e := range es {
+	var resVals []string
+	res, _ := v.validateEntriesWithPointer(es)
+	for _, e := range res {
 		for _, v := range e.EntryValidations {
-			eVals2 = append(eVals2, v.String())
+			resVals = append(resVals, v.String())
 		}
 	}
-	sort.Strings(eVals2)
 
-	if !reflect.DeepEqual(eVals1, eVals2) {
-		t.Errorf(fs, eVals1, eVals2)
+	var expectVals = []string{
+		`Fatal|primary_stress: Primary stress required. Found: /A p a n/`,
+		`Format|syllabic: Each syllable needs a syllabic phoneme. Found: /A p a n/`,
+		`Format|syllabic: Each syllable needs a syllabic phoneme. Found: /" . p a n/`,
+	}
+
+	if !reflect.DeepEqual(resVals, expectVals) {
+		t.Errorf(fs, expectVals, resVals)
+	}
+
+	if len(resVals) != 3 {
+		t.Errorf(fs, "3", len(resVals))
 	}
 
 }

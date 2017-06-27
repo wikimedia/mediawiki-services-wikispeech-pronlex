@@ -2,6 +2,7 @@ package validation
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/stts-se/pronlex/lex"
 )
@@ -133,45 +134,7 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 	return result, nil
 }
 
-// HL test 20170622
-func (v Validator) ValidateEntryConcurrent(e lex.Entry) (lex.Entry, bool) {
-	e.EntryValidations = make([]lex.EntryValidation, 0)
-
-	resCh := make(chan Result)
-	defer close(resCh)
-
-	for _, rule := range v.Rules {
-		go func(rule Rule, e0 lex.Entry, ch chan Result) {
-			res, err := rule.Validate(e0)
-			if err != nil {
-				ch <- Result{
-					RuleName: "System",
-					Level:    "Error",
-					Messages: []string{fmt.Sprintf("error when validating word '%s' with rule %s : %v", e0.Strn, res.RuleName, err)},
-				}
-			}
-			ch <- res
-		}(rule, e, resCh)
-	}
-	for i := 0; i < len(v.Rules); i++ {
-		r := <-resCh
-		for _, msg := range r.Messages {
-			var ev = lex.EntryValidation{
-				RuleName: r.RuleName,
-				Level:    r.Level,
-				Message:  msg,
-			}
-			e.EntryValidations = append(e.EntryValidations, ev)
-		}
-	}
-	return e, len(e.EntryValidations) == 0
-}
-
-// ValidateEntry is used to validate single entries. Any validation
-// errors are added to the entry's EntryValidations field. The
-// function returns true if the entry is valid (i.e., no validation
-// issues are found), otherwise false.
-func (v Validator) ValidateEntry(e lex.Entry) (lex.Entry, bool) {
+func (v Validator) validateEntryOLD(e lex.Entry) (lex.Entry, bool) {
 	e.EntryValidations = make([]lex.EntryValidation, 0)
 	for _, rule := range v.Rules {
 		res, err := rule.Validate(e)
@@ -196,15 +159,75 @@ func (v Validator) ValidateEntry(e lex.Entry) (lex.Entry, bool) {
 	return e, len(e.EntryValidations) == 0
 }
 
+// ValidateEntry is used to validate single entries. Any validation
+// errors are added to the entry's EntryValidations field. The
+// function returns true if the entry is valid (i.e., no validation
+// issues are found), otherwise false.
+func (v Validator) ValidateEntry(e *lex.Entry) {
+	e.EntryValidations = make([]lex.EntryValidation, 0)
+	for _, rule := range v.Rules {
+		res, err := rule.Validate(*e)
+		if err != nil {
+			var ev = lex.EntryValidation{
+				RuleName: "System",
+				Level:    "Error",
+				Message:  fmt.Sprintf("error when validating word '%s' with rule %s : %v", e.Strn, res.RuleName, err),
+			}
+			e.EntryValidations = append(e.EntryValidations, ev)
+		} else {
+			for _, msg := range res.Messages {
+				var ev = lex.EntryValidation{
+					RuleName: res.RuleName,
+					Level:    res.Level,
+					Message:  msg,
+				}
+				e.EntryValidations = append(e.EntryValidations, ev)
+			}
+		}
+	}
+}
+
+func (v Validator) validateEntriesWithPointer(entries []lex.Entry) ([]lex.Entry, bool) {
+	var wg sync.WaitGroup
+	var work = []*lex.Entry{}
+	for _, e := range entries {
+		ex := e
+		work = append(work, &ex)
+	}
+	for _, e := range work {
+		wg.Add(1)
+		func(ee *lex.Entry) {
+			defer wg.Done()
+			v.ValidateEntry(ee)
+		}(e)
+	}
+
+	wg.Wait()
+
+	valid := true
+	var res = []lex.Entry{}
+	for _, e := range work {
+		res = append(res, *e)
+		if len(e.EntryValidations) > 0 {
+			valid = false
+		}
+	}
+	return res, valid
+}
+
 // ValidateEntries is used to validate a slice of entries.  Any validation
 // errors are added to each entry's EntryValidations field. The
 // function returns true if the entry is valid (i.e., no validation
 // issues are found), otherwise false.
 func (v Validator) ValidateEntries(entries []lex.Entry) ([]lex.Entry, bool) {
+	return v.validateEntriesWithPointer(entries)
+}
+
+func (v Validator) validateEntriesOLD(entries []lex.Entry) ([]lex.Entry, bool) {
 	var res []lex.Entry
 	var valid = true
 	for _, e0 := range entries {
-		var e, ok = v.ValidateEntry(e0)
+		var e, ok = v.validateEntryOLD(e0)
 		if !ok {
 			valid = false
 		}

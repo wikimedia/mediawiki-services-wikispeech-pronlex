@@ -8,16 +8,12 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/validation"
 )
-
-// Olika scenarion:
-// Skapa
-// Append
-// Uppdatera
 
 // ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any validation whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
 func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, validator *validation.Validator) error {
@@ -94,7 +90,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		}
 
 		if validator != nil && validator.IsDefined() {
-			e, _ = validator.ValidateEntry(e)
+			validator.ValidateEntry(&e)
 		}
 
 		eBuf = append(eBuf, e)
@@ -162,6 +158,7 @@ const (
 // ValidateLexiconFile validates the input file and prints any validation errors to the specified logger.
 func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
 
+	var wg sync.WaitGroup
 	log.Println(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
 
 	if _, err := os.Stat(lexiconFileName); os.IsNotExist(err) {
@@ -226,34 +223,39 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 			return fmt.Errorf("%v", msg)
 		}
 
-		e, _ = validator.ValidateEntry(e)
-		isValid := (len(e.EntryValidations) == 0)
-		if isValid {
-			nValid = nValid + 1
-		}
-		if printMode == PrintValid && isValid {
-			logger.Write(l)
-			nPrinted = nPrinted + 1
-		} else if printMode == PrintAll {
-			logger.Write(l)
-			nPrinted = nPrinted + 1
-			for _, v := range e.EntryValidations {
-				logger.Write(fmt.Sprintf("#INVALID\t%#v", v.String()))
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			validator.ValidateEntry(&e)
+			isValid := (len(e.EntryValidations) == 0)
+			if isValid {
+				nValid = nValid + 1
 			}
-		} else if printMode == PrintInvalid && !isValid {
-			logger.Write(l)
-			nPrinted = nPrinted + 1
-			for _, v := range e.EntryValidations {
-				logger.Write(fmt.Sprintf("#INVALID\t%#v", v.String()))
+			if printMode == PrintValid && isValid {
+				logger.Write(l)
+				nPrinted = nPrinted + 1
+			} else if printMode == PrintAll {
+				logger.Write(l)
+				nPrinted = nPrinted + 1
+				for _, v := range e.EntryValidations {
+					logger.Write(fmt.Sprintf("#INVALID\t%#v", v.String()))
+				}
+			} else if printMode == PrintInvalid && !isValid {
+				logger.Write(l)
+				nPrinted = nPrinted + 1
+				for _, v := range e.EntryValidations {
+					logger.Write(fmt.Sprintf("#INVALID\t%#v", v.String()))
+				}
 			}
-		}
 
-		n++
-		if n%logger.LogInterval() == 0 {
-			msg2 := fmt.Sprintf("Lines read: %d", n)
-			log.Println(msg2)
-		}
+			n++
+			if n%logger.LogInterval() == 0 {
+				msg2 := fmt.Sprintf("Lines read: %d", n)
+				log.Println(msg2)
+			}
+		}()
 	}
+	wg.Wait()
 	log.Printf("Lines read:\t%d", n)
 	log.Printf("Lines printed:\t%d", nPrinted)
 	log.Printf("Lines valid:\t%d", nValid)
