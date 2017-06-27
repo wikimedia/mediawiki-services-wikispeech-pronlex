@@ -32,10 +32,20 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	}
 
 	validated, _ := vd.ValidateEntries(w.Entries)
-	updated := validated // TODO: proper updated container to just update db for the updated validations? needed?
+	origMap := make(map[int64]lex.Entry)
+	for _, orig := range w.Entries {
+		origMap[orig.ID] = orig
+	}
+	updated := []lex.Entry{}
 	for _, e := range validated {
 		stats.ValidatedEntries++
 		newVal := e.EntryValidations
+		oldVal := origMap[e.ID].EntryValidations
+		if len(newVal) == 0 && len(oldVal) == 0 {
+			// no change
+		} else {
+			updated = append(updated, e)
+		}
 		if len(newVal) > 0 {
 			stats.InvalidEntries++
 			for _, v := range newVal {

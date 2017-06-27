@@ -227,10 +227,10 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 		}
 
 		wg.Add(1)
-		go func() {
+		go func(ee lex.Entry) {
 			defer wg.Done()
-			validator.ValidateEntry(&e)
-			isValid := (len(e.EntryValidations) == 0)
+			validator.ValidateEntry(&ee)
+			isValid := (len(ee.EntryValidations) == 0)
 			if isValid {
 				nValid = nValid + 1
 			}
@@ -238,16 +238,17 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 				logger.Write(l)
 				nPrinted = nPrinted + 1
 			} else if printMode == PrintAll {
-				logger.Write(l)
+				out := []string{l}
 				nPrinted = nPrinted + 1
-				for _, v := range e.EntryValidations {
-					logger.Write(fmt.Sprintf("#INVALID\t%#v", v.String()))
+				for _, v := range ee.EntryValidations {
+					out = append(out, fmt.Sprintf("#INVALID\t%#v", v.String()))
 				}
+				logger.Write(strings.Join(out, "\n"))
 			} else if printMode == PrintInvalid && !isValid {
-				logger.Write(l)
+				out := []string{l}
 				nPrinted = nPrinted + 1
-				for _, v := range e.EntryValidations {
-					logger.Write(fmt.Sprintf("#INVALID\t%#v", v.String()))
+				for _, v := range ee.EntryValidations {
+					out = append(out, fmt.Sprintf("#INVALID\t%#v", v.String()))
 				}
 			}
 
@@ -256,7 +257,7 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 				msg2 := fmt.Sprintf("Lines read: %d", n)
 				log.Println(msg2)
 			}
-		}()
+		}(e)
 	}
 	wg.Wait()
 	log.Printf("Lines read:\t%d", n)

@@ -187,7 +187,7 @@ func (v Validator) ValidateEntry(e *lex.Entry) {
 	}
 }
 
-func (v Validator) validateEntriesWithPointer(entries []lex.Entry) ([]lex.Entry, bool) {
+func (v Validator) validateEntriesConcurrent(entries []lex.Entry) ([]lex.Entry, bool) {
 	var wg sync.WaitGroup
 	var work = []*lex.Entry{}
 	for _, e := range entries {
@@ -196,7 +196,7 @@ func (v Validator) validateEntriesWithPointer(entries []lex.Entry) ([]lex.Entry,
 	}
 	for _, e := range work {
 		wg.Add(1)
-		func(ee *lex.Entry) {
+		go func(ee *lex.Entry) {
 			defer wg.Done()
 			v.ValidateEntry(ee)
 		}(e)
@@ -220,7 +220,7 @@ func (v Validator) validateEntriesWithPointer(entries []lex.Entry) ([]lex.Entry,
 // function returns true if the entry is valid (i.e., no validation
 // issues are found), otherwise false.
 func (v Validator) ValidateEntries(entries []lex.Entry) ([]lex.Entry, bool) {
-	return v.validateEntriesWithPointer(entries)
+	return v.validateEntriesConcurrent(entries)
 }
 
 func (v Validator) validateEntriesOLD(entries []lex.Entry) ([]lex.Entry, bool) {

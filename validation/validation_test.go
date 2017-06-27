@@ -349,7 +349,7 @@ func Test_ValidateEntriesWithPointer(t *testing.T) {
 	es := test_createInvalidEntries()
 
 	var resVals []string
-	res, _ := v.validateEntriesWithPointer(es)
+	res, _ := v.validateEntriesConcurrent(es)
 	for _, e := range res {
 		for _, v := range e.EntryValidations {
 			resVals = append(resVals, v.String())
