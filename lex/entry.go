@@ -6,6 +6,20 @@ import (
 	"strings"
 )
 
+type DBRef string
+type LexName string
+
+type LexRef struct {
+	DBRef   DBRef
+	LexName LexName
+}
+
+func NewLexRef(lexDB string, lexName string) LexRef {
+	return LexRef{DBRef: DBRef(strings.ToLower(strings.TrimSpace(lexDB))),
+		LexName: LexName(strings.ToLower(strings.TrimSpace(lexName))),
+	}
+}
+
 // EntryStatus associates a status to an Entry. The status has a name (such as 'ok') and a source (a string identifying who or what generated the status)
 type EntryStatus struct {
 	ID     int64  `json:"id"`
@@ -94,9 +108,8 @@ type Lemma struct {
 // the entry db table, since it contains data also from associated
 // tables (Lemma, Transcription)
 type Entry struct {
-	ID int64 `json:"id"`
-	// TODO Change LexiconID into LexiconName string
-	LexiconID        int64             `json:"lexiconId"`
+	ID               int64             `json:"id"`
+	LexRef           LexRef            `json:"lexRef"`
 	Strn             string            `json:"strn"`
 	Language         string            `json:"language"`
 	PartOfSpeech     string            `json:"partOfSpeech"`

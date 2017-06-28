@@ -795,8 +795,8 @@ func lookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 	}
 	defer rows.Close()
 
-	var lexiconID, entryID, preferred int64
-	var entryStrn, entryLanguage, partOfSpeech, morphology, wordParts string
+	var entryID, preferred int64
+	var lexiconName, entryStrn, entryLanguage, partOfSpeech, morphology, wordParts string
 
 	var transcriptionID, transcriptionEntryID int64
 	var transcriptionStrn, transcriptionLanguage, transcriptionSources string
@@ -824,7 +824,7 @@ func lookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 	lastE = -1
 	for rows.Next() {
 		rows.Scan(
-			&lexiconID,
+			&lexiconName,
 			&entryID,
 			&entryStrn,
 			&entryLanguage,
@@ -871,7 +871,7 @@ func lookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 				out.Write(currE)
 			}
 			currE = lex.Entry{
-				LexiconID:    lexiconID,
+				LexRef:       lex.NewLexRef("", lexiconName), // DBRef is not set here (will be set by DBManager)
 				ID:           entryID,
 				Strn:         entryStrn,
 				Language:     entryLanguage,
