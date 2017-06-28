@@ -32,7 +32,7 @@ func NewDBManager() DBManager {
 	return DBManager{dbs: make(map[DBRef]*sql.DB)}
 }
 
-func (dmb DBManager) AddDB(dbRef DBRef, db *sql.DB) error {
+func (dbm DBManager) AddDB(dbRef DBRef, db *sql.DB) error {
 	name := string(dbRef)
 	if "" == name {
 		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not be empty")
@@ -44,14 +44,14 @@ func (dmb DBManager) AddDB(dbRef DBRef, db *sql.DB) error {
 		return fmt.Errorf("DBManager.AddDB: illegal argument: db must not be nil")
 	}
 
-	dmb.Lock()
-	defer dmb.Unlock()
+	dbm.Lock()
+	defer dbm.Unlock()
 
-	if _, ok := dmb.dbs[dbRef]; ok {
+	if _, ok := dbm.dbs[dbRef]; ok {
 		return fmt.Errorf("DBManager.AddDB: db already exists: '%s'", name)
 	}
 
-	dmb.dbs[dbRef] = db
+	dbm.dbs[dbRef] = db
 
 	return nil
 }
@@ -95,7 +95,7 @@ func (dbm DBManager) ListDBNames() []DBRef {
 	dbm.RLock()
 	defer dbm.RUnlock()
 
-	for k, _ := range dbm.dbs {
+	for k := range dbm.dbs {
 		res = append(res, k)
 	}
 

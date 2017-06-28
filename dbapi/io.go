@@ -104,10 +104,10 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 				var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 				logger.Write(msg)
 				return fmt.Errorf("%v", msg)
-			} else {
-				msg2 := fmt.Sprintf("Inserted entries (total lines read: %d)", n)
-				logger.Write(msg2)
-			}
+			} //else {
+			//msg2 := fmt.Sprintf("Inserted entries (total lines read: %d)", n)
+			logger.Write(msg2)
+			//}
 			eBuf = make([]lex.Entry, 0)
 		}
 		if n%logger.LogInterval() == 0 {
@@ -122,10 +122,10 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 		logger.Write(msg)
 		return fmt.Errorf("%v", msg)
-	} else {
-		msg2 := fmt.Sprintf("Inserted entries (total lines read: %d)", n)
-		logger.Write(msg2)
-	}
+	} //else {
+	//msg2 := fmt.Sprintf("Inserted entries (total lines read: %d)", n)
+	logger.Write(msg2)
+	//}
 
 	logger.Write("Finalizing import ... ")
 
