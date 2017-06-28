@@ -68,10 +68,10 @@ func ListNamesOfTriggers(db *sql.DB) ([]string, error) {
 		return []string{}, fmt.Errorf("dbapi.ListNamesOfTriggers : %v", err)
 	}
 	defer tx.Commit()
-	return ListNamesOfTriggersTx(tx)
+	return listNamesOfTriggersTx(tx)
 }
 
-func ListNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
+func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	var res []string
 
 	q := "select name from sqlite_master where type = 'trigger'"
@@ -157,10 +157,10 @@ func GetLexicon(db *sql.DB, name string) (Lexicon, error) {
 		return Lexicon{}, fmt.Errorf("failed to create transaction : %v", err)
 	}
 	defer tx.Commit()
-	return GetLexiconTx(tx, name)
+	return getLexiconTx(tx, name)
 }
 
-func GetLexiconTx(tx *sql.Tx, name string) (Lexicon, error) {
+func getLexiconTx(tx *sql.Tx, name string) (Lexicon, error) {
 	res := Lexicon{}
 	name0 := strings.ToLower(name)
 	var err error
@@ -229,12 +229,12 @@ func LexiconFromID(db *sql.DB, id int64) (Lexicon, error) {
 		return Lexicon{}, fmt.Errorf("LexiconFromID failed to start db transaction : %v", err)
 	}
 
-	return LexiconFromIDTx(tx, id)
+	return lexiconFromIDTx(tx, id)
 }
 
 // LexiconFromIDTx returns a Lexicon struct corresponding to a row in
 // the lexicon table with the given id
-func LexiconFromIDTx(tx *sql.Tx, id int64) (Lexicon, error) {
+func lexiconFromIDTx(tx *sql.Tx, id int64) (Lexicon, error) {
 	res := Lexicon{}
 	err := tx.QueryRow("select id, name, symbolsetname from lexicon where id = ?", id).Scan(&res.ID, &res.Name, &res.SymbolSetName)
 	if err == sql.ErrNoRows {
@@ -257,13 +257,13 @@ func DeleteLexicon(db *sql.DB, lexName string) error {
 	if err != nil {
 		return err
 	}
-	return DeleteLexiconTx(tx, lexName)
+	return deleteLexiconTx(tx, lexName)
 }
 
 // DeleteLexiconTx deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
 // It should be impossible to delete the Lexicon table entry if associated to any entries.
-func DeleteLexiconTx(tx *sql.Tx, lexName string) error {
+func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 	// does it exist?
 	rows, err := tx.Query("SELECT * FROM lexicon WHERE name = ?", lexName)
 	if err != nil {
@@ -321,12 +321,12 @@ func SuperDeleteLexicon(db *sql.DB, lexName string) error {
 	if err != nil {
 		return fmt.Errorf("SuperDeleteLexicon failed to initiate transaction : %v", err)
 	}
-	return SuperDeleteLexiconTx(tx, lexName)
+	return superDeleteLexiconTx(tx, lexName)
 }
 
 // SuperDeleteLexiconTx deletes the lexicon name from the lexicon
 // table and also whipes all associated entries out of existence.
-func SuperDeleteLexiconTx(tx *sql.Tx, lexName string) error {
+func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 
 	fmt.Println("dbapi.superDeleteLexiconTX was called")
 
@@ -384,14 +384,14 @@ func DefineLexicon(db *sql.DB, l Lexicon) (Lexicon, error) {
 		return Lexicon{}, fmt.Errorf("failed to get db transaction : %v", err)
 	}
 	defer tx.Commit()
-	res, err := DefineLexiconTx(tx, l)
+	res, err := defineLexiconTx(tx, l)
 	//tx.Commit()
 
 	return res, err
 }
 
 // DefineLexiconTx saves the name of a new lexicon to the db.
-func DefineLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
+func defineLexiconTx(tx *sql.Tx, l Lexicon) (Lexicon, error) {
 
 	res, err := tx.Exec("insert into lexicon (name, symbolsetname) values (?, ?)", strings.ToLower(l.Name), l.SymbolSetName)
 	if err != nil {
@@ -463,13 +463,13 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 
 	res := MoveResult{}
 	var err error
-	fromLex, err := GetLexiconTx(tx, fromLexicon)
+	fromLex, err := getLexiconTx(tx, fromLexicon)
 	if err != nil {
 		err := fmt.Errorf("couldn't find lexicon %s : %v", fromLexicon, err)
 		tx.Rollback()
 		return res, err
 	}
-	toLex, err := GetLexiconTx(tx, toLexicon)
+	toLex, err := getLexiconTx(tx, toLexicon)
 	if err != nil {
 		err := fmt.Errorf("couldn't find lexicon %s : %v", toLexicon, err)
 		tx.Rollback()
@@ -732,11 +732,11 @@ func LookUpIds(db *sql.DB, q Query) ([]int64, error) {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to initialize transaction : %v", err)
 	}
-	return LookUpIdsTx(tx, q)
+	return lookUpIdsTx(tx, q)
 }
 
 // LookUpIdsTx takes a Query struct, searches the lexicon db, and returns a slice of ids
-func LookUpIdsTx(tx *sql.Tx, q Query) ([]int64, error) {
+func lookUpIdsTx(tx *sql.Tx, q Query) ([]int64, error) {
 
 	sqlStmt := selectEntryIdsSQL(q)
 
@@ -772,13 +772,13 @@ func LookUp(db *sql.DB, q Query, out lex.EntryWriter) error {
 		tx.Rollback()
 		return fmt.Errorf("failed to initialize transaction : %v", err)
 	}
-	return LookUpTx(tx, q, out)
+	return lookUpTx(tx, q, out)
 }
 
 // LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
 // EntryWriter.
 // TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
-func LookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
+func lookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 
 	//fmt.Printf("QUWRY %v\n\n", q)
 
@@ -1033,7 +1033,7 @@ func UpdateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 		return res, updated, fmt.Errorf("failed starting transaction for updating entry : %v", err)
 	}
 
-	updated, err = UpdateEntryTx(tx, e)
+	updated, err = updateEntryTx(tx, e)
 	if err != nil {
 		tx.Rollback()
 		return res, updated, fmt.Errorf("failed updating entry : %v", err)
@@ -1050,11 +1050,11 @@ func UpdateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 
 // UpdateEntryTx updates the fields of an lex.Entry that do not match the
 // corresponding values in the db
-func UpdateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO return the updated entry?
+func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO return the updated entry?
 	// updated == false
 	//dbEntryMap := //GetEntriesFromIDsTx(tx, []int64{(e.ID)})
 	var esw lex.EntrySliceWriter
-	err = LookUpTx(tx, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
+	err = lookUpTx(tx, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
 	dbEntries := esw.Entries
 	if len(dbEntries) == 0 {
 		return updated, fmt.Errorf("no entry with id '%d'", e.ID)
@@ -1319,7 +1319,7 @@ func UpdateValidation(db *sql.DB, entries []lex.Entry) error {
 		return fmt.Errorf("failed starting transaction for updating validation : %v", err)
 	}
 
-	err = UpdateValidationTx(tx, entries)
+	err = updateValidationTx(tx, entries)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed updating validation : %v", err)
@@ -1328,7 +1328,7 @@ func UpdateValidation(db *sql.DB, entries []lex.Entry) error {
 	return nil
 }
 
-func UpdateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
+func updateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
 	for _, e := range entries {
 		_, err := updateEntryValidationForce(tx, e)
 		if err != nil {
@@ -1465,7 +1465,7 @@ func LexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	}
 	defer tx.Commit()
 
-	lex, err := GetLexiconTx(tx, lexName)
+	lex, err := getLexiconTx(tx, lexName)
 	if err != nil {
 		return res, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
 	}
@@ -1510,7 +1510,7 @@ func LexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	// t3 := time.Now()
 	// log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
 
-	valStats, err := ValidationStatsTx(tx, lexiconID)
+	valStats, err := validationStatsTx(tx, lexiconID)
 	res.ValStats = valStats
 
 	// t4 := time.Now()
@@ -1531,15 +1531,15 @@ func ValidationStats(db *sql.DB, lexName string) (ValStats, error) {
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
 	}
-	lex, err := GetLexiconTx(tx, lexName)
+	lex, err := getLexiconTx(tx, lexName)
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
 	}
 	lexID := lex.ID
-	return ValidationStatsTx(tx, lexID)
+	return validationStatsTx(tx, lexID)
 }
 
-func ValidationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
+func validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 
 	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
 

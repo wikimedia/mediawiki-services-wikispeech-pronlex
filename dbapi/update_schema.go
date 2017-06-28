@@ -13,7 +13,7 @@ func updateInsertPrefTrigger(tx *sql.Tx) error {
 
 func dropTrigger(tx *sql.Tx, triggerName string) error {
 
-	triggs0, err := ListNamesOfTriggersTx(tx) // Defined in dbapi.go
+	triggs0, err := listNamesOfTriggersTx(tx) // Defined in dbapi.go
 	if err != nil {
 		//fmt.Fprintf(os.Stderr, "What? : %v\n", err)
 		return fmt.Errorf("dbapi.dropTrigger : %v", err)

@@ -25,7 +25,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		return stats, fmt.Errorf("failed to initialize transaction : %v", err)
 	}
 
-	err = LookUpTx(tx, q, &w)
+	err = lookUpTx(tx, q, &w)
 	if err != nil {
 		tx.Rollback()
 		return stats, fmt.Errorf("couldn't lookup from ids : %s", err)
@@ -56,7 +56,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		}
 	}
 
-	err = UpdateValidationTx(tx, updated)
+	err = updateValidationTx(tx, updated)
 	if err != nil {
 		tx.Rollback()
 		return stats, fmt.Errorf("couldn't update validation : %s", err)
