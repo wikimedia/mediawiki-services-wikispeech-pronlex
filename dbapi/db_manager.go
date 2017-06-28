@@ -128,10 +128,10 @@ func (dbm DBManager) LookUp(lexRefs []lex.LexRef, q Query) (map[lex.DBRef][]lex.
 	defer dbm.RUnlock()
 
 	ch := make(chan lookUpRes)
-	for dbN, lexs := range dbz {
-		db, ok := dbm.dbs[dbN]
+	for dbR, lexs := range dbz {
+		db, ok := dbm.dbs[dbR]
 		if !ok {
-			return res, fmt.Errorf("DBManager.LookUp: no db of name '%s'", dbN)
+			return res, fmt.Errorf("DBManager.LookUp: no db of name '%s'", dbR)
 		}
 
 		go func(db0 *sql.DB, dbRef lex.DBRef, lexNames []lex.LexName) {
@@ -155,10 +155,13 @@ func (dbm DBManager) LookUp(lexRefs []lex.LexRef, q Query) (map[lex.DBRef][]lex.
 				ch <- rez
 				return
 			}
-			rez.entries = ew.Entries
+			for _, e := range ew.Entries {
+				e.LexRef.DBRef = dbRef
+				rez.entries = append(rez.entries, e)
+			}
+
 			ch <- rez
-			//res[dbN] = ew.Entries
-		}(db, dbN, lexs)
+		}(db, dbR, lexs)
 	}
 
 	for i := 0; i < len(dbz); i++ {
@@ -257,14 +260,15 @@ func (dbm DBManager) InsertEntries(lexRef lex.LexRef, entries []lex.Entry) ([]in
 	return res, err
 }
 
-func (dbm DBManager) UpdateEntry(dbRef lex.DBRef, e lex.Entry) (lex.Entry, bool, error) {
+//func (dbm DBManager) UpdateEntry(dbRef lex.DBRef, e lex.Entry) (lex.Entry, bool, error) {
+func (dbm DBManager) UpdateEntry(e lex.Entry) (lex.Entry, bool, error) {
 	var res lex.Entry
 
 	dbm.Lock()
 	defer dbm.Unlock()
-	db, ok := dbm.dbs[dbRef]
+	db, ok := dbm.dbs[e.LexRef.DBRef]
 	if !ok {
-		return res, false, fmt.Errorf("DBManager.UpdateEntry: no such db '%s'", dbRef)
+		return res, false, fmt.Errorf("DBManager.UpdateEntry: no such db '%s'", e.LexRef.DBRef)
 	}
 
 	return UpdateEntry(db, e)

@@ -278,7 +278,8 @@ func Test_DBManager(t *testing.T) {
 	w2 := "Svetzzz"
 	apaE.Transcriptions = []lex.Transcription{lex.Transcription{Strn: w1, Language: w2}}
 
-	_, _, err = dbm.UpdateEntry(lex.DBRef("db1"), apaE)
+	//_, _, err = dbm.UpdateEntry(lex.DBRef("db1"), apaE)
+	_, _, err = dbm.UpdateEntry(apaE)
 	if err != nil {
 		t.Errorf("serious! : %v", err)
 	}
