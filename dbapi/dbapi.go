@@ -1459,17 +1459,17 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 func LexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	res := LexStats{Lexicon: lexName}
 
-	lex, err := GetLexicon(db, lexName)
-	if err != nil {
-		return res, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
-	}
-	lexiconID := lex.ID
-
 	tx, err := db.Begin()
 	if err != nil {
 		return res, fmt.Errorf("dbapi.LexiconStats failed opening db transaction : %v", err)
 	}
 	defer tx.Commit()
+
+	lex, err := GetLexiconTx(tx, lexName)
+	if err != nil {
+		return res, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
+	}
+	lexiconID := lex.ID
 
 	// t1 := time.Now()
 
@@ -1525,17 +1525,17 @@ func LexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 }
 
 func ValidationStats(db *sql.DB, lexName string) (ValStats, error) {
-	lex, err := GetLexicon(db, lexName)
-	if err != nil {
-		return ValStats{}, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
-	}
-	lexID := lex.ID
 	tx, err := db.Begin()
 	defer tx.Commit()
 
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
 	}
+	lex, err := GetLexiconTx(tx, lexName)
+	if err != nil {
+		return ValStats{}, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
+	}
+	lexID := lex.ID
 	return ValidationStatsTx(tx, lexID)
 }
 
