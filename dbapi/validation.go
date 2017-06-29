@@ -25,7 +25,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		return stats, fmt.Errorf("failed to initialize transaction : %v", err)
 	}
 
-	err = LookUp(db, []lex.LexName{}, q, &w)
+	err = lookUp(db, []lex.LexName{}, q, &w)
 	if err != nil {
 		tx.Rollback()
 		return stats, fmt.Errorf("couldn't lookup from ids : %s", err)
@@ -81,7 +81,7 @@ func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.V
 	q.Page = 0       //todo?
 
 	logger.Write("Fetching entries from lexicon ... ")
-	ids, err := LookUpIds(db, lexNames, q)
+	ids, err := lookUpIds(db, lexNames, q)
 	if err != nil {
 		return stats, fmt.Errorf("couldn't lookup for validation : %s", err)
 	}

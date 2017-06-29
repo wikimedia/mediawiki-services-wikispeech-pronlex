@@ -56,7 +56,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		return fmt.Errorf("%v", msg)
 	}
 
-	lexicon, err := GetLexicon(db, lexiconName)
+	lexicon, err := getLexicon(db, lexiconName)
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
 		logger.Write(msg)
@@ -99,7 +99,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		if n%10000 == 0 {
 			//msg2 := fmt.Sprintf("Inserting entries (total lines read: %d)  ...", n)
 			//logger.Write(msg2)
-			_, err = InsertEntries(db, lexicon, eBuf)
+			_, err = insertEntries(db, lexicon, eBuf)
 			if err != nil {
 				var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 				logger.Write(msg)
@@ -116,7 +116,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 	}
 	//msg2 := fmt.Sprintf("Inserting entries (total lines read: %d)  ...", n)
 	//logger.Write(msg2)
-	_, err = InsertEntries(db, lexicon, eBuf) // flushing the buffer
+	_, err = insertEntries(db, lexicon, eBuf) // flushing the buffer
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 		logger.Write(msg)

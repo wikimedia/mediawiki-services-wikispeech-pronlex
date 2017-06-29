@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -16,23 +17,49 @@ func main() {
 	// TODO read lexicon name from command line
 	// + db look up
 
-	if len(os.Args) != 4 {
+	if len(os.Args) != 4 && len(os.Args) != 2 {
 		log.Println("go run export.go <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>")
+		log.Println(" if only <DB_FILE> is specified, a list of available lexicons will be printed")
 		return
 	}
 
-	db, err := sql.Open("sqlite3", os.Args[1])
+	dbFile := os.Args[1]
+	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatalf("darn : %v", err)
 	}
 
+	dbm := dbapi.NewDBManager()
+	dbRef := lex.DBRef(dbFile)
+	dbm.AddDB(dbRef, db)
+
+	lexRefs, err := dbm.ListLexicons()
+	lexNames := make(map[lex.LexName]bool)
+	if err != nil {
+		log.Fatalf("darn : %v", err)
+	}
+	for _, ref := range lexRefs {
+		if len(os.Args) == 2 {
+			fmt.Println(ref.LexName)
+		}
+		lexNames[ref.LexName] = true
+	}
+	if len(os.Args) == 2 {
+		return
+	}
+
 	lexName := os.Args[2]
+	lexRef := lex.NewLexRef(dbFile, lexName)
+
 	if "" == lexName {
 		log.Fatalf("invalid lexicon name '%s'", lexName)
 		return
 	}
-	ls := []lex.LexName{lex.LexName(lexName)}
-	q := dbapi.Query{}
+	if _, ok := lexNames[lexRef.LexName]; !ok {
+		log.Fatalf("no such lexicon name '%s'", lexName)
+		return
+	}
+	q := dbapi.DBMQuery{LexRefs: []lex.LexRef{lexRef}}
 	f, err := os.Create(os.Args[3])
 	if err != nil {
 		log.Fatalf("aouch : %v", err)
@@ -46,6 +73,5 @@ func main() {
 		log.Fatal(err)
 	}
 	writer := line.FileWriter{Parser: wsFmt, Writer: bf}
-	dbapi.LookUp(db, ls, q, writer)
-
+	dbm.LookUpIntoWriter(q, writer)
 }

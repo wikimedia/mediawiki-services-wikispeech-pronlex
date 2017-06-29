@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/validation/validators"
@@ -150,38 +151,36 @@ SAMPLE INVOCATION:
 
 	defer db.Close()
 
-	lexiconExists := false
-	lexicon, err := dbapi.GetLexicon(db, lexName)
-	if err == nil {
-		lexiconExists = true
+	dbm := dbapi.NewDBManager()
+	lexRef := lex.NewLexRef(dbFile, lexName)
+	dbRef := lexRef.DBRef
+	dbm.AddDB(dbRef, db)
+
+	lexExists, err := dbm.LexiconExists(lexRef)
+	if err != nil {
+		log.Fatalf("Couldn't super delete lexicon %s: %s", lexRef, err)
+	}
+	if lexExists {
 		if *replace {
-			log.Printf("Running SuperDelete on lexicon %s. This may take some time. Please do not abort during deletion.\n", lexName)
-			err := dbapi.SuperDeleteLexicon(db, lexicon.Name)
+			log.Printf("Running SuperDelete on lexicon %s. This may take some time. Please do not abort during deletion.\n", lexRef)
+			err := dbm.SuperDeleteLexicon(lexRef)
 			if err != nil {
-				log.Fatalf("Couldn't super delete lexicon %s : %s", lexName, err)
+				log.Fatalf("Couldn't super delete lexicon %s : %s", lexRef, err)
 				return
 			}
-			log.Printf("Deleted lexicon %s\n", lexName)
-			lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-			lexicon, err = dbapi.DefineLexicon(db, lexicon)
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
+			log.Printf("Deleted lexicon %s\n", lexRef)
 
 		} else {
-			log.Fatalf("Nothing will be added. Lexicon already exists in database: %s. Use the -replace switch if you want to replace the old lexicon.", lexName)
+			log.Fatalf("Nothing will be added. Lexicon already exists in database: %s. Use the -replace switch if you want to replace the old lexicon.", lexRef)
 			return
 		}
 	}
 
-	if !lexiconExists {
-		lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-		lexicon, err = dbapi.DefineLexicon(db, lexicon)
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
+	//lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
+	err = dbm.DefineLexicon(dbRef, symbolSetName, lexRef.LexName)
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
 
 	logger := dbapi.StderrLogger{}
@@ -210,7 +209,7 @@ SAMPLE INVOCATION:
 	logger.Write("validate=" + strconv.FormatBool(*validate))
 	fmt.Fprintf(os.Stderr, "\n")
 
-	stats, err := dbapi.LexiconStats(db, lexicon.Name)
+	stats, err := dbm.LexiconStats(lexRef)
 	if err != nil {
 		logger.Write(fmt.Sprintf("failed to retreive statistics : %v", err))
 		return
