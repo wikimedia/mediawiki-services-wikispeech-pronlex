@@ -2,7 +2,19 @@ package dbapi
 
 import (
 	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
+
+type DBMQuery struct {
+	LexRefs []lex.LexRef
+	Query   Query
+}
+
+type LexiconQuery struct {
+	Lexicons []string
+	Query    Query
+}
 
 // TODO Lägga till bolska fält för 'not'?
 // Kunna sätta sortering eller ej?
@@ -11,9 +23,6 @@ import (
 // TODO Change to list(s) of search critieria.
 // TODO add boolean for include/exclude (i.e., "NOT" in the generated SQL).
 type Query struct {
-	// Lexicons to be searched. Empty means 'all' (TODO I think)
-	// TODO Change []Lexicon into []string
-	Lexicons []Lexicon `json:"lexicons"`
 	// list of words to get corresponding entries for
 	Words []string `json:"words"`
 	// a 'like' db search expression matching words
@@ -101,13 +110,13 @@ func NewQuery() Query {
 }
 
 // LexiconIDs returns a list of db IDs of the Lexicons of the Query
-func (q Query) LexiconIDs() []int64 {
-	var ids []int64
-	for _, l := range q.Lexicons {
-		ids = append(ids, l.ID)
-	}
-	return ids
-}
+// func (q Query) LexiconIDs() []int64 {
+// 	var ids []int64
+// 	for _, l := range q.Lexicons {
+// 		ids = append(ids, l.ID)
+// 	}
+// 	return ids
+// }
 
 // Lexicon corresponds to the lexicon db table, to which Entries are
 // associated

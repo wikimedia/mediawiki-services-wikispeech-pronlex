@@ -252,6 +252,9 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 
 	lexs := dbapi.RemoveEmptyStrings(
 		splitRE.Split(getParam("lexicons", r), -1))
+	if len(lexs) > 0 {
+		panic("dbapi.Query no longer supports the lexicon field. Use dbapi.DBMQuery instead.")
+	}
 	words := dbapi.RemoveEmptyStrings(
 		splitRE.Split(getParam("words", r), -1))
 	lemmas := dbapi.RemoveEmptyStrings(
@@ -293,10 +296,14 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 		pageLength = 25
 	}
 
-	dbLexs, err := dbapi.GetLexicons(db, lexs)
+	//dbLexs, err := dbapi.GetLexicons(db, lexs)
+
+	lexNames := []lex.LexName{}
+	for _, ln := range lexs {
+		lexNames = append(lexNames, lex.LexName(ln))
+	}
 
 	q := dbapi.Query{
-		Lexicons:            dbLexs,
 		Words:               words,
 		WordLike:            wordLike,
 		WordRegexp:          wordRegexp,
@@ -420,38 +427,29 @@ func keepClientsAlive() {
 }
 
 func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconID, err := strconv.ParseInt(getParam("id", r), 10, 64)
-	if err != nil {
-		msg := "exportLexiconHandler got no lexicon id"
+	lexiconName := getParam("lexicon_name", r)
+	if "" == lexiconName {
+		msg := "exportLexiconHandler got no lexicon name"
 		fmt.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 
-	lexicon, err := dbapi.LexiconFromID(db, lexiconID)
-	if err != nil {
-		msg := fmt.Sprintf("exportLexiconHandler failed to get lexicon from id : %v", err)
-		log.Println(msg)
-		// TODO this might not be a proper error: the client could simply have asked for a lexicon id that doesn't exist.
-		// Handle more gracefully (but for now, let's crash).
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
 	// If client sends UUID, messages can be written to client socket
 	clientUUID := getParam("client_uuid", r)
-	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexicon.Name))
+	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexiconName))
 
 	// local output file
-	fName := filepath.Join(downloadFileArea, lexicon.Name+".txt.gz")
+	fName := filepath.Join(downloadFileArea, lexiconName+".txt.gz")
 	f, err := os.Create(fName)
 	//bf := bufio.NewWriter(f)
 	gz := gzip.NewWriter(f)
 	//defer gz.Flush()
 	defer gz.Close()
 	// Query that returns all entries of lexicon
-	ls := []dbapi.Lexicon{dbapi.Lexicon{ID: lexicon.ID}}
-	q := dbapi.Query{Lexicons: ls}
+	//ls := []dbapi.Lexicon{dbapi.Lexicon{ID: lexicon.ID}}
+	q := dbapi.Query{}
+	lexNames := []lex.LexName{lex.LexName(lexiconName)}
 
 	log.Printf("Query for exporting: %v", q)
 
@@ -463,10 +461,10 @@ func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	wsW := line.FileWriter{Parser: wsFmt, Writer: gz}
-	dbapi.LookUp(db, q, wsW)
+	dbapi.LookUp(db, lexNames, q, wsW)
 	defer gz.Close()
 	gz.Flush()
-	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %s", lexicon.Name, fName))
+	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %s", lexiconName, fName))
 
 	msg := fmt.Sprintf("Lexicon exported to '%s'", fName)
 	log.Print(msg)

@@ -725,20 +725,20 @@ func AssociateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry) error {
 // }
 
 // LookUpIds takes a Query struct, searches the lexicon db, and writes the result to a slice of ids
-func LookUpIds(db *sql.DB, q Query) ([]int64, error) {
+func LookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to initialize transaction : %v", err)
 	}
-	return lookUpIdsTx(tx, q)
+	return lookUpIdsTx(tx, lexNames, q)
 }
 
 // LookUpIdsTx takes a Query struct, searches the lexicon db, and returns a slice of ids
-func lookUpIdsTx(tx *sql.Tx, q Query) ([]int64, error) {
+func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 
-	sqlStmt := selectEntryIdsSQL(q)
+	sqlStmt := selectEntryIdsSQL(lexNames, q)
 
 	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
 	if err != nil {
@@ -765,24 +765,24 @@ func lookUpIdsTx(tx *sql.Tx, q Query) ([]int64, error) {
 
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
-func LookUp(db *sql.DB, q Query, out lex.EntryWriter) error {
+func LookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to initialize transaction : %v", err)
 	}
-	return lookUpTx(tx, q, out)
+	return lookUpTx(tx, lexNames, q, out)
 }
 
 // LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
 // EntryWriter.
 // TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
-func lookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
+func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
 
 	//fmt.Printf("QUWRY %v\n\n", q)
 
-	sqlStmt := selectEntriesSQL(q)
+	sqlStmt := selectEntriesSQL(lexNames, q)
 
 	//fmt.Printf("SQL %v\n\n", sqlString)
 
@@ -976,9 +976,9 @@ func lookUpTx(tx *sql.Tx, q Query, out lex.EntryWriter) error {
 }
 
 // LookUpIntoSlice is a wrapper around LookUp, returning a slice of Entries
-func LookUpIntoSlice(db *sql.DB, q Query) ([]lex.Entry, error) {
+func LookUpIntoSlice(db *sql.DB, lexNames []lex.LexName, q Query) ([]lex.Entry, error) {
 	var esw lex.EntrySliceWriter
-	err := LookUp(db, q, &esw)
+	err := LookUp(db, lexNames, q, &esw)
 	if err != nil {
 		return esw.Entries, fmt.Errorf("failed lookup : %v", err)
 	}
@@ -987,10 +987,10 @@ func LookUpIntoSlice(db *sql.DB, q Query) ([]lex.Entry, error) {
 
 // LookUpIntoMap is a wrapper around LookUp, returning a map where the
 // keys are word forms and the values are slices of Entries. (There may be several entries with the same Strn value.)
-func LookUpIntoMap(db *sql.DB, q Query) (map[string][]lex.Entry, error) {
+func LookUpIntoMap(db *sql.DB, lexNames []lex.LexName, q Query) (map[string][]lex.Entry, error) {
 	res := make(map[string][]lex.Entry)
 	var esw lex.EntrySliceWriter
-	err := LookUp(db, q, &esw)
+	err := LookUp(db, lexNames, q, &esw)
 	if err != nil {
 		return res, fmt.Errorf("failed lookup : %v", err)
 	}
@@ -1007,7 +1007,7 @@ func GetEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 	res := lex.Entry{}
 	q := Query{EntryIDs: []int64{id}}
 	esw := lex.EntrySliceWriter{}
-	err := LookUp(db, q, &esw)
+	err := LookUp(db, []lex.LexName{}, q, &esw)
 	if err != nil {
 		return res, fmt.Errorf("LookUp failed : %v", err)
 	}
@@ -1019,6 +1019,21 @@ func GetEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 		return res, fmt.Errorf("LookUp resulted in more than one entry")
 	}
 	return esw.Entries[0], nil
+
+}
+
+// GetEntriesFromIDs is a wrapper around LookUp and returns the lex.Entry corresponding to the db id
+func GetEntriesFromIDs(db *sql.DB, ids []int64, out lex.EntryWriter) error {
+	q := Query{EntryIDs: ids}
+	err := LookUp(db, []lex.LexName{}, q, out)
+	if err != nil {
+		return fmt.Errorf("LookUp failed : %v", err)
+	}
+
+	if out.Size() != len(ids) {
+		return fmt.Errorf("got %d input ids, but found %d entries", len(ids), out.Size())
+	}
+	return nil
 
 }
 
@@ -1054,7 +1069,7 @@ func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 	// updated == false
 	//dbEntryMap := //GetEntriesFromIDsTx(tx, []int64{(e.ID)})
 	var esw lex.EntrySliceWriter
-	err = lookUpTx(tx, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
+	err = lookUpTx(tx, []lex.LexName{e.LexRef.LexName}, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
 	dbEntries := esw.Entries
 	if len(dbEntries) == 0 {
 		return updated, fmt.Errorf("no entry with id '%d'", e.ID)

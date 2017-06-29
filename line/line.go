@@ -175,6 +175,11 @@ func (f Format) String(fields map[Field]string) (string, error) {
 type FileWriter struct {
 	Parser Parser
 	Writer io.Writer
+	size   int
+}
+
+func (w FileWriter) Size() int {
+	return w.size
 }
 
 // Write is used to write one lex.Entry at a time to a file (using an io.Writer)

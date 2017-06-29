@@ -187,7 +187,7 @@ func Test_DBManager(t *testing.T) {
 	}
 
 	q := Query{Words: []string{"apa"}}
-	lookRes, err := dbm.LookUp([]lex.LexRef{lex.NewLexRef("db2", "zuperduperlex")}, q)
+	lookRes, err := dbm.LookUp(DBMQuery{[]lex.LexRef{lex.NewLexRef("db2", "zuperduperlex")}, q})
 	if w, g := 1, len(lookRes); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}
@@ -205,7 +205,8 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("dbm.InsertEntries: %v", err)
 	}
 
-	lookRes, err = dbm.LookUp([]lex.LexRef{lex.NewLexRef("db2", "zuperduperlex"), lex.NewLexRef("db1", "zuperlex1")}, q)
+	lookRes, err = dbm.LookUp(DBMQuery{[]lex.LexRef{lex.NewLexRef("db2", "zuperduperlex"), lex.NewLexRef("db1", "zuperlex1")}, q})
+
 	if w, g := 2, len(lookRes); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}
@@ -251,7 +252,7 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("gah! : %v", err)
 	}
 
-	lookRez, err := dbm.LookUp([]lex.LexRef{lex.NewLexRef("db2", "zuperduperlex"), lex.NewLexRef("db1", "zuperlex1"), lex.NewLexRef("db1", "zuperlex3")}, Query{WordRegexp: "."})
+	lookRez, err := dbm.LookUp(DBMQuery{[]lex.LexRef{lex.NewLexRef("db2", "zuperduperlex"), lex.NewLexRef("db1", "zuperlex1"), lex.NewLexRef("db1", "zuperlex3")}, Query{WordRegexp: "."}})
 	//fmt.Printf("%v\n", lookRez)
 	if err != nil {
 		t.Errorf("geh! : %v", err)
@@ -268,7 +269,7 @@ func Test_DBManager(t *testing.T) {
 	}
 
 	// Update a DB entry
-	lookUpApa, err := dbm.LookUp([]lex.LexRef{lex.NewLexRef("db1", "zuperlex1")}, Query{Words: []string{"apa"}})
+	lookUpApa, err := dbm.LookUp(DBMQuery{[]lex.LexRef{lex.NewLexRef("db1", "zuperlex1")}, Query{Words: []string{"apa"}}})
 	if err != nil {
 		t.Errorf("LookUp failed : %v", err)
 	}
@@ -284,7 +285,7 @@ func Test_DBManager(t *testing.T) {
 		t.Errorf("serious! : %v", err)
 	}
 
-	lookUpApa, err = dbm.LookUp([]lex.LexRef{lex.NewLexRef("db1", "zuperlex1")}, Query{Words: []string{"apa"}})
+	lookUpApa, err = dbm.LookUp(DBMQuery{[]lex.LexRef{lex.NewLexRef("db1", "zuperlex1")}, Query{Words: []string{"apa"}}})
 	if err != nil {
 		t.Errorf("LookUp failed : %v", err)
 	}

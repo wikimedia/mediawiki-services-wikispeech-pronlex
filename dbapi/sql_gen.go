@@ -3,6 +3,8 @@ package dbapi
 import (
 	"strconv"
 	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 // ***** helpers -->
@@ -44,46 +46,46 @@ func convS(s []string) []interface{} {
 // tables returns at least 'entry' since it makes no sense to return the empty string,
 // since the return value of this function is to be used after 'select
 // entry.id from'
-func tables(q Query) string {
-	var res []string
-	if len(q.Lexicons) > 0 {
-		res = append(res, "lexicon")
-	}
-	//if len(q.Words) > 0 || q.WordLike != "" || q.PartOfSpeechLike != "" {
-	res = append(res, "entry")
-	//}
+// func tables(lexNames []lex.LexName, q Query) string {
+// 	var res []string
+// 	if len(lexNames) > 0 {
+// 		res = append(res, "lexicon")
+// 	}
+// 	//if len(q.Words) > 0 || q.WordLike != "" || q.PartOfSpeechLike != "" {
+// 	res = append(res, "entry")
+// 	//}
 
-	if q.TranscriptionLike != "" {
-		res = append(res, "transcription")
-	}
-	if len(q.Lemmas) > 0 || q.LemmaLike != "" || q.ReadingLike != "" || q.ParadigmLike != "" {
-		res = append(res, "lemma, lemma2entry")
-	}
+// 	if q.TranscriptionLike != "" {
+// 		res = append(res, "transcription")
+// 	}
+// 	if len(q.Lemmas) > 0 || q.LemmaLike != "" || q.ReadingLike != "" || q.ParadigmLike != "" {
+// 		res = append(res, "lemma, lemma2entry")
+// 	}
 
-	return strings.Join(res, ", ")
-}
+// 	return strings.Join(res, ", ")
+// }
 
 // lexicons returns a piece of sql matching the Querys list of
 // lexicons and a slice of the db ids of the lexicons listed in a Query
-func lexicons(q Query) (string, []interface{}) {
+func lexicons(lexNames []lex.LexName) (string, []interface{}) {
 	var res string
 	var resv []interface{}
-	if q.Lexicons == nil || len(q.Lexicons) == 0 {
+	if lexNames == nil || len(lexNames) == 0 {
 		return res, resv
 	}
 
-	res += "entry.lexiconid = lexicon.id AND lexicon.id in " + nQs(len(q.Lexicons))
+	res += "entry.lexiconid = lexicon.id AND lexicon.name in " + nQs(len(lexNames))
 
-	lIds := make([]interface{}, len(q.Lexicons))
-	for i, l := range q.Lexicons {
-		lIds[i] = l.ID
+	lNames := make([]interface{}, len(lexNames))
+	for i, l := range lexNames {
+		lNames[i] = string(l)
 	}
 
-	resv = append(resv, lIds...)
+	resv = append(resv, lNames...)
 	return res, resv
 }
 
-func words(q Query) (string, []interface{}) {
+func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 	var res string
 	var resv []interface{}
 
@@ -126,7 +128,7 @@ func words(q Query) (string, []interface{}) {
 
 	//}
 
-	if len(q.Lexicons) != 0 {
+	if len(lexNames) != 0 {
 		res += " and entry.lexiconid = lexicon.id"
 	}
 
@@ -262,14 +264,14 @@ type sqlStmt struct {
 	values []interface{}
 }
 
-func appendQuery(sql string, q Query) (string, []interface{}) {
+func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interface{}) {
 	var args []interface{}
 
 	// Query.Lexicons
-	l, lv := lexicons(q)
+	l, lv := lexicons(lexNames)
 	args = append(args, lv...)
 	// Query.Words, Query.WordsLike, Query.PartOfSpeechLike, Query.WordsRegexp, Query.PartOfSpeechRegexp
-	w, wv := words(q)
+	w, wv := words(lexNames, q)
 	args = append(args, wv...)
 	// Query.Lemmas, Query.LemmaLike, Query.ReadingLike, Query.ParadigmLike, Query.LemmaRegexp, Query.ReadingRegexp, Query.ParadigmRegexp
 	le, lev := lemmas(q)
@@ -298,8 +300,8 @@ func appendQuery(sql string, q Query) (string, []interface{}) {
 // SelectEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
-func selectEntriesSQL(q Query) sqlStmt {
-	sqlQuery, args := appendQuery(baseSQLSelect, q)
+func selectEntriesSQL(lexNames []lex.LexName, q Query) sqlStmt {
+	sqlQuery, args := appendQuery(baseSQLSelect, lexNames, q)
 
 	// sort by id to make sql rows -> Entry simpler
 	sqlQuery += " ORDER BY entry.id, transcription.id"
@@ -316,16 +318,16 @@ func selectEntriesSQL(q Query) sqlStmt {
 // SelectEntryIdsSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
-func selectEntryIdsSQL(q Query) sqlStmt {
-	sqlQuery, args := appendQuery(baseSQLSelectIds, q)
+func selectEntryIdsSQL(lexNames []lex.LexName, q Query) sqlStmt {
+	sqlQuery, args := appendQuery(baseSQLSelectIds, lexNames, q)
 	return sqlStmt{sql: sqlQuery, values: args}
 }
 
 // CountEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
-func countEntriesSQL(q Query) sqlStmt {
-	sqlQuery, args := appendQuery(baseSQLCount, q)
+func countEntriesSQL(lexNames []lex.LexName, q Query) sqlStmt {
+	sqlQuery, args := appendQuery(baseSQLCount, lexNames, q)
 	return sqlStmt{sql: sqlQuery, values: args}
 }
 

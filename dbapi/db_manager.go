@@ -111,15 +111,11 @@ type lookUpRes struct {
 	err     error
 }
 
-// TODO This turned out somewhat ugly: the Query.Lexicon field is
-// overwritten by the full (DB+lexicon name) lexicon names. The Query
-// will be copied and instantiated with the Lexicon field for each DB.
-// ??? How to handle this in a neater way ???
-func (dbm DBManager) LookUp(lexRefs []lex.LexRef, q Query) (map[lex.DBRef][]lex.Entry, error) {
+func (dbm DBManager) LookUp(q DBMQuery) (map[lex.DBRef][]lex.Entry, error) {
 	var res = make(map[lex.DBRef][]lex.Entry)
 
 	dbz := make(map[lex.DBRef][]lex.LexName)
-	for _, l := range lexRefs {
+	for _, l := range q.LexRefs {
 		lexList := dbz[l.DBRef]
 		dbz[l.DBRef] = append(lexList, l.LexName)
 	}
@@ -135,21 +131,10 @@ func (dbm DBManager) LookUp(lexRefs []lex.LexRef, q Query) (map[lex.DBRef][]lex.
 		}
 
 		go func(db0 *sql.DB, dbRef lex.DBRef, lexNames []lex.LexName) {
-			lexNameStrings := []string{}
-			for _, ln := range lexNames {
-				lexNameStrings = append(lexNameStrings, string(ln)) // TODO: lex.LexName
-			}
 			rez := lookUpRes{}
 			rez.dbRef = dbRef
-			lexs0, err := GetLexicons(db0, lexNameStrings)
-			if err != nil {
-				rez.err = fmt.Errorf("DBManager.LookUp: failed db query : %v", err)
-				ch <- rez
-				return
-			}
-			q.Lexicons = lexs0
 			ew := lex.EntrySliceWriter{}
-			err = LookUp(db, q, &ew)
+			err := LookUp(db0, lexNames, q.Query, &ew)
 			if err != nil {
 				rez.err = fmt.Errorf("DBManager.LookUp dbapi.LookUp failed : %v", err)
 				ch <- rez

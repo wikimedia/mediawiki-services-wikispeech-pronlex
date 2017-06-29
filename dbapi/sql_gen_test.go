@@ -2,6 +2,8 @@ package dbapi
 
 import (
 	"testing"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 var fs = "Wanted: '%v' got: '%v'"
@@ -37,7 +39,7 @@ func TestSql_ToLower(t *testing.T) {
 }
 
 func TestSql_words(t *testing.T) {
-	w, wv := words(Query{})
+	w, wv := words([]lex.LexName{}, Query{})
 	if "" != w {
 		t.Error("Gah!")
 	}
@@ -45,7 +47,8 @@ func TestSql_words(t *testing.T) {
 		t.Error("Gah2!")
 	}
 
-	w, wv = words(Query{Words: []string{"fimbul"}})
+	//w, wv = words(Query{Words: []string{"fimbul"}})
+	w, wv = words([]lex.LexName{}, Query{Words: []string{"fimbul"}})
 	x := "entry.strn in (?)"
 	if w != x {
 		t.Errorf(fs, x, w)
@@ -54,7 +57,8 @@ func TestSql_words(t *testing.T) {
 		t.Errorf(fs, 1, len(wv))
 	}
 
-	w, _ = words(Query{Lexicons: []Lexicon{Lexicon{}}, Words: []string{"fimbul", "vinter"}})
+	//w, _ = words(Query{Lexicons: []Lexicon{Lexicon{}}, Words: []string{"fimbul", "vinter"}})
+	w, _ = words([]lex.LexName{lex.LexName("")}, Query{Words: []string{"fimbul", "vinter"}})
 	x = "entry.strn in (?,?) and entry.lexiconid = lexicon.id"
 	if w != x {
 		t.Errorf(fs, x, w)
@@ -94,7 +98,7 @@ func TestSql_nQs(t *testing.T) {
 
 func TestSql_SelectEntriesSQL(t *testing.T) {
 	q := Query{LemmaLike: "%gal_", ReadingLike: "%grus_"}
-	sq := selectEntriesSQL(q)
+	sq := selectEntriesSQL([]lex.LexName{}, q)
 	if sq.sql == "" {
 		t.Error(fs, "non empty", sq.sql)
 	}

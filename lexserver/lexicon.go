@@ -247,7 +247,8 @@ var lexiconLookup = urlHandler{
 		}
 
 		//res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
-		res, err := dbapi.LookUpIntoSlice(db, q) // GetEntries(db, q)
+		lexNames := []lex.LexName{}                        // TODO: Update with db_manager!!
+		res, err := dbapi.LookUpIntoSlice(db, lexNames, q) // GetEntries(db, q) // TODO: Update with db_manager!!
 		if err != nil {
 			log.Printf("lexserver: Failed to get entries: %v", err)
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -406,8 +407,9 @@ var lexiconValidation = urlHandler{
 			return
 		}
 
-		q := dbapi.Query{Lexicons: []dbapi.Lexicon{lexicon}}
-		stats, err := dbapi.Validate(db, logger, *v, q)
+		q := dbapi.Query{}
+		lexNames := []lex.LexName{lex.LexName(lexicon.Name)}
+		stats, err := dbapi.Validate(db, lexNames, logger, *v, q)
 		if err != nil {
 			msg := fmt.Sprintf("lexiconValidation failed validate : %v", err)
 			log.Println(msg)

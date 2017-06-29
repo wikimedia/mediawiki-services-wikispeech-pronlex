@@ -25,10 +25,14 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		return stats, fmt.Errorf("failed to initialize transaction : %v", err)
 	}
 
-	err = lookUpTx(tx, q, &w)
+	err = LookUp(db, []lex.LexName{}, q, &w)
 	if err != nil {
 		tx.Rollback()
 		return stats, fmt.Errorf("couldn't lookup from ids : %s", err)
+	}
+	if w.Size() != len(chunk) {
+		tx.Rollback()
+		return stats, fmt.Errorf("got %d input ids, but found %d entries", len(chunk), w.Size())
 	}
 
 	validated, _ := vd.ValidateEntries(w.Entries)
@@ -65,7 +69,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	return stats, nil
 }
 
-func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
+func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
 
 	start := time.Now()
 
@@ -77,7 +81,7 @@ func Validate(db *sql.DB, logger Logger, vd validation.Validator, q Query) (ValS
 	q.Page = 0       //todo?
 
 	logger.Write("Fetching entries from lexicon ... ")
-	ids, err := LookUpIds(db, q)
+	ids, err := LookUpIds(db, lexNames, q)
 	if err != nil {
 		return stats, fmt.Errorf("couldn't lookup for validation : %s", err)
 	}

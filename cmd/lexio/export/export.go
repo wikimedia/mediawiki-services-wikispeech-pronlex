@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	// + db look up
 
 	if len(os.Args) != 4 {
-		log.Println("go run export.go <DB_FILE> <LEXICON_DB_ID> <OUTPUT_FILE_NAME>")
+		log.Println("go run export.go <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>")
 		return
 	}
 
@@ -26,14 +26,13 @@ func main() {
 		log.Fatalf("darn : %v", err)
 	}
 
-	dbIDstr := os.Args[2]
-	dbID, err := strconv.ParseInt(dbIDstr, 10, 64)
-	if err != nil {
-		log.Fatalf("failed to convert command line option %s into int : %v", dbIDstr, err)
+	lexName := os.Args[2]
+	if "" == lexName {
+		log.Fatalf("invalid lexicon name '%s'", lexName)
 		return
 	}
-	ls := []dbapi.Lexicon{dbapi.Lexicon{ID: dbID}}
-	q := dbapi.Query{Lexicons: ls}
+	ls := []lex.LexName{lex.LexName(lexName)}
+	q := dbapi.Query{}
 	f, err := os.Create(os.Args[3])
 	if err != nil {
 		log.Fatalf("aouch : %v", err)
@@ -47,6 +46,6 @@ func main() {
 		log.Fatal(err)
 	}
 	writer := line.FileWriter{Parser: wsFmt, Writer: bf}
-	dbapi.LookUp(db, q, writer)
+	dbapi.LookUp(db, ls, q, writer)
 
 }

@@ -129,6 +129,7 @@ type Entry struct {
 // See EntrySliceWriter, for returning a slice of Entry, and EntryFileWriter, for writing Entries to file.
 type EntryWriter interface {
 	Write(Entry) error
+	Size() int
 }
 
 // EntryFileWriter outputs formated entries to an io.Writer.
@@ -138,11 +139,17 @@ type EntryWriter interface {
 //	bfx := lex.EntriesFileWriter{bf}
 //	dbapi.LookUp(db, q, bfx)
 type EntryFileWriter struct {
+	size   int
 	Writer io.Writer
+}
+
+func (w *EntryFileWriter) Size() int {
+	return w.size
 }
 
 func (w *EntryFileWriter) Write(e Entry) error {
 	// TODO call to line formatting of Entry
+	w.size = w.size + 1
 	_, err := fmt.Fprintf(w.Writer, "%v\n", e)
 	return err
 }
@@ -157,6 +164,9 @@ type EntrySliceWriter struct {
 	Entries []Entry
 }
 
+func (w *EntrySliceWriter) Size() int {
+	return len(w.Entries)
+}
 func (w *EntrySliceWriter) Write(e Entry) error {
 	w.Entries = append(w.Entries, e)
 	return nil
