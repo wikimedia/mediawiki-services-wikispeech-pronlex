@@ -162,62 +162,22 @@ type lookUpRes struct {
 	err     error
 }
 
-func (dbm DBManager) LookUp(q DBMQuery) (map[lex.DBRef][]lex.Entry, error) {
+func (dbm DBManager) LookUpIntoMap(q DBMQuery) (map[lex.DBRef][]lex.Entry, error) {
 	var res = make(map[lex.DBRef][]lex.Entry)
-
-	dbz := make(map[lex.DBRef][]lex.LexName)
-	for _, l := range q.LexRefs {
-		lexList := dbz[l.DBRef]
-		dbz[l.DBRef] = append(lexList, l.LexName)
+	writer := lex.EntrySliceWriter{}
+	err := dbm.LookUp(q, &writer)
+	if err != nil {
+		return res, fmt.Errorf("DBManager.LookUp failed : %v", err)
 	}
-
-	dbm.RLock()
-	defer dbm.RUnlock()
-
-	ch := make(chan lookUpRes)
-	for dbR, lexs := range dbz {
-		db, ok := dbm.dbs[dbR]
-		if !ok {
-			return res, fmt.Errorf("DBManager.LookUp: no db of name '%s'", dbR)
-		}
-
-		go func(db0 *sql.DB, dbRef lex.DBRef, lexNames []lex.LexName) {
-			rez := lookUpRes{}
-			rez.dbRef = dbRef
-			ew := lex.EntrySliceWriter{}
-			err := lookUp(db0, lexNames, q.Query, &ew)
-			if err != nil {
-				rez.err = fmt.Errorf("DBManager.LookUp dbapi.LookUp failed : %v", err)
-				ch <- rez
-				return
-			}
-			for _, e := range ew.Entries {
-				e.LexRef.DBRef = dbRef
-				rez.entries = append(rez.entries, e)
-			}
-
-			ch <- rez
-		}(db, dbR, lexs)
+	for _, e := range writer.Entries {
+		es := res[e.LexRef.DBRef]
+		es = append(es, e)
+		res[e.LexRef.DBRef] = es
 	}
-
-	for i := 0; i < len(dbz); i++ {
-		lkUp := <-ch
-		if lkUp.err != nil {
-			return res, fmt.Errorf("DBManager.LookUp failed : %v", lkUp.err)
-		}
-
-		if _, ok := res[lkUp.dbRef]; ok {
-			return res, fmt.Errorf("DBManage.LookUp: returned several result for single DB '%s'", lkUp.dbRef)
-		}
-		res[lkUp.dbRef] = lkUp.entries
-	}
-
 	return res, nil
 }
 
-func (dbm DBManager) LookUpIntoWriter(q DBMQuery, out lex.EntryWriter) error {
-	var res = make(map[lex.DBRef][]lex.Entry)
-
+func (dbm DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 	dbz := make(map[lex.DBRef][]lex.LexName)
 	for _, l := range q.LexRefs {
 		lexList := dbz[l.DBRef]
@@ -246,7 +206,7 @@ func (dbm DBManager) LookUpIntoWriter(q DBMQuery, out lex.EntryWriter) error {
 			}
 			for _, e := range ew.Entries {
 				e.LexRef.DBRef = dbRef
-				out.Write(e)
+				rez.entries = append(rez.entries, e)
 			}
 
 			ch <- rez
@@ -259,10 +219,9 @@ func (dbm DBManager) LookUpIntoWriter(q DBMQuery, out lex.EntryWriter) error {
 			return fmt.Errorf("DBManager.LookUp failed : %v", lkUp.err)
 		}
 
-		if _, ok := res[lkUp.dbRef]; ok {
-			return fmt.Errorf("DBManage.LookUp: returned several result for single DB '%s'", lkUp.dbRef)
+		for _, e := range lkUp.entries {
+			out.Write(e)
 		}
-		res[lkUp.dbRef] = lkUp.entries
 	}
 
 	return nil

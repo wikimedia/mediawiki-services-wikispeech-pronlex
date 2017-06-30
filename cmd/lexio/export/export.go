@@ -73,5 +73,5 @@ func main() {
 		log.Fatal(err)
 	}
 	writer := line.FileWriter{Parser: wsFmt, Writer: bf}
-	dbm.LookUpIntoWriter(q, writer)
+	dbm.LookUp(q, writer)
 }
