@@ -6,15 +6,16 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
+// DBMQuery is a query used by the DBManager, containing lexicon referenes (db+lex name) and a dbapi.Query
 type DBMQuery struct {
 	LexRefs []lex.LexRef
 	Query   Query
 }
 
-type LexiconQuery struct {
-	Lexicons []string
-	Query    Query
-}
+// type LexiconQuery struct {
+// 	Lexicons []string
+// 	Query    Query
+// }
 
 // TODO Lägga till bolska fält för 'not'?
 // Kunna sätta sortering eller ej?

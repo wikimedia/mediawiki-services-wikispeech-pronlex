@@ -61,8 +61,8 @@ var lexiconUpdateEntry = urlHandler{
 	},
 }
 
+// LexWithEntryCount is a struct for collecting lexicon info for json result
 type LexWithEntryCount struct {
-	//ID            int64  `json:"id"`
 	Name          string `json:"name"`
 	SymbolSetName string `json:"symbolSetName"`
 	EntryCount    int64  `json:"entryCount"`
@@ -155,6 +155,7 @@ var lexiconListAllEntryStatuses = urlHandler{
 	},
 }
 
+// LexInfo is a struct for collecting lexicon info for json result
 type LexInfo struct {
 	Name          string `json:"name"`
 	SymbolSetName string `json:"symbolSetName"`

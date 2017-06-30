@@ -16,7 +16,7 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
-// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any validation whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
+// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
 func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexiconFileName string, validator *validation.Validator) error {
 
 	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))

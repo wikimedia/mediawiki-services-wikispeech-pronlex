@@ -254,7 +254,7 @@ var adminListDBs = urlHandler{
 	help:     "Lists available lexicon databases.",
 	examples: []string{"/list_dbs"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		dbs, err := dbm.ListDatabases()
+		dbs, err := dbm.ListDBNames()
 		if err != nil {
 			http.Error(w, fmt.Sprintf("list dbs failed : %v", err), http.StatusInternalServerError)
 			return

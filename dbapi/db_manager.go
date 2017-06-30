@@ -10,15 +10,18 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
+// DBManager is used by external services (i.e., lexserver) to cache sql database instances along with their names
 type DBManager struct {
 	sync.RWMutex
 	dbs map[lex.DBRef]*sql.DB
 }
 
+// NewDBManager creates a new DBManager instance with empty cache
 func NewDBManager() DBManager {
 	return DBManager{dbs: make(map[lex.DBRef]*sql.DB)}
 }
 
+// AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk.
 func (dbm DBManager) AddDB(dbRef lex.DBRef, db *sql.DB) error {
 	name := string(dbRef)
 	if "" == name {
@@ -43,6 +46,7 @@ func (dbm DBManager) AddDB(dbRef lex.DBRef, db *sql.DB) error {
 	return nil
 }
 
+// RemoveDB is used to remove a database from the cached map of available databases. It does NOT from the database from disk.
 func (dbm DBManager) RemoveDB(dbRef lex.DBRef) error {
 	name := string(dbRef)
 	dbm.Lock()
@@ -57,6 +61,24 @@ func (dbm DBManager) RemoveDB(dbRef lex.DBRef) error {
 	return nil
 }
 
+// ListDBNames lists all database names in the cached map of available databases. It does NOT verify what databases are actually existing on disk.
+func (dbm DBManager) ListDBNames() ([]lex.DBRef, error) {
+	var res []lex.DBRef
+
+	dbm.RLock()
+	defer dbm.RUnlock()
+
+	for k := range dbm.dbs {
+		res = append(res, k)
+	}
+
+	return res, nil
+}
+
+// SuperDeleteLexicon deletes the lexicon from the associated lexicon
+// database, and also whipes all associated entries out of existence.
+// Returns an error if the lexicon doesn't exist,
+// TODO Send progress message to client over websocket (it takes some time)
 func (dbm DBManager) SuperDeleteLexicon(lexRef lex.LexRef) error {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -74,6 +96,8 @@ func (dbm DBManager) SuperDeleteLexicon(lexRef lex.LexRef) error {
 	return nil
 }
 
+// DeleteLexicon deletes the lexicon from the associated lexicon
+// database. Returns an error if the lexicon doesn't exist,  or if the lexicon is not empty.
 func (dbm DBManager) DeleteLexicon(lexRef lex.LexRef) error {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -91,6 +115,7 @@ func (dbm DBManager) DeleteLexicon(lexRef lex.LexRef) error {
 	return nil
 }
 
+// LexiconStats calls the specified database a number of times, gathering different numbers, e.g. on how many entries there are in a lexicon.
 func (dbm DBManager) LexiconStats(lexRef lex.LexRef) (LexStats, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -108,6 +133,7 @@ func (dbm DBManager) LexiconStats(lexRef lex.LexRef) (LexStats, error) {
 	return stats, nil
 }
 
+// DefineLexicons saves the names of the new lexicons to the db.
 func (dbm DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, lexes ...lex.LexName) error {
 
 	dbm.RLock()
@@ -127,6 +153,7 @@ func (dbm DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, lexes
 	return nil
 }
 
+// DefineLexicon saves the name of a new lexicon to the db.
 func (dbm DBManager) DefineLexicon(lexRef lex.LexRef, symbolSetName string) error {
 
 	dbm.RLock()
@@ -144,25 +171,13 @@ func (dbm DBManager) DefineLexicon(lexRef lex.LexRef, symbolSetName string) erro
 	return nil
 }
 
-func (dbm DBManager) ListDBNames() []lex.DBRef {
-	var res []lex.DBRef
-
-	dbm.RLock()
-	defer dbm.RUnlock()
-
-	for k := range dbm.dbs {
-		res = append(res, k)
-	}
-
-	return res
-}
-
 type lookUpRes struct {
 	dbRef   lex.DBRef // TODO: move to lex.Entry!!
 	entries []lex.Entry
 	err     error
 }
 
+// LookUpIntoSlice is a wrapper around LookUp, returning a slice of Entries
 func (dbm DBManager) LookUpIntoSlice(q DBMQuery) ([]lex.Entry, error) {
 	var res = []lex.Entry{}
 	writer := lex.EntrySliceWriter{}
@@ -176,6 +191,7 @@ func (dbm DBManager) LookUpIntoSlice(q DBMQuery) ([]lex.Entry, error) {
 	return res, nil
 }
 
+// LookUpIntoMap is a wrapper around LookUp, returning a map of Entries
 func (dbm DBManager) LookUpIntoMap(q DBMQuery) (map[lex.DBRef][]lex.Entry, error) {
 	var res = make(map[lex.DBRef][]lex.Entry)
 	writer := lex.EntrySliceWriter{}
@@ -191,6 +207,7 @@ func (dbm DBManager) LookUpIntoMap(q DBMQuery) (map[lex.DBRef][]lex.Entry, error
 	return res, nil
 }
 
+// LookUp takes a DBMQuery, searches the specified lexicon for the included search query. The result is written to a lex.EntryWriter.
 func (dbm DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 	dbz := make(map[lex.DBRef][]lex.LexName)
 	for _, l := range q.LexRefs {
@@ -248,6 +265,7 @@ type lexRes struct {
 
 // Warning: this is maybe my first attempt at concurrency using a channel in Go
 
+// ListLexicons returns a list of defined lexicons, including database name, lexicon name, and symbol set name
 func (dbm DBManager) ListLexicons() ([]lex.LexRefWithInfo, error) {
 	var res = []lex.LexRefWithInfo{}
 
@@ -296,6 +314,7 @@ func (dbm DBManager) ListLexicons() ([]lex.LexRefWithInfo, error) {
 	return res, nil
 }
 
+// LexiconExists is used to check if the specified lexicon exists in the specified database
 func (dbm DBManager) LexiconExists(lexRef lex.LexRef) (bool, error) {
 	lexInfo, err := dbm.ListLexicons()
 	if err != nil {
@@ -309,6 +328,7 @@ func (dbm DBManager) LexiconExists(lexRef lex.LexRef) (bool, error) {
 	return false, nil
 }
 
+// InsertEntries saves a list of Entries and associates them to the lexicon
 func (dbm DBManager) InsertEntries(lexRef lex.LexRef, entries []lex.Entry) ([]int64, error) {
 
 	var res []int64
@@ -336,7 +356,7 @@ func (dbm DBManager) InsertEntries(lexRef lex.LexRef, entries []lex.Entry) ([]in
 	return res, err
 }
 
-//func (dbm DBManager) UpdateEntry(dbRef lex.DBRef, e lex.Entry) (lex.Entry, bool, error) {
+// UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
 func (dbm DBManager) UpdateEntry(e lex.Entry) (lex.Entry, bool, error) {
 	var res lex.Entry
 
@@ -350,6 +370,7 @@ func (dbm DBManager) UpdateEntry(e lex.Entry) (lex.Entry, bool, error) {
 	return updateEntry(db, e)
 }
 
+// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
 func (dbm DBManager) ImportLexiconFile(lexRef lex.LexRef, logger Logger, lexiconFileName string, validator *validation.Validator) error {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -360,6 +381,7 @@ func (dbm DBManager) ImportLexiconFile(lexRef lex.LexRef, logger Logger, lexicon
 	return ImportLexiconFile(db, lexRef.LexName, logger, lexiconFileName, validator)
 }
 
+// EntryCount counts the number of entries in a lexicon
 func (dbm DBManager) EntryCount(lexRef lex.LexRef) (int64, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -370,6 +392,7 @@ func (dbm DBManager) EntryCount(lexRef lex.LexRef) (int64, error) {
 	return entryCount(db, string(lexRef.LexName))
 }
 
+// ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).
 func (dbm DBManager) ListCurrentEntryStatuses(lexRef lex.LexRef) ([]string, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -380,6 +403,8 @@ func (dbm DBManager) ListCurrentEntryStatuses(lexRef lex.LexRef) ([]string, erro
 	return listCurrentEntryStatuses(db, string(lexRef.LexName))
 }
 
+// ListAllEntryStatuses returns a list of all names EntryStatuses, also those that are not 'current'  (i.e., the most recent status).
+// In other words, this list potentially includes statuses not in use, but that have been used before.
 func (dbm DBManager) ListAllEntryStatuses(lexRef lex.LexRef) ([]string, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -390,6 +415,8 @@ func (dbm DBManager) ListAllEntryStatuses(lexRef lex.LexRef) ([]string, error) {
 	return listAllEntryStatuses(db, string(lexRef.LexName))
 }
 
+// GetLexicon returns a information (LexRefWithInfo) matching a lexicon name in the db.
+// Returns error if no such lexicon name in db
 func (dbm DBManager) GetLexicon(lexRef lex.LexRef) (lex.LexRefWithInfo, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -429,6 +456,7 @@ func (dbm DBManager) MoveNewEntries(dbRef lex.DBRef, fromLex, toLex lex.LexName,
 	return moveNewEntries(db, string(fromLex), string(toLex), newSource, newStatus)
 }
 
+// Validate all entries given the specified lexRef and search query. Updates validation stats in db, and returns these.
 func (dbm DBManager) Validate(lexRef lex.LexRef, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -439,6 +467,7 @@ func (dbm DBManager) Validate(lexRef lex.LexRef, logger Logger, vd validation.Va
 	return Validate(db, []lex.LexName{lexRef.LexName}, logger, vd, q)
 }
 
+// ValidationStats returns existing validation stats for the specified lexRef
 func (dbm DBManager) ValidationStats(lexRef lex.LexRef) (ValStats, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -447,14 +476,4 @@ func (dbm DBManager) ValidationStats(lexRef lex.LexRef) (ValStats, error) {
 		return ValStats{}, fmt.Errorf("DBManager.Validate: no such db '%s'", lexRef.DBRef)
 	}
 	return validationStats(db, string(lexRef.LexName))
-}
-
-func (dbm DBManager) ListDatabases() ([]lex.DBRef, error) {
-	dbm.Lock()
-	defer dbm.Unlock()
-	res := []lex.DBRef{}
-	for dbRef, _ := range dbm.dbs {
-		res = append(res, dbRef)
-	}
-	return res, nil
 }

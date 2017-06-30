@@ -69,6 +69,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	return stats, nil
 }
 
+// Validate all entries given the specified lexRef and search query. Updates validation stats in db, and returns these.
 func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
 
 	start := time.Now()
