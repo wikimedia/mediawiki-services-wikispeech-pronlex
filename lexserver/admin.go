@@ -74,13 +74,13 @@ var adminLexImport = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		lexName := r.PostFormValue("lexicon_name")
-		if strings.TrimSpace(lexName) == "" {
-			msg := "input param <lexicon_name> must not be empty"
-			log.Println(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
+
 		vString := r.PostFormValue("validate")
 		if strings.TrimSpace(vString) == "" {
 			msg := "input param <validate> must not be empty (should be 'true' or 'false')"
@@ -120,39 +120,54 @@ var adminLexImport = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		_, err = dbapi.GetLexicon(db, lexName)
-		if err == nil {
-			msg := fmt.Sprintf("Nothing will be added. Lexicon already exists in database: %s", lexName)
+		exists, err := dbm.LexiconExists(lexRef)
+		if err != nil {
+			msg := fmt.Sprintf("Couldn't lookup lexicon reference: %s", lexRef.String())
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			deleteUploadedFile(serverPath)
 			return
 		}
+		if exists {
+			msg := fmt.Sprintf("Nothing will be added. Lexicon already exists: %s", lexRef.String())
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			deleteUploadedFile(serverPath)
+			return
+		}
+		// _, err = dbapi.GetLexicon(db, lexName)
+		// if err == nil {
+		// 	msg := fmt.Sprintf("Nothing will be added. Lexicon already exists in database: %s", lexName)
+		// 	log.Println(msg)
+		// 	http.Error(w, msg, http.StatusInternalServerError)
+		// 	deleteUploadedFile(serverPath)
+		// 	return
+		// }
 
-		lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-		lexicon, err = dbapi.DefineLexicon(db, lexicon)
+		//lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
+		err = dbm.DefineLexicon(lexRef, symbolSetName)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 			deleteUploadedFile(serverPath)
 			return
 		}
-		log.Println("Created lexicon with name:", lexicon.Name)
+		log.Println("Created lexicon: ", lexRef.String())
 
 		var validator *validation.Validator = &validation.Validator{}
 		if validate {
 			vMut.Lock()
-			validator, err = vMut.service.ValidatorForName(lexicon.SymbolSetName)
+			validator, err = vMut.service.ValidatorForName(symbolSetName)
 			vMut.Unlock()
 			if err != nil {
-				msg := fmt.Sprintf("lexiconRunValidateHandler failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
+				msg := fmt.Sprintf("adminLexImport failed to get validator for symbol set %v : %v", symbolSetName, err)
 				log.Println(msg)
 				http.Error(w, msg, http.StatusBadRequest)
 				return
 			}
 		}
 
-		err = dbapi.ImportLexiconFile(db, logger, lexName, serverPath, validator)
+		err = dbm.ImportLexiconFile(lexRef, logger, serverPath, validator)
 
 		if err == nil {
 			msg := fmt.Sprintf("lexicon file imported successfully : %v", handler.Filename)
@@ -168,7 +183,7 @@ var adminLexImport = urlHandler{
 		f.Close()
 		deleteUploadedFile(serverPath)
 
-		entryCount, err := dbapi.EntryCount(db, lexicon.ID)
+		entryCount, err := dbm.EntryCount(lexRef)
 		if err != nil {
 			msg := fmt.Sprintf("lexicon imported, but couldn't retrieve lexicon info from server : %v", err)
 			log.Println(msg)
@@ -177,9 +192,8 @@ var adminLexImport = urlHandler{
 		}
 
 		info := LexWithEntryCount{
-			ID:            lexicon.ID,
-			Name:          lexicon.Name,
-			SymbolSetName: lexicon.SymbolSetName,
+			Name:          lexRef.String(),
+			SymbolSetName: symbolSetName,
 			EntryCount:    entryCount,
 		}
 		fmt.Fprintf(w, "imported %v entries into lexicon '%v'", info.EntryCount, info.Name)
@@ -192,15 +206,13 @@ var adminDeleteLex = urlHandler{
 	help:     "Delete a lexicon reference from the database without removing associated entries.",
 	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexName := getParam("lexicon_name", r)
-		if lexName == "" {
-			msg := "adminDeleteLex expected a lexicon name defined by 'lexicon_name'"
-			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
-
-		err := dbapi.DeleteLexicon(db, lexName)
+		err = dbm.DeleteLexicon(lexRef)
 		if err != nil {
 			log.Printf("adminDeleteLex got error : %v\n", err)
 			http.Error(w, fmt.Sprintf("failed deleting lexicon : %v", err), http.StatusExpectationFailed)
@@ -215,24 +227,44 @@ var adminSuperDeleteLex = urlHandler{
 	help:     "Delete a complete lexicon from the database, including associated entries. This make take some time.",
 	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexName := getParam("lexicon_name", r)
-		if lexName == "" {
-			msg := "adminDeleteLex expected a lexicon name defined by 'lexicon_name'"
-			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
 
 		uuid := getParam("client_uuid", r)
 		log.Println("adminSuperDeleteLex was called")
-		messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon name %s", lexName))
-		err := dbapi.SuperDeleteLexicon(db, lexName)
+		messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon %s", lexRef.String()))
+		err = dbm.SuperDeleteLexicon(lexRef)
 		if err != nil {
 
 			http.Error(w, fmt.Sprintf("failed super deleting lexicon : %v", err), http.StatusExpectationFailed)
 			return
 		}
 
-		messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon with name %s", lexName))
+		messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon %s", lexRef))
+	},
+}
+
+var adminListDBs = urlHandler{
+	name:     "list_dbs",
+	url:      "/list_dbs",
+	help:     "Lists available lexicon databases.",
+	examples: []string{"/list_dbs"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		dbs, err := dbm.ListDatabases()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("list dbs failed : %v", err), http.StatusInternalServerError)
+			return
+		}
+		jsn, err := marshal(dbs, r)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(jsn))
 	},
 }

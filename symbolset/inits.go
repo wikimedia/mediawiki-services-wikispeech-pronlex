@@ -296,7 +296,7 @@ func LoadSymbolSetsFromDir(dirName string) (map[string]SymbolSet, error) {
 func LoadMapper(s1 SymbolSet, s2 SymbolSet) (Mapper, error) {
 	fromName := s1.Name
 	toName := s2.Name
-	name := fromName + "_2_" + toName
+	name := fromName + " - " + toName
 
 	mapper := Mapper{name, s1, s2}
 

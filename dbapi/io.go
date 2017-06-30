@@ -17,7 +17,7 @@ import (
 )
 
 // ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any validation whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
-func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName string, validator *validation.Validator) error {
+func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexiconFileName string, validator *validation.Validator) error {
 
 	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))
 	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
@@ -56,7 +56,7 @@ func ImportLexiconFile(db *sql.DB, logger Logger, lexiconName, lexiconFileName s
 		return fmt.Errorf("%v", msg)
 	}
 
-	lexicon, err := getLexicon(db, lexiconName)
+	lexicon, err := getLexicon(db, string(lexiconName))
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
 		logger.Write(msg)

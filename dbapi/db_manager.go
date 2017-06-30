@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/validation"
 )
 
 type DBManager struct {
@@ -84,7 +85,7 @@ func (dbm DBManager) DeleteLexicon(lexRef lex.LexRef) error {
 
 	err := deleteLexicon(db, string(lexRef.LexName))
 	if err != nil {
-		return fmt.Errorf("DBManager.SuperDeleteLexicon: couldn't delete '%s'", lexRef)
+		return fmt.Errorf("DBManager.DeleteLexicon: couldn't delete '%s' : %v", lexRef, err)
 	}
 
 	return nil
@@ -101,13 +102,13 @@ func (dbm DBManager) LexiconStats(lexRef lex.LexRef) (LexStats, error) {
 
 	stats, err := lexiconStats(db, string(lexRef.LexName))
 	if err != nil {
-		return LexStats{}, fmt.Errorf("DBManager.LexiconStats: couldn't get stats '%s'", lexRef)
+		return LexStats{}, fmt.Errorf("DBManager.LexiconStats: couldn't get stats '%s' : %v", lexRef, err)
 	}
 
 	return stats, nil
 }
 
-func (dbm DBManager) DefineLexicon(dbRef lex.DBRef, symbolSetName string, lexes ...lex.LexName) error {
+func (dbm DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, lexes ...lex.LexName) error {
 
 	dbm.RLock()
 	defer dbm.RUnlock()
@@ -117,10 +118,27 @@ func (dbm DBManager) DefineLexicon(dbRef lex.DBRef, symbolSetName string, lexes 
 		if !ok {
 			return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", dbRef)
 		}
-		_, err := defineLexicon(db, Lexicon{Name: string(l), SymbolSetName: symbolSetName}) // TODO lex.LexName
+		_, err := defineLexicon(db, lexicon{name: string(l), symbolSetName: symbolSetName})
 		if err != nil {
 			return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s:%s' : %v", dbRef, l, err)
 		}
+	}
+
+	return nil
+}
+
+func (dbm DBManager) DefineLexicon(lexRef lex.LexRef, symbolSetName string) error {
+
+	dbm.RLock()
+	defer dbm.RUnlock()
+
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", lexRef.DBRef)
+	}
+	_, err := defineLexicon(db, lexicon{name: string(lexRef.LexName), symbolSetName: symbolSetName})
+	if err != nil {
+		return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s' : %v", lexRef.String(), err)
 	}
 
 	return nil
@@ -139,27 +157,23 @@ func (dbm DBManager) ListDBNames() []lex.DBRef {
 	return res
 }
 
-// func splitFullLexiconName(fullLexName string) (string, string, error) {
-// 	nameSplit := strings.SplitN(strings.TrimSpace(fullLexName), ":", 2)
-// 	if len(nameSplit) != 2 {
-// 		return "", "", fmt.Errorf("DBManager.splitFullLexiconName: failed to split full lexicon name into two colon separated parts: '%s'", fullLexName)
-// 	}
-// 	db := nameSplit[0]
-// 	if "" == db {
-// 		return "", "", fmt.Errorf("DBManager.splitFullLexiconName: db part of lexicon name empty: '%s'", fullLexName)
-// 	}
-// 	lex := nameSplit[1]
-// 	if "" == lex {
-// 		return "", "", fmt.Errorf("DBManager.splitFullLexiconName: lexicon part of full lexicon name empty: '%s'", fullLexName)
-// 	}
-
-// 	return db, lex, nil
-// }
-
 type lookUpRes struct {
 	dbRef   lex.DBRef // TODO: move to lex.Entry!!
 	entries []lex.Entry
 	err     error
+}
+
+func (dbm DBManager) LookUpIntoSlice(q DBMQuery) ([]lex.Entry, error) {
+	var res = []lex.Entry{}
+	writer := lex.EntrySliceWriter{}
+	err := dbm.LookUp(q, &writer)
+	if err != nil {
+		return res, fmt.Errorf("DBManager.LookUp failed : %v", err)
+	}
+	for _, e := range writer.Entries {
+		res = append(res, e)
+	}
+	return res, nil
 }
 
 func (dbm DBManager) LookUpIntoMap(q DBMQuery) (map[lex.DBRef][]lex.Entry, error) {
@@ -228,15 +242,14 @@ func (dbm DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 }
 
 type lexRes struct {
-	dbRef lex.DBRef
-	lexs  []lex.LexName
+	lexes []lex.LexRefWithInfo
 	err   error
 }
 
 // Warning: this is maybe my first attempt at concurrency using a channel in Go
 
-func (dbm DBManager) ListLexicons() ([]lex.LexRef, error) {
-	var res []lex.LexRef
+func (dbm DBManager) ListLexicons() ([]lex.LexRefWithInfo, error) {
+	var res = []lex.LexRefWithInfo{}
 
 	dbm.RLock()
 	defer dbm.RUnlock()
@@ -247,12 +260,14 @@ func (dbm DBManager) ListLexicons() ([]lex.LexRef, error) {
 	// Go ask each db instance in its own Go-routine
 	for dbRef, db := range dbs {
 		go func(dbRef lex.DBRef, db *sql.DB, ch0 chan lexRes) {
-			lexNames, err := listLexicons(db)
-			lexs := []lex.LexName{}
-			for _, ln := range lexNames {
-				lexs = append(lexs, lex.LexName(ln.Name))
+			lexs, err := listLexicons(db)
+			lexList := []lex.LexRefWithInfo{}
+			for _, ln := range lexs {
+				lexRef := lex.LexRef{dbRef, lex.LexName(ln.name)}
+				withInfo := lex.LexRefWithInfo{lexRef, ln.symbolSetName}
+				lexList = append(lexList, withInfo)
 			}
-			r := lexRes{dbRef: dbRef, lexs: lexs, err: err}
+			r := lexRes{lexes: lexList, err: err}
 			ch0 <- r
 		}(dbRef, db, ch)
 	}
@@ -273,8 +288,8 @@ func (dbm DBManager) ListLexicons() ([]lex.LexRef, error) {
 		// A full lexicon name consists of the name of
 		// the db and the name of the lexicon in the
 		// db joined by ':'
-		for _, l := range r.lexs {
-			res = append(res, lex.LexRef{r.dbRef, l})
+		for _, lex := range r.lexes {
+			res = append(res, lex)
 		}
 	}
 
@@ -282,12 +297,12 @@ func (dbm DBManager) ListLexicons() ([]lex.LexRef, error) {
 }
 
 func (dbm DBManager) LexiconExists(lexRef lex.LexRef) (bool, error) {
-	lexRefs, err := dbm.ListLexicons()
+	lexInfo, err := dbm.ListLexicons()
 	if err != nil {
 		return false, fmt.Errorf("DBManager.LexiconExists failed : %v", err)
 	}
-	for _, lf := range lexRefs {
-		if lf == lexRef {
+	for _, lf := range lexInfo {
+		if lf.LexRef == lexRef {
 			return true, nil
 		}
 	}
@@ -333,4 +348,113 @@ func (dbm DBManager) UpdateEntry(e lex.Entry) (lex.Entry, bool, error) {
 	}
 
 	return updateEntry(db, e)
+}
+
+func (dbm DBManager) ImportLexiconFile(lexRef lex.LexRef, logger Logger, lexiconFileName string, validator *validation.Validator) error {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return fmt.Errorf("DBManager.ImportLexiconFile: no such db '%s'", lexRef.DBRef)
+	}
+	return ImportLexiconFile(db, lexRef.LexName, logger, lexiconFileName, validator)
+}
+
+func (dbm DBManager) EntryCount(lexRef lex.LexRef) (int64, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return 0, fmt.Errorf("DBManager.ImportLexiconFile: no such db '%s'", lexRef.DBRef)
+	}
+	return entryCount(db, string(lexRef.LexName))
+}
+
+func (dbm DBManager) ListCurrentEntryStatuses(lexRef lex.LexRef) ([]string, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return []string{}, fmt.Errorf("DBManager.ListCurrentEntryStatuses: no such db '%s'", lexRef.DBRef)
+	}
+	return listCurrentEntryStatuses(db, string(lexRef.LexName))
+}
+
+func (dbm DBManager) ListAllEntryStatuses(lexRef lex.LexRef) ([]string, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return []string{}, fmt.Errorf("DBManager.ListAllEntryStatuses: no such db '%s'", lexRef.DBRef)
+	}
+	return listAllEntryStatuses(db, string(lexRef.LexName))
+}
+
+func (dbm DBManager) GetLexicon(lexRef lex.LexRef) (lex.LexRefWithInfo, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return lex.LexRefWithInfo{}, fmt.Errorf("DBManager.GetLexicon: no such db '%s'", lexRef.DBRef)
+	}
+	l, err := getLexicon(db, string(lexRef.LexName))
+	if err != nil {
+		return lex.LexRefWithInfo{}, err
+	}
+	return lex.LexRefWithInfo{
+		LexRef:        lexRef,
+		SymbolSetName: l.symbolSetName,
+	}, nil
+}
+
+// MoveNewEntries moves lexical entries from the lexicon named
+// fromLexicon to the lexicon named toLexicon.  The 'newSource' string is
+// the name of the new source of the entries to be moved, and 'newStatus' is
+// the name of the new status to set on the moved entries.  Currently,
+// source and/or status may not be the empty string. TODO: Maybe it
+// should be possible to skip source and status values?
+//
+// Only "new" entries are moved, i.e., entries with lex.Entry.Strn
+// values found in fromLexicon but *not* found in toLexicon.  The
+// rationale behind this function is to first create a small
+// additional lexicon with new entries (the fromLexicon), that can
+// later be appended to the master lexicon (the toLexicon).
+func (dbm DBManager) MoveNewEntries(dbRef lex.DBRef, fromLex, toLex lex.LexName, newSource, newStatus string) (MoveResult, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[dbRef]
+	if !ok {
+		return MoveResult{}, fmt.Errorf("DBManager.MoveNewEntries: no such db '%s'", dbRef)
+	}
+	return moveNewEntries(db, string(fromLex), string(toLex), newSource, newStatus)
+}
+
+func (dbm DBManager) Validate(lexRef lex.LexRef, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return ValStats{}, fmt.Errorf("DBManager.Validate: no such db '%s'", lexRef.DBRef)
+	}
+	return Validate(db, []lex.LexName{lexRef.LexName}, logger, vd, q)
+}
+
+func (dbm DBManager) ValidationStats(lexRef lex.LexRef) (ValStats, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return ValStats{}, fmt.Errorf("DBManager.Validate: no such db '%s'", lexRef.DBRef)
+	}
+	return validationStats(db, string(lexRef.LexName))
+}
+
+func (dbm DBManager) ListDatabases() ([]lex.DBRef, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	res := []lex.DBRef{}
+	for dbRef, _ := range dbm.dbs {
+		res = append(res, dbRef)
+	}
+	return res, nil
 }

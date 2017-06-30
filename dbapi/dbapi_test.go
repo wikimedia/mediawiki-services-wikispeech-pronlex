@@ -68,7 +68,7 @@ func Test_SuperDeleteLexicon(t *testing.T) {
 	// TODO Borde returnera error
 	//CreateTables(db, cmds)
 
-	l := Lexicon{Name: "test", SymbolSetName: "ZZ"}
+	l := lexicon{name: "test", symbolSetName: "ZZ"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -82,31 +82,31 @@ func Test_SuperDeleteLexicon(t *testing.T) {
 	if len(lxs) != 1 {
 		t.Errorf(fs, 1, len(lxs))
 	}
-	if lxs[0].Name != "test" {
-		t.Errorf(fs, "test", lxs[0].Name)
+	if lxs[0].name != "test" {
+		t.Errorf(fs, "test", lxs[0].name)
 	}
-	if lxs[0].ID <= 0 {
-		t.Errorf(fs, ">0", lxs[0].ID)
+	if lxs[0].id <= 0 {
+		t.Errorf(fs, ">0", lxs[0].id)
 	}
-	if lxs[0].SymbolSetName != "ZZ" {
-		t.Errorf(fs, "ZZ", lxs[0].SymbolSetName)
+	if lxs[0].symbolSetName != "ZZ" {
+		t.Errorf(fs, "ZZ", lxs[0].symbolSetName)
 	}
 
 	lx, err := getLexicon(db, "test")
 	if err != nil {
 		t.Errorf("expected nil, got %v", err)
 	}
-	if w, g := "test", lx.Name; w != g {
+	if w, g := "test", lx.name; w != g {
 		t.Errorf("Wanted %s got %s", w, g)
 	}
-	if w, g := "ZZ", lx.SymbolSetName; w != g {
+	if w, g := "ZZ", lx.symbolSetName; w != g {
 		t.Errorf("Wanted %s got %s", w, g)
 	}
 	lx, err = getLexicon(db, "xyzzhga_skdjdj")
 	if err == nil {
 		t.Error("Expected error, got nil")
 	}
-	if w, g := "", lx.Name; w != g {
+	if w, g := "", lx.name; w != g {
 		t.Errorf("Wanted empty string, got '%s'", g)
 	}
 
@@ -207,7 +207,7 @@ func Test_insertEntries(t *testing.T) {
 	// TODO Borde returnera error
 	//CreateTables(db, cmds)
 
-	l := Lexicon{Name: "test", SymbolSetName: "ZZ"}
+	l := lexicon{name: "test", symbolSetName: "ZZ"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -221,31 +221,31 @@ func Test_insertEntries(t *testing.T) {
 	if len(lxs) != 1 {
 		t.Errorf(fs, 1, len(lxs))
 	}
-	if lxs[0].Name != "test" {
-		t.Errorf(fs, "test", lxs[0].Name)
+	if lxs[0].name != "test" {
+		t.Errorf(fs, "test", lxs[0].name)
 	}
-	if lxs[0].ID <= 0 {
-		t.Errorf(fs, ">0", lxs[0].ID)
+	if lxs[0].id <= 0 {
+		t.Errorf(fs, ">0", lxs[0].id)
 	}
-	if lxs[0].SymbolSetName != "ZZ" {
-		t.Errorf(fs, "ZZ", lxs[0].SymbolSetName)
+	if lxs[0].symbolSetName != "ZZ" {
+		t.Errorf(fs, "ZZ", lxs[0].symbolSetName)
 	}
 
 	lx, err := getLexicon(db, "test")
 	if err != nil {
 		t.Errorf("expected nil, got %v", err)
 	}
-	if w, g := "test", lx.Name; w != g {
+	if w, g := "test", lx.name; w != g {
 		t.Errorf("Wanted %s got %s", w, g)
 	}
-	if w, g := "ZZ", lx.SymbolSetName; w != g {
+	if w, g := "ZZ", lx.symbolSetName; w != g {
 		t.Errorf("Wanted %s got %s", w, g)
 	}
 	lx, err = getLexicon(db, "xyzzhga_skdjdj")
 	if err == nil {
 		t.Error("Expected error, got nil")
 	}
-	if w, g := "", lx.Name; w != g {
+	if w, g := "", lx.name; w != g {
 		t.Errorf("Wanted empty string, got '%s'", g)
 	}
 
@@ -539,14 +539,14 @@ func Test_insertEntries(t *testing.T) {
 	}
 
 	// TODO should be in a test of its own
-	eStatsus, err := listCurrentEntryStatuses(db, l.Name)
+	eStatsus, err := listCurrentEntryStatuses(db, l.name)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 	if w, g := 2, len(eStatsus); w != g {
 		t.Errorf(fs, w, g)
 	}
-	eStatsus2, err := listAllEntryStatuses(db, l.Name)
+	eStatsus2, err := listAllEntryStatuses(db, l.name)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -619,7 +619,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
-	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -627,7 +627,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt", &validation.Validator{})
+	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest.txt", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -689,7 +689,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
-	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -697,7 +697,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest-invalid-no-fields.txt", &validation.Validator{})
+	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest-invalid-no-fields.txt", &validation.Validator{})
 	if err == nil {
 		t.Errorf("Expected errors, but got nil")
 	}
@@ -735,7 +735,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
-	l := Lexicon{Name: "test", SymbolSetName: symbolSet.Name}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -743,7 +743,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, logger, l.Name, "./sv-lextest.txt.gz", &validation.Validator{})
+	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest.txt.gz", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}

@@ -57,11 +57,13 @@ LEXIMPORT.ImportFileModel = function () {
     self.hasValidator = ko.observable(false);
     self.validate = ko.observable(true);
     self.lexiconName = ko.observable(null);
+    self.lexiconDB = ko.observable(null);
     self.symbolSetName = ko.observable(null);
     self.selectedFile = ko.observable(null);
     self.validForm = ko.computed(function() {
 	return (self.lexiconName() != null && self.symbolSetName() != null && self.selectedFile() != null &&
-		self.lexiconName().trim() != "" && self.symbolSetName().trim() != "");
+		self.lexiconName().trim() != "" && self.symbolSetName().trim() != "" &&
+		self.lexiconDB() != null && self.lexiconDB().trim() != "");
     });
     
     self.setSelectedFile = function(lexiconFile) {
@@ -70,6 +72,7 @@ LEXIMPORT.ImportFileModel = function () {
     }
     
     self.symbolSetNames = ko.observableArray();
+    self.lexiconDBs = ko.observableArray();
 
     self.loadSymbolSetNames = function () {
 	$.getJSON(LEXIMPORT.baseURL +"/symbolset/list")
@@ -81,8 +84,19 @@ LEXIMPORT.ImportFileModel = function () {
 	    });
     };
     
+    self.loadLexiconDBs = function () {
+	$.getJSON(LEXIMPORT.baseURL +"/admin/list_dbs")
+	    .done(function (data) {
+		console.log(data)
+		self.lexiconDBs(data);
+	    })
+    	    .fail(function (xhr, textStatus, errorThrown) {
+		alert("loadLexiconDBs says: "+ xhr.responseText);
+	    });
+    };
+    
     self.hasValidatorFunc = ko.computed(function() {
-	var url = LEXIMPORT.baseURL + "/validation/has_validator";
+	var url = LEXIMPORT.baseURL + "/validation/has_validator/" + self.SymbolSetName;
 	var xhr = new XMLHttpRequest();
 	var fd = new FormData();
 	xhr.open("POST", url, true);
@@ -121,7 +135,7 @@ LEXIMPORT.ImportFileModel = function () {
 	};
 	fd.append("client_uuid", self.uuid);
 	fd.append("symbolset_name", self.symbolSetName());
-	fd.append("lexicon_name", self.lexiconName());
+	fd.append("lexicon_name", self.lexiconDB() + ":" + self.lexiconName());
 	fd.append("validate", self.validate());
 	fd.append("file", self.selectedFile());
 	self.message("Importing, please wait ...");
@@ -132,6 +146,7 @@ LEXIMPORT.ImportFileModel = function () {
 
 var upload = new LEXIMPORT.ImportFileModel();
 upload.loadSymbolSetNames();
+upload.loadLexiconDBs();
 ko.applyBindings(upload);
 upload.connectWebSock();
 

@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"compress/gzip"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -21,12 +18,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/line"
 	"github.com/stts-se/pronlex/symbolset"
 	"golang.org/x/net/websocket"
 )
-
-// TODO Split this file into packages + main?
 
 func getParam(paramName string, r *http.Request) string {
 	res := r.FormValue(paramName)
@@ -35,6 +29,19 @@ func getParam(paramName string, r *http.Request) string {
 	}
 	vars := mux.Vars(r)
 	return vars[paramName]
+}
+
+func getLexRefParam(r *http.Request) (lex.LexRef, error) {
+	lexRefS := getParam("lexicon_name", r)
+	if strings.TrimSpace(lexRefS) == "" {
+		msg := "input param <lexicon_name> must not be empty"
+		return lex.LexRef{}, fmt.Errorf(msg)
+	}
+	lexRef, err := lex.ParseLexRef(lexRefS)
+	if err != nil {
+		return lex.LexRef{}, err
+	}
+	return lexRef, nil
 }
 
 func (rout *subRouter) addHandler(handler urlHandler) {
@@ -137,6 +144,7 @@ func ff(f string, err error) {
 var uploadFileArea = filepath.Join(".", "upload_area")
 var downloadFileArea = filepath.Join(".", "download_area")
 var symbolSetFileArea = filepath.Join(".", "symbol_set_file_area")
+var dbFileArea = filepath.Join(".", "db_files")
 
 // TODO config stuff
 func init() {
@@ -207,18 +215,18 @@ Instructions on how to create a lexicon database and start the server is availab
 	fmt.Fprint(w, html)
 }
 
-func sqlite3AnalyzeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Print("lexserver: running the Sqlite3 ANALYZE command...")
-	_, err := db.Exec("ANALYZE")
+// func sqlite3AnalyzeHandler(w http.ResponseWriter, r *http.Request) {
+// 	log.Print("lexserver: running the Sqlite3 ANALYZE command...")
+// 	_, err := db.Exec("ANALYZE")
 
-	if err != nil {
-		log.Printf("Failed to exec ANALYZE %v", err)
-		http.Error(w, fmt.Sprintf("/admin/sqlite3_analyze failed : %v", err), http.StatusInternalServerError)
-		return
-	}
-	log.Print("... done!\n")
-	w.Write([]byte("OK"))
-}
+// 	if err != nil {
+// 		log.Printf("Failed to exec ANALYZE %v", err)
+// 		http.Error(w, fmt.Sprintf("/admin/sqlite3_analyze failed : %v", err), http.StatusInternalServerError)
+// 		return
+// 	}
+// 	log.Print("... done!\n")
+// 	w.Write([]byte("OK"))
+// }
 
 // TODO report unused URL parameters
 
@@ -248,13 +256,10 @@ var knownParams = map[string]int{
 // list of values to the same param splits on comma and/or space
 var splitRE = regexp.MustCompile("[, ]+")
 
-func queryFromParams(r *http.Request) (dbapi.Query, error) {
+func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 
 	lexs := dbapi.RemoveEmptyStrings(
 		splitRE.Split(getParam("lexicons", r), -1))
-	if len(lexs) > 0 {
-		panic("dbapi.Query no longer supports the lexicon field. Use dbapi.DBMQuery instead.")
-	}
 	words := dbapi.RemoveEmptyStrings(
 		splitRE.Split(getParam("words", r), -1))
 	lemmas := dbapi.RemoveEmptyStrings(
@@ -281,6 +286,7 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 	if strings.ToLower(getParam("hasEntryValidation", r)) == "true" {
 		hasEntryValidation = true
 	}
+
 	// TODO report error if getParam("page", r) != ""?
 	// Silently sets deafault if no value, or faulty value
 	page, err := strconv.ParseInt(getParam("page", r), 10, 64)
@@ -296,11 +302,13 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 		pageLength = 25
 	}
 
-	//dbLexs, err := dbapi.GetLexicons(db, lexs)
-
-	lexNames := []lex.LexName{}
-	for _, ln := range lexs {
-		lexNames = append(lexNames, lex.LexName(ln))
+	lexRefs := []lex.LexRef{}
+	for _, l := range lexs {
+		ref, err := lex.ParseLexRef(l)
+		if err != nil {
+			return dbapi.DBMQuery{}, fmt.Errorf("couldn't parse lexicon reference from string %s", l)
+		}
+		lexRefs = append(lexRefs, ref)
 	}
 
 	q := dbapi.Query{
@@ -323,8 +331,11 @@ func queryFromParams(r *http.Request) (dbapi.Query, error) {
 		PageLength:          pageLength,
 		HasEntryValidation:  hasEntryValidation,
 	}
-
-	return q, err
+	dq := dbapi.DBMQuery{
+		Query:   q,
+		LexRefs: lexRefs,
+	}
+	return dq, nil
 }
 
 // Remove initial and trailing " or ' from string
@@ -426,243 +437,250 @@ func keepClientsAlive() {
 	}
 }
 
-func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
-	lexiconName := getParam("lexicon_name", r)
-	if "" == lexiconName {
-		msg := "exportLexiconHandler got no lexicon name"
-		fmt.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
+// func exportLexiconHandler(w http.ResponseWriter, r *http.Request) {
+// 	lexiconName := getParam("lexicon_name", r)
+// 	if "" == lexiconName {
+// 		msg := "exportLexiconHandler got no lexicon name"
+// 		fmt.Println(msg)
+// 		http.Error(w, msg, http.StatusBadRequest)
+// 		return
+// 	}
 
-	// If client sends UUID, messages can be written to client socket
-	clientUUID := getParam("client_uuid", r)
-	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexiconName))
+// 	// If client sends UUID, messages can be written to client socket
+// 	clientUUID := getParam("client_uuid", r)
+// 	messageToClientWebSock(clientUUID, fmt.Sprintf("This will take a while. Starting to export lexicon %s", lexiconName))
 
-	// local output file
-	fName := filepath.Join(downloadFileArea, lexiconName+".txt.gz")
-	f, err := os.Create(fName)
-	//bf := bufio.NewWriter(f)
-	gz := gzip.NewWriter(f)
-	//defer gz.Flush()
-	defer gz.Close()
-	// Query that returns all entries of lexicon
-	//ls := []dbapi.Lexicon{dbapi.Lexicon{ID: lexicon.ID}}
-	q := dbapi.Query{}
-	lexNames := []lex.LexName{lex.LexName(lexiconName)}
+// 	// local output file
+// 	fName := filepath.Join(downloadFileArea, lexiconName+".txt.gz")
+// 	f, err := os.Create(fName)
+// 	//bf := bufio.NewWriter(f)
+// 	gz := gzip.NewWriter(f)
+// 	//defer gz.Flush()
+// 	defer gz.Close()
+// 	// Query that returns all entries of lexicon
+// 	//ls := []dbapi.Lexicon{dbapi.Lexicon{ID: lexicon.ID}}
 
-	log.Printf("Query for exporting: %v", q)
+// 	log.Printf("Query for exporting: %v", q)
 
-	//nstFmt, err := line.NewNST()
-	wsFmt, err := line.NewWS()
-	if err != nil {
-		log.Fatal(err)
-		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
-		return
-	}
-	wsW := line.FileWriter{Parser: wsFmt, Writer: gz}
-	dbapi.LookUp(db, lexNames, q, wsW)
-	defer gz.Close()
-	gz.Flush()
-	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %s", lexiconName, fName))
+// 	//nstFmt, err := line.NewNST()
+// 	wsFmt, err := line.NewWS()
+// 	if err != nil {
+// 		log.Fatal(err)
+// 		http.Error(w, "exportLexicon failed to create line writer", http.StatusInternalServerError)
+// 		return
+// 	}
+// 	wsW := line.FileWriter{Parser: wsFmt, Writer: gz}
+// 	//lexNames := []lex.LexName{lex.LexName(lexiconName)}
+// 	lrs := []lex.LexRef{}
+// 	//dbapi.LookUp(db, lexNames, q, wsW)
+// 	dbmQ := dbapi.DBMQuery{
+// 		LexRefs: lrs,
+// 		Query:   dbapi.Query{},
+// 	}
+// 	dbm.LookUp(dbmQ, wsW)
+// 	//dbapi.LookUp(db, lexNames, q, wsW)
+// 	defer gz.Close()
+// 	gz.Flush()
+// 	messageToClientWebSock(clientUUID, fmt.Sprintf("Done exporting lexicon %s to %s", lexiconName, fName))
 
-	msg := fmt.Sprintf("Lexicon exported to '%s'", fName)
-	log.Print(msg)
-	fmt.Fprint(w, filepath.Base(fName))
-}
+// 	msg := fmt.Sprintf("Lexicon exported to '%s'", fName)
+// 	log.Print(msg)
+// 	fmt.Fprint(w, filepath.Base(fName))
+// }
 
-func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
-	if r.Method != "POST" {
-		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
-		return
-	}
+// func lexiconFileUploadHandler(w http.ResponseWriter, r *http.Request) {
+// 	//fmt.Println("lexiconFileUploadHandler: method: ", r.Method)
+// 	if r.Method != "POST" {
+// 		http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+// 		return
+// 	}
 
-	clientUUID := getParam("client_uuid", r)
+// 	clientUUID := getParam("client_uuid", r)
 
-	lexiconID, err := strconv.ParseInt(getParam("lexicon_id", r), 10, 64)
-	if err != nil {
-		msg := "lexiconFileUploadHandler got no lexicon id"
-		fmt.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-	lexiconName := getParam("lexicon_name", r)
-	log.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", lexiconName)
-	symbolSetName := getParam("symbolset_name", r)
-	log.Printf("lexiconFileUploadHandler: incoming db symbol set name: %v\n", symbolSetName)
+// 	lexiconID, err := strconv.ParseInt(getParam("lexicon_id", r), 10, 64)
+// 	if err != nil {
+// 		msg := "lexiconFileUploadHandler got no lexicon id"
+// 		fmt.Println(msg)
+// 		http.Error(w, msg, http.StatusBadRequest)
+// 		return
+// 	}
+// 	lexiconName := getParam("lexicon_name", r)
+// 	log.Printf("lexiconFileUploadHandler: incoming db lexicon name: %v\n", lexiconName)
+// 	symbolSetName := getParam("symbolset_name", r)
+// 	log.Printf("lexiconFileUploadHandler: incoming db symbol set name: %v\n", symbolSetName)
 
-	if "" == strings.TrimSpace(clientUUID) {
-		msg := "lexiconFileUploadHandler got no client uuid"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
+// 	if "" == strings.TrimSpace(clientUUID) {
+// 		msg := "lexiconFileUploadHandler got no client uuid"
+// 		log.Println(msg)
+// 		http.Error(w, msg, http.StatusBadRequest)
+// 		return
+// 	}
 
-	if "" == strings.TrimSpace(lexiconName) {
-		msg := "lexiconFileUploadHandler got no lexicon name"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
-	if "" == strings.TrimSpace(symbolSetName) {
-		msg := "lexiconFileUploadHandler got no symbolset name"
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
+// 	if "" == strings.TrimSpace(lexiconName) {
+// 		msg := "lexiconFileUploadHandler got no lexicon name"
+// 		log.Println(msg)
+// 		http.Error(w, msg, http.StatusBadRequest)
+// 		return
+// 	}
+// 	if "" == strings.TrimSpace(symbolSetName) {
+// 		msg := "lexiconFileUploadHandler got no symbolset name"
+// 		log.Println(msg)
+// 		http.Error(w, msg, http.StatusBadRequest)
+// 		return
+// 	}
 
-	// Lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
+// 	// Lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
-	r.ParseMultipartForm(32 << 20)
-	file, handler, err := r.FormFile("upload_file")
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed reading file : %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-	fName := filepath.Join(uploadFileArea, handler.Filename)
-	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed opening local output file : %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer f.Close()
-	_, err = io.Copy(f, file)
-	if err != nil {
-		msg := fmt.Sprintf("lexiconFileUploadHandler failed copying local output file : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
+// 	r.ParseMultipartForm(32 << 20)
+// 	file, handler, err := r.FormFile("upload_file")
+// 	if err != nil {
+// 		log.Println(err)
+// 		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed reading file : %v", err), http.StatusInternalServerError)
+// 		return
+// 	}
+// 	defer file.Close()
+// 	fName := filepath.Join(uploadFileArea, handler.Filename)
+// 	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0755)
+// 	if err != nil {
+// 		log.Println(err)
+// 		http.Error(w, fmt.Sprintf("lexiconFileUploadHandler failed opening local output file : %v", err), http.StatusInternalServerError)
+// 		return
+// 	}
+// 	defer f.Close()
+// 	_, err = io.Copy(f, file)
+// 	if err != nil {
+// 		msg := fmt.Sprintf("lexiconFileUploadHandler failed copying local output file : %v", err)
+// 		log.Println(msg)
+// 		http.Error(w, msg, http.StatusInternalServerError)
+// 		return
+// 	}
 
-	// TODO temporarily try to directly load the uploaded file
-	// into the database.  However, this should be a step of its
-	// own: first upload file, validate it, etc, and then make it
-	// possible to load into the db, not blindely just adding
-	// stuff.  Should check if there are duplicates:
-	// words+transcription in upload text file already present in
-	// db.
-	f.Close()
-	loadLexiconFileIntoDB(clientUUID, lexiconID, lexiconName, symbolSetName, fName)
+// 	// TODO temporarily try to directly load the uploaded file
+// 	// into the database.  However, this should be a step of its
+// 	// own: first upload file, validate it, etc, and then make it
+// 	// possible to load into the db, not blindely just adding
+// 	// stuff.  Should check if there are duplicates:
+// 	// words+transcription in upload text file already present in
+// 	// db.
+// 	f.Close()
+// 	loadLexiconFileIntoDB(clientUUID, lexiconID, lexiconName, symbolSetName, fName)
 
-	fmt.Fprintf(w, "%v", handler.Header)
-}
+// 	fmt.Fprintf(w, "%v", handler.Header)
+// }
 
 // TODO temporary test thingy
 // TODO This guy should somehow report back what it's doing to the client.
 // TODO Return some sort of result? Stats?
 // TODO Set 'status' value for imported entries (now hard-wired to 'import' below)
 // TODO Set 'source' value for imported entries (now hard-wired to 'unknown' below)
-func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
-	fmt.Printf("clientUUID: %s\n", clientUUID)
-	fmt.Printf("lexid: %v\n", lexiconID)
-	fmt.Printf("lexiconName: %v\n", lexiconName)
-	fmt.Printf("symbolSetName: %v\n", symbolSetName)
-	fmt.Printf("uploadFile: %v\n", uploadFileName)
+// func loadLexiconFileIntoDB(clientUUID string, lexiconID int64, lexiconName string, symbolSetName string, uploadFileName string) error {
+// 	fmt.Printf("clientUUID: %s\n", clientUUID)
+// 	fmt.Printf("lexid: %v\n", lexiconID)
+// 	fmt.Printf("lexiconName: %v\n", lexiconName)
+// 	fmt.Printf("symbolSetName: %v\n", symbolSetName)
+// 	fmt.Printf("uploadFile: %v\n", uploadFileName)
 
-	fh, err := os.Open(uploadFileName)
-	if err != nil {
-		var msg = fmt.Sprintf("loadLexiconFileIntoDB failed to open file : %v", err)
-		messageToClientWebSock(clientUUID, msg)
-		return fmt.Errorf("loadLexiconFileIntoDB failed to open file : %v", err)
-	}
+// 	fh, err := os.Open(uploadFileName)
+// 	if err != nil {
+// 		var msg = fmt.Sprintf("loadLexiconFileIntoDB failed to open file : %v", err)
+// 		messageToClientWebSock(clientUUID, msg)
+// 		return fmt.Errorf("loadLexiconFileIntoDB failed to open file : %v", err)
+// 	}
 
-	s := bufio.NewScanner(fh)
-	// for s.Scan() {
-	// 	l := s.Text()
-	// 	fmt.Println(l)
-	// }
+// 	s := bufio.NewScanner(fh)
+// 	// for s.Scan() {
+// 	// 	l := s.Text()
+// 	// 	fmt.Println(l)
+// 	// }
 
-	// ---------------------------->
+// 	// ---------------------------->
 
-	//nstFmt, err := line.NewNST()
-	wsFmt, err := line.NewWS()
-	if err != nil {
-		//log.Fatal(err)
-		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
-		messageToClientWebSock(clientUUID, msg)
-		return fmt.Errorf("lexserver failed to instantiate lexicon line parser : %v", err)
-	}
-	lexicon := dbapi.Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
+// 	//nstFmt, err := line.NewNST()
+// 	wsFmt, err := line.NewWS()
+// 	if err != nil {
+// 		//log.Fatal(err)
+// 		var msg = fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
+// 		messageToClientWebSock(clientUUID, msg)
+// 		return fmt.Errorf("lexserver failed to instantiate lexicon line parser : %v", err)
+// 	}
+// 	lexicon := dbapi.Lexicon{ID: lexiconID, Name: lexiconName, SymbolSetName: symbolSetName}
 
-	msg := fmt.Sprintf("Trying to load file: %s", uploadFileName)
-	messageToClientWebSock(clientUUID, msg)
-	log.Print(msg)
+// 	msg := fmt.Sprintf("Trying to load file: %s", uploadFileName)
+// 	messageToClientWebSock(clientUUID, msg)
+// 	log.Print(msg)
 
-	n := 0
-	var eBuf []lex.Entry
-	for s.Scan() {
-		if err := s.Err(); err != nil {
-			log.Fatal(err)
-		}
-		l := s.Text()
-		e, err := wsFmt.ParseToEntry(l)
-		if err != nil {
-			log.Fatal(err)
-		}
-		eBuf = append(eBuf, e)
-		n++
-		if n%10000 == 0 {
-			_, err = dbapi.InsertEntries(db, lexicon, eBuf)
-			if err != nil {
-				log.Fatal(err)
-			}
-			eBuf = make([]lex.Entry, 0)
-			//fmt.Printf("\rLines read: %d               \r", n)
-			msg2 := fmt.Sprintf("Lines so far: %d", n)
-			messageToClientWebSock(clientUUID, msg2)
-			fmt.Println(msg2)
-		}
-	}
-	dbapi.InsertEntries(db, lexicon, eBuf) // flushing the buffer
+// 	n := 0
+// 	var eBuf []lex.Entry
+// 	for s.Scan() {
+// 		if err := s.Err(); err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		l := s.Text()
+// 		e, err := wsFmt.ParseToEntry(l)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		eBuf = append(eBuf, e)
+// 		n++
+// 		if n%10000 == 0 {
+// 			_, err = dbapi.InsertEntries(db, lexicon, eBuf)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 			eBuf = make([]lex.Entry, 0)
+// 			//fmt.Printf("\rLines read: %d               \r", n)
+// 			msg2 := fmt.Sprintf("Lines so far: %d", n)
+// 			messageToClientWebSock(clientUUID, msg2)
+// 			fmt.Println(msg2)
+// 		}
+// 	}
+// 	dbapi.InsertEntries(db, lexicon, eBuf) // flushing the buffer
 
-	_, err = db.Exec("ANALYZE")
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	_, err = db.Exec("ANALYZE")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	msg3 := fmt.Sprintf("Lines read:\t%d", n)
-	messageToClientWebSock(clientUUID, msg3)
-	log.Println(msg3)
-	// TODO Copied from addNSTLexToDB
-	// <----------------------------
+// 	msg3 := fmt.Sprintf("Lines read:\t%d", n)
+// 	messageToClientWebSock(clientUUID, msg3)
+// 	log.Println(msg3)
+// 	// TODO Copied from addNSTLexToDB
+// 	// <----------------------------
 
-	if err := s.Err(); err != nil {
-		msg4 := fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
-		messageToClientWebSock(clientUUID, msg4)
-		return fmt.Errorf(msg4)
-	}
+// 	if err := s.Err(); err != nil {
+// 		msg4 := fmt.Sprintf("lexserver failed to instantiate lexicon line parser : %v", err)
+// 		messageToClientWebSock(clientUUID, msg4)
+// 		return fmt.Errorf(msg4)
+// 	}
 
-	// TODO
-	return nil
-}
+// 	// TODO
+// 	return nil
+// }
 
-func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
-	fName := getParam("file", r)
-	if fName == "" {
-		msg := fmt.Sprint("downloadFileHandler got empty 'file' param")
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	path := filepath.Join(".", downloadFileArea, fName)
-	log.Printf("downloadFileHandler: file path: %s", path)
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		msg := fmt.Sprintf("download: no such file '%s'", fName)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusBadRequest)
-		return
-	}
+// func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
+// 	fName := getParam("file", r)
+// 	if fName == "" {
+// 		msg := fmt.Sprint("downloadFileHandler got empty 'file' param")
+// 		log.Println(msg)
+// 		http.Error(w, msg, http.StatusInternalServerError)
+// 		return
+// 	}
+// 	path := filepath.Join(".", downloadFileArea, fName)
+// 	log.Printf("downloadFileHandler: file path: %s", path)
+// 	if _, err := os.Stat(path); os.IsNotExist(err) {
+// 		msg := fmt.Sprintf("download: no such file '%s'", fName)
+// 		log.Println(msg)
+// 		http.Error(w, msg, http.StatusBadRequest)
+// 		return
+// 	}
 
-	w.Header().Set("Content-Disposition", "attachment; filename="+fName)
-	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
-	http.ServeFile(w, r, path)
-}
+// 	w.Header().Set("Content-Disposition", "attachment; filename="+fName)
+// 	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+// 	http.ServeFile(w, r, path)
+// }
 
-var db *sql.DB
+//var db *sql.DB
+var dbm = dbapi.NewDBManager()
 
 func keepAlive(wsC chan string) {
 	c := time.Tick(57 * time.Second)
@@ -689,17 +707,17 @@ func isStaticPage(url string) bool {
 
 func main() {
 
-	dbFile := "./pronlex.db"
+	dbPath := "./pronlex.db"
 	port := ":8787"
 
 	if len(os.Args) > 3 || len(os.Args) == 2 {
 		log.Println("Usages:")
 		log.Println("$ go run lexserver.go <SQLITE DB FILE> <PORT>")
 		log.Println("$ go run lexserver.go")
-		log.Println("  - defaults to db file " + dbFile + ", port " + port)
+		log.Println("  - defaults to db file " + dbPath + ", port " + port)
 		os.Exit(1)
 	} else if len(os.Args) == 3 {
-		dbFile = os.Args[1] // "./pronlex.db"
+		dbPath = os.Args[1] // "./pronlex.db"
 		port = os.Args[2]   //":8787"
 	}
 
@@ -712,13 +730,15 @@ func main() {
 	var err error // återanvänds för alla fel
 
 	// kolla att db-filen existerar
-	_, err = os.Stat(dbFile)
+	_, err = os.Stat(dbPath)
 	ff("lexserver: Cannot find db file. %v", err)
 
 	dbapi.Sqlite3WithRegex()
 
-	log.Print("lexserver: connecting to Sqlite3 db ", dbFile)
-	db, err = sql.Open("sqlite3_with_regexp", dbFile)
+	log.Print("lexserver: connecting to Sqlite3 db ", dbPath)
+
+	var db *sql.DB
+	db, err = sql.Open("sqlite3_with_regexp", dbPath)
 	ff("Failed to open dbfile %v", err)
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	ff("Failed to exec PRAGMA call %v", err)
@@ -729,6 +749,12 @@ func main() {
 	//_, err = db.Exec("PRAGMA busy_timeout=500") // doesn't seem to do the trick
 	//ff("Failed to exec PRAGMA call %v", err)
 	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
+	dbName := filepath.Base(dbPath)
+	var extension = filepath.Ext(dbName)
+	dbName = dbName[0 : len(dbName)-len(extension)]
+	dbRef := lex.DBRef(dbName)
+	dbm.AddDB(dbRef, db)
 
 	// load symbol set mappers
 	err = loadSymbolSets(symbolSetFileArea)
@@ -787,6 +813,7 @@ func main() {
 	admin := newSubRouter(rout, "/admin", "Misc admin tools")
 	admin.addHandler(adminLexImportPage)
 	admin.addHandler(adminLexImport)
+	admin.addHandler(adminListDBs)
 	admin.addHandler(adminDeleteLex)
 	admin.addHandler(adminSuperDeleteLex)
 

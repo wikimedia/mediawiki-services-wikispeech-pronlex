@@ -41,19 +41,19 @@ func Test_MoveNewEntries(t *testing.T) {
 		log.Fatalf("Failed to create lexicon db: %v", err)
 	}
 
-	l1 := Lexicon{Name: "test1", SymbolSetName: "ZZ"}
+	l1 := lexicon{name: "test1", symbolSetName: "ZZ"}
 	l1, err = defineLexicon(db, l1)
 	if err != nil {
 		t.Errorf("holy cow (1)! : %v", err)
 	}
 
-	l2 := Lexicon{Name: "test2", SymbolSetName: "ZZ"}
+	l2 := lexicon{name: "test2", symbolSetName: "ZZ"}
 	l2, err = defineLexicon(db, l2)
 	if err != nil {
 		t.Errorf("holy cow (2)! : %v", err)
 	}
 
-	l3 := Lexicon{Name: "test3", SymbolSetName: "ZZ"}
+	l3 := lexicon{name: "test3", symbolSetName: "ZZ"}
 	l3, err = defineLexicon(db, l3)
 	if err != nil {
 		t.Errorf("holy cow (3)! : %v", err)
@@ -80,7 +80,7 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("The sky is falling! : %v", err)
 	}
 
-	res, err := moveNewEntries(db, l1.Name, l2.Name, "from"+l1.Name, "moved")
+	res, err := moveNewEntries(db, l1.name, l2.name, "from"+l1.name, "moved")
 	if err != nil {
 		t.Errorf("What?! : %v", err)
 	}
@@ -113,7 +113,7 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("Unbelievable! : %v", err)
 	}
 
-	res2, err := moveNewEntries(db, l1.Name, l2.Name, "from:"+l1.Name, "moved")
+	res2, err := moveNewEntries(db, l1.name, l2.name, "from:"+l1.name, "moved")
 	if err != nil {
 		t.Errorf("No fun : %v", err)
 	}
@@ -121,14 +121,14 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL1, err := lexiconStats(db, l1.Name)
+	statsL1, err := lexiconStats(db, l1.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
 	if w, g := int64(1), statsL1.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
-	statsL2, err := lexiconStats(db, l2.Name)
+	statsL2, err := lexiconStats(db, l2.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
@@ -137,7 +137,7 @@ func Test_MoveNewEntries(t *testing.T) {
 	}
 
 	// Move back again
-	res3, err := moveNewEntries(db, l2.Name, l1.Name, "from:"+l2.Name, "moved_back")
+	res3, err := moveNewEntries(db, l2.name, l1.name, "from:"+l2.name, "moved_back")
 	if err != nil {
 		t.Errorf("No fun : %v", err)
 	}
@@ -145,14 +145,14 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL1b, err := lexiconStats(db, l1.Name)
+	statsL1b, err := lexiconStats(db, l1.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
 	if w, g := int64(2), statsL1b.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
-	statsL2b, err := lexiconStats(db, l2.Name)
+	statsL2b, err := lexiconStats(db, l2.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
@@ -160,7 +160,7 @@ func Test_MoveNewEntries(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL3, err := lexiconStats(db, l3.Name)
+	statsL3, err := lexiconStats(db, l3.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}

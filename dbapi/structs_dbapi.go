@@ -120,10 +120,10 @@ func NewQuery() Query {
 
 // Lexicon corresponds to the lexicon db table, to which Entries are
 // associated
-type Lexicon struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	SymbolSetName string `json:"symbolSetName"`
+type lexicon struct {
+	id            int64  `json:"id"`
+	name          string `json:"name"`
+	symbolSetName string `json:"symbolSetName"`
 }
 
 // Symbol corresponds to the symbol db table, and holds a phonetic

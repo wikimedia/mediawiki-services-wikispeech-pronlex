@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
@@ -101,16 +100,16 @@ var validationStats = urlHandler{
 	name:     "stats",
 	url:      "/stats/{lexicon_name}",
 	help:     "Lists validation stats.",
-	examples: []string{"/stats/1"},
+	examples: []string{"/stats/pronlex:sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexiconName := getParam("lexicon_name", r)
-		if len(strings.TrimSpace(lexiconName)) == 0 {
-			msg := fmt.Sprintf("lexicon name should be specified by variable 'lexicon_name'")
-			log.Println(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
-		stats, err := dbapi.ValidationStats(db, lexiconName)
+
+		stats, err := dbm.ValidationStats(lexRef)
 		if err != nil {
 			msg := fmt.Sprintf("validationStatsHandler failed to retreive validation stats : %v", err)
 			log.Println(msg)

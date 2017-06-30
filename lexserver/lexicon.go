@@ -43,7 +43,7 @@ var lexiconUpdateEntry = urlHandler{
 		}
 
 		// Underscore below matches bool indicating if any update has taken place. Return this info?
-		res, _, err2 := dbapi.UpdateEntry(db, e)
+		res, _, err2 := dbm.UpdateEntry(e)
 		if err2 != nil {
 			log.Printf("lexserver: Failed to update entry : %v", err2)
 			http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
@@ -62,7 +62,7 @@ var lexiconUpdateEntry = urlHandler{
 }
 
 type LexWithEntryCount struct {
-	ID            int64  `json:"id"`
+	//ID            int64  `json:"id"`
 	Name          string `json:"name"`
 	SymbolSetName string `json:"symbolSetName"`
 	EntryCount    int64  `json:"entryCount"`
@@ -74,19 +74,19 @@ var lexiconList = urlHandler{
 	help:     "Lists available lexicons along with some basic info.",
 	examples: []string{"/list"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexs0, err := dbapi.ListLexicons(db) // TODO error handling
+		lexs0, err := dbm.ListLexicons() // TODO error handling
 		if err != nil {
 			http.Error(w, fmt.Sprintf("list lexicons failed : %v", err), http.StatusInternalServerError)
 			return
 		}
 		var lexs []LexWithEntryCount
 		for _, lex := range lexs0 {
-			entryCount, err := dbapi.EntryCount(db, lex.ID)
+			entryCount, err := dbm.EntryCount(lex.LexRef)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("lexicon stats failed : %v", err), http.StatusInternalServerError)
 				return
 			}
-			lexs = append(lexs, LexWithEntryCount{ID: lex.ID, Name: lex.Name, SymbolSetName: lex.SymbolSetName, EntryCount: entryCount})
+			lexs = append(lexs, LexWithEntryCount{Name: lex.LexRef.String(), SymbolSetName: lex.SymbolSetName, EntryCount: entryCount})
 		}
 		jsn, err := marshal(lexs, r)
 		if err != nil {
@@ -104,13 +104,14 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 	help:     "List current entry statuses.",
 	examples: []string{"/list_current_entry_statuses/sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexiconName := getParam("lexicon_name", r)
-		if "" == lexiconName {
-			http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
 
-		statuses, err := dbapi.ListCurrentEntryStatuses(db, lexiconName)
+		statuses, err := dbm.ListCurrentEntryStatuses(lexRef)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
 			return
@@ -132,13 +133,14 @@ var lexiconListAllEntryStatuses = urlHandler{
 	help:     "List all entry statuses.",
 	examples: []string{"/list_all_entry_statuses/sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexiconName := getParam("lexicon_name", r)
-		if "" == lexiconName {
-			http.Error(w, "missing value for lexicon_name param", http.StatusBadRequest)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
 
-		statuses, err := dbapi.ListAllEntryStatuses(db, lexiconName)
+		statuses, err := dbm.ListAllEntryStatuses(lexRef)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("listAllEntryStatuses : %v", err), http.StatusInternalServerError)
 			return
@@ -153,26 +155,31 @@ var lexiconListAllEntryStatuses = urlHandler{
 	},
 }
 
+type LexInfo struct {
+	Name          string `json:"name"`
+	SymbolSetName string `json:"symbolSetName"`
+}
+
 var lexiconInfo = urlHandler{
 	name:     "info",
 	url:      "/info/{lexicon_name}",
 	help:     "Get some basic lexicon info.",
 	examples: []string{"/info/sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexName := getParam("lexicon_name", r)
-		if len(strings.TrimSpace(lexName)) == 0 {
-			msg := fmt.Sprintf("lexicon name should be specified by variable 'lexicon_name'")
-			log.Println(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
 
-		lex, err := dbapi.GetLexicon(db, lexName) // TODO error handling
+		lex, err := dbm.GetLexicon(lexRef)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("get lexicon failed : %v", err), http.StatusInternalServerError)
 			return
 		}
-		jsn, err := marshal(lex, r)
+		li := LexInfo{Name: lexRef.String(), SymbolSetName: lex.SymbolSetName}
+		jsn, err := marshal(li, r)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed marshalling : %v", err), http.StatusInternalServerError)
 			return
@@ -188,15 +195,14 @@ var lexiconStats = urlHandler{
 	help:     "Lists lexicon stats.",
 	examples: []string{"/stats/sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexName := getParam("lexicon_name", r)
-		if len(strings.TrimSpace(lexName)) == 0 {
-			msg := fmt.Sprintf("lexicon name should be specified by variable 'lexicon_name'")
-			log.Println(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
 
-		stats, err := dbapi.LexiconStats(db, lexName)
+		stats, err := dbm.LexiconStats(lexRef)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("lexiconStatsHandler: call to  dbapi.LexiconStats failed : %v", err), http.StatusInternalServerError)
 			return
@@ -246,9 +252,7 @@ var lexiconLookup = urlHandler{
 			return
 		}
 
-		//res, err := dbapi.LookUpIntoMap(db, q) // GetEntries(db, q)
-		lexNames := []lex.LexName{}                        // TODO: Update with db_manager!!
-		res, err := dbapi.LookUpIntoSlice(db, lexNames, q) // GetEntries(db, q) // TODO: Update with db_manager!!
+		res, err := dbm.LookUpIntoSlice(q)
 		if err != nil {
 			log.Printf("lexserver: Failed to get entries: %v", err)
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -267,7 +271,7 @@ var lexiconLookup = urlHandler{
 	},
 }
 
-var lexiconAddEntryURL = `/addentry?lexicon=sv-se.nst&entry={
+var lexiconAddEntryURL = `/addentry?lexicon_name=sv-se.nst&entry={
     "strn": "flesk",
     "language": "sv-se",
     "partOfSpeech": "NN",
@@ -295,15 +299,20 @@ var lexiconAddEntry = urlHandler{
 	help:     "Add an entry to the database.",
 	examples: []string{lexiconAddEntryURL},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		// TODO error check parameters
-		lexiconName := getParam("lexicon", r)
-		lexicon, err := dbapi.GetLexicon(db, lexiconName)
+		lexRef, err := getLexRefParam(r)
 		if err != nil {
-			msg := fmt.Sprintf("failed to find lexicon %s in database : %v", lexiconName, err)
-			log.Println(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
+
+		// lexicon, err := dbm.GetLexicon(lexRef)
+		// if err != nil {
+		// 	msg := fmt.Sprintf("failed to find lexicon %s in database : %v", lexRef, err)
+		// 	log.Println(msg)
+		// 	http.Error(w, msg, http.StatusInternalServerError)
+		// 	return
+		// }
 		entryJSON := getParam("entry", r)
 		var e lex.Entry
 		err = json.Unmarshal([]byte(entryJSON), &e)
@@ -313,7 +322,7 @@ var lexiconAddEntry = urlHandler{
 			return
 		}
 
-		ids, err := dbapi.InsertEntries(db, lexicon, []lex.Entry{e})
+		ids, err := dbm.InsertEntries(lexRef, []lex.Entry{e})
 		if err != nil {
 			msg := fmt.Sprintf("lexserver failed to update entry : %v", err)
 			log.Println(msg)
@@ -340,6 +349,7 @@ var lexiconMoveNewEntries = urlHandler{
 			http.Error(w, "no value for parameter 'to_lexicon'", http.StatusBadRequest)
 			return
 		}
+
 		sourceName := delQuote(getParam("new_source", r))
 		if sourceName == "" {
 			http.Error(w, "no value for parameter 'source'", http.StatusBadRequest)
@@ -351,7 +361,22 @@ var lexiconMoveNewEntries = urlHandler{
 			return
 		}
 
-		moveRes, err := dbapi.MoveNewEntries(db, fromLexName, toLexName, sourceName, statusName)
+		fromLex, err := lex.ParseLexRef(fromLexName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
+			return
+		}
+		toLex, err := lex.ParseLexRef(toLexName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
+			return
+		}
+
+		if fromLex.DBRef != toLex.DBRef {
+			http.Error(w, fmt.Sprintf("can only move entries with in the same database, from %s to %s", fromLex.String(), toLex.String()), http.StatusInternalServerError)
+		}
+
+		moveRes, err := dbm.MoveNewEntries(fromLex.DBRef, fromLex.LexName, toLex.LexName, sourceName, statusName)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
 			return
@@ -391,8 +416,14 @@ var lexiconValidation = urlHandler{
 		}
 		logger := dbapi.NewWebSockLogger(conn)
 
-		lexName := getParam("lexicon_name", r)
-		lexicon, err := dbapi.GetLexicon(db, lexName)
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+			return
+		}
+
+		lexicon, err := dbm.GetLexicon(lexRef)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("couldn't retrive lexicon : %v", err), http.StatusInternalServerError)
 			return
@@ -408,8 +439,7 @@ var lexiconValidation = urlHandler{
 		}
 
 		q := dbapi.Query{}
-		lexNames := []lex.LexName{lex.LexName(lexicon.Name)}
-		stats, err := dbapi.Validate(db, lexNames, logger, *v, q)
+		stats, err := dbm.Validate(lexRef, logger, *v, q)
 		if err != nil {
 			msg := fmt.Sprintf("lexiconValidation failed validate : %v", err)
 			log.Println(msg)

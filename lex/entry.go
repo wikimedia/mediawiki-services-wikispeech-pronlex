@@ -14,10 +14,36 @@ type LexRef struct {
 	LexName LexName
 }
 
+type LexRefWithInfo struct {
+	LexRef        LexRef
+	SymbolSetName string
+}
+
+func ParseLexRef(fullLexName string) (LexRef, error) {
+	nameSplit := strings.SplitN(strings.TrimSpace(fullLexName), ":", 2)
+	if len(nameSplit) != 2 {
+		return LexRef{}, fmt.Errorf("ParseLexRef: failed to split full lexicon name into two colon separated parts: '%s'", fullLexName)
+	}
+	db := nameSplit[0]
+	if "" == db {
+		return LexRef{}, fmt.Errorf("ParseLexRef: db part of lexicon name empty: '%s'", fullLexName)
+	}
+	lex := nameSplit[1]
+	if "" == lex {
+		return LexRef{}, fmt.Errorf("ParseLexRef: lexicon part of full lexicon name empty: '%s'", fullLexName)
+	}
+
+	return NewLexRef(db, lex), nil
+}
+
 func NewLexRef(lexDB string, lexName string) LexRef {
 	return LexRef{DBRef: DBRef(strings.ToLower(strings.TrimSpace(lexDB))),
 		LexName: LexName(strings.ToLower(strings.TrimSpace(lexName))),
 	}
+}
+
+func (lr LexRef) String() string {
+	return fmt.Sprintf("%s:%s", string(lr.DBRef), string(lr.LexName))
 }
 
 // EntryStatus associates a status to an Entry. The status has a name (such as 'ok') and a source (a string identifying who or what generated the status)

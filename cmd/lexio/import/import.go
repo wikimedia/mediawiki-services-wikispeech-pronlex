@@ -177,7 +177,7 @@ SAMPLE INVOCATION:
 	}
 
 	//lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-	err = dbm.DefineLexicon(dbRef, symbolSetName, lexRef.LexName)
+	err = dbm.DefineLexicon(lexRef, symbolSetName)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -185,7 +185,7 @@ SAMPLE INVOCATION:
 
 	logger := dbapi.StderrLogger{}
 	// TODO handle errors! Does it make sent to return array of error...?
-	err = dbapi.ImportLexiconFile(db, logger, lexName, inFile, validator)
+	err = dbapi.ImportLexiconFile(db, lexRef.LexName, logger, inFile, validator)
 
 	if err != nil {
 		log.Fatal(err)

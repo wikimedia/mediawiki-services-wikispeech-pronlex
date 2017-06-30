@@ -10,48 +10,6 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-// func Test_splitFullLexiconName(t *testing.T) {
-
-// 	n1 := "sv_se-nst:full_words:v1.0"
-// 	db1, l1, err := splitFullLexiconName(n1)
-// 	if w, g := "sv_se-nst", db1; w != g {
-// 		t.Errorf("wanted %s got '%s'", w, g)
-// 	}
-// 	if w, g := "full_words:v1.0", l1; w != g {
-// 		t.Errorf("wanted %s got '%s'", w, g)
-// 	}
-// 	if err != nil {
-// 		t.Errorf("Auch! %v", err)
-// 	}
-
-// 	// Invalid db name
-// 	n2 := ":full_words:v1.0"
-// 	db2, l2, err := splitFullLexiconName(n2)
-// 	if err == nil {
-// 		t.Errorf("wanted error, got nil")
-// 	}
-// 	if w, g := "", db2; w != g {
-// 		t.Errorf("wanted '%s' got '%s'", w, g)
-// 	}
-// 	if w, g := "", l2; w != g {
-// 		t.Errorf("wanted '%s' got '%s'", w, g)
-// 	}
-
-// 	// Invalid db name
-// 	n2 = "full_wordsv1.0:"
-// 	db2, l2, err = splitFullLexiconName(n2)
-// 	if err == nil {
-// 		t.Errorf("wanted error, got nil")
-// 	}
-// 	if w, g := "", db2; w != g {
-// 		t.Errorf("wanted '%s' got '%s'", w, g)
-// 	}
-// 	if w, g := "", l2; w != g {
-// 		t.Errorf("wanted '%s' got '%s'", w, g)
-// 	}
-
-// }
-
 func Test_DBManager(t *testing.T) {
 
 	dbPath1 := "./testlex_listlex1.db"
@@ -120,11 +78,11 @@ func Test_DBManager(t *testing.T) {
 	l2_2 := lex.LexName("zuperlex2")
 	l2_3 := lex.LexName("zuperduperlex")
 
-	err = dbm.DefineLexicon(lex.DBRef("db1"), "sv_sampa", l1_1, l1_2, l1_3)
+	err = dbm.DefineLexicons(lex.DBRef("db1"), "sv_sampa", l1_1, l1_2, l1_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}
-	err = dbm.DefineLexicon(lex.DBRef("db2"), "sv_sampa", l2_1, l2_2, l2_3)
+	err = dbm.DefineLexicons(lex.DBRef("db2"), "sv_sampa", l2_1, l2_2, l2_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}
@@ -140,7 +98,7 @@ func Test_DBManager(t *testing.T) {
 
 	lexsM := make(map[lex.LexRef]bool)
 	for _, l := range lexs {
-		lexsM[l] = true
+		lexsM[l.LexRef] = true
 	}
 
 	if w := lex.NewLexRef("db1", "zuperlex1"); !lexsM[w] {

@@ -12,8 +12,10 @@
 
 	<form data-bind="submit: $root.importLexiconFile">
 	  <table>
+	    <tr><td>Lexicon DB: </td><td><select data-bind="options: $root.lexiconDBs, optionsCaption: 'Select lexicon db', value: $root.lexiconDB"></select></td></tr>
+
 	    <tr><td>Lexicon name:</td><td> <input data-bind="value: $root.lexiconName"/></td></tr>
-	    	<tr><td>Symbol set: </td><td><select data-bind="options: $root.symbolSetNames, optionsCaption: 'Select symbol set', value: $root.symbolSetName"></select></td></tr>
+	    <tr><td>Symbol set: </td><td><select data-bind="options: $root.symbolSetNames, optionsCaption: 'Select symbol set', value: $root.symbolSetName"></select></td></tr>
 
 	    <tr><td>Lexicon file: </td><td><input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/></td></tr>
 	    <tr><td>Validate after import: </td><td><input type="checkbox" data-bind="checked: $root.validate, enable: $root.hasValidator"/></td></tr>

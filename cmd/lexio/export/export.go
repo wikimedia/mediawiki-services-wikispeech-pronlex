@@ -40,9 +40,9 @@ func main() {
 	}
 	for _, ref := range lexRefs {
 		if len(os.Args) == 2 {
-			fmt.Println(ref.LexName)
+			fmt.Println(ref.LexRef.LexName)
 		}
-		lexNames[ref.LexName] = true
+		lexNames[ref.LexRef.LexName] = true
 	}
 	if len(os.Args) == 2 {
 		return
