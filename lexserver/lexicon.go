@@ -219,6 +219,27 @@ var lexiconStats = urlHandler{
 	},
 }
 
+var lexiconAddEntryURL = `/addentry?lexicon_name=sv-se.nst&entry={
+    "strn": "flesk",
+    "language": "sv-se",
+    "partOfSpeech": "NN",
+    "morphology": "SIN-PLU|IND|NOM|NEU",
+    "wordParts": "flesk",
+    "lemma": {
+	"strn": "flesk",
+	"reading": "",
+	"paradigm": "s7n-övriga ex träd"
+    },
+    "transcriptions": [
+	{
+	    
+	    "strn": "\" f l E s k",
+	    "language": "sv-se"
+	}
+    ]
+}
+`
+
 var lexiconLookup = urlHandler{
 	name:     "lookup",
 	url:      "/lookup",
@@ -236,12 +257,12 @@ var lexiconLookup = urlHandler{
 		ff("lexLookUpHandler failed to get params: %v", err)
 		params := u.Query()
 		if len(params) == 0 {
-			log.Print("lexLookUpHandler: zero params, serving lexlookup.html")
+			log.Print("lexiconLookup: zero params, serving lexlookup.html")
 			http.ServeFile(w, r, "./static/lexlookup.html")
 		}
 		for k, v := range params {
 			if _, ok := knownParams[k]; !ok {
-				log.Printf("lexLookUpHandler: unknown URL parameter: '%s': '%s'", k, v)
+				log.Printf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v)
 			}
 		}
 
@@ -271,27 +292,6 @@ var lexiconLookup = urlHandler{
 		fmt.Fprint(w, string(jsn))
 	},
 }
-
-var lexiconAddEntryURL = `/addentry?lexicon_name=sv-se.nst&entry={
-    "strn": "flesk",
-    "language": "sv-se",
-    "partOfSpeech": "NN",
-    "morphology": "SIN-PLU|IND|NOM|NEU",
-    "wordParts": "flesk",
-    "lemma": {
-	"strn": "flesk",
-	"reading": "",
-	"paradigm": "s7n-övriga ex träd"
-    },
-    "transcriptions": [
-	{
-	    
-	    "strn": "\" f l E s k",
-	    "language": "sv-se"
-	}
-    ]
-}
-`
 
 // TODO add tests
 var lexiconAddEntry = urlHandler{
