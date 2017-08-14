@@ -741,7 +741,7 @@ func main() {
 	for _, f := range files {
 		dbPath := filepath.Join(dbFileArea, f.Name())
 		if !strings.HasSuffix(dbPath, ".db") {
-			fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", dbPath)
+			log.Printf("lexserver: skipping file: '%s'\n", dbPath)
 			continue
 		}
 		nDbs = nDbs + 1

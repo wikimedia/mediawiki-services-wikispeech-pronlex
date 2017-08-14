@@ -151,6 +151,26 @@ func getLexicon(db *sql.DB, name string) (lexicon, error) {
 	return getLexiconTx(tx, name)
 }
 
+func getLexiconMapTx(tx *sql.Tx) (map[string]bool, error) {
+	res := make(map[string]bool)
+
+	rows, err := tx.Query("select name from lexicon")
+	if err != nil {
+		return res, fmt.Errorf("failed db select on lexicon table : %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		res[name] = true
+		if err != nil {
+			return res, fmt.Errorf("failed db select on lexicon table : %v", err)
+		}
+	}
+	return res, err
+
+}
+
 func getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
 	res := lexicon{}
 	name0 := strings.ToLower(name)
@@ -712,17 +732,30 @@ func lookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
 
 // LookUpIdsTx takes a Query struct, searches the lexicon db, and returns a slice of ids
 func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
+	var result []int64
+
+	lexiconMap, err := getLexiconMapTx(tx)
+	if err != nil {
+		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		return result, err
+	}
+	for _, lexName := range lexNames {
+		_, ok := lexiconMap[string(lexName)]
+		if !ok {
+			tx.Rollback()
+			return result, fmt.Errorf("no lexicon exists with name: %s", lexName)
+		}
+	}
 
 	sqlStmt := selectEntryIdsSQL(lexNames, q)
 
 	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
 	if err != nil {
 		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
-		return nil, err
+		return result, err
 	}
 	defer rows.Close()
 
-	var result []int64
 	for rows.Next() {
 		var entryID int64
 		rows.Scan(
@@ -762,6 +795,19 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 	//log.Printf("SQL %v\n\n", sqlString)
 
 	//log.Printf("VALUES %v\n\n", values)
+
+	lexiconMap, err := getLexiconMapTx(tx)
+	if err != nil {
+		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		return err
+	}
+	for _, lexName := range lexNames {
+		_, ok := lexiconMap[string(lexName)]
+		if !ok {
+			tx.Rollback()
+			return fmt.Errorf("no lexicon exists with name: %s", lexName)
+		}
+	}
 
 	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
 	if err != nil {

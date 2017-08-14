@@ -183,7 +183,7 @@ func (dbm DBManager) LookUpIntoSlice(q DBMQuery) ([]lex.Entry, error) {
 	writer := lex.EntrySliceWriter{}
 	err := dbm.LookUp(q, &writer)
 	if err != nil {
-		return res, fmt.Errorf("DBManager.LookUp failed : %v", err)
+		return res, err
 	}
 	for _, e := range writer.Entries {
 		res = append(res, e)
@@ -197,7 +197,7 @@ func (dbm DBManager) LookUpIntoMap(q DBMQuery) (map[lex.DBRef][]lex.Entry, error
 	writer := lex.EntrySliceWriter{}
 	err := dbm.LookUp(q, &writer)
 	if err != nil {
-		return res, fmt.Errorf("DBManager.LookUp failed : %v", err)
+		return res, err
 	}
 	for _, e := range writer.Entries {
 		es := res[e.LexRef.DBRef]
@@ -222,7 +222,7 @@ func (dbm DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 	for dbR, lexs := range dbz {
 		db, ok := dbm.dbs[dbR]
 		if !ok {
-			return fmt.Errorf("DBManager.LookUp: no db of name '%s'", dbR)
+			return fmt.Errorf("DBManager.LookUp failed: no db of name '%s'", dbR)
 		}
 
 		go func(db0 *sql.DB, dbRef lex.DBRef, lexNames []lex.LexName) {
@@ -231,7 +231,7 @@ func (dbm DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 			ew := lex.EntrySliceWriter{}
 			err := lookUp(db0, lexNames, q.Query, &ew)
 			if err != nil {
-				rez.err = fmt.Errorf("DBManager.LookUp dbapi.LookUp failed : %v", err)
+				rez.err = fmt.Errorf("dbapi.LookUp failed : %v", err)
 				ch <- rez
 				return
 			}
