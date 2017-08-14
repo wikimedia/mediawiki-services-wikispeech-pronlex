@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -707,18 +708,16 @@ func isStaticPage(url string) bool {
 
 func main() {
 
-	dbPath := "./pronlex.db"
 	port := ":8787"
 
-	if len(os.Args) > 3 || len(os.Args) == 2 {
+	if len(os.Args) > 2 {
 		log.Println("Usages:")
-		log.Println("$ go run lexserver.go <SQLITE DB FILE> <PORT>")
+		log.Println("$ go run lexserver.go <PORT>")
 		log.Println("$ go run lexserver.go")
-		log.Println("  - defaults to db file " + dbPath + ", port " + port)
+		log.Println("  - defaults to port " + port)
 		os.Exit(1)
-	} else if len(os.Args) == 3 {
-		dbPath = os.Args[1] // "./pronlex.db"
-		port = os.Args[2]   //":8787"
+	} else if len(os.Args) == 2 {
+		port = os.Args[1] //":8787"
 	}
 
 	if !strings.HasPrefix(port, ":") {
@@ -729,32 +728,54 @@ func main() {
 
 	var err error // återanvänds för alla fel
 
-	// kolla att db-filen existerar
-	_, err = os.Stat(dbPath)
-	ff("lexserver: Cannot find db file. %v", err)
-
 	dbapi.Sqlite3WithRegex()
 
-	log.Print("lexserver: connecting to Sqlite3 db ", dbPath)
+	log.Print("lexserver: loading dbs from folder ", dbFileArea)
+	files, err := ioutil.ReadDir(dbFileArea)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "couldn't open db file area: %v\n", err)
+		os.Exit(0)
+	}
 
-	var db *sql.DB
-	db, err = sql.Open("sqlite3_with_regexp", dbPath)
-	ff("Failed to open dbfile %v", err)
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	ff("Failed to exec PRAGMA call %v", err)
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
-	_, err = db.Exec("PRAGMA journal_mode=WAL")
-	ff("Failed to exec PRAGMA call %v", err)
-	//_, err = db.Exec("PRAGMA busy_timeout=500") // doesn't seem to do the trick
-	//ff("Failed to exec PRAGMA call %v", err)
-	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+	nDbs := 0
+	for _, f := range files {
+		dbPath := filepath.Join(dbFileArea, f.Name())
+		if !strings.HasSuffix(dbPath, ".db") {
+			fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", dbPath)
+			continue
+		}
+		nDbs = nDbs + 1
+		log.Print("lexserver: connecting to Sqlite3 db ", dbPath)
+		// kolla att db-filen existerar
+		_, err = os.Stat(dbPath)
+		ff("lexserver: Cannot find db file. %v", err)
 
-	dbName := filepath.Base(dbPath)
-	var extension = filepath.Ext(dbName)
-	dbName = dbName[0 : len(dbName)-len(extension)]
-	dbRef := lex.DBRef(dbName)
-	dbm.AddDB(dbRef, db)
+		var db *sql.DB
+		db, err = sql.Open("sqlite3_with_regexp", dbPath)
+		ff("Failed to open dbfile %v", err)
+		_, err = db.Exec("PRAGMA foreign_keys = ON")
+		ff("Failed to exec PRAGMA call %v", err)
+		_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+		ff("Failed to exec PRAGMA call %v", err)
+		_, err = db.Exec("PRAGMA journal_mode=WAL")
+		ff("Failed to exec PRAGMA call %v", err)
+		//_, err = db.Exec("PRAGMA busy_timeout=500") // doesn't seem to do the trick
+		//ff("Failed to exec PRAGMA call %v", err)
+		db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
+		dbName := filepath.Base(dbPath)
+		var extension = filepath.Ext(dbName)
+		dbName = dbName[0 : len(dbName)-len(extension)]
+		dbRef := lex.DBRef(dbName)
+		dbm.AddDB(dbRef, db)
+	}
+
+	// fatal error if no dbs exist
+	if nDbs == 0 {
+		log.Printf("lexserver: no dbs in specified db file area %s", dbFileArea)
+		os.Exit(1)
+	}
+	log.Printf("lexserver: loaded %v db(s)", nDbs)
 
 	// load symbol set mappers
 	err = loadSymbolSets(symbolSetFileArea)

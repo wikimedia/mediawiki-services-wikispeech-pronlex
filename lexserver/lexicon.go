@@ -79,7 +79,7 @@ var lexiconList = urlHandler{
 			http.Error(w, fmt.Sprintf("list lexicons failed : %v", err), http.StatusInternalServerError)
 			return
 		}
-		var lexs []LexWithEntryCount
+		var lexs []LexWithEntryCount = []LexWithEntryCount{}
 		for _, lex := range lexs0 {
 			entryCount, err := dbm.EntryCount(lex.LexRef)
 			if err != nil {
@@ -102,7 +102,7 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 	name:     "list_current_entry_statuses",
 	url:      "/list_current_entry_statuses/{lexicon_name}",
 	help:     "List current entry statuses.",
-	examples: []string{"/list_current_entry_statuses/sv-se.nst"},
+	examples: []string{"/list_current_entry_statuses/pronlex:sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -131,7 +131,7 @@ var lexiconListAllEntryStatuses = urlHandler{
 	name:     "list_all_entry_statuses",
 	url:      "/list_all_entry_statuses/{lexicon_name}",
 	help:     "List all entry statuses.",
-	examples: []string{"/list_all_entry_statuses/sv-se.nst"},
+	examples: []string{"/list_all_entry_statuses/pronlex:sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -165,7 +165,7 @@ var lexiconInfo = urlHandler{
 	name:     "info",
 	url:      "/info/{lexicon_name}",
 	help:     "Get some basic lexicon info.",
-	examples: []string{"/info/sv-se.nst"},
+	examples: []string{"/info/pronlex:sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -194,7 +194,7 @@ var lexiconStats = urlHandler{
 	name:     "stats",
 	url:      "/stats/{lexicon_name}",
 	help:     "Lists lexicon stats.",
-	examples: []string{"/stats/sv-se.nst"},
+	examples: []string{"/stats/pronlex:sv-se.nst"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -391,7 +391,7 @@ var lexiconValidation = urlHandler{
 	name:     "validation (api)",
 	url:      "/validation/{lexicon_name}",
 	help:     "Validate lexicon (API). Requires POST request.",
-	examples: []string{"/validation/en-us.cmu"},
+	examples: []string{"/validation/pronlex:en-us.cmu"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
