@@ -182,7 +182,7 @@ func Test_Validation1(t *testing.T) {
 
 	q := Query{}
 
-	stats, err := Validate(db, []lex.LexName{}, SilentLogger{}, v, q)
+	stats, err := Validate(db, []lex.LexName{lex.LexName("test1")}, SilentLogger{}, v, q)
 	ff("validation failed : %v", err)
 
 	expect := ValStats{
@@ -237,7 +237,7 @@ func Test_Validation2(t *testing.T) {
 	q := Query{WordRegexp: "a$"}
 
 	// test 1
-	stats, err := Validate(db, []lex.LexName{}, SilentLogger{}, v, q)
+	stats, err := Validate(db, []lex.LexName{lex.LexName("test2")}, SilentLogger{}, v, q)
 	ff("validation failed : %v", err)
 
 	expect := ValStats{
@@ -272,7 +272,7 @@ func Test_Validation2(t *testing.T) {
 	// test 2
 	q = Query{}
 
-	stats, err = Validate(db, []lex.LexName{}, SilentLogger{}, v, q)
+	stats, err = Validate(db, []lex.LexName{lex.LexName("test2")}, SilentLogger{}, v, q)
 	ff("validation failed : %v", err)
 
 	expect = ValStats{
@@ -324,7 +324,7 @@ func Test_ValidationUpdate1(t *testing.T) {
 	db, lexName := vInsertEntries(t, "test3")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
-	err := lookUp(db, []lex.LexName{}, Query{}, &ew)
+	err := lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{}, &ew)
 	ff("lookup failed : %v", err)
 
 	for _, e := range ew.Entries {
@@ -361,7 +361,7 @@ func Test_ValidationUpdate2(t *testing.T) {
 	db, lexName := vInsertEntries(t, "test4")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
-	err := lookUp(db, []lex.LexName{}, Query{}, &ew)
+	err := lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{}, &ew)
 	ff("lookup failed : %v", err)
 
 	var es []lex.Entry
@@ -400,7 +400,7 @@ func Test_ValidationUpdate3(t *testing.T) {
 	db, lexName := vInsertEntries(t, "test5")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
-	err := lookUp(db, []lex.LexName{}, Query{}, &ew)
+	err := lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{}, &ew)
 	ff("lookup failed : %v", err)
 
 	es, _ := v.ValidateEntries(ew.Entries)

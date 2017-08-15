@@ -734,17 +734,9 @@ func lookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
 func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 	var result []int64
 
-	lexiconMap, err := getLexiconMapTx(tx)
+	err := validateInputLexicons(tx, lexNames, q)
 	if err != nil {
-		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
 		return result, err
-	}
-	for _, lexName := range lexNames {
-		_, ok := lexiconMap[string(lexName)]
-		if !ok {
-			tx.Rollback()
-			return result, fmt.Errorf("no lexicon exists with name: %s", lexName)
-		}
 	}
 
 	sqlStmt := selectEntryIdsSQL(lexNames, q)
@@ -783,18 +775,11 @@ func lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) er
 	return lookUpTx(tx, lexNames, q, out)
 }
 
-// LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
-// EntryWriter.
-// TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
-func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
-
-	//log.Printf("QUWRY %v\n\n", q)
-
-	sqlStmt := selectEntriesSQL(lexNames, q)
-
-	//log.Printf("SQL %v\n\n", sqlString)
-
-	//log.Printf("VALUES %v\n\n", values)
+func validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
+	if len(lexNames) == 0 && len(q.EntryIDs) == 0 { // if entry id is specified, we can do the search without the lexicon name
+		tx.Rollback()
+		return fmt.Errorf("cannot perform a search without at least one lexicon specified")
+	}
 
 	lexiconMap, err := getLexiconMapTx(tx)
 	if err != nil {
@@ -807,6 +792,26 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 			tx.Rollback()
 			return fmt.Errorf("no lexicon exists with name: %s", lexName)
 		}
+	}
+	return nil
+}
+
+// LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
+// EntryWriter.
+// TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
+func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
+
+	//log.Printf("QUWRY %v\n\n", q)
+
+	sqlStmt := selectEntriesSQL(lexNames, q)
+
+	//log.Printf("SQL %v\n\n", sqlStmt)
+
+	//log.Printf("VALUES %v\n\n", values)
+
+	err := validateInputLexicons(tx, lexNames, q)
+	if err != nil {
+		return err
 	}
 
 	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)

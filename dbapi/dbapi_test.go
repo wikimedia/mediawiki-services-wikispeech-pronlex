@@ -142,7 +142,7 @@ func Test_SuperDeleteLexicon(t *testing.T) {
 	// Check that there are things in db:
 	q := Query{Page: 0, PageLength: 25}
 
-	entries, err := lookUpIntoMap(db, []lex.LexName{}, q) // GetEntries(db, q)
+	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -159,14 +159,7 @@ func Test_SuperDeleteLexicon(t *testing.T) {
 
 	superDeleteLexicon(db, "test")
 
-	entries, err = lookUpIntoMap(db, []lex.LexName{}, q) // GetEntries(db, q)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
-	if got, want := len(entries), 0; got != want {
-		t.Errorf(fs, got, want)
-	}
-
+	// check that the lexicon named 'test' is deleted
 	lexes, err = listLexicons(db)
 	if err != nil {
 		t.Errorf(fs, nil, err)
@@ -269,7 +262,7 @@ func Test_insertEntries(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	var entries map[string][]lex.Entry
-	entries, err = lookUpIntoMap(db, []lex.LexName{}, q) // GetEntries(db, q)
+	entries, err = lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -304,7 +297,7 @@ func Test_insertEntries(t *testing.T) {
 
 	que := Query{TranscriptionLike: "%pp%"}
 	var queRez lex.EntrySliceWriter
-	err = lookUp(db, []lex.LexName{}, que, &queRez)
+	err = lookUp(db, []lex.LexName{lex.LexName(l.name)}, que, &queRez)
 	if err != nil {
 		t.Errorf("Wanted nil, got %v", err)
 	}
@@ -333,7 +326,7 @@ func Test_insertEntries(t *testing.T) {
 
 	//ess, err := GetEntries(db, q)
 	//var esw lex.EntrySliceWriter
-	ess, err := lookUpIntoMap(db, []lex.LexName{}, q)
+	ess, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -354,7 +347,7 @@ func Test_insertEntries(t *testing.T) {
 	}
 
 	//ees := GetEntriesFromIDs(db, []int64{ess["apa"][0].ID})
-	ees, err := lookUpIntoMap(db, []lex.LexName{}, Query{EntryIDs: []int64{ess["apa"][0].ID}})
+	ees, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryIDs: []int64{ess["apa"][0].ID}})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -363,7 +356,7 @@ func Test_insertEntries(t *testing.T) {
 	}
 
 	// Check that no entries with entryvalidation exist
-	noev, err := lookUpIntoSlice(db, []lex.LexName{}, Query{HasEntryValidation: true})
+	noev, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -388,11 +381,12 @@ func Test_insertEntries(t *testing.T) {
 
 	newE, updated, err := updateEntry(db, ees0)
 
-	if !updated {
-		t.Errorf(fs, true, updated)
-	}
 	if err != nil {
 		t.Errorf(fs, nil, err)
+	}
+
+	if !updated {
+		t.Errorf(fs, true, updated)
 	}
 
 	if want, got := true, newE.Strn == ees0.Strn; !got {
@@ -437,7 +431,7 @@ func Test_insertEntries(t *testing.T) {
 	}
 
 	// Check that one entry with entryvalidation exists
-	noev, err = lookUpIntoSlice(db, []lex.LexName{}, Query{HasEntryValidation: true})
+	noev, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -478,7 +472,7 @@ func Test_insertEntries(t *testing.T) {
 	}
 
 	// Check that no entries with entryvalidation exist
-	noev, err = lookUpIntoSlice(db, []lex.LexName{}, Query{HasEntryValidation: true})
+	noev, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -515,7 +509,7 @@ func Test_insertEntries(t *testing.T) {
 	//q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	var entries2 []lex.Entry
-	entries2, err = lookUpIntoSlice(db, []lex.LexName{}, q)
+	entries2, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	//fmt.Printf("%#v\n", entries2[0])
 	//fmt.Printf("%#v\n", entries2[1])
 	if err != nil {
@@ -554,15 +548,15 @@ func Test_insertEntries(t *testing.T) {
 		t.Errorf(fs, w, g)
 	}
 
-	stat, err := lookUpIntoSlice(db, []lex.LexName{}, Query{EntryStatus: []string{"new"}})
+	stat, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new"}})
 	if w, g := 1, len(stat); w != g {
 		t.Errorf(fs, w, g)
 	}
-	stat1, err := lookUpIntoSlice(db, []lex.LexName{}, Query{EntryStatus: []string{"dkhfkhekjeh"}})
+	stat1, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"dkhfkhekjeh"}})
 	if w, g := 0, len(stat1); w != g {
 		t.Errorf(fs, w, g)
 	}
-	stat2, err := lookUpIntoSlice(db, []lex.LexName{}, Query{EntryStatus: []string{"new", "old2"}})
+	stat2, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new", "old2"}})
 	if w, g := 2, len(stat2); w != g {
 		t.Errorf(fs, w, g)
 	}
@@ -634,7 +628,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 	q := Query{Words: []string{"sprängstoff"}}
 
-	res, err := lookUpIntoSlice(db, []lex.LexName{}, q)
+	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
@@ -644,7 +638,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 	}
 
 	q = Query{Words: []string{"sittriktiga"}}
-	res, err = lookUpIntoSlice(db, []lex.LexName{}, q)
+	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
@@ -750,7 +744,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 	q := Query{Words: []string{"sprängstoff"}}
 
-	res, err := lookUpIntoSlice(db, []lex.LexName{}, q)
+	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
@@ -760,7 +754,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	}
 
 	q = Query{Words: []string{"sittriktiga"}}
-	res, err = lookUpIntoSlice(db, []lex.LexName{}, q)
+	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}

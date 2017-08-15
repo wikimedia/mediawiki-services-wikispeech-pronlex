@@ -209,6 +209,10 @@ func (dbm DBManager) LookUpIntoMap(q DBMQuery) (map[lex.DBRef][]lex.Entry, error
 
 // LookUp takes a DBMQuery, searches the specified lexicon for the included search query. The result is written to a lex.EntryWriter.
 func (dbm DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
+	if len(q.LexRefs) == 0 { //  && len(q.Query.EntryIDs) == 0 {
+		return fmt.Errorf("DBManager.LookUp cannot perform a search without at least one lexicon specified (using the 'lexicons' parameter)")
+	}
+
 	dbz := make(map[lex.DBRef][]lex.LexName)
 	for _, l := range q.LexRefs {
 		lexList := dbz[l.DBRef]
@@ -231,7 +235,7 @@ func (dbm DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 			ew := lex.EntrySliceWriter{}
 			err := lookUp(db0, lexNames, q.Query, &ew)
 			if err != nil {
-				rez.err = fmt.Errorf("dbapi.LookUp failed : %v", err)
+				rez.err = fmt.Errorf("dbapi.LookUp failed for %v:%v : %v", dbRef, lexNames, err)
 				ch <- rez
 				return
 			}

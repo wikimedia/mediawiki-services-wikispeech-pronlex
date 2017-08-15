@@ -86,7 +86,7 @@ func lexicons(lexNames []lex.LexName) (string, []interface{}) {
 }
 
 func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
-	var res string
+	var reses []string
 	var resv []interface{}
 
 	// If none of the following values are set, there are no
@@ -98,35 +98,37 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 	// You must study the Query struct to understand this
 
 	if len(q.Words) == 0 && trm(q.WordLike) == "" && trm(q.WordRegexp) == "" && trm(q.PartOfSpeechLike) == "" && trm(q.PartOfSpeechRegexp) == "" && len(q.EntryIDs) == 0 {
-		return res, resv
+		return "", resv
 	} //else {
 	if len(q.Words) > 0 {
-		res += "entry.strn in " + nQs(len(q.Words))
+		reses = append(reses, "entry.strn in "+nQs(len(q.Words)))
 		resv = append(resv, convS(ToLower(q.Words))...)
 	}
 	if len(q.EntryIDs) > 0 {
-		res += "entry.id in " + nQs(len(q.EntryIDs))
+		reses = append(reses, "entry.id in "+nQs(len(q.EntryIDs)))
 		resv = append(resv, convI(q.EntryIDs)...)
 	}
 	if trm(q.WordLike) != "" {
-		res += "entry.strn like ? "
+		reses = append(reses, "entry.strn like ?")
 		resv = append(resv, q.WordLike)
 	}
 	if trm(q.WordRegexp) != "" {
-		res += "entry.strn REGEXP ? "
+		reses = append(reses, "entry.strn REGEXP ?")
 		resv = append(resv, q.WordRegexp)
 	}
 
 	if trm(q.PartOfSpeechLike) != "" {
-		res += "entry.partofspeech like ? "
+		reses = append(reses, "entry.partofspeech like ?")
 		resv = append(resv, q.PartOfSpeechLike)
 	}
 	if trm(q.PartOfSpeechRegexp) != "" {
-		res += "entry.partofspeech REGEXP ? "
+		reses = append(reses, "entry.partofspeech REGEXP ?")
 		resv = append(resv, q.PartOfSpeechRegexp)
 	}
 
 	//}
+
+	res := strings.Join(reses, " AND ")
 
 	if len(lexNames) != 0 {
 		res += " and entry.lexiconid = lexicon.id"
@@ -136,43 +138,45 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 }
 
 func lemmas(q Query) (string, []interface{}) {
-	var res string
+	var reses []string
 	var resv []interface{}
 
 	if len(q.Lemmas) == 0 && trm(q.LemmaLike) == "" && trm(q.LemmaRegexp) == "" &&
 		trm(q.ReadingLike) == "" && trm(q.ReadingRegexp) == "" &&
 		trm(q.ParadigmLike) == "" && trm(q.ParadigmRegexp) == "" {
-		return res, resv
+		return "", resv
 	}
 	if len(q.Lemmas) > 0 {
-		res += "lemma.strn in " + nQs(len(q.Lemmas))
+		reses = append(reses, "lemma.strn in "+nQs(len(q.Lemmas)))
 		resv = append(resv, convS(q.Lemmas)...)
 	}
 	if trm(q.LemmaLike) != "" {
-		res += "lemma.strn like ? "
+		reses = append(reses, "lemma.strn like ?")
 		resv = append(resv, q.LemmaLike)
 	}
 	if trm(q.LemmaRegexp) != "" {
-		res += "lemma.strn REGEXP ? "
+		reses = append(reses, "lemma.strn REGEXP ?")
 		resv = append(resv, q.LemmaRegexp)
 	}
 
 	if trm(q.ReadingLike) != "" {
-		res += "lemma.reading like ? "
+		reses = append(reses, "lemma.reading like ?")
 		resv = append(resv, q.ReadingLike)
 	}
 	if trm(q.ReadingRegexp) != "" {
-		res += "lemma.reading REGEXP ? "
+		reses = append(reses, "lemma.reading REGEXP ?")
 		resv = append(resv, q.ReadingRegexp)
 	}
 	if trm(q.ParadigmLike) != "" {
-		res += "lemma.paradigm like ? "
+		reses = append(reses, "lemma.paradigm like ?")
 		resv = append(resv, q.ParadigmLike)
 	}
 	if trm(q.ParadigmRegexp) != "" {
-		res += "lemma.paradigm REGEXP ? "
+		reses = append(reses, "lemma.paradigm REGEXP ?")
 		resv = append(resv, q.ParadigmRegexp)
 	}
+
+	res := strings.Join(reses, " AND ")
 
 	res += " and lemma.id = lemma2entry.lemmaid and entry.id = lemma2entry.entryid "
 
@@ -181,19 +185,20 @@ func lemmas(q Query) (string, []interface{}) {
 
 func transcriptions(q Query) (string, []interface{}) {
 
-	var res string
+	var reses []string
 	var resv []interface{}
 
 	if trm(q.TranscriptionLike) != "" {
-		res += "transcription.strn LIKE ? "
+		reses = append(reses, "transcription.strn LIKE ?")
 		resv = append(resv, q.TranscriptionLike)
 	}
 
 	if trm(q.TranscriptionRegexp) != "" {
-		res += "transcription.strn REGEXP ? "
+		reses = append(reses, "transcription.strn REGEXP ?")
 		resv = append(resv, q.TranscriptionRegexp)
 	}
 
+	res := strings.Join(reses, " AND ")
 	return res, resv
 }
 
