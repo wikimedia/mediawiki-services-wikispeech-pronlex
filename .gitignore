@@ -3,6 +3,7 @@
 lexserver/download_area
 lexserver/upload_area
 lexserver/symbol_set_file_area
+lexserver/db_files
 lexserver/pronlex.db.ORIG
 dbapi/*.db-journal
 lexserver/pronlex.db-shm
