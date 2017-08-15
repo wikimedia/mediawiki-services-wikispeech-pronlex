@@ -234,6 +234,7 @@ Instructions on how to create a lexicon database and start the server is availab
 // TODO Gör konstanter som kan användas istället för strängar
 var knownParams = map[string]int{
 	"lexicons":            1,
+	"entryids":            1,
 	"words":               1,
 	"lemmas":              1,
 	"wordlike":            1,
@@ -265,6 +266,16 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		splitRE.Split(getParam("words", r), -1))
 	lemmas := dbapi.RemoveEmptyStrings(
 		splitRE.Split(getParam("lemmas", r), -1))
+	entryIDStrings := dbapi.RemoveEmptyStrings(
+		splitRE.Split(getParam("entryids", r), -1))
+	entryIDs := []int64{}
+	for _, s := range entryIDStrings {
+		id, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return dbapi.DBMQuery{}, fmt.Errorf("couldn't create int64 from input string '%s' : %v", s, err)
+		}
+		entryIDs = append(entryIDs, id)
+	}
 
 	wordLike := strings.TrimSpace(getParam("wordlike", r))
 	wordRegexp := strings.TrimSpace(getParam("wordregexp", r))
@@ -314,6 +325,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 
 	q := dbapi.Query{
 		Words:               words,
+		EntryIDs:            entryIDs,
 		WordLike:            wordLike,
 		WordRegexp:          wordRegexp,
 		TranscriptionLike:   transcriptionLike,
