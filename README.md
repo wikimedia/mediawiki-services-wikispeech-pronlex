@@ -3,7 +3,7 @@ pronlex is a pronunciation lexicon database behind an http API.
 
 [![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://godoc.org/github.com/stts-se/pronlex)
 
-You need [Go](https://golang.org/) (1.7 or higher)  
+You need [Go](https://golang.org/) (1.8 or higher)  
 You need [Sqlite3](https://www.sqlite.org/)
 
 ----
