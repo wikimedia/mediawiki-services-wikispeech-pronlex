@@ -334,59 +334,6 @@ var lexiconAddEntry = urlHandler{
 	},
 }
 
-var lexiconMoveNewEntries = urlHandler{
-	name:     "move_new_entries",
-	url:      "/move_new_entries/{from_lexicon}/{to_lexicon}/{new_source}/{new_status}",
-	help:     "Move entries from one lexicon to another.",
-	examples: []string{},
-	handler: func(w http.ResponseWriter, r *http.Request) {
-		fromLexName := delQuote(getParam("from_lexicon", r))
-		if fromLexName == "" {
-			http.Error(w, "no value for parameter 'from_lexicon'", http.StatusBadRequest)
-			return
-		}
-		toLexName := delQuote(getParam("to_lexicon", r))
-		if toLexName == "" {
-			http.Error(w, "no value for parameter 'to_lexicon'", http.StatusBadRequest)
-			return
-		}
-
-		sourceName := delQuote(getParam("new_source", r))
-		if sourceName == "" {
-			http.Error(w, "no value for parameter 'source'", http.StatusBadRequest)
-			return
-		}
-		statusName := delQuote(getParam("new_status", r))
-		if statusName == "" {
-			http.Error(w, "no value for parameter 'status'", http.StatusBadRequest)
-			return
-		}
-
-		fromLex, err := lex.ParseLexRef(fromLexName)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
-			return
-		}
-		toLex, err := lex.ParseLexRef(toLexName)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
-			return
-		}
-
-		if fromLex.DBRef != toLex.DBRef {
-			http.Error(w, fmt.Sprintf("can only move entries with in the same database, from %s to %s", fromLex.String(), toLex.String()), http.StatusInternalServerError)
-		}
-
-		moveRes, err := dbm.MoveNewEntries(fromLex.DBRef, fromLex.LexName, toLex.LexName, sourceName, statusName)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
-			return
-		}
-
-		fmt.Fprintf(w, "number of entries moved from '%s' to '%s': %d", fromLexName, toLexName, moveRes.N)
-	},
-}
-
 var lexiconValidation = urlHandler{
 	name:     "validation (api)",
 	url:      "/validation/{lexicon_name}",

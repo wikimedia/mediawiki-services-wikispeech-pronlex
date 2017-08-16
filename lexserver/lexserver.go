@@ -187,6 +187,18 @@ func init() {
 		}
 	} // else: already exists, hopefullly
 
+	// If the db dir doesn't exist, create it
+	if _, err := os.Stat(dbFileArea); err != nil {
+		if os.IsNotExist(err) {
+			err2 := os.Mkdir(dbFileArea, 0755)
+			if err2 != nil {
+				fmt.Printf("lexserver.init: failed to create %s : %v", dbFileArea, err2)
+			}
+		} else {
+			fmt.Printf("lexserver.init: peculiar error : %v", err)
+		}
+	} // else: already exists, hopefullly
+
 }
 
 // TODO remove pretty-print option, since you can use the JSONView plugin to Chrome instead
@@ -782,11 +794,6 @@ func main() {
 		dbm.AddDB(dbRef, db)
 	}
 
-	// fatal error if no dbs exist
-	if nDbs == 0 {
-		log.Printf("lexserver: no dbs in specified db file area %s", dbFileArea)
-		os.Exit(1)
-	}
 	log.Printf("lexserver: loaded %v db(s)", nDbs)
 
 	// load symbol set mappers
@@ -812,7 +819,6 @@ func main() {
 	lexicon.addHandler(lexiconListCurrentEntryStatuses)
 	lexicon.addHandler(lexiconListAllEntryStatuses)
 	lexicon.addHandler(lexiconUpdateEntry)
-	lexicon.addHandler(lexiconMoveNewEntries)
 	lexicon.addHandler(lexiconValidationPage)
 	lexicon.addHandler(lexiconValidation)
 	lexicon.addHandler(lexiconAddEntry)
@@ -847,6 +853,8 @@ func main() {
 	admin.addHandler(adminLexImportPage)
 	admin.addHandler(adminLexImport)
 	admin.addHandler(adminListDBs)
+	admin.addHandler(adminCreateDB)
+	admin.addHandler(adminMoveNewEntries)
 	admin.addHandler(adminDeleteLex)
 	admin.addHandler(adminSuperDeleteLex)
 

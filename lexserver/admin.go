@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/validation"
 )
 
@@ -266,5 +268,90 @@ var adminListDBs = urlHandler{
 		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		fmt.Fprint(w, string(jsn))
+	},
+}
+
+var adminCreateDB = urlHandler{
+	name:     "create_db",
+	url:      "/create_db/{db_name}",
+	help:     "Create a new (empty) lexicon database.",
+	examples: []string{"/create_db/pronlex3"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		dbName := delQuote(getParam("db_name", r))
+		if dbName == "" {
+			http.Error(w, "no value for parameter 'db_name'", http.StatusBadRequest)
+			return
+		}
+		dbFile := filepath.Join(dbFileArea, dbName+".db")
+		if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+			http.Error(w, "Cannot create a db that already exists: "+dbName, http.StatusBadRequest)
+			return
+		}
+
+		db, err := sql.Open("sqlite3", dbFile)
+		if err != nil {
+			db.Close()
+			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusBadRequest)
+			return
+		}
+		_, err = db.Exec("PRAGMA foreign_keys = ON")
+		if err != nil {
+			db.Close()
+			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusBadRequest)
+			return
+		}
+
+		_, err = db.Exec(dbapi.Schema)
+		if err != nil {
+			db.Close()
+			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusBadRequest)
+			return
+		}
+		dbm.AddDB(lex.DBRef(dbName), db)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, "Created database "+dbName)
+	},
+}
+
+var adminMoveNewEntries = urlHandler{
+	name:     "move_new_entries",
+	url:      "/move_new_entries/{db_name}/{from_lexicon_name}/{to_lexicon_name}/{new_source}/{new_status}",
+	help:     "Move entries from one lexicon to another. N.B! Only entries that do not already exist in the right hand will be moved.",
+	examples: []string{},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		dbName := delQuote(getParam("db_name", r))
+		if dbName == "" {
+			http.Error(w, "no value for parameter 'db_name'", http.StatusBadRequest)
+			return
+		}
+		fromLexName := delQuote(getParam("from_lexicon", r))
+		if fromLexName == "" {
+			http.Error(w, "no value for parameter 'from_lexicon'", http.StatusBadRequest)
+			return
+		}
+		toLexName := delQuote(getParam("to_lexicon", r))
+		if toLexName == "" {
+			http.Error(w, "no value for parameter 'to_lexicon'", http.StatusBadRequest)
+			return
+		}
+
+		sourceName := delQuote(getParam("new_source", r))
+		if sourceName == "" {
+			http.Error(w, "no value for parameter 'source'", http.StatusBadRequest)
+			return
+		}
+		statusName := delQuote(getParam("new_status", r))
+		if statusName == "" {
+			http.Error(w, "no value for parameter 'status'", http.StatusBadRequest)
+			return
+		}
+
+		moveRes, err := dbm.MoveNewEntries(lex.DBRef(dbName), lex.LexName(fromLexName), lex.LexName(toLexName), sourceName, statusName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failure when trying to move entries from '%s' to '%s' : %v", fromLexName, toLexName, err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, "number of entries moved from '%s' to '%s': %d", fromLexName, toLexName, moveRes.N)
 	},
 }

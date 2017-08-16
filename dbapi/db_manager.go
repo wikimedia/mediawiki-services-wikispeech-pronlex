@@ -3,6 +3,7 @@ package dbapi
 import (
 	"database/sql"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 
@@ -63,7 +64,7 @@ func (dbm DBManager) RemoveDB(dbRef lex.DBRef) error {
 
 // ListDBNames lists all database names in the cached map of available databases. It does NOT verify what databases are actually existing on disk.
 func (dbm DBManager) ListDBNames() ([]lex.DBRef, error) {
-	var res []lex.DBRef
+	var res []lex.DBRef = []lex.DBRef{}
 
 	dbm.RLock()
 	defer dbm.RUnlock()
@@ -72,6 +73,7 @@ func (dbm DBManager) ListDBNames() ([]lex.DBRef, error) {
 		res = append(res, k)
 	}
 
+	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
 	return res, nil
 }
 
