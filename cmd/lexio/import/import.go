@@ -59,6 +59,7 @@ func main() {
 	var validate = f.Bool("validate", false, "validate each entry, and save the validation in the database (default: false)")
 	var force = f.Bool("force", false, "force loading of lexicon even if the symbolset is undefined (default: false)")
 	var replace = f.Bool("replace", false, "if the lexicon already exists, delete it before importing the new input data (default: false)")
+	var quiet = f.Bool("quiet", false, "mute information logging (default: false)")
 	var help = f.Bool("help", false, "print help message")
 
 	usage := `USAGE:
@@ -68,6 +69,7 @@ FLAGS:
    -validate bool  validate each entry, and save the validation in the database (default: false)
    -force    bool  force loading of lexicon even if the symbolset is undefined (default: false)
    -replace  bool  if the lexicon already exists, delete it before importing the new input data (default: false)
+   -quiet    bool  mute information logging (default: false)
    -help     bool  print help message
 
 SAMPLE INVOCATION:
@@ -183,8 +185,16 @@ SAMPLE INVOCATION:
 		return
 	}
 
-	logger := dbapi.StderrLogger{}
-	// TODO handle errors! Does it make sent to return array of error...?
+	var logger dbapi.Logger
+	var stderrLogger = dbapi.StderrLogger{}
+
+	if *quiet {
+		logger = dbapi.SilentLogger{}
+	} else {
+		logger = stderrLogger
+	}
+	// TODO handle errors? Does it make sent to return array of error...?
+	stderrLogger.Write("importing lexicon file ...")
 	err = dbapi.ImportLexiconFile(db, lexRef.LexName, logger, inFile, validator)
 
 	if err != nil {
@@ -192,31 +202,31 @@ SAMPLE INVOCATION:
 		return
 	}
 
-	logger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")
+	stderrLogger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")
 	_, err = db.Exec("ANALYZE")
 	if err != nil {
-		logger.Write(fmt.Sprintf("failed to run ANALYZE command : %v", err))
+		stderrLogger.Write(fmt.Sprintf("failed to run ANALYZE command : %v", err))
 		return
 	}
 
 	fmt.Fprintf(os.Stderr, "\n")
-	logger.Write("finished importing lexicon file")
-	logger.Write("dbFile=" + dbFile)
-	logger.Write("lexName=" + lexName)
-	logger.Write("lexFile=" + inFile)
-	logger.Write("symbolSet=" + symbolSetName)
-	logger.Write("symbolSetFolder=" + symsetDirName)
-	logger.Write("validate=" + strconv.FormatBool(*validate))
+	stderrLogger.Write("finished importing lexicon file")
+	stderrLogger.Write("dbFile=" + dbFile)
+	stderrLogger.Write("lexName=" + lexName)
+	stderrLogger.Write("lexFile=" + inFile)
+	stderrLogger.Write("symbolSet=" + symbolSetName)
+	stderrLogger.Write("symbolSetFolder=" + symsetDirName)
+	stderrLogger.Write("validate=" + strconv.FormatBool(*validate))
 	fmt.Fprintf(os.Stderr, "\n")
 
 	stats, err := dbm.LexiconStats(lexRef)
 	if err != nil {
-		logger.Write(fmt.Sprintf("failed to retreive statistics : %v", err))
+		stderrLogger.Write(fmt.Sprintf("failed to retreive statistics : %v", err))
 		return
 	}
 	err = printStats(stats, *validate)
 	if err != nil {
-		logger.Write(fmt.Sprintf("failed to print statistics : %v", err))
+		stderrLogger.Write(fmt.Sprintf("failed to print statistics : %v", err))
 		return
 	}
 }
