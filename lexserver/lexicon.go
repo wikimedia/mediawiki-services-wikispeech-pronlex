@@ -254,7 +254,11 @@ var lexiconLookup = urlHandler{
 
 		// TODO report unknown params to client
 		u, err := url.Parse(r.URL.String())
-		ff("lexLookUpHandler failed to get params: %v", err)
+		if err != nil {
+			log.Printf("lexLookUpHandler failed to get params: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
 		params := u.Query()
 		if len(params) == 0 {
 			log.Print("lexiconLookup: zero params, serving lexlookup.html")
