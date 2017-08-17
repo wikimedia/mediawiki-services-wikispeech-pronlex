@@ -69,6 +69,11 @@ type urlHandler struct {
 	examples []string
 }
 
+// TODO: Neat URL encoding...
+func urlEnc(url string) string {
+	return strings.Replace(strings.Replace(strings.Replace(url, " ", "%20", -1), "\n", "", -1), `"`, "%22", -1)
+}
+
 func (h urlHandler) helpHTML(root string) string {
 	s := "<h2>" + h.name + "</h2> " + h.help
 	if strings.Contains(h.url, "{") {
@@ -78,7 +83,7 @@ func (h urlHandler) helpHTML(root string) string {
 		//s = s + `<p>Example invocation:`
 		for _, x := range h.examples {
 			urlPretty := root + x
-			url := root + strings.Replace(strings.Replace(strings.Replace(x, " ", "%20", -1), "\n", "", -1), `"`, "%22", -1) // TODO: Neat urlenc...
+			url := root + urlEnc(x)
 			s = s + `<pre><a href="` + url + `">` + urlPretty + `</a></pre>`
 		}
 		//s = s + "</p>"
@@ -495,22 +500,29 @@ func isStaticPage(url string) bool {
 func main() {
 	port := ":8787"
 	test := false
+	tag := "standard"
 
-	if len(os.Args) > 2 {
-		log.Println("Usages:")
-		log.Println("$ go run *.go <PORT>")
-		log.Println("$ go run *.go")
-		log.Println("  - defaults to port " + port)
-		log.Println("$ go run *.go TEST")
-		log.Println("  - runs api tests and exits")
+	usage := `lexserver usage:
+		$ go run *.go
+		  - defaults to port ` + port + `
+		$ go run *.go <PORT>
+		$ go run *.go <PORT> TEST
+		  - start as demo test server`
+
+	if len(os.Args) > 3 {
+		fmt.Println(usage)
 		os.Exit(1)
-	} else if len(os.Args) == 2 {
-		if strings.ToLower(os.Args[1]) == "test" {
-			port = ":8799"
+	} else if len(os.Args) == 3 {
+		if strings.ToLower(os.Args[2]) == "test" {
 			test = true
+			tag = "test"
 		} else {
-			port = os.Args[1] // default = ":8787"
+			fmt.Println(usage)
+			os.Exit(1)
 		}
+	}
+	if len(os.Args) > 1 {
+		port = os.Args[1]
 	}
 
 	dbapi.Sqlite3WithRegex()
@@ -521,22 +533,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	log.Printf("lexserver: starting %s server on port %s", tag, port)
+	s, err := createServer(port)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "COULDN'T CREATE SERVER : %v\n", err)
+		os.Exit(1)
+	}
+
 	if test {
-		log.Println("lexserver: starting test server for API tests only")
-		err := serverInitTests()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "SERVER INIT TESTS FAILED : %v\n", err)
-			os.Exit(1)
-		} else {
-			log.Println("lexserver: init tests done")
+		if err := s.ListenAndServe(); err != nil {
+			log.Fatal(err)
 		}
-	} else { // start the actual server
-		log.Println("lexserver: starting server")
-		s, err := createServer(port)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "COULDN'T CREATE SERVER : %v\n", err)
-			os.Exit(1)
-		}
+	} else { // start the standard server
 		stop := make(chan os.Signal, 1)
 
 		signal.Notify(stop, os.Interrupt)
@@ -545,6 +553,7 @@ func main() {
 				log.Fatal(err)
 			}
 		}()
+		log.Printf("lexserver: standard server up and running")
 
 		<-stop
 
@@ -754,17 +763,8 @@ func createServer(port string) (*http.Server, error) {
 	})
 
 	meta := newSubRouter(rout, "/meta", "Meta API calls (list served URLs, etc)")
-	meta.addHandler(urlHandler{
-		name:     "API URLs",
-		url:      "/urls",
-		help:     "Lists all API urls.",
-		examples: []string{"/urls"},
-		handler: func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-			fmt.Fprint(w, "Served URLS:\n\n")
-			fmt.Fprint(w, strings.Join(urls, "\n"))
-		},
-	})
+	meta.addHandler(metaURLsHandler(urls))
+	meta.addHandler(metaExamplesHandler)
 
 	// Pinging connected websocket clients
 	go keepClientsAlive()

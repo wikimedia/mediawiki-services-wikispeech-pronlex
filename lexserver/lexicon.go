@@ -24,13 +24,14 @@ var lexiconValidationPage = urlHandler{
 		http.ServeFile(w, r, "./static/lexicon/validation_page.html")
 	},
 }
-var lexiconUpdateEntryURL = "/lexicon/updateentry?entry={...}"
+
+//var lexiconUpdateEntryURL = "/lexicon/updateentry?entry={...}"
 
 var lexiconUpdateEntry = urlHandler{
 	name:     "updateentry",
 	url:      "/updateentry",
 	help:     " Updates an entry in the database.",
-	examples: []string{lexiconUpdateEntryURL},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entryJSON := getParam("entry", r)
 		//body, err := ioutil.ReadAll(r.Body)
@@ -259,12 +260,13 @@ var lexiconLookup = urlHandler{
 		if len(params) == 0 {
 			log.Print("lexiconLookup: zero params, serving lexlookup.html")
 			http.ServeFile(w, r, "./static/lexlookup.html")
+			return
 		}
 		for k, v := range params {
 			if _, ok := knownParams[k]; !ok {
 				log.Printf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v)
 				http.Error(w, fmt.Sprintf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v), http.StatusBadRequest)
-				return // NB only informs about the first unknown param...
+				return // NB: only informs about the first unknown param...
 			}
 		}
 
@@ -308,13 +310,6 @@ var lexiconAddEntry = urlHandler{
 			return
 		}
 
-		// lexicon, err := dbm.GetLexicon(lexRef)
-		// if err != nil {
-		// 	msg := fmt.Sprintf("failed to find lexicon %s in database : %v", lexRef, err)
-		// 	log.Println(msg)
-		// 	http.Error(w, msg, http.StatusInternalServerError)
-		// 	return
-		// }
 		entryJSON := getParam("entry", r)
 		var e lex.Entry
 		err = json.Unmarshal([]byte(entryJSON), &e)

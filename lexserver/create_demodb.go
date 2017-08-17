@@ -2,42 +2,13 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net"
-	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 )
-
-func serverInitTests() error {
-	log.Println("init_tests: starting tests ...")
-	port := "8799"
-	s, err := createServer(port)
-	if err != nil {
-		return err
-	}
-
-	_, err = net.Listen("tcp", fmt.Sprintf(":%s", port))
-	if err != nil {
-		return err
-	}
-	s.ListenAndServe()
-
-	err = runTests(port)
-	if err != nil {
-		return err
-	}
-
-	s.Close()
-
-	log.Println("init_tests: done")
-
-	return nil
-}
 
 func demoEntries() []lex.Entry {
 	entries := []lex.Entry{}
@@ -216,38 +187,5 @@ func setupDemoDB() error {
 	}
 
 	log.Println("demo_setup: test database completed")
-	return nil
-}
-
-func runTests(port string) error {
-	for _, subRouter := range subRouters {
-		for _, handler := range subRouter.handlers {
-			for _, example := range handler.examples {
-				url := "http://localhost:" + port + subRouter.root + example
-				template := subRouter.root + handler.url
-				log.Println("init_tests: " + template + " => " + url)
-				resp, err := http.Get(url)
-				if err != nil {
-					log.Fatal(err)
-				}
-				json, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "violence from many sides : %v\n", err)
-					os.Exit(1)
-				}
-				resp.Body.Close()
-
-				fmt.Printf("Server says: %s\n", json)
-				// fmt.Println(resp)
-				// defer resp.Body.Close()
-				// _, err = io.Copy(os.Stdout, resp.Body)
-				// body, err := ioutil.ReadAll(resp.Body)
-				// if err != nil {
-				// 	log.Fatal(err)
-				// }
-				// fmt.Println(body)
-			}
-		}
-	}
 	return nil
 }

@@ -275,7 +275,7 @@ var adminCreateDB = urlHandler{
 	name:     "create_db",
 	url:      "/create_db/{db_name}",
 	help:     "Create a new (empty) lexicon database.",
-	examples: []string{"/create_db/pronlex3"},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		dbName := delQuote(getParam("db_name", r))
 		if dbName == "" {

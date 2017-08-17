@@ -161,7 +161,7 @@ var symbolsetDelete = urlHandler{
 	name:     "delete",
 	url:      "/delete/{name}",
 	help:     "Deletes a named symbol set.",
-	examples: []string{"/delete/sv-se_nst-xsampa"},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		name := getParam("name", r)
 		if len(strings.TrimSpace(name)) == 0 {
@@ -251,7 +251,7 @@ var symbolsetUpload = urlHandler{
 	name:     "upload (api)",
 	url:      "/upload",
 	help:     "Upload symbol set file (API)",
-	examples: []string{"/upload"},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, fmt.Sprintf("symbol set upload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
