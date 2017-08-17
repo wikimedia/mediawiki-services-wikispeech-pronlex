@@ -100,7 +100,7 @@ var validationStats = urlHandler{
 	name:     "stats",
 	url:      "/stats/{lexicon_name}",
 	help:     "Lists validation stats.",
-	examples: []string{"/stats/pronlex:sv-se.nst"},
+	examples: []string{"/stats/demodb:demolex"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {

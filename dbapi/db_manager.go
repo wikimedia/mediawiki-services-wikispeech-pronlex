@@ -22,7 +22,45 @@ func NewDBManager() DBManager {
 	return DBManager{dbs: make(map[lex.DBRef]*sql.DB)}
 }
 
-// AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk.
+// DefineSqliteDB is used to define a new sqlite3 database and add it to the DB manager cache.
+func (dbm DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
+	name := string(dbRef)
+	if "" == name {
+		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not be empty")
+	}
+	if strings.Contains(name, ":") {
+		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not contain ':'")
+	}
+
+	dbm.Lock()
+	defer dbm.Unlock()
+
+	if _, ok := dbm.dbs[dbRef]; ok {
+		return fmt.Errorf("DBManager.AddDB: db already exists: '%s'", name)
+	}
+
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		db.Close()
+		return fmt.Errorf("sql error : %v", err)
+	}
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		db.Close()
+		return fmt.Errorf("sql error : %v", err)
+	}
+	_, err = db.Exec(Schema)
+	if err != nil {
+		db.Close()
+		return fmt.Errorf("sql error : %v", err)
+	}
+
+	dbm.dbs[dbRef] = db
+
+	return nil
+}
+
+// AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk. To create AND add the database, use DefineSqliteDB instead.
 func (dbm DBManager) AddDB(dbRef lex.DBRef, db *sql.DB) error {
 	name := string(dbRef)
 	if "" == name {
@@ -47,7 +85,7 @@ func (dbm DBManager) AddDB(dbRef lex.DBRef, db *sql.DB) error {
 	return nil
 }
 
-// RemoveDB is used to remove a database from the cached map of available databases. It does NOT from the database from disk.
+// RemoveDB is used to remove a database from the cached map of available databases. It does NOT remove from the database from disk.
 func (dbm DBManager) RemoveDB(dbRef lex.DBRef) error {
 	name := string(dbRef)
 	dbm.Lock()
@@ -60,6 +98,11 @@ func (dbm DBManager) RemoveDB(dbRef lex.DBRef) error {
 	delete(dbm.dbs, dbRef)
 
 	return nil
+}
+
+func (dbm DBManager) ContainsDB(dbRef lex.DBRef) bool {
+	_, ok := dbm.dbs[dbRef]
+	return ok
 }
 
 // ListDBNames lists all database names in the cached map of available databases. It does NOT verify what databases are actually existing on disk.

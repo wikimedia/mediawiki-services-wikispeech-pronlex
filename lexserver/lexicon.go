@@ -102,7 +102,7 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 	name:     "list_current_entry_statuses",
 	url:      "/list_current_entry_statuses/{lexicon_name}",
 	help:     "List current entry statuses.",
-	examples: []string{"/list_current_entry_statuses/pronlex:sv-se.nst"},
+	examples: []string{"/list_current_entry_statuses/demodb:demolex"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -131,7 +131,7 @@ var lexiconListAllEntryStatuses = urlHandler{
 	name:     "list_all_entry_statuses",
 	url:      "/list_all_entry_statuses/{lexicon_name}",
 	help:     "List all entry statuses.",
-	examples: []string{"/list_all_entry_statuses/pronlex:sv-se.nst"},
+	examples: []string{"/list_all_entry_statuses/demodb:demolex"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -165,7 +165,7 @@ var lexiconInfo = urlHandler{
 	name:     "info",
 	url:      "/info/{lexicon_name}",
 	help:     "Get some basic lexicon info.",
-	examples: []string{"/info/pronlex:sv-se.nst"},
+	examples: []string{"/info/demodb:demolex"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -194,7 +194,7 @@ var lexiconStats = urlHandler{
 	name:     "stats",
 	url:      "/stats/{lexicon_name}",
 	help:     "Lists lexicon stats.",
-	examples: []string{"/stats/pronlex:sv-se.nst"},
+	examples: []string{"/stats/demodb:demolex"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -219,7 +219,7 @@ var lexiconStats = urlHandler{
 	},
 }
 
-var lexiconAddEntryURL = `/addentry?lexicon_name=sv-se.nst&entry={
+var lexiconAddEntryURL = `/addentry?lexicon_name=demodb:demolex&entry={
     "strn": "flesk",
     "language": "sv-se",
     "partOfSpeech": "NN",
@@ -247,12 +247,8 @@ var lexiconLookup = urlHandler{
 	examples: []string{"/lookup"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 
-		// TODO check r.Method?
-
 		var err error
-		// TODO Felhantering?
 
-		// TODO report unknown params to client
 		u, err := url.Parse(r.URL.String())
 		if err != nil {
 			log.Printf("lexLookUpHandler failed to get params: %v", err)
@@ -267,6 +263,8 @@ var lexiconLookup = urlHandler{
 		for k, v := range params {
 			if _, ok := knownParams[k]; !ok {
 				log.Printf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v)
+				http.Error(w, fmt.Sprintf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v), http.StatusBadRequest)
+				return // NB only informs about the first unknown param...
 			}
 		}
 
@@ -297,7 +295,6 @@ var lexiconLookup = urlHandler{
 	},
 }
 
-// TODO add tests
 var lexiconAddEntry = urlHandler{
 	name:     "addentry",
 	url:      "/addentry",
@@ -342,7 +339,7 @@ var lexiconValidation = urlHandler{
 	name:     "validation (api)",
 	url:      "/validation/{lexicon_name}",
 	help:     "Validate lexicon (API). Requires POST request.",
-	examples: []string{"/validation/pronlex:en-us.cmu"},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)

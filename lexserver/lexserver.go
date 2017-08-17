@@ -515,6 +515,12 @@ func main() {
 
 	dbapi.Sqlite3WithRegex()
 
+	err := setupDemoDB()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "COULDN'T INITIALISE DEMO DB : %v\n", err)
+		os.Exit(1)
+	}
+
 	if test {
 		log.Println("lexserver: starting test server for API tests only")
 		err := serverInitTests()
@@ -524,11 +530,11 @@ func main() {
 		} else {
 			log.Println("lexserver: init tests done")
 		}
-	} else {
+	} else { // start the actual server
 		log.Println("lexserver: starting server")
 		s, err := createServer(port)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "COULDN'T START SERVER : %v\n", err)
+			fmt.Fprintf(os.Stderr, "COULDN'T CREATE SERVER : %v\n", err)
 			os.Exit(1)
 		}
 		stop := make(chan os.Signal, 1)
@@ -542,6 +548,7 @@ func main() {
 
 		<-stop
 
+		// TODO: Call shutdowns/close databases here if needed
 		fmt.Fprintf(os.Stderr, "\n")
 		log.Println("lexserver: shutting down...")
 
@@ -611,7 +618,11 @@ func createServer(port string) (*http.Server, error) {
 		var extension = filepath.Ext(dbName)
 		dbName = dbName[0 : len(dbName)-len(extension)]
 		dbRef := lex.DBRef(dbName)
-		dbm.AddDB(dbRef, db)
+		err = dbm.AddDB(dbRef, db)
+		if err != nil {
+			return s, fmt.Errorf("Failed to add db: %v", err)
+		}
+
 	}
 
 	log.Printf("lexserver: loaded %v db(s)", nDbs)
