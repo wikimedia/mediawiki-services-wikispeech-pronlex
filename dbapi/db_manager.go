@@ -22,6 +22,18 @@ func NewDBManager() DBManager {
 	return DBManager{dbs: make(map[lex.DBRef]*sql.DB)}
 }
 
+// CloseDB is used to close the specified database
+func (dbm DBManager) CloseDB(dbRef lex.DBRef) error {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[dbRef]
+	if !ok {
+		return fmt.Errorf("DBManager.CloseDB: no such db '%s'", dbRef)
+	}
+	err := db.Close()
+	return err
+}
+
 // DefineSqliteDB is used to define a new sqlite3 database and add it to the DB manager cache.
 func (dbm DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	name := string(dbRef)
