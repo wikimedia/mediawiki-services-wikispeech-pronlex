@@ -548,13 +548,24 @@ func main() {
 
 		<-stop
 
-		// TODO: Call shutdowns/close databases here if needed
 		fmt.Fprintf(os.Stderr, "\n")
 		log.Println("lexserver: shutting down...")
 
 		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		defer s.Shutdown(ctx)
 
-		s.Shutdown(ctx)
+		// shut down databases nicely
+		dbNames, err := dbm.ListDBNames()
+		if err != nil {
+			log.Printf("couldn't close databases properly, will exit anyway : %v", err)
+		}
+		for _, dbName := range dbNames {
+			err = dbm.CloseDB(dbName)
+			if err != nil {
+				log.Printf("couldn't close database %s properly, will exit anyway : %v", string(dbName), err)
+			}
+			log.Printf("lexserver: closed database %s", string(dbName))
+		}
 
 		log.Println("lexserver: BYE!")
 	}
