@@ -23,7 +23,7 @@ func demoEntries() []lex.Entry {
 	e = lex.Entry{Strn: "kex",
 		PartOfSpeech:   "NN",
 		Morphology:     "NEU IND SIN",
-		WordParts:      "kexet",
+		WordParts:      "kex",
 		Language:       "sv",
 		Preferred:      true,
 		Transcriptions: []lex.Transcription{t1, t2},

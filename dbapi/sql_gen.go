@@ -97,12 +97,26 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 
 	// You must study the Query struct to understand this
 
-	if len(q.Words) == 0 && trm(q.WordLike) == "" && trm(q.WordRegexp) == "" && trm(q.PartOfSpeechLike) == "" && trm(q.PartOfSpeechRegexp) == "" && len(q.EntryIDs) == 0 {
+	//fmt.Printf("sql_gen QUERY : %#v\n", q)
+
+	if len(q.Words) == 0 && len(q.WordParts) == 0 && trm(q.WordLike) == "" && trm(q.WordPartsLike) == "" && trm(q.WordPartsRegexp) == "" && trm(q.WordRegexp) == "" && trm(q.PartOfSpeechLike) == "" && trm(q.PartOfSpeechRegexp) == "" && len(q.EntryIDs) == 0 {
 		return "", resv
 	} //else {
 	if len(q.Words) > 0 {
 		reses = append(reses, "entry.strn in "+nQs(len(q.Words)))
 		resv = append(resv, convS(ToLower(q.Words))...)
+	}
+	if len(q.WordParts) > 0 {
+		reses = append(reses, "entry.wordparts in "+nQs(len(q.WordParts)))
+		resv = append(resv, convS(ToLower(q.WordParts))...)
+	}
+	if trm(q.WordPartsLike) != "" {
+		reses = append(reses, "entry.wordparts like ?")
+		resv = append(resv, q.WordPartsLike)
+	}
+	if trm(q.WordPartsRegexp) != "" {
+		reses = append(reses, "entry.wordparts REGEXP ?")
+		resv = append(resv, q.WordPartsRegexp)
 	}
 	if len(q.EntryIDs) > 0 {
 		reses = append(reses, "entry.id in "+nQs(len(q.EntryIDs)))

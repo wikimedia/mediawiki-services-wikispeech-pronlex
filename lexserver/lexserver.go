@@ -261,6 +261,9 @@ var knownParams = map[string]int{
 	"lemmas":              1,
 	"wordlike":            1,
 	"wordregexp":          1,
+	"wordparts":           1,
+	"wordpartslike":       1,
+	"wordpartsregexp":     1,
 	"transcriptionlike":   1,
 	"transcriptionregexp": 1,
 	"partofspeechlike":    1,
@@ -286,6 +289,8 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		splitRE.Split(getParam("lexicons", r), -1))
 	words := dbapi.RemoveEmptyStrings(
 		splitRE.Split(getParam("words", r), -1))
+	wordParts := dbapi.RemoveEmptyStrings(
+		splitRE.Split(getParam("wordparts", r), -1))
 	lemmas := dbapi.RemoveEmptyStrings(
 		splitRE.Split(getParam("lemmas", r), -1))
 	entryIDStrings := dbapi.RemoveEmptyStrings(
@@ -301,6 +306,8 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 
 	wordLike := strings.TrimSpace(getParam("wordlike", r))
 	wordRegexp := strings.TrimSpace(getParam("wordregexp", r))
+	wordPartsLike := strings.TrimSpace(getParam("wordpartslike", r))
+	wordPartsRegexp := strings.TrimSpace(getParam("wordpartsregexp", r))
 	transcriptionLike := strings.TrimSpace(getParam("transcriptionlike", r))
 	transcriptionRegexp := strings.TrimSpace(getParam("transcriptionregexp", r))
 	partOfSpeechLike := strings.TrimSpace(getParam("partofspeechlike", r))
@@ -347,6 +354,9 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 
 	q := dbapi.Query{
 		Words:               words,
+		WordParts:           wordParts,
+		WordPartsLike:       wordPartsLike,
+		WordPartsRegexp:     wordPartsRegexp,
 		EntryIDs:            entryIDs,
 		WordLike:            wordLike,
 		WordRegexp:          wordRegexp,

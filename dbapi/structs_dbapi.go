@@ -29,6 +29,11 @@ type Query struct {
 	// a 'like' db search expression matching words
 	WordLike   string `json:"wordLike"`
 	WordRegexp string `json:"wordRegexp"`
+
+	WordParts       []string `json:"wordParts"`
+	WordPartsLike   string   `json:"wordPartsLike"`
+	WordPartsRegexp string   `json:"wordPartsRegexp"`
+
 	// a slice of Entry.IDs to search for
 	EntryIDs []int64 `json:"entryIds"`
 	// a 'like' db search expression matching transcriptions
@@ -74,6 +79,12 @@ func (q Query) Empty() bool {
 	case strings.TrimSpace(q.WordLike) != "":
 		return false
 	case strings.TrimSpace(q.WordRegexp) != "":
+		return false
+	case len(q.WordParts) > 0:
+		return false
+	case strings.TrimSpace(q.WordPartsLike) != "":
+		return false
+	case strings.TrimSpace(q.WordPartsRegexp) != "":
 		return false
 	case len(q.EntryIDs) > 0:
 		return false
