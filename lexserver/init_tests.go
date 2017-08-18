@@ -86,6 +86,7 @@ func testURLsWithContent(port string) (int, int, error) {
 	jsonMapTests := map[string]string{
 		"/symbolset/list": `{"symbol_set_names":["ar_sampa_mary","ar_ws-sampa","en-us_cmu","en-us_sampa_mary","en-us_ws-sampa","nb-no_nst-xsampa","nb-no_ws-sampa","sv-se_nst-xsampa","sv-se_sampa_mary","sv-se_ws-sampa"]}`,
 		"/mapper/map/sv-se_ws-sampa/sv-se_sampa_mary/%22%22%20p%20O%20j%20.%20k%20@": `{"From":"sv-se_ws-sampa","To":"sv-se_sampa_mary","Input":"\"\" p O j . k @","Result":"\" p O j - k @"}`,
+		"/mapper/map/sv-se_sampa_mary/sv-se_ws-sampa/%22%20p%20O%20j%20-%20k%20@":    `{"From":"sv-se_sampa_mary","To":"sv-se_ws-sampa","Input":"\" p O j - k @","Result":"\"\" p O j . k @"}`,
 	}
 
 	jsonListTestsMustContain := map[string]string{
@@ -136,7 +137,7 @@ func jsonMapTest(port string, url string, expect string) (bool, error) {
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
 		return false, nil
 	} else {
-		log.Printf("init_tests: %s : %s", url, resp.Status)
+		log.Printf("init_tests: jsonMap %s", url)
 
 		if resp.StatusCode != http.StatusOK {
 			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
@@ -185,7 +186,7 @@ func jsonListTestMustContain(port string, url string, expect string) (bool, erro
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
 		return false, nil
 	} else {
-		log.Printf("init_tests: %s : %s", url, resp.Status)
+		log.Printf("init_tests: jsonList %s", url)
 
 		if resp.StatusCode != http.StatusOK {
 			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
@@ -219,7 +220,7 @@ func lookupTest(port string, url string, expect string) (bool, error) {
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
 		return false, nil
 	} else {
-		log.Printf("init_tests: %s : %s", url, resp.Status)
+		log.Printf("init_tests: lookup/entry %s", url)
 
 		if resp.StatusCode != http.StatusOK {
 			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
