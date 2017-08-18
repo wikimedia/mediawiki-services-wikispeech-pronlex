@@ -6,7 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
+	"reflect"
+	"strings"
+
+	"github.com/stts-se/pronlex/lex"
 )
 
 func runInitTests(s *http.Server, port string) error {
@@ -15,13 +18,37 @@ func runInitTests(s *http.Server, port string) error {
 
 	log.Println("init_tests: running tests")
 
-	err := runTests(port)
+	nErrs1, nTests1, err1 := testExampleURLs(port)
+	nErrs2, nTests2, err2 := testURLsWithContent(port)
+
+	var err error
+	if err1 != nil && err2 != nil {
+		err = fmt.Errorf("%v, %v", err1, err2)
+	} else if err1 != nil {
+		err = err1
+	} else if err2 != nil {
+		err = err2
+	}
 	if err != nil {
-		log.Println("init_tests: tests completed with errors!")
 		return err
 	}
 
-	log.Println("init_tests: tests completed without errors")
+	nTests := nTests1 + nTests2
+	testString := "tests"
+	if nTests == 1 {
+		testString = "test"
+	}
+	if nErrs1 > 0 || nErrs2 > 0 {
+		nErrs := nErrs1 + nErrs2
+		errString := "errors"
+		if nErrs == 1 {
+			errString = "error"
+		}
+		log.Printf("init_tests: %d %s completed with %d %s!", nTests, testString, nErrs, errString)
+		return fmt.Errorf("INIT TESTS FAILED")
+	}
+
+	log.Printf("init_tests: %d %s completed without errors", nTests, testString)
 	return nil
 }
 
@@ -34,46 +61,176 @@ func shortenURL(url string) string {
 	return url
 }
 
-func runTests(port string) error {
+func testURLsWithContent(port string) (int, int, error) {
+
+	log.Println("init_tests: testing some URLs with content")
+
+	nFailed := 0
+	nTests := 0
+
+	lookupTests := map[string]string{
+		"/lexicon/lookup?lexicons=demodb:demolex&wordlike=h%C3%A4st__": `[{"id":6,"lexRef":{"DBRef":"demodb","LexName":"demolex"},"strn":"hästar","language":"sv","partOfSpeech":"NN","morphology":"NEU IND PLU","wordParts":"hästar","lemma":{"id":4,"strn":"häst","reading":"","paradigm":""},"transcriptions":[{"id":9,"entryId":6,"strn":"\" h E . s t a r","language":"sv","sources":[]}],"status":{"id":6,"name":"demo","source":"auto","timestamp":"2017-08-18T09:37:51Z","current":true},"entryValidations":[],"preferred":false},{"id":7,"lexRef":{"DBRef":"demodb","LexName":"demolex"},"strn":"hästar","language":"sv","partOfSpeech":"NN","morphology":"NEU IND PLU","wordParts":"hästar","lemma":{"id":4,"strn":"häst","reading":"","paradigm":""},"transcriptions":[{"id":10,"entryId":7,"strn":"\" h { . s t a r","language":"sv","sources":[]}],"status":{"id":7,"name":"demo","source":"auto","timestamp":"2017-08-18T09:37:51Z","current":true},"entryValidations":[],"preferred":true}]`,
+
+		"/lexicon/lookup?lexicons=demodb:demolex&wordpartsregexp=h%C3%A4st": `[{"id":5,"lexRef":{"DBRef":"demodb","LexName":"demolex"},"strn":"häst","language":"sv","partOfSpeech":"NN","morphology":"NEU IND SIN","wordParts":"häst","lemma":{"id":4,"strn":"häst","reading":"","paradigm":""},"transcriptions":[{"id":8,"entryId":5,"strn":"\" h E s t","language":"sv","sources":[]}],"status":{"id":5,"name":"demo","source":"auto","timestamp":"2017-08-18T10:02:32Z","current":true},"entryValidations":[],"preferred":true},{"id":6,"lexRef":{"DBRef":"demodb","LexName":"demolex"},"strn":"hästar","language":"sv","partOfSpeech":"NN","morphology":"NEU IND PLU","wordParts":"hästar","lemma":{"id":4,"strn":"häst","reading":"","paradigm":""},"transcriptions":[{"id":9,"entryId":6,"strn":"\" h E . s t a r","language":"sv","sources":[]}],"status":{"id":6,"name":"demo","source":"auto","timestamp":"2017-08-18T10:02:32Z","current":true},"entryValidations":[],"preferred":false},{"id":7,"lexRef":{"DBRef":"demodb","LexName":"demolex"},"strn":"hästar","language":"sv","partOfSpeech":"NN","morphology":"NEU IND PLU","wordParts":"hästar","lemma":{"id":4,"strn":"häst","reading":"","paradigm":""},"transcriptions":[{"id":10,"entryId":7,"strn":"\" h { . s t a r","language":"sv","sources":[]}],"status":{"id":7,"name":"demo","source":"auto","timestamp":"2017-08-18T10:02:32Z","current":true},"entryValidations":[],"preferred":true}]`,
+
+		"/lexicon/lookup?lemmas=kex&lexicons=demodb:demolex": `[{"id":1,"lexRef":{"DBRef":"demodb","LexName":"demolex"},"strn":"kex","language":"sv","partOfSpeech":"NN","morphology":"NEU IND SIN","wordParts":"kex","lemma":{"id":1,"strn":"kex","reading":"","paradigm":""},"transcriptions":[ { "id":1,"entryId":1,"strn":"\" k e k s","language":"sv","sources":[]}, { "id":2,"entryId":1,"strn":"\" C e k s","language":"sv","sources":[]}],"status":{"id":1,"name":"demo","source":"auto","timestamp":"2017-08-18T09:57:30Z","current":true},"entryValidations":[],"preferred":true}, { "id":2,"lexRef":{"DBRef":"demodb","LexName":"demolex"},"strn":"kexet","language":"sv","partOfSpeech":"NN","morphology":"NEU DEF SIN","wordParts":"kexet","lemma":{"id":1,"strn":"kex","reading":"","paradigm":""},"transcriptions":[ { "id":3,"entryId":2,"strn":"\" k e k . s @ t","language":"sv","sources":[]}, { "id":4,"entryId":2,"strn":"\" C e k . s @ t","language":"sv","sources":[]}],"status":{"id":2,"name":"demo","source":"auto","timestamp":"2017-08-18T09:57:30Z","current":true},"entryValidations":[],"preferred":true}]`,
+
+		"/lexicon/lookup?lexicons=demodb:demolex&words=dom&transcriptionlike=%25o:%25&pp=yes": `[
+ { "id": 9, "lexRef": { "DBRef": "demodb", "LexName": "demolex" }, "strn": "dom", "language": "sv", "partOfSpeech": "NN", "morphology": "UTR IND SIN", "wordParts": "dom", "lemma": { "id": 5, "strn": "dom", "reading": "", "paradigm": "" }, "transcriptions": [ { "id": 12, "entryId": 9, "strn": "\" d o: m", "language": "sv", "sources": [] } ], "status": { "id": 9, "name": "demo", "source": "auto", "timestamp": "2017-08-18T10:04:44Z", "current": true }, "entryValidations": [], "preferred": true }]`,
+	}
+
+	otherTests := map[string]string{
+	//	"/symbolset/list": `{"symbol_set_names":["ar_sampa_mary","ar_ws-sampa","en-us_cmu","en-us_sampa_mary","en-us_ws-sampa","nb-no_nst-xsampa","nb-no_ws-sampa","sv-se_nst-xsampa","sv-se_sampa_mary","sv-se_ws-sampa"]}`,
+	}
+
+	for url, expect := range lookupTests {
+		nTests = nTests + 1
+		ok, err := lookupTest(port, url, expect)
+		if !ok {
+			nFailed = nFailed + 1
+		}
+		if err != nil {
+			return nFailed, nTests, err
+		}
+	}
+
+	for url, expect := range otherTests {
+		nTests = nTests + 1
+		ok, err := htmlTest(port, url, expect)
+		if !ok {
+			nFailed = nFailed + 1
+		}
+		if err != nil {
+			return nFailed, nTests, err
+		}
+	}
+
+	return nFailed, nTests, nil
+}
+
+func htmlTest(port string, url string, expect string) (bool, error) {
+	url = "http://localhost:" + port + url
+	resp, err := http.Get(url)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		return false, nil
+	} else {
+		log.Printf("init_tests: %s : %s", url, resp.Status)
+
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			return false, nil
+		}
+
+		got, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return false, fmt.Errorf("couldn't read response body : %v", err)
+		}
+		if !reflect.DeepEqual(got, expect) {
+			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func lookupTest(port string, url string, expect string) (bool, error) {
+	url = "http://localhost:" + port + url
+	resp, err := http.Get(url)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		return false, nil
+	} else {
+		log.Printf("init_tests: %s : %s", url, resp.Status)
+
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			return false, nil
+		}
+
+		got, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return false, fmt.Errorf("couldn't read response body : %v", err)
+		}
+		var gotEs []lex.Entry
+		err = json.Unmarshal(got, &gotEs)
+		if err != nil {
+			return false, fmt.Errorf("couldn't parse json : %v", err)
+		}
+		var expEs []lex.Entry
+		err = json.Unmarshal([]byte(expect), &expEs)
+		if err != nil {
+			return false, fmt.Errorf("couldn't parse expect string : %v", err)
+		}
+		for i, e := range gotEs {
+			e.EntryStatus.Timestamp = ""
+			gotEs[i] = e
+		}
+		for i, e := range expEs {
+			e.EntryStatus.Timestamp = ""
+			expEs[i] = e
+		}
+
+		if !reflect.DeepEqual(gotEs, expEs) {
+			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func testExampleURLs(port string) (int, int, error) {
+
+	log.Println("init_tests: testing response codes for built-in example URLs")
+
+	nFailed := 0
+	nTests := 0
 
 	resp, err := http.Get("http://localhost:" + port + "/meta/examples")
 	defer resp.Body.Close()
 	if err != nil {
-		return fmt.Errorf("couldn't retrieve server's url examples : %v", err)
+		return nFailed, nTests, fmt.Errorf("couldn't retrieve server's url examples : %v", err)
 	}
 	js, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("couldn't retrieve server's url examples : %v", err)
-		os.Exit(1)
+		return nFailed, nTests, fmt.Errorf("couldn't retrieve server's url examples : %v", err)
 	}
 
 	var res []JSONURLExample
 	err = json.Unmarshal([]byte(js), &res)
 	if err != nil {
-		return fmt.Errorf("couldn't unmarshal json : %v", err)
+		return nFailed, nTests, fmt.Errorf("couldn't unmarshal json : %v", err)
 	}
 
 	for _, example := range res {
+		nTests = nTests + 1
 		url := "http://localhost:" + port + urlEnc(example.URL)
 		resp, err = http.Get(url)
 		defer resp.Body.Close()
 		if err != nil {
-			return fmt.Errorf("couldn't get URL : %v", err)
-		}
-		log.Printf("demotest: %s => %s : %s", example.Template, shortenURL(example.URL), resp.Status)
+			fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+			nFailed = nFailed + 1
+		} else {
+			log.Printf("init_tests: %s => %s : %s", example.Template, shortenURL(example.URL), resp.Status)
 
-		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("expected response status 200, found %s for url %s", resp.Status, url)
-			os.Exit(1)
-		}
+			if resp.StatusCode != http.StatusOK {
+				fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+				nFailed = nFailed + 1
+			} else {
+				got, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					return nFailed, nTests, fmt.Errorf("couldn't read response body : %v", err)
+				}
 
-		// TODO: Read body?
-		// r, err := ioutil.ReadAll(resp.Body)
-		// if err != nil {
-		// 	return fmt.Errorf("couldn't read response body : %v", err)
-		// }
-		//fmt.Println(string(r))
+				if strings.TrimSpace(string(got)) == "" {
+					fmt.Printf("** FAILED TEST ** for %s : expected non-empty response\n", url, resp)
+					nFailed = nFailed + 1
+				}
+			}
+		}
 	}
 
-	return nil
+	return nFailed, nTests, nil
 }

@@ -509,6 +509,7 @@ func isStaticPage(url string) bool {
 }
 
 func main() {
+
 	port := ":8787"
 	tag := "standard"
 
@@ -536,6 +537,8 @@ Flags:
 
 	dbapi.Sqlite3WithRegex()
 
+	log.Println("lexserver: started")
+
 	err := setupDemoDB()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "COULDN'T INITIALISE DEMO DB : %v\n", err)
@@ -552,8 +555,7 @@ Flags:
 	if *test {
 		err = runInitTests(s, port)
 		if err != nil {
-			log.Printf("%v", err)
-			log.Println("SERVER TESTS FAILED")
+			log.Printf("lexserver: %v", err)
 			os.Exit(1)
 		}
 	} else { // start the standard server
@@ -588,7 +590,7 @@ Flags:
 			log.Printf("lexserver: closed database %s", string(dbName))
 		}
 	}
-	log.Println("lexserver: BYE!")
+	log.Println("lexserver: BYE!\n")
 }
 
 func createServer(port string) (*http.Server, error) {
