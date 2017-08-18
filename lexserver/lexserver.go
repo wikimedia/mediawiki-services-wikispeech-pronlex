@@ -508,6 +508,12 @@ func isStaticPage(url string) bool {
 	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt"
 }
 
+func isHelpFlag(s string) bool {
+	s = strings.Replace(s, "-", "", 0)
+	s = strings.ToLower(s)
+	return s == "h" || s == "help"
+}
+
 func main() {
 
 	port := ":8787"
@@ -539,7 +545,7 @@ Default ports:
 		fmt.Println(usage)
 		os.Exit(1)
 	} else if len(flag.Args()) == 1 {
-		if flag.Args()[0] == "help" {
+		if isHelpFlag(flag.Args()[0]) {
 			fmt.Println(usage)
 			os.Exit(1)
 		}
