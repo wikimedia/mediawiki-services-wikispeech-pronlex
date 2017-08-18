@@ -14,10 +14,6 @@ import (
 
 func runInitTests(s *http.Server, port string) error {
 
-	if !strings.HasPrefix(port, ":") {
-		port = ":" + port
-	}
-
 	go s.ListenAndServe()
 
 	log.Println("init_tests: running tests")

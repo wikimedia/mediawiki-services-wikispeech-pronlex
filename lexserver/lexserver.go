@@ -511,20 +511,27 @@ func isStaticPage(url string) bool {
 func main() {
 
 	port := ":8787"
+	testPort := ":8799"
 	tag := "standard"
 
 	var test = flag.Bool("test", false, "run server tests")
 
 	usage := `Usage:
-        $ go run *.go
-         - defaults to port ` + port + `
-        $ go run *.go <PORT>
+     $ go run *.go <PORT>
+     $ go run *.go
+      - use default port
 
 Flags:
-        -test  bool  run server tests and exit (defaults: false)`
+     -test  bool  run server tests and exit (defaults: false)
+
+Default ports:
+     ` + port + `  for the standard server
+     ` + testPort + `  for the test server
+`
 
 	flag.Parse()
 	if *test {
+		port = testPort
 		tag = "test"
 	}
 
@@ -532,7 +539,14 @@ Flags:
 		fmt.Println(usage)
 		os.Exit(1)
 	} else if len(flag.Args()) == 1 {
+		if flag.Args()[0] == "help" {
+			fmt.Println(usage)
+			os.Exit(1)
+		}
 		port = flag.Args()[0]
+	}
+	if !strings.HasPrefix(port, ":") {
+		port = ":" + port
 	}
 
 	dbapi.Sqlite3WithRegex()
