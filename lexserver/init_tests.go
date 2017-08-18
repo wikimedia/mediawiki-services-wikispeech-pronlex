@@ -14,6 +14,10 @@ import (
 
 func runInitTests(s *http.Server, port string) error {
 
+	if !strings.HasPrefix(port, ":") {
+		port = ":" + port
+	}
+
 	go s.ListenAndServe()
 
 	log.Println("init_tests: running tests")
@@ -79,8 +83,13 @@ func testURLsWithContent(port string) (int, int, error) {
  { "id": 9, "lexRef": { "DBRef": "demodb", "LexName": "demolex" }, "strn": "dom", "language": "sv", "partOfSpeech": "NN", "morphology": "UTR IND SIN", "wordParts": "dom", "lemma": { "id": 5, "strn": "dom", "reading": "", "paradigm": "" }, "transcriptions": [ { "id": 12, "entryId": 9, "strn": "\" d o: m", "language": "sv", "sources": [] } ], "status": { "id": 9, "name": "demo", "source": "auto", "timestamp": "2017-08-18T10:04:44Z", "current": true }, "entryValidations": [], "preferred": true }]`,
 	}
 
-	otherTests := map[string]string{
-	//	"/symbolset/list": `{"symbol_set_names":["ar_sampa_mary","ar_ws-sampa","en-us_cmu","en-us_sampa_mary","en-us_ws-sampa","nb-no_nst-xsampa","nb-no_ws-sampa","sv-se_nst-xsampa","sv-se_sampa_mary","sv-se_ws-sampa"]}`,
+	jsonMapTests := map[string]string{
+		"/symbolset/list": `{"symbol_set_names":["ar_sampa_mary","ar_ws-sampa","en-us_cmu","en-us_sampa_mary","en-us_ws-sampa","nb-no_nst-xsampa","nb-no_ws-sampa","sv-se_nst-xsampa","sv-se_sampa_mary","sv-se_ws-sampa"]}`,
+		"/mapper/map/sv-se_ws-sampa/sv-se_sampa_mary/%22%22%20p%20O%20j%20.%20k%20@": `{"From":"sv-se_ws-sampa","To":"sv-se_sampa_mary","Input":"\"\" p O j . k @","Result":"\" p O j - k @"}`,
+	}
+
+	jsonListTestsMustContain := map[string]string{
+		"/admin/list_dbs": "demodb",
 	}
 
 	for url, expect := range lookupTests {
@@ -94,9 +103,20 @@ func testURLsWithContent(port string) (int, int, error) {
 		}
 	}
 
-	for url, expect := range otherTests {
+	for url, expect := range jsonMapTests {
 		nTests = nTests + 1
-		ok, err := htmlTest(port, url, expect)
+		ok, err := jsonMapTest(port, url, expect)
+		if !ok {
+			nFailed = nFailed + 1
+		}
+		if err != nil {
+			return nFailed, nTests, err
+		}
+	}
+
+	for url, expect := range jsonListTestsMustContain {
+		nTests = nTests + 1
+		ok, err := jsonListTestMustContain(port, url, expect)
 		if !ok {
 			nFailed = nFailed + 1
 		}
@@ -108,8 +128,8 @@ func testURLsWithContent(port string) (int, int, error) {
 	return nFailed, nTests, nil
 }
 
-func htmlTest(port string, url string, expect string) (bool, error) {
-	url = "http://localhost:" + port + url
+func jsonMapTest(port string, url string, expect string) (bool, error) {
+	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
 	if err != nil {
@@ -127,7 +147,20 @@ func htmlTest(port string, url string, expect string) (bool, error) {
 		if err != nil {
 			return false, fmt.Errorf("couldn't read response body : %v", err)
 		}
-		if !reflect.DeepEqual(got, expect) {
+
+		var gotJ map[string]interface{}
+		err = json.Unmarshal([]byte(got), &gotJ)
+		if err != nil {
+			return false, fmt.Errorf("couldn't convert response to json : %v", err)
+		}
+
+		var expJ map[string]interface{}
+		err = json.Unmarshal([]byte(expect), &expJ)
+		if err != nil {
+			return false, fmt.Errorf("couldn't convert expected result to json : %v", err)
+		}
+
+		if !reflect.DeepEqual(gotJ, expJ) {
 			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
 			return false, nil
 		}
@@ -135,8 +168,51 @@ func htmlTest(port string, url string, expect string) (bool, error) {
 	return true, nil
 }
 
+func contains(slice []string, item string) bool {
+	for _, a := range slice {
+		if a == item {
+			return true
+		}
+	}
+	return false
+}
+
+func jsonListTestMustContain(port string, url string, expect string) (bool, error) {
+	url = "http://localhost" + port + url
+	resp, err := http.Get(url)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		return false, nil
+	} else {
+		log.Printf("init_tests: %s : %s", url, resp.Status)
+
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			return false, nil
+		}
+
+		got, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return false, fmt.Errorf("couldn't read response body : %v", err)
+		}
+
+		var gotJ []string
+		err = json.Unmarshal([]byte(got), &gotJ)
+		if err != nil {
+			return false, fmt.Errorf("couldn't convert response to json : %v", err)
+		}
+
+		if !contains(gotJ, expect) {
+			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE TO CONTAIN:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func lookupTest(port string, url string, expect string) (bool, error) {
-	url = "http://localhost:" + port + url
+	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
 	if err != nil {
@@ -188,7 +264,7 @@ func testExampleURLs(port string) (int, int, error) {
 	nFailed := 0
 	nTests := 0
 
-	resp, err := http.Get("http://localhost:" + port + "/meta/examples")
+	resp, err := http.Get("http://localhost" + port + "/meta/examples")
 	defer resp.Body.Close()
 	if err != nil {
 		return nFailed, nTests, fmt.Errorf("couldn't retrieve server's url examples : %v", err)
@@ -206,7 +282,7 @@ func testExampleURLs(port string) (int, int, error) {
 
 	for _, example := range res {
 		nTests = nTests + 1
-		url := "http://localhost:" + port + urlEnc(example.URL)
+		url := "http://localhost" + port + urlEnc(example.URL)
 		resp, err = http.Get(url)
 		defer resp.Body.Close()
 		if err != nil {
