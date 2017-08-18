@@ -87,10 +87,17 @@ func testURLsWithContent(port string) (int, int, error) {
 		`/validation/validateentry?symbolsetname=en-us_ws-sampa&entry={%22id%22:1703348,%22lexiconId%22:3,%22strn%22:%22barn%22,%22language%22:%22en-us%22,%22partOfSpeech%22:%22%22,%22wordParts%22:%22%22,%22lemma%22:{%22id%22:0,%22strn%22:%22%22,%22reading%22:%22%22,%22paradigm%22:%22%22},%22transcriptions%22:[{%22id%22:1717337,%22entryId%22:1703348,%22strn%22:%22\%22%20b%20A%20r%20n%22,%22language%22:%22%22,%22sources%22:[]}],%22status%22:{%22id%22:1703348,%22name%22:%22imported%22,%22source%22:%22cmu%22,%22timestamp%22:%222016-09-06T13:16:07Z%22,%22current%22:true},%22entryValidations%22:[]}`: `{"id":1703348,"lexRef":{"DBRef":"","LexName":""},"strn":"barn","language":"en-us","partOfSpeech":"","morphology":"","wordParts":"","lemma":{"id":0,"strn":"","reading":"","paradigm":""},"transcriptions":[{"id":1717337,"entryId":1703348,"strn":"\" b A r n","language":"","sources":[]}],"status":{"id":1703348,"name":"imported","source":"cmu","timestamp":"2016-09-06T13:16:07Z","current":true},"entryValidations":[{"id":0,"level":"Format","ruleName":"primary_stress","Message":"Each trans should have one primary stress. Found: /\" b A r n/","timestamp":""},{"id":0,"level":"Fatal","ruleName":"SymbolSet","Message":"Invalid transcription symbol '\"' in /\" b A r n/","timestamp":""}],"preferred":false}`,
 	}
 
-	jsonListTestsMustContain := map[string]string{
-		"/admin/list_dbs": "demodb",
+	jsonListTestsMustContain := map[string][]string{
+		"/admin/list_dbs": []string{"demodb"},
+		"/mapper/list":    []string{"sv-se_ws-sampa - sv-se_sampa_mary", "sv-se_sampa_mary - sv-se_ws-sampa"},
 	}
 
+	jsonBoolTests := map[string]bool{
+		"/validation/has_validator/sv-se_ws-sampa": true,
+		"/validation/has_validator/ar_ws-sampa":    false,
+	}
+
+	log.Printf("init_tests: testing entry lookup: %d", len(lookupTests))
 	for url, expect := range lookupTests {
 		nTests = nTests + 1
 		ok, err := lookupTest(port, url, expect)
@@ -102,6 +109,7 @@ func testURLsWithContent(port string) (int, int, error) {
 		}
 	}
 
+	log.Printf("init_tests: testing json map results: %d", len(jsonMapTests))
 	for url, expect := range jsonMapTests {
 		nTests = nTests + 1
 		ok, err := jsonMapTest(port, url, expect)
@@ -113,9 +121,22 @@ func testURLsWithContent(port string) (int, int, error) {
 		}
 	}
 
+	log.Printf("init_tests: testing json list results: %d", len(jsonListTestsMustContain))
 	for url, expect := range jsonListTestsMustContain {
 		nTests = nTests + 1
 		ok, err := jsonListTestMustContain(port, url, expect)
+		if !ok {
+			nFailed = nFailed + 1
+		}
+		if err != nil {
+			return nFailed, nTests, err
+		}
+	}
+
+	log.Printf("init_tests: testing boolean results: %d", len(jsonBoolTests))
+	for url, expect := range jsonBoolTests {
+		nTests = nTests + 1
+		ok, err := jsonTestBool(port, url, expect)
 		if !ok {
 			nFailed = nFailed + 1
 		}
@@ -167,6 +188,39 @@ func jsonMapTest(port string, url string, expect string) (bool, error) {
 	return true, nil
 }
 
+func jsonTestBool(port string, url string, expect bool) (bool, error) {
+	url = "http://localhost" + port + url
+	resp, err := http.Get(url)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		return false, nil
+	} else {
+		log.Printf("init_tests: jsonMap %s", url)
+
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			return false, nil
+		}
+
+		got, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return false, fmt.Errorf("couldn't read response body : %v", err)
+		}
+
+		var gotJ bool
+		err = json.Unmarshal([]byte(got), &gotJ)
+		if err != nil {
+			return false, fmt.Errorf("couldn't convert response to json : %v", err)
+		}
+		if gotJ != expect {
+			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE: %v\n >> FOUND: %v\n", url, expect, gotJ)
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func contains(slice []string, item string) bool {
 	for _, a := range slice {
 		if a == item {
@@ -176,7 +230,7 @@ func contains(slice []string, item string) bool {
 	return false
 }
 
-func jsonListTestMustContain(port string, url string, expect string) (bool, error) {
+func jsonListTestMustContain(port string, url string, expect []string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
@@ -202,10 +256,17 @@ func jsonListTestMustContain(port string, url string, expect string) (bool, erro
 			return false, fmt.Errorf("couldn't convert response to json : %v", err)
 		}
 
-		if !contains(gotJ, expect) {
-			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE TO CONTAIN:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
+		ok := true
+		for _, exp := range expect {
+			if !contains(gotJ, exp) {
+				ok = false
+			}
+		}
+		if !ok {
+			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE TO CONTAIN ALL OF:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
 			return false, nil
 		}
+
 	}
 	return true, nil
 }

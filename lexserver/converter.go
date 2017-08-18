@@ -45,7 +45,8 @@ var converterConvert = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		cMut.Lock()
+		cMut.RLock()
+		defer cMut.RUnlock()
 		conv, ok := cMut.service[convName]
 		if !ok {
 			msg := fmt.Sprintf("no converter named : %s", convName)
@@ -53,7 +54,6 @@ var converterConvert = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		cMut.Unlock()
 		result0, err := conv.Convert(trans)
 		if err != nil {
 			msg := fmt.Sprintf("failed converting transcription : %v", err)
@@ -99,7 +99,8 @@ var converterTable = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		cMut.Lock()
+		cMut.RLock()
+		defer cMut.RUnlock()
 		conv, ok := cMut.service[convName]
 		if !ok {
 			msg := fmt.Sprintf("no converter named : %s", convName)
@@ -107,7 +108,6 @@ var converterTable = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		cMut.Unlock()
 		jConv := JSONConverter{Name: conv.Name, From: conv.From.Name, To: conv.To.Name}
 		jConv.Rules = make([]JSONCRule, 0)
 		for _, rule := range conv.Rules {
@@ -132,11 +132,11 @@ var converterList = urlHandler{
 	examples: []string{"/list"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		cMut.RLock()
+		defer cMut.RUnlock()
 		cs := []string{}
 		for key, _ := range cMut.service {
 			cs = append(cs, key)
 		}
-		cMut.RUnlock()
 		j, err := json.Marshal(cs)
 		if err != nil {
 			msg := fmt.Sprintf("failed to marshal struct : %v", err)
