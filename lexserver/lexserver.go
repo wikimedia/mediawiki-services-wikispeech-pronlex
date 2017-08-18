@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -509,30 +510,28 @@ func isStaticPage(url string) bool {
 
 func main() {
 	port := ":8787"
-	test := false
 	tag := "standard"
 
-	usage := `lexserver usage:
-		$ go run *.go
-		  - defaults to port ` + port + `
-		$ go run *.go <PORT>
-		$ go run *.go <PORT> TEST
-		  - start as demo test server`
+	var test = flag.Bool("test", false, "run server tests")
 
-	if len(os.Args) > 3 {
+	usage := `Usage:
+        $ go run *.go
+         - defaults to port ` + port + `
+        $ go run *.go <PORT>
+
+Flags:
+        -test  bool  run server tests and exit (defaults: false)`
+
+	flag.Parse()
+	if *test {
+		tag = "test"
+	}
+
+	if len(flag.Args()) > 1 {
 		fmt.Println(usage)
 		os.Exit(1)
-	} else if len(os.Args) == 3 {
-		if strings.ToLower(os.Args[2]) == "test" {
-			test = true
-			tag = "test"
-		} else {
-			fmt.Println(usage)
-			os.Exit(1)
-		}
-	}
-	if len(os.Args) > 1 {
-		port = os.Args[1]
+	} else if len(flag.Args()) == 1 {
+		port = flag.Args()[0]
 	}
 
 	dbapi.Sqlite3WithRegex()
@@ -550,9 +549,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if test {
-		if err := s.ListenAndServe(); err != nil {
-			log.Fatal(err)
+	if *test {
+		err = runInitTests(s, port)
+		if err != nil {
+			log.Printf("%v", err)
+			log.Println("SERVER TESTS FAILED")
+			os.Exit(1)
 		}
 	} else { // start the standard server
 		stop := make(chan os.Signal, 1)
@@ -585,9 +587,8 @@ func main() {
 			}
 			log.Printf("lexserver: closed database %s", string(dbName))
 		}
-
-		log.Println("lexserver: BYE!")
 	}
+	log.Println("lexserver: BYE!")
 }
 
 func createServer(port string) (*http.Server, error) {

@@ -7,35 +7,22 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
-func main() {
-	usage := `demotest usage:
-		$ go run demotest.go <PORT>`
+func runInitTests(s *http.Server, port string) error {
 
-	if len(os.Args) != 2 {
-		fmt.Println(usage)
-		os.Exit(1)
-	}
-	port := os.Args[1]
-	log.Println("demotest: running tests...")
+	go s.ListenAndServe()
+
+	log.Println("init_tests: running tests")
+
 	err := runTests(port)
 	if err != nil {
-		log.Printf("demotest: tests failed : %v", err)
-		os.Exit(1)
+		log.Println("init_tests: tests completed with errors!")
+		return err
 	}
-	log.Println("demotest: all tests completed")
-}
 
-type JSONURLExample struct {
-	Template string `json:"template"`
-	URL      string `json:"url"`
-}
-
-// TODO: Neat URL encoding...
-func urlEnc(url string) string {
-	return strings.Replace(strings.Replace(strings.Replace(url, " ", "%20", -1), "\n", "", -1), `"`, "%22", -1)
+	log.Println("init_tests: tests completed without errors")
+	return nil
 }
 
 func shortenURL(url string) string {
