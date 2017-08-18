@@ -8,14 +8,24 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/stts-se/pronlex/lex"
 )
 
 func runInitTests(s *http.Server, port string) error {
 
-	go s.ListenAndServe()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			log.Fatal(fmt.Errorf("init_tests: couldn't start test server on port %s : %v", port, err))
+		}
+	}()
 
+	log.Println("init_tests: waiting for server to start ...")
+
+	time.Sleep(time.Second)
+
+	log.Printf("init_tests: server up and running using port " + port)
 	log.Println("init_tests: running tests")
 
 	nErrs1, nTests1, err1 := testExampleURLs(port)

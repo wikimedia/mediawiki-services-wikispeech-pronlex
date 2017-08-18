@@ -559,7 +559,7 @@ Default ports:
 		os.Exit(1)
 	}
 
-	log.Printf("lexserver: starting %s server on port %s", tag, port)
+	log.Printf("lexserver: creating %s server on port %s", tag, port)
 	s, err := createServer(port)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "COULDN'T CREATE SERVER : %v\n", err)
@@ -578,10 +578,10 @@ Default ports:
 		signal.Notify(stop, os.Interrupt)
 		go func() {
 			if err := s.ListenAndServe(); err != nil {
-				log.Fatal(err)
+				log.Fatal(fmt.Errorf("lexserver: couldn't start server on port %s : %v", port, err))
 			}
 		}()
-		log.Printf("lexserver: standard server up and running")
+		log.Printf("lexserver: server up and running using port " + port)
 
 		<-stop
 
@@ -796,7 +796,7 @@ func createServer(port string) (*http.Server, error) {
 	// Pinging connected websocket clients
 	go keepClientsAlive()
 
-	log.Print("lexserver: listening on port ", port)
+	log.Print("lexserver: server created but not started for port ", port)
 
 	s = &http.Server{
 		Addr:           port,
