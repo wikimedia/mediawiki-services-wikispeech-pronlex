@@ -527,9 +527,9 @@ func main() {
       - use default port
 
 Flags:
-     -test       bool    run server tests and exit (defaults: false)
-     -ss_files   string  location for symbol set files (default: symbol_sets)")
-     -db_files   string  location for db files (default: db_files)")
+     -test       bool    run server tests and exit (default: false)
+     -ss_files   string  location for symbol set files (default: symbol_sets)
+     -db_files   string  location for db files (default: db_files)
      -static     string  location for static html files (default: ./)
 
 
