@@ -2,7 +2,7 @@
 *.db
 lexserver/download_area
 lexserver/upload_area
-lexserver/symbol_set_file_area
+lexserver/symbol_sets
 lexserver/db_files
 lexserver/pronlex.db.ORIG
 dbapi/*.db-journal
