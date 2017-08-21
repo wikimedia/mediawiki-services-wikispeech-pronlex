@@ -10,8 +10,15 @@ You need [Sqlite3](https://www.sqlite.org/)
 # Lexicon data and database
 
 How to set up:
-* For developers: https://github.com/stts-se/lexdata/wiki/Lexserver-setup-for-developers
-* Standalone server: coming soon!
+
+## Standalone setup
+File: install/STANDALONE.md   
+URL: https://github.com/stts-se/pronlex/blob/master/install/STANDALONE.md
+
+## Setup for developers
+File: install/DEVELOPER.md   
+URL: https://github.com/stts-se/pronlex/blob/master/install/DEVELOPER.md
+
 
 
 ---
