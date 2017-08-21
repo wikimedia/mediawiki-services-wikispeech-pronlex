@@ -1,5 +1,7 @@
 # Standalone setup
 
+WORK IN PROGRESS, BELOW INSTRUCTIONS ARE NOT CORRECT
+
 ## I. Preparation steps
 
 1. Prerequisites
