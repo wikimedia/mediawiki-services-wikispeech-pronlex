@@ -188,16 +188,16 @@ func initFolders() {
 	} // else: already exists, hopefullly
 
 	// If the symbol set dir doesn't exist, create it
-	if _, err := os.Stat(symbolSetFileArea); err != nil {
-		if os.IsNotExist(err) {
-			err2 := os.Mkdir(symbolSetFileArea, 0755)
-			if err2 != nil {
-				fmt.Printf("lexserver.init: failed to create %s : %v", symbolSetFileArea, err2)
-			}
-		} else {
-			fmt.Printf("lexserver.init: peculiar error : %v", err)
-		}
-	} // else: already exists, hopefullly
+	// if _, err := os.Stat(symbolSetFileArea); err != nil {
+	// 	if os.IsNotExist(err) {
+	// 		err2 := os.Mkdir(symbolSetFileArea, 0755)
+	// 		if err2 != nil {
+	// 			fmt.Printf("lexserver.init: failed to create %s : %v", symbolSetFileArea, err2)
+	// 		}
+	// 	} else {
+	// 		fmt.Printf("lexserver.init: peculiar error : %v", err)
+	// 	}
+	// } // else: already exists, hopefullly
 
 	// If the db dir doesn't exist, create it
 	if _, err := os.Stat(dbFileArea); err != nil {
