@@ -23,7 +23,7 @@ func runInitTests(s *http.Server, port string) error {
 
 	log.Println("init_tests: waiting for server to start ...")
 
-	time.Sleep(time.Second)
+	time.Sleep(time.Second) // TODO: This is not beautiful...
 
 	log.Printf("init_tests: server up and running using port " + port)
 	log.Println("init_tests: running tests")
@@ -105,6 +105,22 @@ func testURLsWithContent(port string) (int, int, error) {
 	jsonBoolTests := map[string]bool{
 		"/validation/has_validator/sv-se_ws-sampa": true,
 		"/validation/has_validator/ar_ws-sampa":    false,
+	}
+
+	mustExistTests := []string{
+		"/ipa_table.txt",
+	}
+
+	log.Printf("init_tests: testing 200 status: %d", len(mustExistTests))
+	for _, url := range mustExistTests {
+		nTests = nTests + 1
+		ok, err := mustExistTest(port, url)
+		if !ok {
+			nFailed = nFailed + 1
+		}
+		if err != nil {
+			return nFailed, nTests, err
+		}
 	}
 
 	log.Printf("init_tests: testing entry lookup: %d", len(lookupTests))
@@ -325,6 +341,26 @@ func lookupTest(port string, url string, expect string) (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+func mustExistTest(port string, url string) (bool, error) {
+	url = "http://localhost" + port + url
+	resp, err := http.Get(url)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		return false, nil
+	} else {
+		log.Printf("init_tests: lookup/entry %s", url)
+
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			return false, nil
+		}
+
+	}
+	return true, nil
+
 }
 
 func testExampleURLs(port string) (int, int, error) {

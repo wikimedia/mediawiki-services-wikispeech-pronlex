@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -259,7 +260,7 @@ var lexiconLookup = urlHandler{
 		params := u.Query()
 		if len(params) == 0 {
 			log.Print("lexiconLookup: zero params, serving lexlookup.html")
-			http.ServeFile(w, r, "./static/lexlookup.html")
+			http.ServeFile(w, r, filepath.Join(staticFolder, "lexlookup.html"))
 			return
 		}
 		for k, v := range params {

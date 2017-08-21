@@ -157,6 +157,7 @@ var uploadFileArea = filepath.Join(".", "upload_area")
 var downloadFileArea = filepath.Join(".", "download_area")
 var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
 var dbFileArea string        // = filepath.Join(".", "db_files")
+var staticFolder string      // = "."
 
 // TODO config stuff
 func initFolders() {
@@ -517,6 +518,7 @@ func main() {
 	var test = flag.Bool("test", false, "run server tests")
 	var ssFiles = flag.String("ss_files", filepath.Join(".", "symbol_sets"), "location for symbol set files")
 	var dbFiles = flag.String("db_files", filepath.Join(".", "db_files"), "location for db files")
+	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var help = flag.Bool("help", false, "print usage/help and exit")
 
 	usage := `Usage:
@@ -528,6 +530,7 @@ Flags:
      -test       bool    run server tests and exit (defaults: false)
      -ss_files   string  location for symbol set files (default: symbol_sets)")
      -db_files   string  location for db files (default: db_files)")
+     -static     string  location for static html files (default: ./)
 
 
 Default ports:
@@ -559,6 +562,7 @@ Default ports:
 
 	symbolSetFileArea = *ssFiles
 	dbFileArea = *dbFiles
+	staticFolder = *static
 
 	initFolders()
 
@@ -780,12 +784,12 @@ func createServer(port string) (*http.Server, error) {
 
 	// static
 	rout.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/favicon.ico")
+		http.ServeFile(w, r, filepath.Join(staticFolder, "favicon.ico"))
 	})
 	rout.HandleFunc("/ipa_table.txt", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/ipa_table.txt")
+		http.ServeFile(w, r, filepath.Join(staticFolder, "ipa_table.txt"))
 	})
-	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(staticFolder)))))
 
 	var urls = []string{}
 	rout.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
