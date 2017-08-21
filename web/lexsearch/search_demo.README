@@ -1,0 +1,4 @@
+cd pronlex/web/lexsearch
+cp -r externals ../../static/
+cp index.html ../../static/search_demo.html
+cp built/search_demo.js ../../static/

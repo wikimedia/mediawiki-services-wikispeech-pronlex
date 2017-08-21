@@ -773,7 +773,7 @@ func createServer(port string) (*http.Server, error) {
 		help:     "Typescript search demo.",
 		examples: []string{"/search"},
 		handler: func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, "../web/lexsearch/index.html")
+			http.ServeFile(w, r, filepath.Join(staticFolder, "search_demo.html"))
 		},
 	}
 
