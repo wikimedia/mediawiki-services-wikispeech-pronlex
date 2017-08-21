@@ -155,11 +155,11 @@ func protect(w http.ResponseWriter) {
 // TODO should go into config file
 var uploadFileArea = filepath.Join(".", "upload_area")
 var downloadFileArea = filepath.Join(".", "download_area")
-var symbolSetFileArea = filepath.Join(".", "symbol_set_file_area")
-var dbFileArea = filepath.Join(".", "db_files")
+var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
+var dbFileArea string        // = filepath.Join(".", "db_files")
 
 // TODO config stuff
-func init() {
+func initFolders() {
 	// TODO sane error handling
 
 	// If the upload area dir doesn't exist, create it
@@ -508,12 +508,6 @@ func isStaticPage(url string) bool {
 	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt"
 }
 
-func isHelpFlag(s string) bool {
-	s = strings.Replace(s, "-", "", 0)
-	s = strings.ToLower(s)
-	return s == "h" || s == "help"
-}
-
 func main() {
 
 	port := ":8787"
@@ -521,6 +515,9 @@ func main() {
 	tag := "standard"
 
 	var test = flag.Bool("test", false, "run server tests")
+	var ssFiles = flag.String("ss_files", filepath.Join(".", "symbol_sets"), "location for symbol set files")
+	var dbFiles = flag.String("db_files", filepath.Join(".", "db_files"), "location for db files")
+	var help = flag.Bool("help", false, "print usage/help and exit")
 
 	usage := `Usage:
      $ go run *.go <PORT>
@@ -528,7 +525,10 @@ func main() {
       - use default port
 
 Flags:
-     -test  bool  run server tests and exit (defaults: false)
+     -test       bool    run server tests and exit (defaults: false)
+     -ss_files   string  location for symbol set files (default: symbol_sets)")
+     -db_files   string  location for db files (default: db_files)")
+
 
 Default ports:
      ` + port + `  for the standard server
@@ -536,6 +536,12 @@ Default ports:
 `
 
 	flag.Parse()
+
+	if *help {
+		fmt.Println(usage)
+		os.Exit(1)
+	}
+
 	if *test {
 		port = testPort
 		tag = "test"
@@ -545,15 +551,16 @@ Default ports:
 		fmt.Println(usage)
 		os.Exit(1)
 	} else if len(flag.Args()) == 1 {
-		if isHelpFlag(flag.Args()[0]) {
-			fmt.Println(usage)
-			os.Exit(1)
-		}
 		port = flag.Args()[0]
 	}
 	if !strings.HasPrefix(port, ":") {
 		port = ":" + port
 	}
+
+	symbolSetFileArea = *ssFiles
+	dbFileArea = *dbFiles
+
+	initFolders()
 
 	dbapi.Sqlite3WithRegex()
 
