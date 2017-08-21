@@ -9,7 +9,9 @@ You need [Sqlite3](https://www.sqlite.org/)
 ----
 # Lexicon data and database
 
-How to set up: https://github.com/stts-se/lexdata/wiki/Create-lexicon-database
+How to set up:
+* For developers: https://github.com/stts-se/lexdata/wiki/Lexserver-setup-for-developers
+* Standalone server: coming soon!
 
 
 ---
