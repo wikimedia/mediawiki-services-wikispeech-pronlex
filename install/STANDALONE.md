@@ -1,3 +1,5 @@
+# Standalone setup
+
 ## I. Preparation steps
 
 1. Prerequisites
