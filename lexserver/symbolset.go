@@ -243,7 +243,7 @@ var symbolsetUploadPage = urlHandler{
 	help:     "Upload symbol set file (GUI)",
 	examples: []string{"/upload_page"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/symbolset/upload_page.html")
+		http.ServeFile(w, r, filepath.Join(staticFolder, "symbolset/upload_page.html"))
 	},
 }
 

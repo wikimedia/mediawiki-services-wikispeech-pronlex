@@ -22,7 +22,7 @@ var lexiconValidationPage = urlHandler{
 	help:     "Validate lexicon (GUI).",
 	examples: []string{"/validation_page"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/lexicon/validation_page.html")
+		http.ServeFile(w, r, filepath.Join(staticFolder, "lexicon/validation_page.html"))
 	},
 }
 

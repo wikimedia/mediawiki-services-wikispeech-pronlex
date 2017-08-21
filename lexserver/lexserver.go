@@ -789,7 +789,7 @@ func createServer(port string) (*http.Server, error) {
 	rout.HandleFunc("/ipa_table.txt", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(staticFolder, "ipa_table.txt"))
 	})
-	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(staticFolder)))))
+	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(staticFolder))))
 
 	var urls = []string{}
 	rout.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {

@@ -34,7 +34,7 @@ var adminLexImportPage = urlHandler{
 	help:     "Import lexicon file (GUI).",
 	examples: []string{"/lex_import_page"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/admin/lex_import_page.html")
+		http.ServeFile(w, r, filepath.Join(staticFolder, "admin/lex_import_page.html"))
 	},
 }
 
