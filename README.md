@@ -11,7 +11,7 @@ You need [Sqlite3](https://www.sqlite.org/)
 
 How to set up:
 * For developers: https://github.com/stts-se/lexdata/wiki/Lexserver-setup-for-developers
-* For standalone server: coming soon!
+* Standalone server: coming soon!
 
 
 ---
