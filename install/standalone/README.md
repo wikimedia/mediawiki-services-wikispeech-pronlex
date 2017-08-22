@@ -20,11 +20,21 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
      3. Install [Sqlite3](https://www.sqlite.org/)
 
-## II. Run setup scripts
 
-`sh build_standalone.sh <APPDIR>`   
+## II. Installation scripts
 
-Installs the pronlex lexserver and imports lexicon files for Swedish, Norwegian, US English and Arabic (test file).
+1. Install the pronlex server
+
+   `$ sh install.sh <APPDIR>`
+
+   Installs the pronlex server and a small demo db for testing
+
+
+2. Import lexicon files (optional)
+
+   `$ sh import.sh <APPDIR>`   
+
+   Imports lexicon files for Swedish, Norwegian, US English and a tint test file Arabic.
 
 
 ## III. Start the lexicon server
