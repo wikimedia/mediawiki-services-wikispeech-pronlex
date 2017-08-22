@@ -18,7 +18,7 @@ func main() {
 	// + db look up
 
 	if len(os.Args) != 4 && len(os.Args) != 2 {
-		log.Println("go run export.go <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>")
+		log.Println("go run exportLex.go <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>")
 		log.Println(" if only <DB_FILE> is specified, a list of available lexicons will be printed")
 		return
 	}
