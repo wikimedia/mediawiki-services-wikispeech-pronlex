@@ -80,7 +80,7 @@ SAMPLE INVOCATION:
 	}
 
 	var args = os.Args
-	if strings.HasSuffix(args[0], "import") {
+	if strings.HasSuffix(args[0], "importLex") {
 		args = args[1:] // remove first argument if it's the program name
 	}
 	err := f.Parse(args)
