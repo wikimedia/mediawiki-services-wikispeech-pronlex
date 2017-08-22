@@ -12,11 +12,11 @@ TODO: add instructions here
 ## Lexicon server: Lexicon data and database
 
 * **Standalone setup**    
-Readme: standalone/README.md   
+standalone/README.md   
 URL: https://github.com/stts-se/pronlex/blob/master/install/standalone
 
 * **Setup for developers**    
-Readme: developer/README.md   
+developer/README.md   
 URL: https://github.com/stts-se/pronlex/blob/master/install/developer
 
 
