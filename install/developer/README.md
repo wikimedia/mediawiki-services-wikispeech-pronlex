@@ -27,13 +27,13 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 1. Install the pronlex server
 
-   * Clone the source code
+ i. Clone the source code
 
     `$ mkdir -p $GOPATH/src/github.com/stts-se`  
     `$ cd $GOPATH/src/github.com/stts-se`  
     `stts-se$ git clone https://github.com/stts-se/pronlex.git`  
 
-    * Download dependencies
+ ii. Download dependencies
     
     `$ cd $GOPATH/src/github.com/stts-se/pronlex`   
 
@@ -43,13 +43,13 @@ Below are instructions on how to set up the lexicon server for development. For 
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
 
-    * Clone the lexdata repository:
+ iii. Clone the lexdata repository:
     
      `$ mkdir -p ~/gitrepos`  
      `$ cd ~/gitrepos`  
      `gitrepos$ git clone https://github.com/stts-se/lexdata.git`
 
-    * Prepare symbol sets and symbol set mappers/converters
+ iiii. Prepare symbol sets and symbol set mappers/converters
     
      `$ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver`
      `lexserver$ mkdir symbol_sets`  
