@@ -43,7 +43,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
 
-  3. Clone the lexdata repository:
+     3. Clone the lexdata repository:
     
      `$ mkdir -p ~/gitrepos`  
      `$ cd ~/gitrepos`  
@@ -58,12 +58,13 @@ Below are instructions on how to set up the lexicon server for development. For 
      `lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets`  
      `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
 
-
+---
 ** UPCOMING: SCRIPT TO INSTALL pronlex INSTEAD OF COMMANDS **
 
 `$ sh install.sh <APPDIR>`
 
    Installs the pronlex server and a small demo db for testing
+---
 
 
 2. Import lexicon files (optional)
