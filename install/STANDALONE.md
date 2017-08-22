@@ -37,14 +37,14 @@ WORK IN PROGRESS, THE INSTRUCTIONS BELOW ARE *NOT* CORRECT
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
 
-3. Clone the lexdata repository:
+2. Clone the lexdata repository:
     
      `$ mkdir -p ~/gitrepos`  
      `$ cd ~/gitrepos`  
      `gitrepos$ git clone https://github.com/stts-se/lexdata.git`
 
 
-4. Prepare symbol sets and symbol set mappers/converters
+3. Prepare symbol sets and symbol set mappers/converters
     
      `$ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver`
      `lexserver$ mkdir symbol_sets`  
@@ -52,7 +52,7 @@ WORK IN PROGRESS, THE INSTRUCTIONS BELOW ARE *NOT* CORRECT
      `lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets`  
      `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
 
-5. Import lexicon files
+4. Import lexicon files
 
 Follow the instructions here to import the lexicon files from the command line:   
 * File: IMPORTLEX.md   
