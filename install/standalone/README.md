@@ -34,7 +34,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
    `$ sh import.sh <APPDIR>`   
 
-   Imports lexicon files for Swedish, Norwegian, US English and a tint test file Arabic.
+   Imports lexicon files for Swedish, Norwegian, US English and a small test file Arabic.
 
 
 ## III. Start the lexicon server
