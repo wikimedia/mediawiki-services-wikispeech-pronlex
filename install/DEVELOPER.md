@@ -53,7 +53,7 @@ The last command is optional, it copies pre-defined mapper definitions and tests
 
 ## II. Import lexicon files
 
-Follow the instructions here to import the lexicon files from the command line:
+Follow the instructions here to import the lexicon files from the command line:   
 File: IMPORTLEX.md   
 URL: https://github.com/stts-se/pronlex/blob/master/install/IMPORTLEX.md
 
