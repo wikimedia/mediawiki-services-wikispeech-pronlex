@@ -23,8 +23,6 @@ cp $APPDIR/lexdata/*/*/*.sym $APPDIR/symbol_sets/
 cp $APPDIR/lexdata/mappers.txt $APPDIR/symbol_sets/
 cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/
 
-rm -fr $APPDIR/lexdata
-
 
 ### LEXDATA IMPORT
 

@@ -49,7 +49,6 @@ Below are instructions on how to set up the lexicon server for development. For 
      `$ cd ~/gitrepos`  
      `gitrepos$ git clone https://github.com/stts-se/lexdata.git`
 
-
     * Prepare symbol sets and symbol set mappers/converters
     
      `$ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver`
