@@ -15,9 +15,10 @@ RUN go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
 RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
 RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
-#ADD init_lexica.sh .
-
-#CMD bash init_lexica.sh
+RUN ln -s $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh import_lex0
+RUN echo "sh import_lex0 lexserver_files" > import_lex
+RUN which bash > which_bash.txt
+RUN chmod +x import_lex
 
 EXPOSE 8787
 
