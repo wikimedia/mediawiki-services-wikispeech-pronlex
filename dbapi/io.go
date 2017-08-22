@@ -96,7 +96,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 
 		eBuf = append(eBuf, e)
 		n++
-		if n%10000 == 0 {
+		if n%1000 == 0 {
 			_, err = insertEntries(db, lexicon, eBuf)
 			if err != nil {
 				var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
