@@ -26,11 +26,10 @@ WORK IN PROGRESS, THE INSTRUCTIONS BELOW ARE *NOT* CORRECT
 
 1. Download and install pronlex and its dependencies
 
-    `$ go get https://github.com/stts-se/pronlex  
-    `$ go install github.com/stts-se/pronlex/lexserver    
-    `$ go install github.com/stts-se/pronlex/cmd/lexio/import   
+    `$ go get https://github.com/stts-se/pronlex`  
+    `$ go install github.com/stts-se/pronlex/lexserver`    
+    `$ go install github.com/stts-se/pronlex/cmd/lexio/import`   
     `$ go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB`   
-
 
 2. Clone the lexdata repository:
     
