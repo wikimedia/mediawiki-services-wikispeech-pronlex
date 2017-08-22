@@ -43,7 +43,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
 
- iii. Clone the lexdata repository:
+ iii. Clone the lexdata repository
     
      `$ mkdir -p ~/gitrepos`  
      `$ cd ~/gitrepos`  
