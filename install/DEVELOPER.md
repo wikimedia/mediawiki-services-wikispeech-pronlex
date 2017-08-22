@@ -64,6 +64,3 @@ The startup script will run some init tests in a separate test server, before st
 
 When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data provided on this site.
 
-## IV. [Import lexicon files (via browser)](https://github.com/stts-se/lexdata/wiki/Import-lexicon-files-(via-browser))
-
-Follow the instructions here if you want to import the lexicon files via your browser.
