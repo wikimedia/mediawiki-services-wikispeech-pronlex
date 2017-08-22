@@ -48,11 +48,6 @@ ii. Download dependencies
     $ cd $GOPATH/src/github.com/stts-se/pronlex
 
     pronlex$ go get ./...
-        or, if you want to know what's going on:    
-    pronlex$ go get -v ./...
-
-Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
-
 
  iii. Clone the lexdata repository
     
