@@ -186,7 +186,7 @@ SAMPLE INVOCATION:
 	}
 
 	var logger dbapi.Logger
-	var stderrLogger = dbapi.StderrLogger{}
+	var stderrLogger = dbapi.StderrLogger{-1}
 
 	if *quiet {
 		logger = dbapi.SilentLogger{}
@@ -194,7 +194,7 @@ SAMPLE INVOCATION:
 		logger = stderrLogger
 	}
 	// TODO handle errors? Does it make sent to return array of error...?
-	stderrLogger.Write("importing lexicon file ...")
+	stderrLogger.Write(fmt.Sprintf("importing lexicon file %s ...", inFile))
 	err = dbapi.ImportLexiconFile(db, lexRef.LexName, logger, inFile, validator)
 
 	if err != nil {

@@ -5,10 +5,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/stts-se/pronlex/dbapi"
 	"log"
 	"os"
+
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/stts-se/pronlex/dbapi"
 )
 
 func main() {
@@ -19,7 +20,7 @@ func main() {
 
 	fOut := os.Args[1]
 	if _, err := os.Stat(fOut); !os.IsNotExist(err) {
-		fmt.Fprintln(os.Stderr, "Cannot create file that already exists:", fOut)
+		fmt.Fprintln(os.Stderr, "[createEmptyDB] Cannot create file that already exists:", fOut)
 		os.Exit(1)
 	}
 
