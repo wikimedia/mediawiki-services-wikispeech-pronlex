@@ -1,6 +1,6 @@
 # Setup for developers
 
-THESE INSTRUCTIONS ARE BEING UPDATED RIGHT NOW. PLEASE DO NOT USE.
+WORK IN PROGRESS. THESE INSTRUCTIONS ARE BEING UPDATED RIGHT NOW. PLEASE DO NOT USE.
 
 
 Below are instructions on how to set up the lexicon server for development. For standalone setup, see STANDALONE.md.
@@ -23,7 +23,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
      3. Install [Sqlite3](https://www.sqlite.org/)
 
-## II. Installation scripts
+## II. Installation scripts (work in progress)
 
 1. Install the pronlex server
 
