@@ -9,7 +9,7 @@ pronlex is a pronunciation lexicon database behind an http API.
 TODO: add instructions here
 
 
-## Lexicon server: Lexicon data and database
+## Lexicon server and data installation
 
 * **Standalone setup**    
 standalone/README.md   
