@@ -107,7 +107,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 			logger.Progress(msg2)
 			eBuf = make([]lex.Entry, 0)
 		}
-		if n%logger.LogInterval() == 0 {
+		if logger.LogInterval() > 0 && n%logger.LogInterval() == 0 {
 			msg2 := fmt.Sprintf("ImportLexiconFile: Lines read: %d                         ", n)
 			logger.Progress(msg2)
 		}
@@ -247,7 +247,7 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 			}
 
 			n++
-			if n%logger.LogInterval() == 0 {
+			if logger.LogInterval() > 0 && n%logger.LogInterval() == 0 {
 				msg2 := fmt.Sprintf("Lines read: %d", n)
 				log.Println(msg2)
 			}
