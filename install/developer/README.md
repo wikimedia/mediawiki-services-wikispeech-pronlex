@@ -46,7 +46,6 @@ i. Clone the source code
 ii. Download dependencies
     
     $ cd $GOPATH/src/github.com/stts-se/pronlex
-
     pronlex$ go get ./...
 
  iii. Clone the lexdata repository
