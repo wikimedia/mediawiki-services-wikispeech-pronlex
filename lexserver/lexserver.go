@@ -153,15 +153,23 @@ func protect(w http.ResponseWriter) {
 }
 
 // TODO should go into config file
-var uploadFileArea = filepath.Join(".", "upload_area")
-var downloadFileArea = filepath.Join(".", "download_area")
+var uploadFileArea string    // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
+var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
 var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
 var dbFileArea string        // = filepath.Join(".", "db_files")
 var staticFolder string      // = "."
 
 // TODO config stuff
-func initFolders() {
+func initFolders() error {
 	// TODO sane error handling
+
+	tmpDir, err := ioutil.TempDir("", "lexserver-")
+	if err != nil {
+		return err
+	}
+
+	uploadFileArea := filepath.Join(tmpDir, "upload_area")
+	downloadFileArea := filepath.Join(tmpDir, "download_area")
 
 	// If the upload area dir doesn't exist, create it
 	if _, err := os.Stat(uploadFileArea); err != nil {
@@ -210,7 +218,7 @@ func initFolders() {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
 		}
 	} // else: already exists, hopefullly
-
+	return nil
 }
 
 // TODO remove pretty-print option, since you can use the JSONView plugin to Chrome instead
@@ -564,13 +572,17 @@ Default ports:
 	dbFileArea = *dbFiles
 	staticFolder = *static
 
-	initFolders()
+	err := initFolders()
+	if err != nil {
+		log.Fatal(fmt.Errorf("lexserver: couldn't initialize folders : %v", err))
+		os.Exit(1)
+	}
 
 	dbapi.Sqlite3WithRegex()
 
 	log.Println("lexserver: started")
 
-	err := setupDemoDB()
+	err = setupDemoDB()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "COULDN'T INITIALISE DEMO DB : %v\n", err)
 		os.Exit(1)
