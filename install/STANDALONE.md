@@ -1,6 +1,8 @@
 # Standalone setup
 
-WORK IN PROGRESS, BELOW INSTRUCTIONS ARE NOT CORRECT
+Below are instructions on how to set up the lexicon server for standalone use. For developer setup, see DEVELOPER.md.
+
+WORK IN PROGRESS, THE INSTRUCTIONS BELOW ARE *NOT* CORRECT
 
 ## I. Preparation steps
 
@@ -10,7 +12,7 @@ WORK IN PROGRESS, BELOW INSTRUCTIONS ARE NOT CORRECT
      `$ sudo apt-get install gcc`   
      `$ sudo apt-get install build-essential`
 
-2. Set up `go` and sqlite3
+2. Set up `go` and `sqlite3`
 
      1. Install `go` following the instructions here: https://golang.org/dl/ (1.8 or higher)
 
@@ -20,14 +22,13 @@ WORK IN PROGRESS, BELOW INSTRUCTIONS ARE NOT CORRECT
 
      3. Install [Sqlite3](https://www.sqlite.org/)
 
-3. Clone the source code
+## II. Steps to be scripted
 
-    `$ mkdir -p $GOPATH/src/github.com/stts-se`  
-    `$ cd $GOPATH/src/github.com/stts-se`  
-    `stts-se$ git clone https://github.com/stts-se/pronlex.git`  
+1. Download and install pronlex and its dependencies
 
-4. Download dependencies
-    
+    `$ go get https://github.com/stts-se/pronlex`
+    `$ go install github.com/stts-se/pronlex/lexserver`	
+
     `$ cd $GOPATH/src/github.com/stts-se/pronlex`   
 
     `pronlex$ go get ./...`   
@@ -36,14 +37,14 @@ WORK IN PROGRESS, BELOW INSTRUCTIONS ARE NOT CORRECT
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
 
-5. Clone the lexdata repository:
+3. Clone the lexdata repository:
     
      `$ mkdir -p ~/gitrepos`  
      `$ cd ~/gitrepos`  
      `gitrepos$ git clone https://github.com/stts-se/lexdata.git`
 
 
-6. Prepare symbol sets and symbol set mappers/converters
+4. Prepare symbol sets and symbol set mappers/converters
     
      `$ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver`
      `lexserver$ mkdir symbol_sets`  
@@ -51,9 +52,7 @@ WORK IN PROGRESS, BELOW INSTRUCTIONS ARE NOT CORRECT
      `lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets`  
      `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
 
-The last command is optional, it copies pre-defined mapper definitions and tests.
-
-## II. Import lexicon files
+5. Import lexicon files
 
 Follow the instructions here to import the lexicon files from the command line:   
 * File: IMPORTLEX.md   

@@ -1,5 +1,7 @@
 # Setup for developers
 
+Below are instructions on how to set up the lexicon server for development. For standalone setup, see STANDALONE.md.
+
 ## I. Preparation steps
 
 1. Prerequisites
@@ -48,8 +50,6 @@
      `lexserver$ cp ~/gitrepos/lexdata/*/*/*.sym symbol_sets`   
      `lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets`  
      `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
-
-The last command is optional, it copies pre-defined mapper definitions and tests.
 
 ## II. Import lexicon files
 
