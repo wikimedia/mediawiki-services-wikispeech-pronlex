@@ -38,9 +38,10 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 
 ## III. Start the lexicon server
+
 The server should be started using this script
 
-`sh start_server.sh`
+`$ sh start_server.sh <APPDIR>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 

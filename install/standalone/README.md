@@ -41,7 +41,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 The server should be started using this script
 
-`$ sh run_standalone.sh <APPDIR>`
+`$ sh start_server.sh <APPDIR>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
