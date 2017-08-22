@@ -23,7 +23,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 ## II. Installation scripts (work in progress)
 
-1. Install the pronlex server (SCRIPT NOT FINISHED!)
+1. Install the pronlex server (WORK IN PROGRESS)
 
    `$ sh install.sh <APPDIR>`
 
