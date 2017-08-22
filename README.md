@@ -12,11 +12,11 @@ pronlex is a pronunciation lexicon database behind an http API.
 
 # Lexicon data and database
 
-* Standalone setup    
+* **Standalone setup**    
 File: install/STANDALONE.md   
 URL: https://github.com/stts-se/pronlex/blob/master/install/STANDALONE.md
 
-* Setup for developers    
+* **Setup for developers**    
 File: install/DEVELOPER.md   
 URL: https://github.com/stts-se/pronlex/blob/master/install/DEVELOPER.md
 
