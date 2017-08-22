@@ -28,16 +28,16 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 1. Install the pronlex server
 
-`$ sh install.sh <APPDIR>`
+   `$ sh install.sh <APPDIR>`
 
-Installs the pronlex server and a small demo db for testing (upcoming feature!)
+   Installs the pronlex server and a small demo db for testing (upcoming feature!)
 
 
 2. Import lexicon files (optional)
 
-`$ sh import.sh <APPDIR>`   
+   `$ sh import.sh <APPDIR>`   
 
-Imports lexicon files for Swedish, Norwegian, US English and a small test file Arabic.
+   Imports lexicon files for Swedish, Norwegian, US English and a small test file Arabic.
 
 
 ## III. Start the lexicon server
