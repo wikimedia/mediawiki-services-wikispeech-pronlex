@@ -18,19 +18,31 @@ Before you start, `cd` to this folder: `$GOPATH/src/github.com/stts-se/pronlex`
 
 #### Swedish
 
-    pronlex$ go run cmd/lexio/import/import.go lexserver/db_files/pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa lexserver/symbol_set_file_area
+    pronlex$ go run cmd/lexio/import/import.go \ 
+      lexserver/db_files/pronlex.db sv-se.nst \ 
+      ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz \ 
+      sv-se_ws-sampa lexserver/symbol_set_file_area
 
 #### Norwegian Bokmål
 
-    pronlex$ go run cmd/lexio/import/import.go lexserver/db_files/pronlex.db nb-no.nst ~/gitrepos/lexdata/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa lexserver/symbol_set_file_area
+    pronlex$ go run cmd/lexio/import/import.go \
+      lexserver/db_files/pronlex.db nb-no.nst \ 
+      ~/gitrepos/lexdata/nb-no/nst/nor030224NST.pron-ws.utf8.gz \ 
+      nb-no_ws-sampa lexserver/symbol_set_file_area
 
 #### US English
 
-    pronlex$ go run cmd/lexio/import/import.go lexserver/db_files/pronlex.db en-us.cmu ~/gitrepos/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa lexserver/symbol_set_file_area
+    pronlex$ go run cmd/lexio/import/import.go \
+      lexserver/db_files/pronlex.db en-us.cmu \ 
+      ~/gitrepos/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 \ 
+      en-us_ws-sampa lexserver/symbol_set_file_area
 
 #### Test Arabic
 
-    pronlex$ go run cmd/lexio/import/import.go lexserver/db_files/pronlex.db ar-test ~/gitrepos/lexdata/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $GOPATH/src/github.com/stts-se/pronlex/lexserver/symbol_set_file_area
+    pronlex$ go run cmd/lexio/import/import.go \ 
+      lexserver/db_files/pronlex.db ar-test \ 
+      ~/gitrepos/lexdata/ar/TEST/ar_TEST.pron-ws.utf8 \ 
+      ar_ws-sampa lexserver/symbol_set_file_area
 
 ***
 ### Flags
@@ -47,11 +59,17 @@ The instructions above will load lexicon files without validation. If you want t
 
 Example exec (Swedish):  
 
-     pronlex$ go run cmd/lexio/import/import.go -validate lexserver/db_files/pronlex.db sv-se.nst ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa lexserver/symbol_set_file_area
+     pronlex$ go run cmd/lexio/import/import.go -validate \
+       lexserver/db_files/pronlex.db sv-se.nst \ 
+       ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz \ 
+       sv-se_ws-sampa lexserver/symbol_set_file_area
 
 Example exec (US English):  
 
-    pronlex$ go run cmd/lexio/import/import.go -validate lexserver/db_files/pronlex.db en-us.cmu ~/gitrepos/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa lexserver/symbol_set_file_area
+    pronlex$ go run cmd/lexio/import/import.go -validate \
+     lexserver/db_files/pronlex.db en-us.cmu \ 
+     ~/gitrepos/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 \ 
+     en-us_ws-sampa lexserver/symbol_set_file_area
 
 
 This will validate each entry according to the validation rules of it's associated project/language, and add the validation messages to the database.
