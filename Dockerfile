@@ -23,4 +23,6 @@ EXPOSE 8787
 
 RUN echo "Mount external host dir to /go/lexserver_files"
 
-CMD lexserver -ss_files lexserver_files/symbol_sets -db_files lexserver_files/db_files -static lexserver_files/static
+#CMD lexserver -ss_files lexserver_files/symbol_sets -db_files lexserver_files/db_files -static lexserver_files/static
+
+CMD (lexserver -test -ss_files lexserver_files/symbol_sets -db_files lexserver_files/db_files -static lexserver_files/static && lexserver -ss_files lexserver_files/symbol_sets -db_files lexserver_files/db_files -static lexserver_files/static)
