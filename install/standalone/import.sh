@@ -8,6 +8,12 @@ APPDIR=$1
 
 ### LEXDATA SETUP
 
+if [ ! -d "$APPDIR" ]; then
+    echo "FAILED: $APPDIR is not configured for lexserver"
+    exit 1
+fi
+
+
 mkdir -p $APPDIR
 
 if [ -d "$APPDIR/lexdata" ]; then
