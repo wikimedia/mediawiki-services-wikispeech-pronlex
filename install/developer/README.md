@@ -27,36 +27,6 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 1. Install the pronlex server
 
- i. Clone the source code
-
-    $ mkdir -p $GOPATH/src/github.com/stts-se
-    $ cd $GOPATH/src/github.com/stts-se
-    stts-se$ git clone https://github.com/stts-se/pronlex.git
-
- ii. Download dependencies
-    
-    $ cd $GOPATH/src/github.com/stts-se/pronlex
-
-    pronlex$ go get ./...
-        or, if you want to know what's going on:    
-    pronlex$ go get -v ./...
-
-        Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
-
- iii. Clone the lexdata repository
-    
-     $ mkdir -p ~/gitrepos  
-     $ cd ~/gitrepos  
-     gitrepos$ git clone https://github.com/stts-se/lexdata.git
-
- iiii. Prepare symbol sets and symbol set mappers/converters
-    
-     $ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver
-     lexserver$ mkdir symbol_sets  
-     lexserver$ cp ~/gitrepos/lexdata/*/*/*.sym symbol_sets   
-     lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets  
-     lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets  
-
 ---
 ** UPCOMING: SCRIPT TO INSTALL pronlex INSTEAD OF COMMANDS **
 
@@ -64,6 +34,40 @@ Below are instructions on how to set up the lexicon server for development. For 
 
    Installs the pronlex server and a small demo db for testing
 ---
+
+
+i. Clone the source code
+
+    $ mkdir -p $GOPATH/src/github.com/stts-se
+    $ cd $GOPATH/src/github.com/stts-se
+    stts-se$ git clone https://github.com/stts-se/pronlex.git
+
+
+ii. Download dependencies
+    
+    $ cd $GOPATH/src/github.com/stts-se/pronlex
+
+    pronlex$ go get ./...
+        or, if you want to know what's going on:    
+    pronlex$ go get -v ./...
+
+Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
+
+
+ iii. Clone the lexdata repository
+    
+     $ mkdir -p ~/gitrepos  
+     $ cd ~/gitrepos  
+     gitrepos$ git clone https://github.com/stts-se/lexdata.git
+
+
+iiii. Prepare symbol sets and symbol set mappers/converters
+    
+     $ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver
+     lexserver$ mkdir symbol_sets  
+     lexserver$ cp ~/gitrepos/lexdata/*/*/*.sym symbol_sets   
+     lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets  
+     lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets  
 
 
 2. Import lexicon files (optional)
