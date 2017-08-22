@@ -2,8 +2,6 @@
 
 Below are instructions on how to set up the lexicon server for standalone use. For developer setup, see DEVELOPER.md.
 
-WORK IN PROGRESS, THE INSTRUCTIONS BELOW ARE *NOT* CORRECT
-
 ## I. Preparation steps
 
 1. Prerequisites
@@ -22,41 +20,18 @@ WORK IN PROGRESS, THE INSTRUCTIONS BELOW ARE *NOT* CORRECT
 
      3. Install [Sqlite3](https://www.sqlite.org/)
 
-## II. Steps to be scripted
+## II. Run setup scripts
 
-1. Download and install pronlex and its dependencies
+`sh build_standalone.sh <APPDIR>`   
 
-    `$ go get https://github.com/stts-se/pronlex`  
-    `$ go install github.com/stts-se/pronlex/lexserver`    
-    `$ go install github.com/stts-se/pronlex/cmd/lexio/import`   
-    `$ go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB`   
-
-2. Clone the lexdata repository:
-    
-     `$ mkdir -p ~/gitrepos`  
-     `$ cd ~/gitrepos`  
-     `gitrepos$ git clone https://github.com/stts-se/lexdata.git`
-
-
-3. Prepare symbol sets and symbol set mappers/converters
-    
-     `$ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver`
-     `lexserver$ mkdir symbol_sets`  
-     `lexserver$ cp ~/gitrepos/lexdata/*/*/*.sym symbol_sets`   
-     `lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets`  
-     `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
-
-4. Import lexicon files
-
-Follow the instructions here to import the lexicon files from the command line:   
-* File: IMPORTLEX.md   
-* URL: https://github.com/stts-se/pronlex/blob/master/install/IMPORTLEX.md
+Installs the pronlex lexserver and imports lexicon files for Swedish, Norwegian, US English and Arabic (test file).
 
 
 ## III. Start the lexicon server
+
 The server should be started using this script
 
-`sh start_server.sh`
+`$ sh run_standalone.sh <APPDIR>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
