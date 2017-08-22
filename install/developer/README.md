@@ -1,8 +1,5 @@
 # Setup for developers
 
-WORK IN PROGRESS. THESE INSTRUCTIONS ARE BEING UPDATED RIGHT NOW. PLEASE DO NOT USE.
-
-
 Below are instructions on how to set up the lexicon server for development. For standalone setup, see STANDALONE.md.
 
 ## I. Preparation steps
@@ -26,11 +23,11 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 ## II. Installation scripts (work in progress)
 
-1. Install the pronlex server
+1. Install the pronlex server (SCRIPT NOT FINISHED!)
 
    `$ sh install.sh <APPDIR>`
 
-   Installs the pronlex server and a small demo db for testing (upcoming feature!)
+   Installs the pronlex server and a small demo db for testing
 
 
 2. Import lexicon files (optional)
