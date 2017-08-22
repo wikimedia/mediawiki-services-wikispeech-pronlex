@@ -6,7 +6,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 1. Prerequisites
 
-     If you're on Linux, you may need to install `gcc` and `build-essential` for the `sqlite3` go adapter to work properly (the adapter is installed in _Download dependencies_ below):   
+     If you're on Linux, you may need to install `gcc` and `build-essential` for the `sqlite3` go adapter to work properly:   
      `$ sudo apt-get install gcc`   
      `$ sudo apt-get install build-essential`
 
