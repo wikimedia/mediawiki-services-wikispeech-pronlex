@@ -53,9 +53,12 @@ WORK IN PROGRESS, BELOW INSTRUCTIONS ARE NOT CORRECT
 
 The last command is optional, it copies pre-defined mapper definitions and tests.
 
-## II. [Import lexicon files (command line)](https://github.com/stts-se/lexdata/wiki/Import-lexicon-files-(command-line))
+## II. Import lexicon files
 
-Follow the instructions here if you want to import the lexicon files from the command line.
+Follow the instructions here to import the lexicon files from the command line:
+File: IMPORTLEX.md   
+URL: https://github.com/stts-se/pronlex/blob/master/install/IMPORTLEX.md
+
 
 ## III. Start the lexicon server
 The server should be started using this script
