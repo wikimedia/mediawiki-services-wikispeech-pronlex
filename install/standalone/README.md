@@ -1,6 +1,6 @@
 # Standalone setup
 
-Below are instructions on how to set up the lexicon server for standalone use. For developer setup, see DEVELOPER.md.
+Below are instructions on how to set up the lexicon server for standalone use. For developer setup, see the `developer` folder.
 
 ## I. Preparation steps
 
