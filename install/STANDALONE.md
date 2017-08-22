@@ -26,16 +26,13 @@ WORK IN PROGRESS, THE INSTRUCTIONS BELOW ARE *NOT* CORRECT
 
 1. Download and install pronlex and its dependencies
 
-    `$ go get https://github.com/stts-se/pronlex`
-    `$ go install github.com/stts-se/pronlex/lexserver`	
+    `$ go get https://github.com/stts-se/pronlex`  
+    `$ go install github.com/stts-se/pronlex/lexserver`    
+    `$ go install github.com/stts-se/pronlex/cmd/lexio/import`   
+    `$ go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB`   
 
-    `$ cd $GOPATH/src/github.com/stts-se/pronlex`   
-
-    `pronlex$ go get ./...`   
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  or, if you want to know what's going on:    
-    `pronlex$ go get -v ./...`
-
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
+    `$ cd $GOPATH/src/github.com/stts-se/pronlex`   //?
+    `pronlex$ go get ./...`   //?
 
 2. Clone the lexdata repository:
     
