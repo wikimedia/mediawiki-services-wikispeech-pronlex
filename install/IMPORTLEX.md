@@ -21,28 +21,28 @@ Before you start, `cd` to this folder: `$GOPATH/src/github.com/stts-se/pronlex`
     pronlex$ go run cmd/lexio/importLex/importLex.go \ 
       lexserver/db_files/pronlex.db sv-se.nst \ 
       ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz \ 
-      sv-se_ws-sampa lexserver/symbol_set_file_area
+      sv-se_ws-sampa lexserver/symbol_sets
 
 #### Norwegian Bokmål
 
     pronlex$ go run cmd/lexio/importLex/importLex.go \
       lexserver/db_files/pronlex.db nb-no.nst \ 
       ~/gitrepos/lexdata/nb-no/nst/nor030224NST.pron-ws.utf8.gz \ 
-      nb-no_ws-sampa lexserver/symbol_set_file_area
+      nb-no_ws-sampa lexserver/symbol_sets
 
 #### US English
 
     pronlex$ go run cmd/lexio/importLex/importLex.go \
       lexserver/db_files/pronlex.db en-us.cmu \ 
       ~/gitrepos/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 \ 
-      en-us_ws-sampa lexserver/symbol_set_file_area
+      en-us_ws-sampa lexserver/symbol_sets
 
 #### Test Arabic
 
     pronlex$ go run cmd/lexio/importLex/importLex.go \ 
       lexserver/db_files/pronlex.db ar-test \ 
       ~/gitrepos/lexdata/ar/TEST/ar_TEST.pron-ws.utf8 \ 
-      ar_ws-sampa lexserver/symbol_set_file_area
+      ar_ws-sampa lexserver/symbol_sets
 
 ***
 ### Flags
@@ -62,14 +62,14 @@ Example exec (Swedish):
      pronlex$ go run cmd/lexio/importLex/importLex.go -validate \
        lexserver/db_files/pronlex.db sv-se.nst \ 
        ~/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz \ 
-       sv-se_ws-sampa lexserver/symbol_set_file_area
+       sv-se_ws-sampa lexserver/symbol_sets
 
 Example exec (US English):  
 
     pronlex$ go run cmd/lexio/importLex/importLex.go -validate \
      lexserver/db_files/pronlex.db en-us.cmu \ 
      ~/gitrepos/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 \ 
-     en-us_ws-sampa lexserver/symbol_set_file_area
+     en-us_ws-sampa lexserver/symbol_sets
 
 
 This will validate each entry according to the validation rules of it's associated project/language, and add the validation messages to the database.
