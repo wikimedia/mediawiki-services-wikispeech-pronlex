@@ -1,16 +1,22 @@
+# Docker installation
+
+TODO: add instructions here
+
+
 # pronlex
 pronlex is a pronunciation lexicon database behind an http API.
 
 [![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://godoc.org/github.com/stts-se/pronlex)
 
-----
+---
+
 # Lexicon data and database
 
-## Standalone setup
+* Standalone setup
 File: install/STANDALONE.md   
 URL: https://github.com/stts-se/pronlex/blob/master/install/STANDALONE.md
 
-## Setup for developers
+* Setup for developers
 File: install/DEVELOPER.md   
 URL: https://github.com/stts-se/pronlex/blob/master/install/DEVELOPER.md
 
