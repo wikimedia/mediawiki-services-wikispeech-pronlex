@@ -1,13 +1,7 @@
 *~
 *.db
-lexserver/download_area
-lexserver/upload_area
 lexserver/symbol_sets
 lexserver/db_files
-lexserver/pronlex.db.ORIG
-dbapi/*.db-journal
-lexserver/pronlex.db-shm
-lexserver/pronlex.db-wal
 
 OLDdecompounder/test_word_parts_out.txt
 lexserver/user_db/test_server/node_modules/
