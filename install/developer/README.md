@@ -52,7 +52,7 @@ Below are instructions on how to set up the lexicon server for development. For 
      `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
 
 
-II. Import lexicon files (optional)
+## II. Import lexicon files (optional)
 
 `$ sh import.sh <APPDIR>`   
 
