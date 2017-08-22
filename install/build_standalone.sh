@@ -34,18 +34,22 @@ cp $APP_DIR/lexdata/mappers.txt $APP_DIR/symbol_sets/
 cp $APP_DIR/lexdata/converters/*.cnv $APP_DIR/symbol_sets/
 
 
+#echo ""
 # echo "IMPORT: $SVLEX"
 # createEmptyDB $APP_DIR/db_files/$SVLEX
 # importLex -replace $APP_DIR/db_files/$SVLEX sv-se.nst $APP_DIR/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APP_DIR/symbol_sets
 
+#echo ""
 # echo "IMPORT: $NOBLEX"
 # createEmptyDB $APP_DIR/db_files/$NOBLEX
 # importLex -replace $APP_DIR/db_files/$NOBLEX nb-no.nst $APP_DIR/lexdata/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APP_DIR/symbol_sets
 
+echo ""
 echo "IMPORT: $AMELEX"
 createEmptyDB $APP_DIR/db_files/$AMELEX
 importLex -replace $APP_DIR/db_files/$AMELEX en-us.cmu $APP_DIR/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APP_DIR/symbol_sets
 
+echo ""
 echo "IMPORT: $ARLEX"
 createEmptyDB $APP_DIR/db_files/$ARLEX
 importLex -replace $APP_DIR/db_files/$ARLEX ar-test $APP_DIR/lexdata/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APP_DIR/symbol_sets

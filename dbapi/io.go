@@ -119,7 +119,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		return fmt.Errorf("%v", msg)
 	} // else
 	msg2 := fmt.Sprintf("ImportLexiconFile: Inserted entries (total lines read: %d)", n)
-	logger.Progress(msg2)
+	logger.Write(msg2)
 
 	logger.Write("Finalizing import ... ")
 

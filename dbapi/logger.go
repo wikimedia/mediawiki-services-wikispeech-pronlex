@@ -27,11 +27,7 @@ func (l StderrLogger) Write(s string) {
 	log.Println(s)
 }
 func (l StderrLogger) LogInterval() int {
-	if l.LogIntervalVar == 0 {
-		return 10000
-	} else {
-		return l.LogIntervalVar
-	}
+	return l.LogIntervalVar
 }
 
 // StdoutLogger is a logger for printing messages to standard out. Implements the dbapi.Logger interface.
@@ -46,11 +42,7 @@ func (l StdoutLogger) Write(s string) {
 	fmt.Println(s)
 }
 func (l StdoutLogger) LogInterval() int {
-	if l.LogIntervalVar == 0 {
-		return 10000
-	} else {
-		return l.LogIntervalVar
-	}
+	return l.LogIntervalVar
 }
 
 // WebSockLogger is a logger for printing messages to a web socket. Implements the dbapi.Logger interface.
@@ -72,11 +64,7 @@ func (l WebSockLogger) Progress(msg string) {
 }
 
 func (l WebSockLogger) LogInterval() int {
-	if l.LogIntervalVar == 0 {
-		return 100
-	} else {
-		return l.LogIntervalVar
-	}
+	return l.LogIntervalVar
 }
 
 // SilentLogger is a muted logger, used for testing to skip too much confusing test output
