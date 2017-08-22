@@ -1,5 +1,8 @@
 # Setup for developers
 
+THESE INSTRUCTIONS ARE BEING UPDATED RIGHT NOW. PLEASE DO NOT USE.
+
+
 Below are instructions on how to set up the lexicon server for development. For standalone setup, see STANDALONE.md.
 
 ## I. Preparation steps
@@ -20,13 +23,17 @@ Below are instructions on how to set up the lexicon server for development. For 
 
      3. Install [Sqlite3](https://www.sqlite.org/)
 
-3. Clone the source code
+## II. Installation scripts
+
+1. Install the pronlex server
+
+   1. Clone the source code
 
     `$ mkdir -p $GOPATH/src/github.com/stts-se`  
     `$ cd $GOPATH/src/github.com/stts-se`  
     `stts-se$ git clone https://github.com/stts-se/pronlex.git`  
 
-4. Download dependencies
+    2. Download dependencies
     
     `$ cd $GOPATH/src/github.com/stts-se/pronlex`   
 
@@ -36,14 +43,14 @@ Below are instructions on how to set up the lexicon server for development. For 
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Please note that the verbosity flag may give you a few confusing warnings, but you will at least see what packages are being processed.
 
-5. Clone the lexdata repository:
+  3. Clone the lexdata repository:
     
      `$ mkdir -p ~/gitrepos`  
      `$ cd ~/gitrepos`  
      `gitrepos$ git clone https://github.com/stts-se/lexdata.git`
 
 
-6. Prepare symbol sets and symbol set mappers/converters
+     4. Prepare symbol sets and symbol set mappers/converters
     
      `$ cd $GOPATH/src/github.com/stts-se/pronlex/lexserver`
      `lexserver$ mkdir symbol_sets`  
@@ -52,7 +59,14 @@ Below are instructions on how to set up the lexicon server for development. For 
      `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
 
 
-## II. Import lexicon files (optional)
+** UPCOMING: SCRIPT TO INSTALL pronlex INSTEAD OF COMMANDS **
+
+`$ sh install.sh <APPDIR>`
+
+   Installs the pronlex server and a small demo db for testing
+
+
+2. Import lexicon files (optional)
 
 `$ sh import.sh <APPDIR>`   
 
