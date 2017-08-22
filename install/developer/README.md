@@ -51,11 +51,12 @@ Below are instructions on how to set up the lexicon server for development. For 
      `lexserver$ cp ~/gitrepos/lexdata/mappers.txt symbol_sets`  
      `lexserver$ cp ~/gitrepos/lexdata/converters/*.cnv symbol_sets`  
 
-## II. Import lexicon files
 
-Follow the instructions here to import the lexicon files from the command line:   
-* File: IMPORTLEX.md   
-* URL: https://github.com/stts-se/pronlex/blob/master/install/IMPORTLEX.md
+II. Import lexicon files (optional)
+
+`$ sh import.sh <APPDIR>`   
+
+Imports lexicon files for Swedish, Norwegian, US English and a small test file Arabic.
 
 
 ## III. Start the lexicon server

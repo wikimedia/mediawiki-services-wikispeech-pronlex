@@ -5,8 +5,8 @@ fi
 
 APPDIR=$1
 
-### LEXDATA SETUP
 
+### LEXDATA SETUP
 
 mkdir -p $APPDIR
 
@@ -25,15 +25,8 @@ cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/
 
 rm -fr $APPDIR/lexdata
 
+
 ### LEXDATA IMPORT
-
-mkdir -p $APPDIR
-
-if [ -d "$APPDIR/lexdata" ]; then
-    cd $APPDIR/lexdata && git pull && cd -
-    else
-	git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata
-fi
 
 SVLEX=sv_se_nst_lex.db
 NOBLEX=no_nob_nst_lex.db
