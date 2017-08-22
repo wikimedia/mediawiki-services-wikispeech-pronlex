@@ -1,4 +1,4 @@
-## pronlex
+# pronlex
 pronlex is a pronunciation lexicon database behind an http API.
 
 [![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://godoc.org/github.com/stts-se/pronlex)
