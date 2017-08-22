@@ -27,14 +27,9 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 1. Install the pronlex server
 
----
-** UPCOMING: SCRIPT TO INSTALL pronlex INSTEAD OF COMMANDS **
-
 `$ sh install.sh <APPDIR>`
 
-   Installs the pronlex server and a small demo db for testing
----
-
+Installs the pronlex server and a small demo db for testing (upcoming feature!)
 
 i. Clone the source code
 
