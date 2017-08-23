@@ -16,11 +16,11 @@ Below are instructions on how to set up the lexicon server for development. For 
         Download: https://golang.org/dl/ (1.8 or higher)   
         Installation instructions: https://golang.org/doc/install
         
-     2. Install [Sqlite3](https://www.sqlite.org/)
-
-     3. Make sure the GOPATH variable is set
+     2. Make sure the GOPATH variable is set
 
          `$ echo $GOPATH` 
+     3. Install [Sqlite3](https://www.sqlite.org/)
+
 
 
 ## II. Download and install the pronlex library
