@@ -22,6 +22,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 3. Clone the source code
 
    1. Make sure the GOPATH variable is set
+   
       `$ echo $GOPATH`
 
    2. Clone
