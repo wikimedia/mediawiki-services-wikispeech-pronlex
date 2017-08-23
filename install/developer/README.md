@@ -19,31 +19,31 @@ Below are instructions on how to set up the lexicon server for development. For 
      2. Install [Sqlite3](https://www.sqlite.org/)
 
 
-3. Clone the source code
+## II. Download and install the pronlex library
 
-   `$ echo $GOPATH` - make sure the GOPATH variable is set
+1. Clone the source code
+
+   `$ echo $GOPATH` (to make sure the GOPATH variable is set)
 
    `$ mkdir -p $GOPATH/src/github.com/stts-se`   
    `$ cd $GOPATH/src/github.com/stts-se`   
    `$ git clone https://github.com/stts-se/pronlex.git`
 
 
-4. Download dependencies
+2. Download dependencies
    
    `$ cd $GOPATH/src/github.com/stts-se/pronlex`   
    `pronlex$ go get ./...`
 
 
-## II. Installation scripts (WORK IN PROGRESS)
+3. Setup the pronlex server
 
-1. Install the pronlex server
+   `$ sh setup.sh <APPDIR>`
 
-   `$ sh install.sh <APPDIR>`
-
-   Installs the pronlex server and a small demo db for testing
+   Installs files needed for the pronlex server
 
 
-2. Import lexicon files (optional)
+4. Import lexicon files (optional)
 
    `$ sh import.sh <APPDIR>`   
 

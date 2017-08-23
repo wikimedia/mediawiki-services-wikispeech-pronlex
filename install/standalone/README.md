@@ -25,7 +25,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
      `$ sh install.sh <APPDIR>` | [download script](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/install.sh)
 
-   Installs the pronlex server and a small demo db for testing
+   Installs the pronlex server 
 
 
 2. Import lexicon files (optional)
