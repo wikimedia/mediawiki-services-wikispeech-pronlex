@@ -32,7 +32,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 3. Import lexicon data (optional)
 
-    `$ sh <APPDIR>/import.sh <APPDIR>`
+    `$ sh <APPDIR>/import.sh`
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 
@@ -41,7 +41,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 The server is started using this script
 
-`$ sh <APPDIR>/start_server.sh <APPDIR>`
+`$ sh <APPDIR>/start_server.sh`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 

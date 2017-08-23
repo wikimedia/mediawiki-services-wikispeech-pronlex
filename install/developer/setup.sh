@@ -1,20 +1,22 @@
-## WORK IN PROGRESS
+#!/bin/bash 
+
+CMD=`basename $0`
 
 if [ $# -ne 1 ]; then
-    echo "USAGE: sh $0 <APPDIR>"
+    echo "USAGE: sh $CMD <APPDIR>" >&2
     exit 1
 fi
 
 APPDIR=$1
 
 if [ -z "$GOPATH" ] ; then
-    echo "[$0] The GOPATH environment variable is required!"
+    echo "[$CMD] The GOPATH environment variable is required!" >&2
     exit 1
 fi
 
 ### LEXDATA PREPS
 
-echo "[$0] Setting up basic files ... "
+echo "[$CMD] Setting up basic files ... " >&2
 
 mkdir -p $APPDIR
 
@@ -27,4 +29,4 @@ cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_
 echo "
 BUILD COMPLETED. YOU CAN NOW START THE LEXICON SERVER BY INVOKING
   $ sh start_server.sh $APPDIR
-"
+" >&2

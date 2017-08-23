@@ -1,21 +1,44 @@
-if [ $# -ne 1 ]; then
-    echo "USAGE: sh $0 <APPDIR>
+#!/bin/bash 
+
+CMD=`basename $0`
+APPDIR=`dirname $0`
+
+while getopts ":ha:" opt; do
+  case $opt in
+    h)
+	echo "
+USAGE: sh $CMD <OPTIONS>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
-"
+
+Options:
+  -h help
+  -a appdir (default: this script's folder)
+" >&2
+	exit 1
+      ;;
+    a)
+        APPDIR=$OPTARG
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+shift $(expr $OPTIND - 1 )
+
+if [ $# -ne 0 ]; then
+    echo "[$CMD] invalid option(s): $*" >&2
     exit 1
 fi
-
-APPDIR=$1
-
 
 ### LEXDATA SETUP
 
 if [ ! -d "$APPDIR" ]; then
-    echo "FAILED: $APPDIR is not configured for lexserver"
+    echo "FAILED: $APPDIR is not configured for lexserver" >&2
     exit 1
 fi
-
 
 mkdir -p $APPDIR
 
@@ -40,39 +63,39 @@ NOBLEX=no_nob_nst_lex.db
 AMELEX=en_am_cmu_lex.db
 ARLEX=ar_ar_tst_lex.db
 
-echo ""
-echo "IMPORT: $SVLEX"
+echo "" >&2
+echo "IMPORT: $SVLEX" >&2
 if createEmptyDB $APPDIR/db_files/$SVLEX ; then
     importLex $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets
 else
-    echo "$SVLEX FAILED"
+    echo "$SVLEX FAILED" >&2
     exit 1
 fi
 
-echo ""
-echo "IMPORT: $NOBLEX"
+echo "" >&2
+echo "IMPORT: $NOBLEX" >&2
 if createEmptyDB $APPDIR/db_files/$NOBLEX ; then
     importLex $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APPDIR/symbol_sets
 else
-    echo "$NOBLEX FAILED"
+    echo "$NOBLEX FAILED" >&2
     exit 1
 fi
 
-echo ""
-echo "IMPORT: $AMELEX"
+echo "" >&2
+echo "IMPORT: $AMELEX" >&2
 if createEmptyDB $APPDIR/db_files/$AMELEX ; then 
     importLex $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets
 else
-    echo "$AMELEX FAILED"
+    echo "$AMELEX FAILED" >&2
     exit 1
 fi
 
-echo ""
-echo "IMPORT: $ARLEX"
+echo "" >&2
+echo "IMPORT: $ARLEX" >&2
 if createEmptyDB $APPDIR/db_files/$ARLEX ; then
     importLex $APPDIR/db_files/$ARLEX ar-test $APPDIR/lexdata/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
 else
-    echo "$ARLEX FAILED"
+    echo "$ARLEX FAILED" >&2
     exit 1
 fi
 
