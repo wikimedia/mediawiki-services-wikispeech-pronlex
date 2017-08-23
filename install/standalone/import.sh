@@ -1,5 +1,8 @@
 if [ $# -ne 1 ]; then
-    echo "USAGE: sh $0 <APPDIR>"
+    echo "USAGE: sh $0 <APPDIR>
+
+Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
+"
     exit 1
 fi
 
