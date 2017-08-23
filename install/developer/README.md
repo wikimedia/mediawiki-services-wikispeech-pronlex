@@ -21,14 +21,19 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 3. Clone the source code
 
-   `mkdir -p $GOPATH/src/github.com/stts-se`   
-   `cd $GOPATH/src/github.com/stts-se`   
-   `git clone https://github.com/stts-se/pronlex.git`
+   1. Make sure the GOPATH variable is set
+      `$ echo $GOPATH`
+
+   2. Clone
+
+      `$ mkdir -p $GOPATH/src/github.com/stts-se`   
+      `$ cd $GOPATH/src/github.com/stts-se`   
+      `$ git clone https://github.com/stts-se/pronlex.git`
 
 4. Download dependencies
    
-   `cd $GOPATH/src/github.com/stts-se/pronlex`   
-   `go get ./...`
+   `$ cd $GOPATH/src/github.com/stts-se/pronlex`   
+   `pronlex$ go get ./...`
 
 
 ## II. Installation scripts (WORK IN PROGRESS)
