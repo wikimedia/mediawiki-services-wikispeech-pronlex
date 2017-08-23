@@ -39,7 +39,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 ## III. Start the lexicon server
 
-The server should be started using this script
+The server is started using this script
 
 `$ sh <APPDIR>/start_server.sh <APPDIR>`
 

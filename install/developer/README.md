@@ -52,7 +52,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 ## III. Start the lexicon server
 
-The server should be started using this script
+The server is started using this script
 
 `developer$ sh start_server.sh <APPDIR>`
 
