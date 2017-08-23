@@ -6,7 +6,7 @@ pronlex is a pronunciation lexicon database with a server behind an http API.
 
 ## Docker installation
 
-[docker/](https://github.com/stts-se/pronlex/blob/master/docker/)
+[docker/](https://github.com/stts-se/pronlex/blob/master/docker/) (work in progress)
 
 ## Lexicon server and setup
 
