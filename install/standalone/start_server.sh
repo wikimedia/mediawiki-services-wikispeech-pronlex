@@ -59,4 +59,4 @@ fi
 
 APPDIR=$1
 switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static $APPDIR/static/"
-lexserver $switches -test && lexserver $switches -port $PORT
+echo "lexserver $switches -test && lexserver $switches -port $PORT"
