@@ -13,11 +13,11 @@ TODO: add instructions here
 
 * **Standalone setup**    
 install/standalone/README.md   
-URL: [install/standalone/README.md](https://github.com/stts-se/pronlex/blob/master/install/standalone)
+[install/standalone/README.md](https://github.com/stts-se/pronlex/blob/master/install/standalone)
 
 * **Setup for developers**    
 install/developer/README.md   
-URL: [install/developer/README.md](https://github.com/stts-se/pronlex/blob/master/install/developer)
+[install/developer/README.md](https://github.com/stts-se/pronlex/blob/master/install/developer)
 
 
 
