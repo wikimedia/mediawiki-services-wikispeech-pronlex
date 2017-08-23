@@ -15,7 +15,7 @@ WORK IN PROGRESS
     Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (updated git repos, etc).
 
 
-2. Create the application folder:
+2. Create the application folder
 
    `$ mkdir <APPDIR>`
 
@@ -34,6 +34,9 @@ WORK IN PROGRESS
 
    ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver``
 
+
+Steps 2-5 can easily be executed using the following script:   
+[run_docker.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/run_docker.sh)
 
 
 You can also investigate the server environment using `bash`:
