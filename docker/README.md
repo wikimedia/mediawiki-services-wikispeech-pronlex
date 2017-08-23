@@ -22,21 +22,21 @@ WORK IN PROGRESS
 
 3. Setup server
 
-   `$ docker run -u \`stat -c "%u:%g" <APPDIR>\` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver setup`
+   ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver setup``
 
 
 4. Import lexicon files (optional)
 
-   `$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver import_lex`
+   ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver import_lex``
 
 
 5. Run lex server
 
-   `$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver`
+   ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver``
 
 
 
 You can also investigate the server environment using `bash`:
 
-`$ docker run -v </FULL/PATH/TO/APPDIRAPPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver bash`
+``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIRAPPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver bash``
 
