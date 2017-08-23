@@ -12,13 +12,11 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 2. Set up `go` and `sqlite3`
 
-     1. Install `go` following the instructions here: https://golang.org/dl/ (1.8 or higher)
-
-     2. Set your `$GOPATH` (we suggest `~/go`). Make sure the go binaries are in your `$PATH`.  
-        If you're on Linux, add `export PATH=$PATH:/usr/local/go/bin:GOPATH/bin` to your `.bashrc` file.  
-        (if you installed `go` here: `/usr/local/go`)
-
-     3. Install [Sqlite3](https://www.sqlite.org/)
+     1. Install `go`   
+        Download: https://golang.org/dl/ (1.8 or higher)   
+        Installation instructions: https://golang.org/doc/install
+        
+     2. Install [Sqlite3](https://www.sqlite.org/)
 
 
 ## II. Installation scripts
