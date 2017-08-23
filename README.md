@@ -13,7 +13,7 @@ TODO: add instructions here
 
 * **Standalone setup**    
 Readme: install/standalone/README.md   
-Git folder: install/standalone/](https://github.com/stts-se/pronlex/blob/master/install/standalone)
+Git folder: [install/standalone/](https://github.com/stts-se/pronlex/blob/master/install/standalone)
 
 * **Setup for developers**    
 Readme: install/developer/README.md   
