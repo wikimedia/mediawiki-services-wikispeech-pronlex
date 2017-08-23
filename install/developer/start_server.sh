@@ -54,6 +54,11 @@ if [ -z "$APPDIR" ] ; then
     exit 1
 fi
 
+if [ -z "$GOPATH" ] ; then
+    echo "[$CMD] The GOPATH environment variable is required!" >&2
+    exit 1
+fi
+
 shift $(expr $OPTIND - 1 )
 
 if [ $# -ne 0 ]; then
@@ -62,5 +67,5 @@ if [ $# -ne 0 ]; then
 fi
 
 
-switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static $APPDIR/static/"
-go run *.go $switches -test && go run *.go $switches $PORT
+switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static static"
+cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
