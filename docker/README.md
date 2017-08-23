@@ -1,25 +1,44 @@
 ## Docker installation
 
-TODO/WORK IN PROGRESS
+WORK IN PROGRESS
 
 1. Build
 
-    1. from Dockerfile URL:
+   `$ cd <DOCKER DIR>`   
 
-        `$ cd <DOCKER DIR>`   
-        `$ docker build --no-cache https://raw.githubusercontent.com/stts-se/pronlex/master/docker/Dockerfile -t sttsse/lexserver`   
+   1. from Dockerfile URL:
+
+        `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/docker/Dockerfile -t sttsse/lexserver`   
 
     2. from local Dockerfile:
 
-        `$ cd <DOCKER DIR>`   
-        `$ docker build --no-cache $GOPATH/src/github.com/stts-se/pronlex/docker -t sttsse/lexserver`   
+        `$ docker build $GOPATH/src/github.com/stts-se/pronlex/docker -t sttsse/lexserver`
+
+    Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (updated git repos, etc).
+
+
+2. Create the application folder:
+
+   `$ mkdir <APPDIR>`
+
 
 3. Setup server
 
-   `$ docker run -v <DOCKERDIR>/lexserver_files:/go/lexserver_files -p 8787:8787 -it sttsse/lexserver sh setup`
+   `$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver setup`
+
 
 4. Import lexicon files (optional)
 
-   `$ docker run -v <DOCKERDIR>/lexserver_files:/go/lexserver_files -p 8787:8787 -it sttsse/lexserver sh import_lex`
+   `$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver import_lex`
 
+
+5. Run lex server
+
+   `$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver`
+
+
+
+You can also investigate the server environment using `bash`:
+
+`$ docker run -v </FULL/PATH/TO/APPDIRAPPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver bash`
 
