@@ -18,12 +18,14 @@ Below are instructions on how to set up the lexicon server for development. For 
         
      2. Install [Sqlite3](https://www.sqlite.org/)
 
+     3. Make sure the GOPATH variable is set
+
+         `$ echo $GOPATH` 
+
 
 ## II. Download and install the pronlex library
 
 1. Clone the source code
-
-   `$ echo $GOPATH` (to make sure the GOPATH variable is set)
 
    `$ mkdir -p $GOPATH/src/github.com/stts-se`   
    `$ cd $GOPATH/src/github.com/stts-se`   
