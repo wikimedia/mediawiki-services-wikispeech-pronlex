@@ -40,7 +40,7 @@ if [ ! -d "$APPDIR" ]; then
     exit 1
 fi
 
-mkdir -p $APPDIR
+mkdir -p $APPDIR || exit 1
 
 if [ -d "$APPDIR/lexdata" ]; then
     cd $APPDIR/lexdata && git pull && cd -
@@ -48,12 +48,12 @@ if [ -d "$APPDIR/lexdata" ]; then
 	git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata
 fi
 
-mkdir -p $APPDIR/db_files
-mkdir -p $APPDIR/symbol_sets
+mkdir -p $APPDIR/db_files || exit 1
+mkdir -p $APPDIR/symbol_sets || exit 1
 
-cp $APPDIR/lexdata/*/*/*.sym $APPDIR/symbol_sets/
-cp $APPDIR/lexdata/mappers.txt $APPDIR/symbol_sets/
-cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/
+cp $APPDIR/lexdata/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
+cp $APPDIR/lexdata/mappers.txt $APPDIR/symbol_sets/ || exit 1
+cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
 
 ### LEXDATA IMPORT

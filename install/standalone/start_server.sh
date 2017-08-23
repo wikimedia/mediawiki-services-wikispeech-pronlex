@@ -23,7 +23,7 @@ while getopts ":hp:a:" opt; do
 Options:
   -h help
   -a appdir (default: this script's folder)
-  -p port   (default: 8787)
+  -p port   (default: $PORT)
 
 EXAMPLE INVOCATION: $CMD -a lexserver_files
 " >&2
@@ -57,6 +57,5 @@ if [ $# -ne 0 ]; then
 fi
 
 
-APPDIR=$1
 switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static $APPDIR/static/"
-echo "lexserver $switches -test && lexserver $switches -port $PORT"
+lexserver $switches -test && lexserver $switches $PORT

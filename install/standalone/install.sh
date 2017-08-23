@@ -19,31 +19,31 @@ fi
 
 echo "[$CMD] Installing pronlex/lexserver ... " >&2
 
-go get github.com/stts-se/pronlex/lexserver
-go install github.com/stts-se/pronlex/lexserver
+go get github.com/stts-se/pronlex/lexserver || exit 1
+go install github.com/stts-se/pronlex/lexserver || exit 1
 
-go get github.com/stts-se/pronlex/cmd/lexio/importLex
-go install github.com/stts-se/pronlex/cmd/lexio/importLex
+go get github.com/stts-se/pronlex/cmd/lexio/importLex || exit 1
+go install github.com/stts-se/pronlex/cmd/lexio/importLex || exit 1
 
-go get github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
-go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
+go get github.com/stts-se/pronlex/cmd/lexio/createEmptyDB || exit 1
+go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB || exit 1
 
 ### LEXDATA PREPS
 
 echo "[$CMD] Setting up basic files ... " >&2
 
-mkdir -p $APPDIR
+mkdir -p $APPDIR || exit 1
 
-mkdir -p $APPDIR/static
-cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/static/* $APPDIR/static/
+mkdir -p $APPDIR/static || exit 1
+cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/static/* $APPDIR/static/ || exit 1
 
-mkdir -p $APPDIR/symbol_sets
-cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_sets
+mkdir -p $APPDIR/symbol_sets || exit 1
+cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_sets || exit 1
 
 echo "[$CMD] Setting up scripts ... " >&2
 
-cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh $APPDIR
-cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/start_server.sh $APPDIR
+cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh $APPDIR || exit 1
+cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/start_server.sh $APPDIR || exit 1
 
 
 ### COMPLETED
