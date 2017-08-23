@@ -23,14 +23,14 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 1. Install the pronlex server
 
-   `$ sh install.sh <APPDIR>`
+   `$ sh install.sh <APPDIR>` | [download](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/install.sh)  
 
    Installs the pronlex server and a small demo db for testing
 
 
 2. Import lexicon files (optional)
 
-   `$ sh import.sh <APPDIR>`   
+   `$ sh import.sh <APPDIR>` | [download](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/import.sh)
 
    Imports lexicon files for Swedish, Norwegian, US English and a small test file Arabic.
 
