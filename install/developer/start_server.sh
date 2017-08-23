@@ -63,4 +63,4 @@ fi
 
 
 switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static $APPDIR/static/"
-go run *.go $switches -test && go run *.go $switches
+go run *.go $switches -test && go run *.go $switches $PORT

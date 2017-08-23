@@ -46,3 +46,11 @@ The server is started using this script
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
 When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
+
+To specify port, run:   
+`$ sh <APPDIR>/start_server.sh -p PORT`
+
+
+For a complete set of options, run:  
+`$ sh <APPDIR>/start_server.sh -h`
+
