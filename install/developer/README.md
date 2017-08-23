@@ -21,7 +21,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 3. Clone the source code
 
-   `$ echo $GOPATH` # make sure the GOPATH variable is set
+   `$ echo $GOPATH` - make sure the GOPATH variable is set
 
    `$ mkdir -p $GOPATH/src/github.com/stts-se`   
    `$ cd $GOPATH/src/github.com/stts-se`   
