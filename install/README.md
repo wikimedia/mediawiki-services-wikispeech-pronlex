@@ -1,8 +1,8 @@
 ## Standalone setup
 standalone/README.md   
-URL: https://github.com/stts-se/pronlex/blob/master/install/standalone
+URL: [standalone/README.md](https://github.com/stts-se/pronlex/blob/master/install/standalone)
 
 ## Setup for developers
 developer/README.md   
-URL: https://github.com/stts-se/pronlex/blob/master/install/developer
+URL: [developer/README.md   ](https://github.com/stts-se/pronlex/blob/master/install/developer)
 
