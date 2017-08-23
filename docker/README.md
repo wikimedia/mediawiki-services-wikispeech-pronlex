@@ -4,8 +4,6 @@ WORK IN PROGRESS
 
 1. Build
 
-   `$ cd <DOCKER DIR>`   
-
    1. from Dockerfile URL:
 
         `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/docker/Dockerfile -t sttsse/lexserver`   
