@@ -35,8 +35,7 @@ WORK IN PROGRESS
    ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver``
 
 
-Steps 2-5 can easily be executed using the following script:   
-[run_docker.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/run_docker.sh)
+Steps 2-5 can easily be executed using the following script: [run_docker.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/run_docker.sh)
 
 
 You can also investigate the server environment using `bash`:
