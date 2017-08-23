@@ -31,10 +31,15 @@ cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/static/* $APPDIR/static/
 mkdir -p $APPDIR/symbol_sets
 cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_sets
 
+echo "[$0] Setting up scripts ... "
+
+cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh $APPDIR
+cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/start_server.sh $APPDIR
+
 
 ### COMPLETED
 
 echo "
 BUILD COMPLETED. YOU CAN NOW START THE LEXICON SERVER BY INVOKING
-  $ sh start_server.sh $APPDIR
+  $ sh $APPDIR/start_server.sh $APPDIR
 "
