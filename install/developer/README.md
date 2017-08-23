@@ -19,7 +19,9 @@ Below are instructions on how to set up the lexicon server for development. For 
      2. Make sure the GOPATH variable is set
 
          `$ echo $GOPATH` 
-     3. Install [Sqlite3](https://www.sqlite.org/)
+
+
+3. Install [Sqlite3](https://www.sqlite.org/)
 
 
 
