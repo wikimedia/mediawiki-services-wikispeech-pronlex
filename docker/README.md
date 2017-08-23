@@ -2,7 +2,7 @@
 
 WORK IN PROGRESS
 
-1. Build
+1. Build the Docker image
 
     1. from Dockerfile URL:
 
@@ -15,22 +15,24 @@ WORK IN PROGRESS
     Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (updated git repos, etc).
 
 
-2. Create the application folder:
+2. Configure the server
+
+   1. Create the application folder:
 
    `$ mkdir <APPDIR>`
 
 
-3. Setup server
+   2. Setup server
 
    ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver setup``
 
 
-4. Import lexicon files (optional)
+   3. Import lexicon files (optional)
 
    ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver import_lex``
 
 
-5. Run lex server
+3. Run lex server
 
    ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver``
 
