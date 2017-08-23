@@ -10,7 +10,7 @@ Below are instructions on how to set up the lexicon server for development. For 
      `$ sudo apt-get install gcc`   
      `$ sudo apt-get install build-essential`
 
-2. Set up go
+2. Set up `go`
 
      Download: https://golang.org/dl/ (1.8 or higher)   
      Installation instructions: https://golang.org/doc/install
