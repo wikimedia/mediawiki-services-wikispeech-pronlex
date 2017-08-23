@@ -36,5 +36,5 @@ cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_
 
 echo "
 BUILD COMPLETED. YOU CAN NOW START THE LEXICON SERVER BY INVOKING
-  $ sh run_standalone.sh $APPDIR
+  $ sh start_server.sh $APPDIR
 "
