@@ -32,7 +32,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 3. Import lexicon data (optional)
 
-    `$ sh import.sh <APPDIR>`
+    `$ sh <APPDIR>/import.sh <APPDIR>`
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 
@@ -41,7 +41,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 The server should be started using this script
 
-`$ sh start_server.sh <APPDIR>` | [download script](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/start_server.sh)
+`$ sh <APPDIR>/start_server.sh <APPDIR>` | [download script](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/start_server.sh)
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
