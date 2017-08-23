@@ -2,7 +2,7 @@
 
 TODO/WORK IN PROGRESS
 
-1 Build
+1. Build
 
   a) from Dockerfile URL:
 
