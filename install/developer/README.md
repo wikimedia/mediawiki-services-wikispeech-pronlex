@@ -40,7 +40,7 @@ Below are instructions on how to set up the lexicon server for development. For 
    `pronlex$ cd install/developer`   
    `developer$ sh setup.sh <APPDIR>`
 
-   Installs files needed for the pronlex server
+   Sets up the pronlex server in the folder specified by <APPDIR>
 
 
 4. Import lexicon data (optional)
