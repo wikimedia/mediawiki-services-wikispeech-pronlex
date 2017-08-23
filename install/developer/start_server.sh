@@ -20,5 +20,15 @@ fi
 
 
 APPDIR=$1
-switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static $APPDIR/static/"
-lexserver $switches -test && lexserver $switches
+
+if [ -z "$GOPATH" ] ; then
+    echo "[$0] The GOPATH environment variable is required!"
+    exit 1
+fi
+
+
+cd $GOPATH/src/github.com/stts-se/pronlex/lexserver
+
+APPDIR=$1
+switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/"
+go run *.go $switches -test && go run *.go $switches
