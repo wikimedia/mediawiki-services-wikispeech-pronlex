@@ -12,11 +12,10 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 2. Set up go
 
-     1. Install `go`   
-        Download: https://golang.org/dl/ (1.8 or higher)   
-        Installation instructions: https://golang.org/doc/install
+     Download: https://golang.org/dl/ (1.8 or higher)   
+     Installation instructions: https://golang.org/doc/install
         
-     2. Make sure the GOPATH variable is set
+     Make sure the GOPATH variable is set
 
          `$ echo $GOPATH` 
 
