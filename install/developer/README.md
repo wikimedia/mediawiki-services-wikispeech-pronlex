@@ -37,14 +37,15 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 3. Setup the pronlex server
 
-   `$ sh setup.sh <APPDIR>`
+   `pronlex$ cd install/developer`
+   `developer$ sh setup.sh <APPDIR>`
 
    Installs files needed for the pronlex server
 
 
 4. Import lexicon data (optional)
 
-   `$ sh import.sh <APPDIR>`   
+   `developer$ sh import.sh <APPDIR>`   
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 
@@ -53,7 +54,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 The server should be started using this script
 
-`$ sh start_server.sh <APPDIR>`
+`developer$ sh start_server.sh <APPDIR>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
