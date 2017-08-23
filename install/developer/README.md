@@ -46,7 +46,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
    `$ sh import.sh <APPDIR>`   
 
-   Imports lexicon files for Swedish, Norwegian, US English and a small test file Arabic.
+   Imports lexicon files for Swedish, Norwegian, US English and a small test file for Arabic.
 
 
 ## III. Start the lexicon server
