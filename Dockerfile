@@ -14,7 +14,7 @@ RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
 RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
 RUN ln -s $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh import_lex0
-RUN echo "sh import_lex0 lexserver_files" > import_lex
+RUN echo "sh import_lex0 -a lexserver_files" > import_lex
 #ENV PATH /usr/local/nginx/bin:$PATH:.
 #RUN "echo $PATH" > .profile
 #RUN /bin/bash 'source .profile'
