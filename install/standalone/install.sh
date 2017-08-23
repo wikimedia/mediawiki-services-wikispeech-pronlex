@@ -3,9 +3,9 @@
 CMD=`basename $0`
 
 if [ $# -ne 1 ]; then
-    echo "USAGE: sh $CMD <APPDIR>"
+    echo "USAGE: sh $CMD <APPDIR>
 
- Pronlex will be installed in the destination folder <APPDIR>.
+ Pronlex will be installed in the destination folder APPDIR.
 ">&2
     exit 1
 fi
