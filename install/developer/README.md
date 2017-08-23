@@ -43,7 +43,7 @@ Below are instructions on how to set up the lexicon server for development. For 
    Installs files needed for the pronlex server
 
 
-4. Import lexicon files (optional)
+4. Import lexicon data (optional)
 
    `$ sh import.sh <APPDIR>`   
 
@@ -58,5 +58,5 @@ The server should be started using this script
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
-When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data provided on this site.
+When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
 
