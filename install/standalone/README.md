@@ -10,13 +10,12 @@ Below are instructions on how to set up the lexicon server for standalone use. F
      `$ sudo apt-get install gcc`   
      `$ sudo apt-get install build-essential`
 
-2. Set up `go` and `sqlite3`
+2. Set up `go`
 
-     1. Install `go`   
-        Download: https://golang.org/dl/ (1.8 or higher)   
-        Installation instructions: https://golang.org/doc/install
+   Download: https://golang.org/dl/ (1.8 or higher)  
+   Installation instructions: https://golang.org/doc/install
         
-     2. Install [Sqlite3](https://www.sqlite.org/)
+3. Install [Sqlite3](https://www.sqlite.org/)
 
 
 ## II. Installation scripts
