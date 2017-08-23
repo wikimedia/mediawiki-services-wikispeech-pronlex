@@ -4,12 +4,12 @@ TODO/WORK IN PROGRESS
 
 1. Build
 
-  a) from Dockerfile URL:
+  1. from Dockerfile URL:
 
    `$ cd <DOCKER DIR>`   
    `$ docker build --no-cache https://raw.githubusercontent.com/stts-se/pronlex/master/docker/Dockerfile -t sttsse/lexserver`   
 
-   b) from local Dockerfile:
+  2. from local Dockerfile:
 
    `$ cd <DOCKER DIR>`   
    `$ docker build --no-cache $GOPATH/src/github.com/stts-se/pronlex/docker -t sttsse/lexserver`   
