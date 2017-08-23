@@ -20,7 +20,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 
 
-## II. Download and install the pronlex library
+## II. Installation
 
 1. Clone the source code
 
