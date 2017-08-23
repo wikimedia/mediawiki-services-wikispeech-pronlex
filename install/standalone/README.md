@@ -18,18 +18,20 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 3. Install [Sqlite3](https://www.sqlite.org/)
 
 
-## II. Installation scripts
+## II. Installation
 
-1. Install the pronlex server
+1. Download the install script: [install.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/install.sh)
 
-     `$ sh install.sh <APPDIR>` | [download script](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/install.sh)
+2. Install the pronlex server
+
+     `$ sh install.sh <APPDIR>`
 
    Installs the pronlex server 
 
 
-2. Import lexicon data (optional)
+3. Import lexicon data (optional)
 
-    `$ sh import.sh <APPDIR>` | [download script](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/import.sh)
+    `$ sh import.sh <APPDIR>`
 
    Imports lexicon files for Swedish, Norwegian, US English and a small test file for Arabic.
 
