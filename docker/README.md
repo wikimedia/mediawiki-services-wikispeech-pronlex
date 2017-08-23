@@ -4,7 +4,7 @@ WORK IN PROGRESS
 
 1. Build
 
-   1. from Dockerfile URL:
+    1. from Dockerfile URL:
 
         `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/docker/Dockerfile -t sttsse/lexserver`   
 
@@ -22,7 +22,7 @@ WORK IN PROGRESS
 
 3. Setup server
 
-   `$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver setup`
+   `$ docker run -u ``stat -c "%u:%g" <APPDIR>`` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver setup`
 
 
 4. Import lexicon files (optional)
