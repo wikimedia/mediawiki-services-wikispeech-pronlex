@@ -45,13 +45,20 @@ if [ ! -d "$APPDIR" ]; then
     exit 1
 fi
 
-mkdir -p $APPDIR || exit 1
+if [ ! -d "$APPDIR" ]; then
+    mkdir -p $APPDIR || exit 1
+fi
+
 
 if [ -d "$APPDIR/lexdata" ]; then
     cd $APPDIR/lexdata && git pull && cd -
     KEEP=1
     else
-	git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata
+	if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata ; then
+	    echo -n "" # OK
+	else
+	    echo "[$CMD] git clone failed" >&2
+	fi
 fi
 
 mkdir -p $APPDIR/db_files || exit 1

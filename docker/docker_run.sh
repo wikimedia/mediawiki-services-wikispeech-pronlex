@@ -1,6 +1,6 @@
 #/bin/bash
 
-DOCKERNAME="sttsse/lexserver-local"
+DOCKERNAME="stts-lexserver-local"
 
 CMD=`basename $0`
 
@@ -41,7 +41,7 @@ shift $(expr $OPTIND - 1 )
 
 
 if [ -z "$APPDIR" ] ; then
-    echo "[$CMD] APPDIR must be specified!" >&2
+    echo "[$CMD] FAILED: APPDIR must be specified!" >&2
     exit 1
 fi
 
