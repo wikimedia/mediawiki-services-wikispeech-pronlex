@@ -5,16 +5,17 @@ pronlex is a pronunciation lexicon database with a server behind an http API.
 [![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex)
 
 
-## Docker installation
+## Lexicon server / Docker installation
 
+Readme: docker/README.md   
 Git folder: [docker/](https://github.com/stts-se/pronlex/blob/master/docker/)
 
-## Lexicon server and setup
+## Lexicon server / Setup for standalone use
 
-* **Standalone setup**    
 Readme: install/standalone/README.md   
 Git folder: [install/standalone/](https://github.com/stts-se/pronlex/blob/master/install/standalone)
 
-* **Setup for developers**    
+## Lexicon server / Setup for developers
+
 Readme: install/developer/README.md   
 Git folder: [install/developer/](https://github.com/stts-se/pronlex/blob/master/install/developer)
