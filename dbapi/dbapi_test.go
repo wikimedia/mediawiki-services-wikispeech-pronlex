@@ -770,6 +770,9 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 	q = Query{Words: []string{"sittriktiga"}}
 	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
