@@ -16,6 +16,7 @@ type Converter struct {
 	Rules []Rule
 }
 
+// Convert : converts the input transcription string
 func (c Converter) Convert(trans string) (string, error) {
 	var res = trans
 	var err error
@@ -40,6 +41,7 @@ type test struct {
 	to   string
 }
 
+// TestResult a test result container
 type TestResult struct {
 	OK     bool
 	Errors []string
@@ -62,6 +64,7 @@ func (c Converter) getInvalidSymbols(trans string, symbolset symbolset.SymbolSet
 	return invalid, nil
 }
 
+// Rule is a rule interface for transcription converters
 type Rule interface {
 
 	// FromString returns a string representation of the rule's input field
@@ -106,6 +109,7 @@ func (r SymbolRule) Type() string {
 	return "SYMBOL"
 }
 
+// Convert is used to execute the conversion for this rule
 func (r SymbolRule) Convert(trans string, symbolset symbolset.SymbolSet) (string, error) {
 	splitted, err := symbolset.SplitTranscription(trans)
 	if err != nil {
@@ -149,6 +153,7 @@ func (r RegexpRule) Type() string {
 	return "RE"
 }
 
+// Convert is used to execute the conversion for this rule
 func (r RegexpRule) Convert(trans string, symbolset symbolset.SymbolSet) (string, error) {
 	res, err := r.From.Replace(trans, r.To, -1, -1)
 	if err != nil {

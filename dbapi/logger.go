@@ -61,6 +61,7 @@ type WebSockLogger struct {
 	LogIntervalVar int
 }
 
+// NewWebSockLogger creates a new websock logger using the input connection
 func NewWebSockLogger(websock *websocket.Conn) WebSockLogger {
 	return WebSockLogger{websock: websock}
 }

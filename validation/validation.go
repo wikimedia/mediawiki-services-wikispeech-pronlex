@@ -60,7 +60,7 @@ func (tc TestResultContainer) Size() int {
 	return len(tc.AcceptErrors) + len(tc.RejectErrors) + len(tc.CrossErrors)
 }
 
-// AllErrrors returns all errors in the TestResultContainer
+// AllErrors returns all errors in the TestResultContainer
 func (tc TestResultContainer) AllErrors() []TestResult {
 	return append(append(tc.AcceptErrors, tc.RejectErrors...), tc.CrossErrors...)
 }

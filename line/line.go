@@ -178,6 +178,7 @@ type FileWriter struct {
 	size   int
 }
 
+// Size returns the size of the FileWriter content
 func (w FileWriter) Size() int {
 	return w.size
 }

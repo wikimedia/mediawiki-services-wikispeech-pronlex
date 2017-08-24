@@ -112,6 +112,7 @@ func (dbm *DBManager) RemoveDB(dbRef lex.DBRef) error {
 	return nil
 }
 
+// ContainsDB checks if the input database reference exists
 func (dbm *DBManager) ContainsDB(dbRef lex.DBRef) bool {
 	_, ok := dbm.dbs[dbRef]
 	return ok
@@ -119,7 +120,7 @@ func (dbm *DBManager) ContainsDB(dbRef lex.DBRef) bool {
 
 // ListDBNames lists all database names in the cached map of available databases. It does NOT verify what databases are actually existing on disk.
 func (dbm *DBManager) ListDBNames() ([]lex.DBRef, error) {
-	var res []lex.DBRef = []lex.DBRef{}
+	var res = []lex.DBRef{}
 
 	dbm.RLock()
 	defer dbm.RUnlock()

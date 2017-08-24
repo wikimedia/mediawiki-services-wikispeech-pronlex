@@ -6,19 +6,30 @@ import (
 	"strings"
 )
 
+// DBRef a database reference string (i.e., the database filename without extension)
 type DBRef string
+
+// LexName a lexicon name
 type LexName string
 
+// LexRef a lexicon reference specified by DBRef and LexName
 type LexRef struct {
 	DBRef   DBRef
 	LexName LexName
 }
 
+// LexRefWithInfo is a lexicon reference (LexRef) with additional info (SymbolSetName)
 type LexRefWithInfo struct {
 	LexRef        LexRef
 	SymbolSetName string
 }
 
+/*ParseLexRef is used to parse a lexicon reference string into a LexRef struct
+    var fullLexName  = "pronlex:sv-se-nst"
+    var lexRef, _    = ParseLexRef(fullLexName)
+    // lexRef.DBRef  = pronlex
+    // lexRef.LexName = sv-se-nst
+**/
 func ParseLexRef(fullLexName string) (LexRef, error) {
 	nameSplit := strings.SplitN(strings.TrimSpace(fullLexName), ":", 2)
 	if len(nameSplit) != 2 {
@@ -36,6 +47,7 @@ func ParseLexRef(fullLexName string) (LexRef, error) {
 	return NewLexRef(db, lex), nil
 }
 
+// NewLexRef creates a lexicon reference from input strings
 func NewLexRef(lexDB string, lexName string) LexRef {
 	return LexRef{DBRef: DBRef(strings.ToLower(strings.TrimSpace(lexDB))),
 		LexName: LexName(strings.ToLower(strings.TrimSpace(lexName))),
@@ -169,10 +181,12 @@ type EntryFileWriter struct {
 	Writer io.Writer
 }
 
+// Size returns the size of the EntryFileWriter content
 func (w *EntryFileWriter) Size() int {
 	return w.size
 }
 
+// Write is used to write one lex.Entry at a time to a file
 func (w *EntryFileWriter) Write(e Entry) error {
 	// TODO call to line formatting of Entry
 	w.size = w.size + 1
@@ -190,9 +204,12 @@ type EntrySliceWriter struct {
 	Entries []Entry
 }
 
+// Size returns the size of the EntryFileWriter content
 func (w *EntrySliceWriter) Size() int {
 	return len(w.Entries)
 }
+
+// Write is used to write one lex.Entry at a time to a file
 func (w *EntrySliceWriter) Write(e Entry) error {
 	w.Entries = append(w.Entries, e)
 	return nil

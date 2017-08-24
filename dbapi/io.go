@@ -142,11 +142,17 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 	return nil
 }
 
+// PrintMode specified the type of output to print (all/valid/invalid)
 type PrintMode int
 
 const (
+	// PrintAll prints all entries, valid or invalid
 	PrintAll PrintMode = iota
+
+	// PrintValid prints valid entries only
 	PrintValid
+
+	// PrintInvalid prints invalid entries only
 	PrintInvalid
 )
 
