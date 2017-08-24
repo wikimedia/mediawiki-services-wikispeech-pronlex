@@ -15,10 +15,11 @@ RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
 ENV APPDIR appdir
 
-ARG USER
-RUN useradd $USER
-RUN groupadd docker
-USER $user
+## CHANGE USER FROM ROOT TO SYSTEM USER
+#ARG USER
+#RUN useradd $USER
+#RUN groupadd docker
+#USER $user
 
 # setup script
 RUN echo "#!/bin/bash" > bin/setup

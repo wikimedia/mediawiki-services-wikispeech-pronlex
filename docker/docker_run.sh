@@ -55,4 +55,8 @@ mkdir -p $APPDIR
 chgrp docker $APPDIR
 APPDIRABS=`realpath $APPDIR`
 
-docker run -u $USER -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERNAME $*
+## => use system user inside container
+# docker run -u $USER -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERNAME $*
+
+## => root user
+docker run -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERNAME $*
