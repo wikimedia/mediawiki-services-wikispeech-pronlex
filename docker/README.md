@@ -52,6 +52,7 @@ You can also investigate the server environment using `bash`:
 
    `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> bash`
   
+---
 
 Server data files and databases are saved in the folder `<APPDIR>`. Please note that this folder will be owned by `root`. If this is a problem, make sure you change the ownership and/or permissions to whatever is best for your environmemnt.
 
