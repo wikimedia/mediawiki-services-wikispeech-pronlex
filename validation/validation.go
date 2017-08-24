@@ -77,7 +77,7 @@ type acceptExample struct {
 	Entry    lex.Entry
 }
 
-// RunTests runs accept/reject tests for all individual rules, and cross checks all accept tests agains the other rules
+// RunTests runs accept/reject tests for all individual rules, and cross checks all accept tests against the other rules
 func (v Validator) RunTests() (TestResultContainer, error) {
 	var result TestResultContainer
 	var allAccept []acceptExample

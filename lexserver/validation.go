@@ -111,7 +111,7 @@ var validationStats = urlHandler{
 
 		stats, err := dbm.ValidationStats(lexRef)
 		if err != nil {
-			msg := fmt.Sprintf("validationStatsHandler failed to retreive validation stats : %v", err)
+			msg := fmt.Sprintf("validationStatsHandler failed to retrieve validation stats : %v", err)
 			log.Println(msg)
 			http.Error(w, msg, http.StatusBadRequest)
 			return

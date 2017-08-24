@@ -181,7 +181,7 @@ func initFolders() error {
 		} else {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
 		}
-	} // else: already exists, hopefullly
+	} // else: already exists, hopefully
 
 	// If the download area dir doesn't exist, create it
 	if _, err := os.Stat(downloadFileArea); err != nil {
@@ -193,7 +193,7 @@ func initFolders() error {
 		} else {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
 		}
-	} // else: already exists, hopefullly
+	} // else: already exists, hopefully
 
 	// If the symbol set dir doesn't exist, create it
 	// if _, err := os.Stat(symbolSetFileArea); err != nil {
@@ -205,7 +205,7 @@ func initFolders() error {
 	// 	} else {
 	// 		fmt.Printf("lexserver.init: peculiar error : %v", err)
 	// 	}
-	// } // else: already exists, hopefullly
+	// } // else: already exists, hopefully
 
 	// If the db dir doesn't exist, create it
 	if _, err := os.Stat(dbFileArea); err != nil {
@@ -217,7 +217,7 @@ func initFolders() error {
 		} else {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
 		}
-	} // else: already exists, hopefullly
+	} // else: already exists, hopefully
 	return nil
 }
 

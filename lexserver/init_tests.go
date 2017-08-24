@@ -178,7 +178,7 @@ func jsonMapTest(port string, url string, expect string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
 	}
 	defer resp.Body.Close()
@@ -217,7 +217,7 @@ func jsonTestBool(port string, url string, expect bool) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
 	}
 	defer resp.Body.Close()
@@ -258,7 +258,7 @@ func jsonListTestMustContain(port string, url string, expect []string) (bool, er
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
 	}
 	defer resp.Body.Close()
@@ -298,7 +298,7 @@ func lookupTest(port string, url string, expect string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
 	}
 	defer resp.Body.Close()
@@ -343,7 +343,7 @@ func mustExistTest(port string, url string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
 	}
 	defer resp.Body.Close()
@@ -386,7 +386,7 @@ func testExampleURLs(port string) (int, int, error) {
 		resp, err = http.Get(url)
 		defer resp.Body.Close()
 		if err != nil {
-			fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+			fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 			nFailed = nFailed + 1
 		} else {
 			log.Printf("init_tests: %s => %s : %s", example.Template, shortenURL(example.URL), resp.Status)

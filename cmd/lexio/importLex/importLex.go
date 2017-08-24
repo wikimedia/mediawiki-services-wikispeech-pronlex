@@ -221,7 +221,7 @@ SAMPLE INVOCATION:
 
 	stats, err := dbm.LexiconStats(lexRef)
 	if err != nil {
-		stderrLogger.Write(fmt.Sprintf("failed to retreive statistics : %v", err))
+		stderrLogger.Write(fmt.Sprintf("failed to retrieve statistics : %v", err))
 		return
 	}
 	err = printStats(stats, *validate)
