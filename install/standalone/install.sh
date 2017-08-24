@@ -54,5 +54,8 @@ cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/start_server.sh $AP
 echo "
 BUILD COMPLETED. YOU CAN NOW START THE LEXICON SERVER BY INVOKING
   $ sh $APPDIR/start_server.sh
+
+OR IMPORT STANDARD LEXICON DATA:
+  $ sh $APPDIR/import.sh
 " >&2
 

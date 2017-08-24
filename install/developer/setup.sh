@@ -32,4 +32,7 @@ cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_
 echo "
 BUILD COMPLETED. YOU CAN NOW START THE LEXICON SERVER BY INVOKING
   $ sh start_server.sh $APPDIR
+
+OR IMPORT STANDARD LEXICON DATA:
+  $ sh import.sh <LEXDATA-GIT> $APPDIR
 " >&2
