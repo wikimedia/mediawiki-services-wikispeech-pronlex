@@ -1,10 +1,12 @@
 ## Docker installation
 
+`<DOCKERTAG>` below should be `stts-lexserver-local`
+
 1. Build the Docker image
 
     1. from Dockerfile URL:
 
-        `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t stts-lexserver-local`   
+        `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
 
     2. from local Dockerfile:
 
@@ -18,23 +20,25 @@
 
    1. Setup the server 
 
-      `$ docker_run.sh -a <APPDIR> setup`
+      `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> setup`
 
 
    2. Import lexicon files (optional)
 
-      `$ docker_run.sh -a <APPDIR> import_all`
+      `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> import_all`
 
 
    3. Run lex server
 
-      `$ docker_run.sh -a <APPDIR>`
+      `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG>`
 
 
    You can also investigate the server environment using `bash`:   
 
-   `$ docker_run.sh -a <APPDIR> bash`
+   `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> bash`
   
+
+Server data files and databases are saved in the folder `<APPDIR>`. Please note that this folder will be owned by `root`. If this is a problem, make sure you change the ownership and/or permissions to whatever is best for your environmemnt.
 
 
 <!-- to pass on system user to the docker environment:

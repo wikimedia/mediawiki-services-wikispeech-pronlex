@@ -1,12 +1,12 @@
 #/bin/bash
 
-DOCKERNAME="stts-lexserver-local"
+DOCKERTAG="stts-lexserver-local"
 
 CMD=`basename $0`
 
 PORT="8787"
 
-while getopts ":ha:p:" opt; do
+while getopts ":ha:p:t:" opt; do
   case $opt in
     h)
 	echo "
@@ -26,8 +26,9 @@ USAGES:
 
 Options:
   -h help
-  -a appdir (required)
-  -p port   (default: $PORT)
+  -a appdir     (required)
+  -p port       (default: $PORT)
+  -t docker-tag (default: $DOCKERTAG)
 " >&2
 	exit 1
       ;;
@@ -36,6 +37,9 @@ Options:
       ;;
     p)
         PORT=$OPTARG
+      ;;
+    t)
+        DOCKERTAG=$OPTARG
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -51,13 +55,17 @@ if [ -z "$APPDIR" ] ; then
     exit 1
 fi
 
+echo "[$CMD] APPDIR    : $APPDIR" >%2
+echo "[$CMD] PORT      : $PORT" >%2
+echo "[$CMD] DOCKERTAG : $DOCKERTAg" >%2
+
 #mkdir -p $APPDIR
 #chgrp docker $APPDIR
 
 APPDIRABS=`realpath $APPDIR`
 
 ## => use system user inside container
-# docker run -u $USER -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERNAME $*
+# docker run -u $USER -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
 
 ## => root user
-docker run -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERNAME $*
+docker run -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
