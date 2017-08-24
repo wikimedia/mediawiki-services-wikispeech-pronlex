@@ -1,6 +1,7 @@
 #!/bin/bash 
 
 CMD=`basename $0`
+SCRIPTDIR=`dirname $0`
 
 if [ $# -ne 1 ]; then
     echo "USAGE: sh $CMD <APPDIR>
@@ -30,9 +31,17 @@ cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_
 ### COMPLETED
 
 echo "
-BUILD COMPLETED. YOU CAN NOW START THE LEXICON SERVER BY INVOKING:
-  $ sh start_server.sh $APPDIR
+BUILD COMPLETED! YOU CAN NOW START THE LEXICON SERVER BY INVOKING:
+  $ sh $SCRIPTDIR/start_server.sh $APPDIR
+
+  USAGE INFO:
+  $ sh $SCRIPTDIR/start_server.sh -h
+
 
 OR IMPORT STANDARD LEXICON DATA:
-  $ sh import.sh <LEXDATA-GIT> $APPDIR
+  $ sh $SCRIPTDIR/import.sh <LEXDATA-GIT> $APPDIR
+
+  USAGE INFO:
+  $ sh $SCRIPTDIR/import.sh
+
 " >&2
