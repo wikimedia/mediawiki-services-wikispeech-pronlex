@@ -1,8 +1,8 @@
 ## Docker installation
 
-### Obtain a Docker image
+### I. Obtain a Docker image
 
-A) Obtain a Docker image using one of the following methods
+Obtain a Docker image using one of the following methods
 
 * from a Dockerfile URL:
 
@@ -26,7 +26,7 @@ A) Obtain a Docker image using one of the following methods
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
 
 
-### B) Run the docker app
+### II. Run the docker app
 
 
 1. Setup the server 
