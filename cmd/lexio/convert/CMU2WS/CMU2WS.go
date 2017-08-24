@@ -125,7 +125,7 @@ func main() {
 				}
 				out(lastEntry)
 			}
-			ts := []lex.Transcription{lex.Transcription{Strn: t}}
+			ts := []lex.Transcription{{Strn: t}}
 			// Hard-wired (ISO 639-1 language name + ISO 3166-1 alpha 2 country)
 			lastEntry = lex.Entry{Strn: w, Transcriptions: ts, Language: "en-us"}
 		}
