@@ -33,16 +33,23 @@ func (r SymbolSetRule) Validate(e lex.Entry) (validation.Result, error) {
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
+
+// ShouldAccept returns a slice of entries that the rule should accept
 func (r SymbolSetRule) ShouldAccept() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
+
+// ShouldReject returns a slice of entries that the rule should reject
 func (r SymbolSetRule) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
 
+// Name is the name of this rule
 func (r SymbolSetRule) Name() string {
 	return "SymbolSet"
 }
+
+// Level is the rule level (typically format, fatal, warning, info)
 func (r SymbolSetRule) Level() string {
 	return "Fatal"
 }
@@ -83,15 +90,23 @@ func (r IllegalTransRe) Validate(e lex.Entry) (validation.Result, error) {
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
+
+// ShouldAccept returns a slice of entries that the rule should accept
 func (r IllegalTransRe) ShouldAccept() []lex.Entry {
 	return r.Accept
 }
+
+// ShouldReject returns a slice of entries that the rule should reject
 func (r IllegalTransRe) ShouldReject() []lex.Entry {
 	return r.Reject
 }
+
+// Name is the name of this rule
 func (r IllegalTransRe) Name() string {
 	return r.NameStr
 }
+
+// Level is the rule level (typically format, fatal, warning, info)
 func (r IllegalTransRe) Level() string {
 	return r.LevelStr
 }
@@ -121,15 +136,23 @@ func (r RequiredTransRe) Validate(e lex.Entry) (validation.Result, error) {
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
+
+// ShouldAccept returns a slice of entries that the rule should accept
 func (r RequiredTransRe) ShouldAccept() []lex.Entry {
 	return r.Accept
 }
+
+// ShouldReject returns a slice of entries that the rule should reject
 func (r RequiredTransRe) ShouldReject() []lex.Entry {
 	return r.Reject
 }
+
+// Name is the name of this rule
 func (r RequiredTransRe) Name() string {
 	return r.NameStr
 }
+
+// Level is the rule level (typically format, fatal, warning, info)
 func (r RequiredTransRe) Level() string {
 	return r.LevelStr
 }
@@ -146,15 +169,23 @@ func (r MustHaveTrans) Validate(e lex.Entry) (validation.Result, error) {
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
+
+// ShouldAccept returns a slice of entries that the rule should accept
 func (r MustHaveTrans) ShouldAccept() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
+
+// ShouldReject returns a slice of entries that the rule should reject
 func (r MustHaveTrans) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
+
+// Name is the name of this rule
 func (r MustHaveTrans) Name() string {
 	return "MustHaveTrans"
 }
+
+// Level is the rule level (typically format, fatal, warning, info)
 func (r MustHaveTrans) Level() string {
 	return "Format"
 }
@@ -173,15 +204,23 @@ func (r NoEmptyTrans) Validate(e lex.Entry) (validation.Result, error) {
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
+
+// ShouldAccept returns a slice of entries that the rule should accept
 func (r NoEmptyTrans) ShouldAccept() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
+
+// ShouldReject returns a slice of entries that the rule should reject
 func (r NoEmptyTrans) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
+
+// Name is the name of this rule
 func (r NoEmptyTrans) Name() string {
 	return "NoEmptyTrans"
 }
+
+// Level is the rule level (typically format, fatal, warning, info)
 func (r NoEmptyTrans) Level() string {
 	return "Format"
 }
@@ -214,15 +253,22 @@ func (r Decomp2Orth) Validate(e lex.Entry) (validation.Result, error) {
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
 
+// ShouldAccept returns a slice of entries that the rule should accept
 func (r Decomp2Orth) ShouldAccept() []lex.Entry {
 	return r.Accept
 }
+
+// ShouldReject returns a slice of entries that the rule should reject
 func (r Decomp2Orth) ShouldReject() []lex.Entry {
 	return r.Accept
 }
+
+// Name is the name of this rule
 func (r Decomp2Orth) Name() string {
 	return "Decomp2Orth"
 }
+
+// Level is the rule level (typically format, fatal, warning, info)
 func (r Decomp2Orth) Level() string {
 	return "Fatal"
 }
