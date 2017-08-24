@@ -26,7 +26,7 @@ Obtain a Docker image using one of the following methods
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
 
 
-### II. Run the docker app
+### II. Run the Docker app
 
 
 1. Setup the server 
@@ -56,7 +56,7 @@ You can also investigate the server environment using `bash`:
 Server data files and databases are saved in the folder `<APPDIR>`. Please note that this folder will be owned by `root`. If this is a problem, make sure you change the ownership and/or permissions to whatever is best for your environmemnt.
 
 
-<!-- to pass on system user to the docker environment:
+<!-- to pass on system user to the Docker environment:
 <!---   $ docker build --build-arg USER=$USER https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t stts-lexserver-local	 --->
 
 <!---   $ docker build --build-arg USER=$USER $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local --->
