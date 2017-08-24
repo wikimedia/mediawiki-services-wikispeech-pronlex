@@ -22,7 +22,7 @@ The `<DOCKERTAG>` variable below should be set to `stts-lexserver-local`.
 
       `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> setup`
 
-      Set up the server's required files in the specified `<APPDIR>`
+      Set up the server's required file structure in the specified `<APPDIR>`
       
 
    2. Import lexicon files (optional)
