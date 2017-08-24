@@ -2,21 +2,21 @@
 
 ### Obtain a Docker image
 
-Obtain a Docker image using one of the following methods
+A) Obtain a Docker image using one of the following methods
 
-1. from Dockerfile URL:
+* from a Dockerfile URL:
 
    `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
 
    `<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
 
-2. from local Dockerfile:
+* from local Dockerfile:
 
    `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
 
    `<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
 
-3. download from https://hub.docker.com/r/sttsse/wikispeech:
+* download from https://hub.docker.com/r/sttsse/wikispeech:
 
    `$ git pull docker pull sttsse/wikispeech`
 
@@ -26,7 +26,7 @@ Obtain a Docker image using one of the following methods
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
 
 
-### Run the docker app
+### B) Run the docker app
 
 
 1. Setup the server 
