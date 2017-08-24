@@ -127,7 +127,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 // NewWS is used to create a new instance of the WS parser
 func NewWS() (WS, error) {
 	tests := []FormatTest{
-		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	false	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+		{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	false	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 			map[Field]string{
 				Orth:         "storstaden",
 				Pos:          "NN",
@@ -150,7 +150,7 @@ func NewWS() (WS, error) {
 			},
 			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	false	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 		},
-		FormatTest{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	true	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
+		{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	true	\"\"stu:$%s`t`A:$den	SWE							imported	nst",
 			map[Field]string{
 				Orth:         "storstaden",
 				Pos:          "NN",
