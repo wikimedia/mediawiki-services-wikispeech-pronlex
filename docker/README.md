@@ -1,52 +1,54 @@
 ## Docker installation
 
-1. Obtain a Docker build image using one of the following methods
+### Obtain a Docker image
 
-    1. from Dockerfile URL:
+Obtain a Docker image using one of the following methods
 
-        `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
+1. from Dockerfile URL:
 
-	`<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
+   `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
 
-    2. from local Dockerfile:
+   `<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
 
-        `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
+2. from local Dockerfile:
 
-	`<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
+   `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
 
-    3. download from https://hub.docker.com/r/sttsse/wikispeech:
+   `<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
 
-        `$ git pull docker pull sttsse/wikispeech`
+3. download from https://hub.docker.com/r/sttsse/wikispeech:
 
-	Here, the `<DOCKERTAG>` variable is set to `sttsse/wikispeech`.
+   `$ git pull docker pull sttsse/wikispeech`
+
+   Here, the `<DOCKERTAG>` variable is set to `sttsse/wikispeech`.
 	
 
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
 
 
-2. Run the docker app
+### Run the docker app
 
 
-   1. Setup the server 
+1. Setup the server 
 
-      `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> setup`
+  `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> setup`
 
-      Set up the server's required file structure in the specified `<APPDIR>`
-      
+  Set up the server's required file structure in the specified `<APPDIR>`
+  
 
-   2. Import lexicon files (optional)
+2. Import lexicon files (optional)
 
-      `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> import_all`
+  `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> import_all`
 
-      Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
-
-
-   3. Run lex server
-
-      `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG>`
+  Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 
 
-   You can also investigate the server environment using `bash`:   
+3. Run lex server
+
+  `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG>`
+
+
+You can also investigate the server environment using `bash`:   
 
    `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> bash`
   
@@ -57,6 +59,6 @@ Server data files and databases are saved in the folder `<APPDIR>`. Please note 
 <!-- to pass on system user to the docker environment:
 <!---   $ docker build --build-arg USER=$USER https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t stts-lexserver-local	 --->
 
-<!---       $ docker build --build-arg USER=$USER $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local --->
+<!---   $ docker build --build-arg USER=$USER $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local --->
 
 
