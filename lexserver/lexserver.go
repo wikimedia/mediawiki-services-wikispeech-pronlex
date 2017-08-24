@@ -530,8 +530,8 @@ func main() {
 	var help = flag.Bool("help", false, "print usage/help and exit")
 
 	usage := `Usage:
-     $ go run *.go <PORT>
-     $ go run *.go
+     $ lexserver <PORT>
+     $ lexserver
       - use default port
 
 Flags:

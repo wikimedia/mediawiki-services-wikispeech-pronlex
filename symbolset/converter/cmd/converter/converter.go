@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	var usage = `go run converter.go <SYMBOL SET FOLDER> <CONVERTER FILE or FOLDER>`
+	var usage = `converter <SYMBOL SET FOLDER> <CONVERTER FILE or FOLDER>`
 
 	if len(os.Args) != 3 {
 		fmt.Println(usage)

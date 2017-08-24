@@ -26,12 +26,12 @@ func loadValidators(symsetDirName string) error {
 func main() {
 
 	usage := `USAGE:
-  go run validate_lex_file.go <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER> <PRINTMODE>
+  validate_lex_file <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER> <PRINTMODE>
 
 PRINTMODE: valid/invalid/all
 
 SAMPLE INVOCATION:
-  go run validate_lex_file.go [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER] valid`
+  validate_lex_file [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER] valid`
 
 	var args = os.Args
 	if len(args) != 5 {

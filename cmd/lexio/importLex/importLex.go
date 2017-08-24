@@ -63,7 +63,7 @@ func main() {
 	var help = f.Bool("help", false, "print help message")
 
 	usage := `USAGE:
-  go run importLex.go <FLAGS> <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
+ importLex <FLAGS> <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
 
 FLAGS:
    -validate bool  validate each entry, and save the validation in the database (default: false)
@@ -73,7 +73,7 @@ FLAGS:
    -help     bool  print help message
 
 SAMPLE INVOCATION:
-  go run importLex.go -validate pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
+  importLex -validate pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage)
