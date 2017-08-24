@@ -34,14 +34,14 @@ func testEqSymbols(t *testing.T, expect []Symbol, result []Symbol) {
 
 func Test_buildRegexp1(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
-		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
+		{"a", Syllabic, "", IPASymbol{"", ""}},
+		{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	re, err := buildRegexp(symbols)
 	if err != nil {
@@ -55,14 +55,14 @@ func Test_buildRegexp1(t *testing.T) {
 
 func Test_buildRegexp2(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
-		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
+		{"a", Syllabic, "", IPASymbol{"", ""}},
+		{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	re, err := buildRegexpWithGroup(symbols, true, false)
 	if err != nil {
@@ -76,15 +76,15 @@ func Test_buildRegexp2(t *testing.T) {
 
 func Test_buildRegexp3(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
-		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
+		{"a", Syllabic, "", IPASymbol{"", ""}},
+		{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	re, err := buildRegexpWithGroup(symbols, false, false)
 	if err != nil {
@@ -98,30 +98,30 @@ func Test_buildRegexp3(t *testing.T) {
 
 func Test_FilterSymbolsByCat(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
-		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"%", Stress, "", IPASymbol{"", ""}},
-		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"\"", Stress, "", IPASymbol{"", ""}},
-		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
-		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"+", MorphemeDelimiter, "", IPASymbol{"", ""}},
+		{"a", Syllabic, "", IPASymbol{"", ""}},
+		{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		{"%", Stress, "", IPASymbol{"", ""}},
+		{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"\"", Stress, "", IPASymbol{"", ""}},
+		{"e", Syllabic, "", IPASymbol{"", ""}},
+		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"+", MorphemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	stressE := []Symbol{
-		Symbol{"%", Stress, "", IPASymbol{"", ""}},
-		Symbol{"\"", Stress, "", IPASymbol{"", ""}},
+		{"%", Stress, "", IPASymbol{"", ""}},
+		{"\"", Stress, "", IPASymbol{"", ""}},
 	}
 	stressR := filterSymbolsByCat(symbols, []SymbolCat{Stress})
 	testEqSymbols(t, stressE, stressR)
 
 	delimE := []Symbol{
-		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"+", MorphemeDelimiter, "", IPASymbol{"", ""}},
+		{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"+", MorphemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	delimR := filterSymbolsByCat(symbols, []SymbolCat{SyllableDelimiter, PhonemeDelimiter, MorphemeDelimiter})
 	testEqSymbols(t, delimE, delimR)
@@ -129,15 +129,15 @@ func Test_FilterSymbolsByCat(t *testing.T) {
 
 func Test_contains(t *testing.T) {
 	symbols := []Symbol{
-		Symbol{"a", Syllabic, "", IPASymbol{"", ""}},
-		Symbol{"t", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{".", SyllableDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
-		Symbol{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-		Symbol{"e", Syllabic, "", IPASymbol{"", ""}},
+		{"a", Syllabic, "", IPASymbol{"", ""}},
+		{"t", NonSyllabic, "", IPASymbol{"", ""}},
+		{".", SyllableDelimiter, "", IPASymbol{"", ""}},
+		{"s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"t_s", NonSyllabic, "", IPASymbol{"", ""}},
+		{"$", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"e", Syllabic, "", IPASymbol{"", ""}},
 	}
 	var s string
 
