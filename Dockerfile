@@ -22,7 +22,7 @@ RUN echo "cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/static $APPDIR/
 # import_lex script
 RUN ln -s $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh bin/import_lex0
 RUN echo "#!/bin/bash" > bin/import_lex
-RUN echo "sh bin/import_lex0 -a $APPDIR" >> bin/import_lex
+RUN echo "sh bin/import_lex0 -a $APPDIR -k" >> bin/import_lex
 
 RUN chmod +x bin/*
 
