@@ -51,7 +51,7 @@ func (t *tNode) add(s string) *tNode {
 			// This is where you could increment a frequency counter.
 			// You'd want to add a frequency field to both tNode and arc.
 		}
-		son.add(s[l:len(s)])
+		son.add(s[l:])
 
 	} else { // new path
 		son := NewtNode()
@@ -60,7 +60,7 @@ func (t *tNode) add(s string) *tNode {
 			son.leaf = true
 		}
 		t.sons[r] = son
-		son.add(s[l:len(s)])
+		son.add(s[l:])
 	}
 
 	return t
