@@ -90,21 +90,21 @@ func testURLsWithContent(port string) (int, int, error) {
 	}
 
 	jsonMapTests := map[string]string{
-		"/symbolset/list": `{"symbol_set_names":["ar_sampa_mary","ar_ws-sampa","en-us_cmu","en-us_sampa_mary","en-us_ws-sampa","nb-no_nst-xsampa","nb-no_ws-sampa","sv-se_nst-xsampa","sv-se_sampa_mary","sv-se_ws-sampa"]}`,
-		"/mapper/map/sv-se_ws-sampa/sv-se_sampa_mary/%22%22%20p%20O%20j%20.%20k%20@": `{"From":"sv-se_ws-sampa","To":"sv-se_sampa_mary","Input":"\"\" p O j . k @","Result":"\" p O j - k @"}`,
-		"/mapper/map/sv-se_sampa_mary/sv-se_ws-sampa/%22%20p%20O%20j%20-%20k%20@":    `{"From":"sv-se_sampa_mary","To":"sv-se_ws-sampa","Input":"\" p O j - k @","Result":"\"\" p O j . k @"}`,
-		"/validation/list": `{"validator_names":["en-us_ws-sampa","nb-no_ws-sampa","sv-se_ws-sampa"]}`,
-		`/validation/validateentry?symbolsetname=en-us_ws-sampa&entry={%22id%22:1703348,%22lexiconId%22:3,%22strn%22:%22barn%22,%22language%22:%22en-us%22,%22partOfSpeech%22:%22%22,%22wordParts%22:%22%22,%22lemma%22:{%22id%22:0,%22strn%22:%22%22,%22reading%22:%22%22,%22paradigm%22:%22%22},%22transcriptions%22:[{%22id%22:1717337,%22entryId%22:1703348,%22strn%22:%22\%22%20b%20A%20r%20n%22,%22language%22:%22%22,%22sources%22:[]}],%22status%22:{%22id%22:1703348,%22name%22:%22imported%22,%22source%22:%22cmu%22,%22timestamp%22:%222016-09-06T13:16:07Z%22,%22current%22:true},%22entryValidations%22:[]}`: `{"id":1703348,"lexRef":{"DBRef":"","LexName":""},"strn":"barn","language":"en-us","partOfSpeech":"","morphology":"","wordParts":"","lemma":{"id":0,"strn":"","reading":"","paradigm":""},"transcriptions":[{"id":1717337,"entryId":1703348,"strn":"\" b A r n","language":"","sources":[]}],"status":{"id":1703348,"name":"imported","source":"cmu","timestamp":"2016-09-06T13:16:07Z","current":true},"entryValidations":[{"id":0,"level":"Format","ruleName":"primary_stress","Message":"Each trans should have one primary stress. Found: /\" b A r n/","timestamp":""},{"id":0,"level":"Fatal","ruleName":"SymbolSet","Message":"Invalid transcription symbol '\"' in /\" b A r n/","timestamp":""}],"preferred":false}`,
+		"/mapper/map/sv-se_ws-sampa-DEMO/sv-se_sampa_mary-DEMO/%22%22%20p%20O%20j%20.%20k%20@": `{"From":"sv-se_ws-sampa-DEMO","To":"sv-se_sampa_mary-DEMO","Input":"\"\" p O j . k @","Result":"\" p O j - k @"}`,
+		"/mapper/map/sv-se_sampa_mary-DEMO/sv-se_ws-sampa-DEMO/%22%20p%20O%20j%20-%20k%20@":    `{"From":"sv-se_sampa_mary-DEMO","To":"sv-se_ws-sampa-DEMO","Input":"\" p O j - k @","Result":"\"\" p O j . k @"}`,
+		`/validation/validateentry?symbolsetname=sv-se_ws-sampa-DEMO&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`: `{"id":371546,"lexRef":{"DBRef":"","LexName":""},"strn":"häst","language":"SWE","partOfSpeech":"NN SIN|IND|NOM|UTR","morphology":"","wordParts":"häst","lemma":{"id":42815,"strn":"häst","reading":"","paradigm":"s2q-lapp"},"transcriptions":[{"id":377191,"entryId":371546,"strn":"\" h E s t","language":"SWE","sources":[]}],"status":{"id":371546,"name":"imported","source":"nst","timestamp":"2016-09-06T12:54:12Z","current":true},"entryValidations":[],"preferred":false}`,
 	}
 
 	jsonListTestsMustContain := map[string][]string{
-		"/admin/list_dbs": {"demodb"},
-		"/mapper/list":    {"sv-se_ws-sampa - sv-se_sampa_mary", "sv-se_sampa_mary - sv-se_ws-sampa"},
+		"/admin/list_dbs":  {"demodb"},
+		"/mapper/list":     {"sv-se_ws-sampa-DEMO - sv-se_sampa_mary-DEMO", "sv-se_sampa_mary-DEMO - sv-se_ws-sampa-DEMO"},
+		"/symbolset/list":  {"sv-se_sampa_mary-DEMO", "sv-se_ws-sampa-DEMO", "sv-se_nst-xsampa-DEMO"},
+		"/validation/list": {"sv-se_ws-sampa-DEMO"},
 	}
 
 	jsonBoolTests := map[string]bool{
-		"/validation/has_validator/sv-se_ws-sampa": true,
-		"/validation/has_validator/ar_ws-sampa":    false,
+		"/validation/has_validator/sv-se_ws-sampa-DEMO": true,
+		"/validation/has_validator/ar_ws-sampa-DEMO":    false,
 	}
 
 	mustExistTests := []string{

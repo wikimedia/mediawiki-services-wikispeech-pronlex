@@ -41,7 +41,7 @@ var symbolsetContent = urlHandler{
 	name:     "content",
 	url:      "/content/{name}",
 	help:     "Lists content of a named symbolset.",
-	examples: []string{"/content/sv-se_ws-sampa"},
+	examples: []string{"/content/sv-se_ws-sampa-DEMO"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		name := getParam("name", r)
 		if len(strings.TrimSpace(name)) == 0 {
@@ -148,7 +148,7 @@ var symbolsetReloadOne = urlHandler{
 	name:     "reload",
 	url:      "/reload/{name}",
 	help:     "Reloads a named symbol set in the pre-defined folder.",
-	examples: []string{"/reload/sv-se_nst-xsampa"},
+	examples: []string{"/reload/sv-se_nst-xsampa-DEMO"},
 	handler:  symbolsetReloadOneHandler,
 }
 
@@ -326,16 +326,11 @@ var symbolsetUpload = urlHandler{
 	},
 }
 
-// SymbolSetNames : JSON container
-type SymbolSetNames struct {
-	SymbolSetNames []string `json:"symbol_set_names"`
-}
-
-func symbolSetNames(sss map[string]symbolset.SymbolSet) SymbolSetNames {
+func symbolSetNames(sss map[string]symbolset.SymbolSet) []string {
 	var ssNames []string
 	for ss := range sss {
 		ssNames = append(ssNames, ss)
 	}
 	sort.Strings(ssNames)
-	return SymbolSetNames{SymbolSetNames: ssNames}
+	return ssNames
 }

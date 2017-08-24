@@ -29,8 +29,8 @@ var converterConvert = urlHandler{
 	name: "convert",
 	url:  "/convert/{converter}/{trans}",
 	help: "Maps a transcription using a specified converter.",
-	examples: []string{"/convert/enusampa_svsampa/%22 D i s",
-		"/convert/enusampa_svsampa/%22 D EI . z i"},
+	examples: []string{"/convert/enusampa_svsampa-DEMO/%22 D i s",
+		"/convert/enusampa_svsampa-DEMO/%22 D EI . z i"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		convName := getParam("converter", r)
 		trans := trimTrans(getParam("trans", r))
@@ -93,7 +93,7 @@ var converterTable = urlHandler{
 	name:     "table",
 	url:      "/table/{converter}",
 	help:     "Lists map table for a specified converter.",
-	examples: []string{"/table/enusampa_svsampa"},
+	examples: []string{"/table/enusampa_svsampa-DEMO"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		convName := getParam("converter", r)
 		if len(strings.TrimSpace(convName)) == 0 {

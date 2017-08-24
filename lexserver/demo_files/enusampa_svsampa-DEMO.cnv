@@ -1,5 +1,5 @@
-FROM	en-us_ws-sampa
-TO	sv-se_ws-sampa
+FROM	en-us_ws-sampa-DEMO
+TO	sv-se_ws-sampa-DEMO
 
 RE	^T	t
 

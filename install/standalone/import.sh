@@ -66,7 +66,7 @@ mkdir -p $APPDIR/db_files || exit 1
 mkdir -p $APPDIR/symbol_sets || exit 1
 
 cp $APPDIR/lexdata/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
-cp $APPDIR/lexdata/mappers.txt $APPDIR/symbol_sets/ || exit 1
+cat $APPDIR/lexdata/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
 cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
 

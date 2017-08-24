@@ -36,6 +36,13 @@ func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error
 		}
 		vs.Validators[ss.Name] = &v
 	}
+	if ss, ok := symbolsets["sv-se_ws-sampa-DEMO"]; ok { // FOR DEMO DB
+		v, err := newSvSeNstValidator(ss)
+		if err != nil {
+			return fmt.Errorf("couldn't initialize symbol set : %v", err)
+		}
+		vs.Validators[ss.Name] = &v
+	}
 	if ss, ok := symbolsets["nb-no_ws-sampa"]; ok {
 		v, err := newNbNoNstValidator(ss)
 		if err != nil {

@@ -44,7 +44,7 @@ var mapperMap = urlHandler{
 	name:     "map",
 	url:      "/map/{from}/{to}/{trans}",
 	help:     "Maps a transcription from one symbolset to another.",
-	examples: []string{"/map/sv-se_ws-sampa/sv-se_sampa_mary/%22%22 p O j . k @"},
+	examples: []string{"/map/sv-se_ws-sampa-DEMO/sv-se_sampa_mary-DEMO/%22%22 p O j . k @"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		fromName := getParam("from", r)
 		toName := getParam("to", r)
@@ -108,7 +108,7 @@ var mapperMaptable = urlHandler{
 	name:     "maptable",
 	url:      "/maptable/{from}/{to}",
 	help:     "Lists content of a maptable given two symbolset names.",
-	examples: []string{"/maptable/sv-se_ws-sampa/sv-se_sampa_mary"},
+	examples: []string{"/maptable/sv-se_ws-sampa-DEMO/sv-se_sampa_mary-DEMO"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		fromName := getParam("from", r)
 		toName := getParam("to", r)
