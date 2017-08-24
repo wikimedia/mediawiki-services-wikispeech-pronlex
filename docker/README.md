@@ -1,7 +1,5 @@
 ## Docker installation
 
-WORK IN PROGRESS
-
 1. Build the Docker image
 
     1. from Dockerfile URL:
