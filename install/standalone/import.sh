@@ -53,12 +53,13 @@ fi
 if [ -d "$APPDIR/lexdata" ]; then
     cd $APPDIR/lexdata && git pull && cd -
     KEEP=1
+else
+    if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata; then
+	echo -n "" # OK
     else
-	if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata ; then
-	    echo -n "" # OK
-	else
-	    echo "[$CMD] git clone failed" >&2
-	fi
+	echo "[$CMD] git clone failed" >&2
+	exit 1
+    fi
 fi
 
 mkdir -p $APPDIR/db_files || exit 1

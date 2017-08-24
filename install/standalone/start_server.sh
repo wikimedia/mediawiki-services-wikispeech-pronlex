@@ -57,5 +57,5 @@ if [ $# -ne 0 ]; then
 fi
 
 
-switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static $APPDIR/static/"
+switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static $APPDIR/.static/"
 lexserver $switches -test && lexserver $switches $PORT
