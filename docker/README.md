@@ -10,7 +10,7 @@
 
         `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
 
-    Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (updated git repos, etc).
+    Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
 
 
 2. Run the docker app
