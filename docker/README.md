@@ -19,7 +19,7 @@ Obtain a Docker image using one of the following methods
 
    `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
 
-* Download from https://hub.docker.com/r/sttsse/wikispeech:
+* Download from https://hub.docker.com/r/sttsse/wikispeech (not guaranteed to be updated on a regular basis):
 
    `$ git pull docker pull sttsse/wikispeech`
 
