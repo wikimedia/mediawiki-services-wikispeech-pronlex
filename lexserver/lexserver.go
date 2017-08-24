@@ -633,7 +633,8 @@ Default ports:
 			log.Printf("lexserver: closed database %s", string(dbName))
 		}
 	}
-	log.Println("lexserver: BYE!\n")
+	log.Println("lexserver: BYE!")
+	log.Println("")
 }
 
 func createServer(port string) (*http.Server, error) {

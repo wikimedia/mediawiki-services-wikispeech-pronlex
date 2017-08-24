@@ -384,26 +384,25 @@ func testExampleURLs(port string) (int, int, error) {
 		nTests = nTests + 1
 		url := "http://localhost" + port + urlEnc(example.URL)
 		resp, err = http.Get(url)
-		defer resp.Body.Close()
 		if err != nil {
 			fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 			nFailed = nFailed + 1
+		}
+		defer resp.Body.Close()
+		log.Printf("init_tests: %s => %s : %s", example.Template, shortenURL(example.URL), resp.Status)
+
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			nFailed = nFailed + 1
 		} else {
-			log.Printf("init_tests: %s => %s : %s", example.Template, shortenURL(example.URL), resp.Status)
+			got, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nFailed, nTests, fmt.Errorf("couldn't read response body : %v", err)
+			}
 
-			if resp.StatusCode != http.StatusOK {
-				fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			if strings.TrimSpace(string(got)) == "" {
+				fmt.Printf("** FAILED TEST ** for %s : expected non-empty response\n", url)
 				nFailed = nFailed + 1
-			} else {
-				got, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					return nFailed, nTests, fmt.Errorf("couldn't read response body : %v", err)
-				}
-
-				if strings.TrimSpace(string(got)) == "" {
-					fmt.Printf("** FAILED TEST ** for %s : expected non-empty response\n", url, resp)
-					nFailed = nFailed + 1
-				}
 			}
 		}
 	}
