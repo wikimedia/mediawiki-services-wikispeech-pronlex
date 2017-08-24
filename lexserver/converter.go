@@ -134,7 +134,7 @@ var converterList = urlHandler{
 		cMut.RLock()
 		defer cMut.RUnlock()
 		cs := []string{}
-		for key, _ := range cMut.service {
+		for key := range cMut.service {
 			cs = append(cs, key)
 		}
 		j, err := json.Marshal(cs)

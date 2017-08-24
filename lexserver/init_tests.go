@@ -98,8 +98,8 @@ func testURLsWithContent(port string) (int, int, error) {
 	}
 
 	jsonListTestsMustContain := map[string][]string{
-		"/admin/list_dbs": []string{"demodb"},
-		"/mapper/list":    []string{"sv-se_ws-sampa - sv-se_sampa_mary", "sv-se_sampa_mary - sv-se_ws-sampa"},
+		"/admin/list_dbs": {"demodb"},
+		"/mapper/list":    {"sv-se_ws-sampa - sv-se_sampa_mary", "sv-se_sampa_mary - sv-se_ws-sampa"},
 	}
 
 	jsonBoolTests := map[string]bool{
