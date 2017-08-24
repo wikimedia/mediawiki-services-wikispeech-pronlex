@@ -28,6 +28,7 @@ mkdir -p $APPDIR/db_files || exit 1
 mkdir -p $APPDIR/symbol_sets || exit 1
 
 cp $LEXDATA/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
+echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
 cat $LEXDATA/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
 cp $LEXDATA/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
