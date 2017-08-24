@@ -144,7 +144,7 @@ func Test_NewFormat_01(t *testing.T) {
 	nFields := 16
 	sep := ";"
 	tests := []FormatTest{
-		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;ANKA;;swe;hanna_01",
+		{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;ANKA;;swe;hanna_01",
 			map[Field]string{
 				Orth:       "hannas",
 				Pos:        "PM",
@@ -178,7 +178,7 @@ func Test_NewFormat_02(t *testing.T) {
 	nFields := 16
 	sep := ";"
 	tests := []FormatTest{
-		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
+		{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
 			map[Field]string{
 				Orth:       "hannas",
 				Pos:        "PM",
@@ -190,7 +190,7 @@ func Test_NewFormat_02(t *testing.T) {
 				Lemma:      "hanna_01"},
 			"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
 		},
-		FormatTest{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
+		{"hannas;PM;GEN;hannas;;;eng;;;;;\"\" h a . n a s;;;swe;hanna_01",
 			map[Field]string{
 				Orth:       "hannas_x",
 				Pos:        "PM",

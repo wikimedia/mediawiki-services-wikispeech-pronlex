@@ -14,18 +14,18 @@ func testMapTranscription(t *testing.T, mapper Mapper, input string, expect stri
 
 func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 	symbols1 := []Symbol{
-		Symbol{"a", Syllabic, "", IPASymbol{"a", "U+0061"}},
-		Symbol{"r", NonSyllabic, "", IPASymbol{"r", "U+0072"}},
-		Symbol{"t", NonSyllabic, "", IPASymbol{"t", "U+0074"}},
-		Symbol{"r*t", NonSyllabic, "", IPASymbol{"R", "U+0052"}},
-		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"a", Syllabic, "", IPASymbol{"a", "U+0061"}},
+		{"r", NonSyllabic, "", IPASymbol{"r", "U+0072"}},
+		{"t", NonSyllabic, "", IPASymbol{"t", "U+0074"}},
+		{"r*t", NonSyllabic, "", IPASymbol{"R", "U+0052"}},
+		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	symbols2 := []Symbol{
-		Symbol{"A", Syllabic, "", IPASymbol{"a", "U+0061"}},
-		Symbol{"R", NonSyllabic, "", IPASymbol{"r", "U+0072"}},
-		Symbol{"T", NonSyllabic, "", IPASymbol{"t", "U+0074"}},
-		Symbol{"RT", NonSyllabic, "", IPASymbol{"R", "U+0052"}},
-		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+		{"A", Syllabic, "", IPASymbol{"a", "U+0061"}},
+		{"R", NonSyllabic, "", IPASymbol{"r", "U+0072"}},
+		{"T", NonSyllabic, "", IPASymbol{"t", "U+0074"}},
+		{"RT", NonSyllabic, "", IPASymbol{"R", "U+0052"}},
+		{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	ss1, err := NewSymbolSet("sampa1", symbols1)
 	ss2, err := NewSymbolSet("sampa2", symbols2)
@@ -62,11 +62,11 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "ssLC"
 // 	toName := "ssIPA"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"A", ""}},
-// 		Symbol{"r", NonSyllabic, "", IPASymbol{"R", ""}},
-// 		Symbol{"t", NonSyllabic, "", IPASymbol{"T", ""}},
-// 		Symbol{"r*t", NonSyllabic, "", IPASymbol{"RT", ""}},
-// 		Symbol{"", PhonemeDelimiter, "", IPASymbol{" ", ""}},
+// 		{"a", Syllabic, "", IPASymbol{"A", ""}},
+// 		{"r", NonSyllabic, "", IPASymbol{"R", ""}},
+// 		{"t", NonSyllabic, "", IPASymbol{"T", ""}},
+// 		{"r*t", NonSyllabic, "", IPASymbol{"RT", ""}},
+// 		{"", PhonemeDelimiter, "", IPASymbol{" ", ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -87,11 +87,11 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "ssLC"
 // 	toName := "ssIPA"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"A", ""}},
-// 		Symbol{"r", NonSyllabic, "", IPASymbol{"R", ""}},
-// 		Symbol{"t", NonSyllabic, "", IPASymbol{"T", ""}},
-// 		Symbol{"rt", NonSyllabic, "", IPASymbol{"R*T", ""}},
-// 		Symbol{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
+// 		{"a", Syllabic, "", IPASymbol{"A", ""}},
+// 		{"r", NonSyllabic, "", IPASymbol{"R", ""}},
+// 		{"t", NonSyllabic, "", IPASymbol{"T", ""}},
+// 		{"rt", NonSyllabic, "", IPASymbol{"R*T", ""}},
+// 		{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -112,13 +112,13 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "sampa1"
 // 	toName := "ipa2"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"A", ""}},
-// 		Symbol{"b", NonSyllabic, "", IPASymbol{"b", ""}},
-// 		Symbol{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
-// 		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-// 		Symbol{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
-// 		Symbol{"\"", Stress, "", IPASymbol{"\"", Stress, ""}},
-// 		Symbol{"\"\"", Stress, "", IPASymbol{"\"\"", Stress, ""}},
+// 		{"a", Syllabic, "", IPASymbol{"A", ""}},
+// 		{"b", NonSyllabic, "", IPASymbol{"b", ""}},
+// 		{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
+// 		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+// 		{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
+// 		{"\"", Stress, "", IPASymbol{"\"", Stress, ""}},
+// 		{"\"\"", Stress, "", IPASymbol{"\"\"", Stress, ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -135,14 +135,14 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "ipa"
 // 	toName := "sampa"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"a", ""}},
-// 		Symbol{"b", NonSyllabic, "", IPASymbol{"b", ""}},
-// 		Symbol{"k", NonSyllabic, "", IPASymbol{"k", ""}},
-// 		Symbol{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
-// 		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-// 		Symbol{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
-// 		Symbol{"\u02C8", Stress, "", IPASymbol{"\"", Stress, ""}},
-// 		Symbol{"\u02C8\u0300", Stress, "", IPASymbol{"\"\"", Stress, ""}},
+// 		{"a", Syllabic, "", IPASymbol{"a", ""}},
+// 		{"b", NonSyllabic, "", IPASymbol{"b", ""}},
+// 		{"k", NonSyllabic, "", IPASymbol{"k", ""}},
+// 		{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
+// 		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+// 		{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
+// 		{"\u02C8", Stress, "", IPASymbol{"\"", Stress, ""}},
+// 		{"\u02C8\u0300", Stress, "", IPASymbol{"\"\"", Stress, ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -163,14 +163,14 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "ipa"
 // 	toName := "sampa"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"a", ""}},
-// 		Symbol{"b", NonSyllabic, "", IPASymbol{"b", ""}},
-// 		Symbol{"k", NonSyllabic, "", IPASymbol{"k", ""}},
-// 		Symbol{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
-// 		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-// 		Symbol{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
-// 		Symbol{"\u02C8", Stress, "", IPASymbol{"\"", Stress, ""}},
-// 		Symbol{"\u02C8\u0300", Stress, "", IPASymbol{"\"\"", Stress, ""}},
+// 		{"a", Syllabic, "", IPASymbol{"a", ""}},
+// 		{"b", NonSyllabic, "", IPASymbol{"b", ""}},
+// 		{"k", NonSyllabic, "", IPASymbol{"k", ""}},
+// 		{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
+// 		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+// 		{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
+// 		{"\u02C8", Stress, "", IPASymbol{"\"", Stress, ""}},
+// 		{"\u02C8\u0300", Stress, "", IPASymbol{"\"\"", Stress, ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -191,15 +191,15 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "ipa"
 // 	toName := "sampa"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"a", ""}},
-// 		Symbol{"b", NonSyllabic, "", IPASymbol{"b", ""}},
-// 		Symbol{"r", NonSyllabic, "", IPASymbol{"r", ""}},
-// 		Symbol{"k", NonSyllabic, "", IPASymbol{"k", ""}},
-// 		Symbol{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
-// 		Symbol{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
-// 		Symbol{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
-// 		Symbol{"\u02C8", Stress, "", IPASymbol{"\"", Stress, ""}},
-// 		Symbol{"\u02C8\u0300", Stress, "", IPASymbol{"\"\"", Stress, ""}},
+// 		{"a", Syllabic, "", IPASymbol{"a", ""}},
+// 		{"b", NonSyllabic, "", IPASymbol{"b", ""}},
+// 		{"r", NonSyllabic, "", IPASymbol{"r", ""}},
+// 		{"k", NonSyllabic, "", IPASymbol{"k", ""}},
+// 		{"ŋ", NonSyllabic, "", IPASymbol{"N", ""}},
+// 		{"", PhonemeDelimiter, "", IPASymbol{"", ""}},
+// 		{".", SyllableDelimiter, "", IPASymbol{"$", SyllableDelimiter, ""}},
+// 		{"\u02C8", Stress, "", IPASymbol{"\"", Stress, ""}},
+// 		{"\u02C8\u0300", Stress, "", IPASymbol{"\"\"", Stress, ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -220,15 +220,15 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "NST-XSAMPA"
 // 	toName := "WS-SAMPA_IPADUMMY"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"a", ""}},
-// 		Symbol{"b", NonSyllabic, "", IPASymbol{"b", ""}},
-// 		Symbol{"r", NonSyllabic, "", IPASymbol{"r", ""}},
-// 		Symbol{"k", NonSyllabic, "", IPASymbol{"k", ""}},
-// 		Symbol{"N", NonSyllabic, "", IPASymbol{"N", ""}},
-// 		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", ""}},
-// 		Symbol{"$", SyllableDelimiter, "", IPASymbol{".", SyllableDelimiter, ""}},
-// 		Symbol{"\"", Stress, "", IPASymbol{"\"", Stress, ""}},
-// 		Symbol{"\"\"", Stress, "", IPASymbol{"\"\"", Stress, ""}},
+// 		{"a", Syllabic, "", IPASymbol{"a", ""}},
+// 		{"b", NonSyllabic, "", IPASymbol{"b", ""}},
+// 		{"r", NonSyllabic, "", IPASymbol{"r", ""}},
+// 		{"k", NonSyllabic, "", IPASymbol{"k", ""}},
+// 		{"N", NonSyllabic, "", IPASymbol{"N", ""}},
+// 		{" ", PhonemeDelimiter, "", IPASymbol{" ", ""}},
+// 		{"$", SyllableDelimiter, "", IPASymbol{".", SyllableDelimiter, ""}},
+// 		{"\"", Stress, "", IPASymbol{"\"", Stress, ""}},
+// 		{"\"\"", Stress, "", IPASymbol{"\"\"", Stress, ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -249,17 +249,17 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "NST-XSAMPA"
 // 	toName := "WS-SAMPA_IPADUMMY"
 // 	symbols := []Symbol{
-// 		Symbol{"a", Syllabic, "", IPASymbol{"a", ""}},
-// 		Symbol{"b", NonSyllabic, "", IPASymbol{"b", ""}},
-// 		Symbol{"r", NonSyllabic, "", IPASymbol{"r", ""}},
-// 		Symbol{"rs", NonSyllabic, "", IPASymbol{"rs", ""}},
-// 		Symbol{"s", NonSyllabic, "", IPASymbol{"s", ""}},
-// 		Symbol{"k", NonSyllabic, "", IPASymbol{"k", ""}},
-// 		Symbol{"N", NonSyllabic, "", IPASymbol{"N", ""}},
-// 		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", ""}},
-// 		Symbol{"$", SyllableDelimiter, "", IPASymbol{".", SyllableDelimiter, ""}},
-// 		Symbol{"\"", Stress, "", IPASymbol{"\"", Stress, ""}},
-// 		Symbol{"\"\"", Stress, "", IPASymbol{"\"\"", Stress, ""}},
+// 		{"a", Syllabic, "", IPASymbol{"a", ""}},
+// 		{"b", NonSyllabic, "", IPASymbol{"b", ""}},
+// 		{"r", NonSyllabic, "", IPASymbol{"r", ""}},
+// 		{"rs", NonSyllabic, "", IPASymbol{"rs", ""}},
+// 		{"s", NonSyllabic, "", IPASymbol{"s", ""}},
+// 		{"k", NonSyllabic, "", IPASymbol{"k", ""}},
+// 		{"N", NonSyllabic, "", IPASymbol{"N", ""}},
+// 		{" ", PhonemeDelimiter, "", IPASymbol{" ", ""}},
+// 		{"$", SyllableDelimiter, "", IPASymbol{".", SyllableDelimiter, ""}},
+// 		{"\"", Stress, "", IPASymbol{"\"", Stress, ""}},
+// 		{"\"\"", Stress, "", IPASymbol{"\"\"", Stress, ""}},
 // 	}
 // 	ssm, err := NewSymbolSet("test", symbols)
 // 	if err != nil {
@@ -305,10 +305,10 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 // 	fromName := "ssLC"
 // 	toName := "ssUC"
 // 	symbols := []Symbol{
-// 		Symbol{"A", NonSyllabic, "", IPASymbol{"a", ""}},
-// 		Symbol{"A", Syllabic, "", IPASymbol{"A", ""}},
-// 		Symbol{"p", NonSyllabic, "", IPASymbol{"P", ""}},
-// 		Symbol{" ", PhonemeDelimiter, "", IPASymbol{" ", ""}},
+// 		{"A", NonSyllabic, "", IPASymbol{"a", ""}},
+// 		{"A", Syllabic, "", IPASymbol{"A", ""}},
+// 		{"p", NonSyllabic, "", IPASymbol{"P", ""}},
+// 		{" ", PhonemeDelimiter, "", IPASymbol{" ", ""}},
 // 	}
 // 	_, err := NewSymbolSet("test", symbols)
 // 	if err == nil {
