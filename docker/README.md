@@ -1,6 +1,6 @@
 ## Docker installation
 
-`<DOCKERTAG>` below should be `stts-lexserver-local`
+The `<DOCKERTAG>` variable below should be set to `stts-lexserver-local`.
 
 1. Build the Docker image
 
