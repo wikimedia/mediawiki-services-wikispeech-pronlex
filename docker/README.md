@@ -1,5 +1,8 @@
 ## Docker installation
 
+The `<DOCKERTAG>` variable represents the name of the Docker installation image.
+
+
 ### I. Obtain a Docker image
 
 Obtain a Docker image using one of the following methods
@@ -8,19 +11,19 @@ Obtain a Docker image using one of the following methods
 
    `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
 
-   `<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
+   `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
 
 * from local Dockerfile:
 
    `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
 
-   `<DOCKERTAG>` defines the name of the Docker installation image. It should normally be set to `stts-lexserver-local`.
+   `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
 
 * download from https://hub.docker.com/r/sttsse/wikispeech:
 
    `$ git pull docker pull sttsse/wikispeech`
 
-   Here, the `<DOCKERTAG>` variable is set to `sttsse/wikispeech`.
+   `<DOCKERTAG>` is set to `sttsse/wikispeech`.
 	
 
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
