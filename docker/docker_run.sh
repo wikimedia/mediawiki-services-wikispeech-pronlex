@@ -51,8 +51,9 @@ if [ -z "$APPDIR" ] ; then
     exit 1
 fi
 
-mkdir -p $APPDIR
-chgrp docker $APPDIR
+#mkdir -p $APPDIR
+#chgrp docker $APPDIR
+
 APPDIRABS=`realpath $APPDIR`
 
 ## => use system user inside container
