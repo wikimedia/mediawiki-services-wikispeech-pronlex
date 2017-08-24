@@ -37,8 +37,8 @@ echo "[$CMD] Setting up basic files ... " >&2
 
 mkdir -p $APPDIR || exit 1
 
-mkdir -p $APPDIR/static || exit 1
-cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/static/* $APPDIR/static/ || exit 1
+mkdir -p $APPDIR/.static || exit 1
+cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/static/* $APPDIR/.static || exit 1
 
 mkdir -p $APPDIR/symbol_sets || exit 1
 cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/* $APPDIR/symbol_sets || exit 1

@@ -549,14 +549,23 @@ func Test_insertEntries(t *testing.T) {
 	}
 
 	stat, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new"}})
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 	if w, g := 1, len(stat); w != g {
 		t.Errorf(fs, w, g)
 	}
 	stat1, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"dkhfkhekjeh"}})
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 	if w, g := 0, len(stat1); w != g {
 		t.Errorf(fs, w, g)
 	}
 	stat2, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new", "old2"}})
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 	if w, g := 2, len(stat2); w != g {
 		t.Errorf(fs, w, g)
 	}
@@ -639,6 +648,9 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 	q = Query{Words: []string{"sittriktiga"}}
 	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
@@ -745,6 +757,9 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	q := Query{Words: []string{"sprängstoff"}}
 
 	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
@@ -755,6 +770,9 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 	q = Query{Words: []string{"sittriktiga"}}
 	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}

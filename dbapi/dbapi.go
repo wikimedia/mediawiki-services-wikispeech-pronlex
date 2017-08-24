@@ -1,7 +1,7 @@
 /*
 Package dbapi contains code wrapped around an SQL(ite3) DB.
 It is used for inserting, updating and retrieving lexical entries from
-a pronounciation lexicon database. A lexical entry is represented by
+a pronunciation lexicon database. A lexical entry is represented by
 the dbapi.Entry struct, that mirrors entries of the entry database
 table, along with associated tables such as transcription and lemma.
 */
@@ -743,7 +743,7 @@ func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 
 	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
 	if err != nil {
-		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		tx.Rollback() // nothing to rollback here, but may have been called from within another transaction
 		return result, err
 	}
 	defer rows.Close()
@@ -756,7 +756,7 @@ func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 		result = append(result, entryID)
 	}
 	if rows.Err() != nil {
-		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		tx.Rollback() // nothing to rollback here, but may have been called from within another transaction
 		return nil, rows.Err()
 	}
 
@@ -783,7 +783,7 @@ func validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
 
 	lexiconMap, err := getLexiconMapTx(tx)
 	if err != nil {
-		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		tx.Rollback() // nothing to rollback here, but may have been called from within another transaction
 		return err
 	}
 	for _, lexName := range lexNames {
@@ -816,7 +816,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 
 	rows, err := tx.Query(sqlStmt.sql, sqlStmt.values...)
 	if err != nil {
-		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		tx.Rollback() // nothing to rollback here, but may have been called from within another transaction
 		return err
 	}
 	defer rows.Close()
@@ -994,7 +994,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 		out.Write(currE)
 	}
 	if rows.Err() != nil {
-		tx.Rollback() // nothing to rollback here, but may have been called from withing another transaction
+		tx.Rollback() // nothing to rollback here, but may have been called from within another transaction
 		return rows.Err()
 	}
 

@@ -124,7 +124,7 @@ func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.V
 		if err != nil {
 			return stats, err
 		}
-		chunk = []int64{}
+		//chunk = []int64{}
 	}
 	end := time.Now()
 	log.Printf("dbapi/validation.go Validate took %v\n", end.Sub(start))

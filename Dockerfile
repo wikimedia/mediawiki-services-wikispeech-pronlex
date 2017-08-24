@@ -15,14 +15,19 @@ RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
 ENV APPDIR appdir
 
+ARG USER
+RUN useradd $USER
+RUN groupadd docker
+USER $user
+
 # setup script
 RUN echo "#!/bin/bash" > bin/setup
-RUN echo "cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/static $APPDIR/static/ && cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files $APPDIR/symbol_sets" >> bin/setup
+RUN echo "cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files $APPDIR/symbol_sets" >> bin/setup
 
-# import_lex script
-RUN ln -s $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh bin/import_lex0
-RUN echo "#!/bin/bash" > bin/import_lex
-RUN echo "sh bin/import_lex0 -a $APPDIR" >> bin/import_lex
+# import script
+RUN ln -s $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh bin/import_all0
+RUN echo "#!/bin/bash" > bin/import_all
+RUN echo "sh bin/import_all0 -a $APPDIR" >> bin/import_all
 
 RUN chmod +x bin/*
 
@@ -30,7 +35,5 @@ EXPOSE 8787
 
 RUN echo "Mount external host dir to $APPDIR"
 
-#CMD lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $APPDIR/static
-
-CMD (lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $APPDIR/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $APPDIR/static 8787)
+CMD (lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static 8787)
 

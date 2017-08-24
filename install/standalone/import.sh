@@ -2,8 +2,9 @@
 
 CMD=`basename $0`
 APPDIR=`dirname $0`
+KEEP=0
 
-while getopts ":ha:" opt; do
+while getopts ":hka:" opt; do
   case $opt in
     h)
 	echo "
@@ -14,11 +15,15 @@ Imports lexicon data for Swedish, Norwegian, US English and a small test file fo
 Options:
   -h help
   -a appdir (default: this script's folder)
+  -k keep lexdata files after import
 " >&2
 	exit 1
       ;;
     a)
         APPDIR=$OPTARG
+      ;;
+    k)
+        KEEP=1
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -40,12 +45,21 @@ if [ ! -d "$APPDIR" ]; then
     exit 1
 fi
 
-mkdir -p $APPDIR || exit 1
+if [ ! -d "$APPDIR" ]; then
+    mkdir -p $APPDIR || exit 1
+fi
+
 
 if [ -d "$APPDIR/lexdata" ]; then
     cd $APPDIR/lexdata && git pull && cd -
+    KEEP=1
+else
+    if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata; then
+	echo -n "" # OK
     else
-	git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata
+	echo "[$CMD] git clone failed" >&2
+	exit 1
+    fi
 fi
 
 mkdir -p $APPDIR/db_files || exit 1
@@ -99,6 +113,13 @@ else
     exit 1
 fi
 
-rm -fr $APPDIR/lexdata
+if [ $KEEP -eq 0 ]; then
+    echo "[$CMD] Clearing lexdata cache" >&2
+    rm -fr $APPDIR/lexdata
+else
+    echo "[$CMD] Keeping lexdata cache" >&2  
+fi
+
+echo "[$CMD] Done. BYE!" >&2
 
 

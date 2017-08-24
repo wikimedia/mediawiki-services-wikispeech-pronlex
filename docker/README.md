@@ -6,39 +6,35 @@ WORK IN PROGRESS
 
     1. from Dockerfile URL:
 
-        `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/docker/Dockerfile -t sttsse/lexserver`   
+        `$ docker build --build-arg USER=$USER https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t stts-lexserver-local`   
 
     2. from local Dockerfile:
 
-        `$ docker build $GOPATH/src/github.com/stts-se/pronlex/docker -t sttsse/lexserver`
+        `$ docker build --build-arg USER=$USER $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
 
     Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (updated git repos, etc).
 
 
-2. Create the application folder
-
-   `$ mkdir <APPDIR>`
+2. Run the docker app
 
 
-3. Setup the server 
+   1. Setup the server 
 
-   ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver setup``
-
-
-4. Import lexicon files (optional)
-
-   ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver import_lex``
+      `$ docker_run.sh -a <APPDIR> setup`
 
 
-5. Run lex server
+   2. Import lexicon files (optional)
 
-   ``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver``
-
-
-Steps 2-5 can easily be executed using the following script: [run_docker.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/run_docker.sh)
+      `$ docker_run.sh -a <APPDIR> import_all`
 
 
-You can also investigate the server environment using `bash`:
+   3. Run lex server
 
-``$ docker run -u `stat -c "%u:%g" <APPDIR>` -v </FULL/PATH/TO/APPDIRAPPDIR>:/go/appdir -p 8787:8787 -it sttsse/lexserver bash``
+      `$ docker_run.sh -a <APPDIR>`
+
+
+   You can also investigate the server environment using `bash`:   
+
+   `$ docker_run.sh -a <APPDIR> bash`
+  
 

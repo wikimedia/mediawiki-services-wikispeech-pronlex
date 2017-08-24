@@ -159,7 +159,7 @@ type EntryWriter interface {
 }
 
 // EntryFileWriter outputs formated entries to an io.Writer.
-// Exmaple usage:
+// Example usage:
 //	bf := bufio.NewWriter(f)
 //	defer bf.Flush()
 //	bfx := lex.EntriesFileWriter{bf}

@@ -177,39 +177,38 @@ func testURLsWithContent(port string) (int, int, error) {
 func jsonMapTest(port string, url string, expect string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
-	} else {
-		log.Printf("init_tests: jsonMap %s", url)
+	}
+	defer resp.Body.Close()
+	log.Printf("init_tests: jsonMap %s", url)
 
-		if resp.StatusCode != http.StatusOK {
-			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
-			return false, nil
-		}
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+		return false, nil
+	}
 
-		got, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return false, fmt.Errorf("couldn't read response body : %v", err)
-		}
+	got, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, fmt.Errorf("couldn't read response body : %v", err)
+	}
 
-		var gotJ map[string]interface{}
-		err = json.Unmarshal([]byte(got), &gotJ)
-		if err != nil {
-			return false, fmt.Errorf("couldn't convert response to json : %v", err)
-		}
+	var gotJ map[string]interface{}
+	err = json.Unmarshal([]byte(got), &gotJ)
+	if err != nil {
+		return false, fmt.Errorf("couldn't convert response to json : %v", err)
+	}
 
-		var expJ map[string]interface{}
-		err = json.Unmarshal([]byte(expect), &expJ)
-		if err != nil {
-			return false, fmt.Errorf("couldn't convert expected result to json : %v", err)
-		}
+	var expJ map[string]interface{}
+	err = json.Unmarshal([]byte(expect), &expJ)
+	if err != nil {
+		return false, fmt.Errorf("couldn't convert expected result to json : %v", err)
+	}
 
-		if !reflect.DeepEqual(gotJ, expJ) {
-			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
-			return false, nil
-		}
+	if !reflect.DeepEqual(gotJ, expJ) {
+		fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
+		return false, nil
 	}
 	return true, nil
 }
@@ -217,32 +216,31 @@ func jsonMapTest(port string, url string, expect string) (bool, error) {
 func jsonTestBool(port string, url string, expect bool) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
-	} else {
-		log.Printf("init_tests: jsonMap %s", url)
+	}
+	defer resp.Body.Close()
+	log.Printf("init_tests: jsonMap %s", url)
 
-		if resp.StatusCode != http.StatusOK {
-			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
-			return false, nil
-		}
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+		return false, nil
+	}
 
-		got, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return false, fmt.Errorf("couldn't read response body : %v", err)
-		}
+	got, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, fmt.Errorf("couldn't read response body : %v", err)
+	}
 
-		var gotJ bool
-		err = json.Unmarshal([]byte(got), &gotJ)
-		if err != nil {
-			return false, fmt.Errorf("couldn't convert response to json : %v", err)
-		}
-		if gotJ != expect {
-			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE: %v\n >> FOUND: %v\n", url, expect, gotJ)
-			return false, nil
-		}
+	var gotJ bool
+	err = json.Unmarshal([]byte(got), &gotJ)
+	if err != nil {
+		return false, fmt.Errorf("couldn't convert response to json : %v", err)
+	}
+	if gotJ != expect {
+		fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE: %v\n >> FOUND: %v\n", url, expect, gotJ)
+		return false, nil
 	}
 	return true, nil
 }
@@ -259,86 +257,84 @@ func contains(slice []string, item string) bool {
 func jsonListTestMustContain(port string, url string, expect []string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
-	} else {
-		log.Printf("init_tests: jsonList %s", url)
-
-		if resp.StatusCode != http.StatusOK {
-			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
-			return false, nil
-		}
-
-		got, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return false, fmt.Errorf("couldn't read response body : %v", err)
-		}
-
-		var gotJ []string
-		err = json.Unmarshal([]byte(got), &gotJ)
-		if err != nil {
-			return false, fmt.Errorf("couldn't convert response to json : %v", err)
-		}
-
-		ok := true
-		for _, exp := range expect {
-			if !contains(gotJ, exp) {
-				ok = false
-			}
-		}
-		if !ok {
-			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE TO CONTAIN ALL OF:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
-			return false, nil
-		}
-
 	}
+	defer resp.Body.Close()
+	log.Printf("init_tests: jsonList %s", url)
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+		return false, nil
+	}
+
+	got, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, fmt.Errorf("couldn't read response body : %v", err)
+	}
+
+	var gotJ []string
+	err = json.Unmarshal([]byte(got), &gotJ)
+	if err != nil {
+		return false, fmt.Errorf("couldn't convert response to json : %v", err)
+	}
+
+	ok := true
+	for _, exp := range expect {
+		if !contains(gotJ, exp) {
+			ok = false
+		}
+	}
+	if !ok {
+		fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE TO CONTAIN ALL OF:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
+		return false, nil
+	}
+
 	return true, nil
 }
 
 func lookupTest(port string, url string, expect string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
-	} else {
-		log.Printf("init_tests: lookup/entry %s", url)
+	}
+	defer resp.Body.Close()
+	log.Printf("init_tests: lookup/entry %s", url)
 
-		if resp.StatusCode != http.StatusOK {
-			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
-			return false, nil
-		}
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+		return false, nil
+	}
 
-		got, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return false, fmt.Errorf("couldn't read response body : %v", err)
-		}
-		var gotEs []lex.Entry
-		err = json.Unmarshal(got, &gotEs)
-		if err != nil {
-			return false, fmt.Errorf("couldn't parse json : %v", err)
-		}
-		var expEs []lex.Entry
-		err = json.Unmarshal([]byte(expect), &expEs)
-		if err != nil {
-			return false, fmt.Errorf("couldn't parse expect string : %v", err)
-		}
-		for i, e := range gotEs {
-			e.EntryStatus.Timestamp = ""
-			gotEs[i] = e
-		}
-		for i, e := range expEs {
-			e.EntryStatus.Timestamp = ""
-			expEs[i] = e
-		}
+	got, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, fmt.Errorf("couldn't read response body : %v", err)
+	}
+	var gotEs []lex.Entry
+	err = json.Unmarshal(got, &gotEs)
+	if err != nil {
+		return false, fmt.Errorf("couldn't parse json : %v", err)
+	}
+	var expEs []lex.Entry
+	err = json.Unmarshal([]byte(expect), &expEs)
+	if err != nil {
+		return false, fmt.Errorf("couldn't parse expect string : %v", err)
+	}
+	for i, e := range gotEs {
+		e.EntryStatus.Timestamp = ""
+		gotEs[i] = e
+	}
+	for i, e := range expEs {
+		e.EntryStatus.Timestamp = ""
+		expEs[i] = e
+	}
 
-		if !reflect.DeepEqual(gotEs, expEs) {
-			fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
-			return false, nil
-		}
+	if !reflect.DeepEqual(gotEs, expEs) {
+		fmt.Printf("** FAILED TEST ** for %s :\n >> EXPECTED RESPONSE:\n%s\n >> FOUND:\n%s\n", url, expect, string(got))
+		return false, nil
 	}
 	return true, nil
 }
@@ -346,18 +342,16 @@ func lookupTest(port string, url string, expect string) (bool, error) {
 func mustExistTest(port string, url string) (bool, error) {
 	url = "http://localhost" + port + url
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	if err != nil {
-		fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
 		return false, nil
-	} else {
-		log.Printf("init_tests: lookup/entry %s", url)
+	}
+	defer resp.Body.Close()
+	log.Printf("init_tests: lookup/entry %s", url)
 
-		if resp.StatusCode != http.StatusOK {
-			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
-			return false, nil
-		}
-
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+		return false, nil
 	}
 	return true, nil
 
@@ -371,10 +365,10 @@ func testExampleURLs(port string) (int, int, error) {
 	nTests := 0
 
 	resp, err := http.Get("http://localhost" + port + "/meta/examples")
-	defer resp.Body.Close()
 	if err != nil {
 		return nFailed, nTests, fmt.Errorf("couldn't retrieve server's url examples : %v", err)
 	}
+	defer resp.Body.Close()
 	js, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nFailed, nTests, fmt.Errorf("couldn't retrieve server's url examples : %v", err)
@@ -390,26 +384,25 @@ func testExampleURLs(port string) (int, int, error) {
 		nTests = nTests + 1
 		url := "http://localhost" + port + urlEnc(example.URL)
 		resp, err = http.Get(url)
-		defer resp.Body.Close()
 		if err != nil {
-			fmt.Printf("** FAILED TEST ** for %s : couldn't retreive URL : %v\n", url, err)
+			fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
+			nFailed = nFailed + 1
+		}
+		defer resp.Body.Close()
+		log.Printf("init_tests: %s => %s : %s", example.Template, shortenURL(example.URL), resp.Status)
+
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
 			nFailed = nFailed + 1
 		} else {
-			log.Printf("init_tests: %s => %s : %s", example.Template, shortenURL(example.URL), resp.Status)
+			got, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nFailed, nTests, fmt.Errorf("couldn't read response body : %v", err)
+			}
 
-			if resp.StatusCode != http.StatusOK {
-				fmt.Printf("** FAILED TEST ** for %s : expected response code 200, found %d\n", url, resp.StatusCode)
+			if strings.TrimSpace(string(got)) == "" {
+				fmt.Printf("** FAILED TEST ** for %s : expected non-empty response\n", url)
 				nFailed = nFailed + 1
-			} else {
-				got, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					return nFailed, nTests, fmt.Errorf("couldn't read response body : %v", err)
-				}
-
-				if strings.TrimSpace(string(got)) == "" {
-					fmt.Printf("** FAILED TEST ** for %s : expected non-empty response\n", url, resp)
-					nFailed = nFailed + 1
-				}
 			}
 		}
 	}
