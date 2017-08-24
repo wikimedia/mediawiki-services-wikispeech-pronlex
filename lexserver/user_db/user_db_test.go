@@ -86,6 +86,9 @@ func Test_UserDB(t *testing.T) {
 	// ==================================
 
 	ok, err := udb.Authorized(u.Name, "sekret")
+	if err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
 
 	//fmt.Printf("User: %#v\n", user)
 
@@ -94,6 +97,9 @@ func Test_UserDB(t *testing.T) {
 	}
 
 	ok, err = udb.Authorized(u.Name, "wrongily")
+	if err == nil {
+		t.Errorf("expected error here")
+	}
 	if w, g := false, ok; w != g {
 		t.Errorf(fs, w, g)
 	}

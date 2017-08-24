@@ -85,7 +85,7 @@ func Test_splitIntoPhonemes(t *testing.T) {
 	}
 
 	s4 := "a aa aaa f33"
-	res, unk, err = splitIntoPhonemes(phs, s4)
+	res, _, err = splitIntoPhonemes(phs, s4)
 	if err != nil {
 		t.Errorf("%s", err)
 	}
