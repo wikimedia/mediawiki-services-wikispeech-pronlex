@@ -21,7 +21,7 @@ Obtain a Docker image using one of the following methods
 
 * Download from https://hub.docker.com/r/sttsse/wikispeech (not guaranteed to be updated on a regular basis):
 
-   `$ git pull docker pull sttsse/wikispeech`
+   `$ docker pull sttsse/wikispeech`
 
    `<DOCKERTAG>` is set to `sttsse/wikispeech`.
 	
