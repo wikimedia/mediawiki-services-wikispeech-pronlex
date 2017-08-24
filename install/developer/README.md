@@ -45,9 +45,10 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 4. Import lexicon data (optional)
 
-   `developer$ sh import.sh <APPDIR>`   
+   `developer$ sh import.sh <LEXDATA-GIT> <APPDIR>`   
 
-   Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
+   Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
+If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github.
 
 
 ## III. Start the lexicon server

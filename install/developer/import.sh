@@ -2,33 +2,34 @@
 
 CMD=`basename $0`
 
-if [ $# -ne 1 ]; then
-    echo "USAGE: sh $CMD <APPDIR>
+if [ $# -ne 2 ]; then
+    echo "USAGE: sh $CMD <LEXDATA-GIT> <APPDIR>
 
-Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
+Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
+If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github.
 " >&2
     exit 1
 fi
 
-APPDIR=`realpath $1`
-
+LEXDATA=$1
+APPDIR=`realpath $2`
 
 ### LEXDATA SETUP
 
 mkdir -p $APPDIR || exit 1
 
-if [ -d "$APPDIR/lexdata" ]; then
-    cd $APPDIR/lexdata && git pull && cd -
-    else
-	git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata
+if [ -d $LEXDATA ]; then
+    cd $LEXDATA && git pull && cd - || exit 1
+else
+    git clone https://github.com/stts-se/lexdata.git $LEXDATA || exit 1
 fi
 
 mkdir -p $APPDIR/db_files || exit 1
 mkdir -p $APPDIR/symbol_sets || exit 1
 
-cp $APPDIR/lexdata/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
-cat $APPDIR/lexdata/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
-cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
+cp $LEXDATA/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
+cat $LEXDATA/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
+cp $LEXDATA/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
 
 ### LEXDATA IMPORT
@@ -43,7 +44,7 @@ CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
 if  go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$SVLEX ; then
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets
+    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$SVLEX sv-se.nst $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets
 else
     echo "$SVLEX FAILED" >&2
     exit 1
@@ -52,7 +53,7 @@ fi
 echo "" >&2
 echo "IMPORT: $NOBLEX" >&2
 if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$NOBLEX ; then
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APPDIR/symbol_sets
+    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb-no.nst $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APPDIR/symbol_sets
 else
     echo "$NOBLEX FAILED" >&2
     exit 1
@@ -61,7 +62,7 @@ fi
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
 if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$AMELEX ; then 
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets
+    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$AMELEX en-us.cmu $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets
 else
     echo "$AMELEX FAILED" >&2
     exit 1
@@ -70,12 +71,8 @@ fi
 echo "" >&2
 echo "IMPORT: $ARLEX" >&2
 if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$ARLEX ; then
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$ARLEX ar-test $APPDIR/lexdata/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
+    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$ARLEX ar-test $LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
 else
     echo "$ARLEX FAILED" >&2
     exit 1
 fi
-
-rm -fr $APPDIR/lexdata
-
-
