@@ -481,6 +481,7 @@ func splitTrans(lhs, rhs, trans string) (string, string, error) {
 	return t1, t2, errr
 }
 
+// HerusticSvNSTTransDecomp is a heuristic trans decompounder for Swedish
 func HerusticSvNSTTransDecomp(orthDecomp, trans string) ([]string, error) {
 	var res []string
 	var err error
@@ -554,6 +555,7 @@ func cleanUpDecomp(d string) string {
 	return res
 }
 
+// WP defines a word part
 type WP struct {
 	trans string
 	pos   string
@@ -603,6 +605,7 @@ func addWordParts(wps string, trans []string, pos, morph string) {
 	//fmt.Println(wps)
 }
 
+// Freq defines a word part frequency
 type Freq struct {
 	Word WP
 	Freq int
