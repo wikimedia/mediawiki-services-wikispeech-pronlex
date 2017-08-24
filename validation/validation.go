@@ -55,10 +55,12 @@ type TestResultContainer struct {
 	CrossErrors  []TestResult
 }
 
+// Size returns the total number of errors in the TestResultContainer
 func (tc TestResultContainer) Size() int {
 	return len(tc.AcceptErrors) + len(tc.RejectErrors) + len(tc.CrossErrors)
 }
 
+// AllErrrors returns all errors in the TestResultContainer
 func (tc TestResultContainer) AllErrors() []TestResult {
 	return append(append(tc.AcceptErrors, tc.RejectErrors...), tc.CrossErrors...)
 }

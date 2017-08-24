@@ -111,11 +111,11 @@ func removeInitialSlash(url string) string {
 	return initialSlashRe.ReplaceAllString(url, "")
 }
 
-func (sr subRouter) handlerExamples() []string {
+func (rout subRouter) handlerExamples() []string {
 	res := []string{}
-	for _, handler := range sr.handlers {
+	for _, handler := range rout.handlers {
 		for _, example := range handler.examples {
-			res = append(res, sr.root+example)
+			res = append(res, rout.root+example)
 		}
 	}
 	return res

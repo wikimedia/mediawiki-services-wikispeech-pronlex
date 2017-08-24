@@ -101,6 +101,7 @@ func parseSymbolSet(s string) (string, error) {
 
 var fileSuffix = regexp.MustCompile(".[^.]+$")
 
+// LoadFile loads a converter file and runs the specified tests
 func LoadFile(symbolSets map[string]symbolset.SymbolSet, fName string) (Converter, TestResult, error) {
 	name := filepath.Base(fName)
 	var extension = filepath.Ext(name)
@@ -212,6 +213,7 @@ func LoadFromDir(symbolSets map[string]symbolset.SymbolSet, dirName string) (map
 	return convs, res, nil
 }
 
+// Test runs the input tests and returns a test result
 func (c Converter) Test(tests []test) (TestResult, error) {
 	res1, err := c.testExamples(tests)
 	if err != nil {

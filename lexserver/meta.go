@@ -23,6 +23,7 @@ func metaURLsHandler(urls []string) urlHandler {
 	return res
 }
 
+// JSONURLExample : JSON container
 type JSONURLExample struct {
 	Template string `json:"template"`
 	URL      string `json:"url"`

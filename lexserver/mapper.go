@@ -25,6 +25,7 @@ var mMut = struct {
 	},
 }
 
+// JSONMapped : JSON container
 type JSONMapped struct {
 	From   string
 	To     string
@@ -87,12 +88,14 @@ var mapperMap = urlHandler{
 	},
 }
 
+// JSONMapper : JSON container
 type JSONMapper struct {
 	From    string
 	To      string
 	Symbols []JSONMSymbol
 }
 
+// JSONMSymbol : JSON container
 type JSONMSymbol struct {
 	From string
 	To   string

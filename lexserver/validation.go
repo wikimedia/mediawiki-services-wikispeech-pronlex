@@ -215,6 +215,7 @@ func trimEntries(entries []lex.Entry) []lex.Entry {
 	return res
 }
 
+// ValidatorNames : JSON container
 type ValidatorNames struct {
 	ValidatorNames []string `json:"validator_names"`
 }

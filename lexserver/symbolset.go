@@ -17,11 +17,13 @@ import (
 	"github.com/stts-se/pronlex/symbolset"
 )
 
+// JSONSymbolSet : JSON container
 type JSONSymbolSet struct {
 	Name    string
 	Symbols []JSONSymbol
 }
 
+// JSONSymbol : JSON container
 type JSONSymbol struct {
 	Symbol string
 	IPA    JSONIPA
@@ -29,6 +31,7 @@ type JSONSymbol struct {
 	Cat    string
 }
 
+// JSONIPA : JSON container
 type JSONIPA struct {
 	String  string
 	Unicode string
@@ -323,6 +326,7 @@ var symbolsetUpload = urlHandler{
 	},
 }
 
+// SymbolSetNames : JSON container
 type SymbolSetNames struct {
 	SymbolSetNames []string `json:"symbol_set_names"`
 }

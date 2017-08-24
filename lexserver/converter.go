@@ -18,6 +18,7 @@ var cMut = struct {
 	service: make(map[string]converter.Converter),
 }
 
+// JSONConverted : JSON container
 type JSONConverted struct {
 	Converter string
 	Input     string
@@ -73,6 +74,7 @@ var converterConvert = urlHandler{
 	},
 }
 
+// JSONConverter : JSON container
 type JSONConverter struct {
 	Name  string
 	From  string
@@ -80,6 +82,7 @@ type JSONConverter struct {
 	Rules []JSONCRule
 }
 
+// JSONCRule : JSON container
 type JSONCRule struct {
 	Type string
 	From string
