@@ -66,11 +66,11 @@ func Test_NSTParse_01(t *testing.T) {
 			Paradigm: "s111n, a->ä, stad",
 		},
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\"stu:$%s`t`A:$den",
 				Language: "SWE",
 			},
-			lex.Transcription{
+			{
 				Strn:     "\"\"stu:$%s`t`A:n",
 				Language: "SWE",
 			},
@@ -106,7 +106,7 @@ func Test_NSTParse_WithPosConversion(t *testing.T) {
 			Paradigm: "",
 		},
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     `h}:$""mA:n$%fOn$den`,
 				Language: "SWE",
 			},

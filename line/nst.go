@@ -164,7 +164,7 @@ func (nst NST) fields(e lex.Entry) (map[Field]string, error) {
 // NewNST is used to create an instance of the NST parser
 func NewNST() (NST, error) {
 	tests := []FormatTest{
-		FormatTest{"storstaden;NN;SIN|DEF|NOM|UTR;stor+staden;JJ+NN;LEX|INFL;SWE;;;;;\"\"stu:$%s`t`A:$den;1;STD;SWE;;;;;;;;;;;;;;18174;enter_se|inflector;;INFLECTED;storstad|95522;s111n, a->ä, stad;s111;;;;;;;;;;;;;storstaden;;;88748",
+		{"storstaden;NN;SIN|DEF|NOM|UTR;stor+staden;JJ+NN;LEX|INFL;SWE;;;;;\"\"stu:$%s`t`A:$den;1;STD;SWE;;;;;;;;;;;;;;18174;enter_se|inflector;;INFLECTED;storstad|95522;s111n, a->ä, stad;s111;;;;;;;;;;;;;storstaden;;;88748",
 			map[Field]string{
 				Orth:       "storstaden",
 				Pos:        "NN",
