@@ -12,6 +12,7 @@ import (
 	_ "github.com/mattn/go-sqlite3" // Silent import needed to load sqlite3 libs
 )
 
+// A User class for the user db
 type User struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
@@ -21,12 +22,16 @@ type User struct {
 }
 
 //TODO Not sure whether mutex is strictly needed, but want to try it anyway.
+
+// UserDB : A user database
 type UserDB struct {
 	mutex *sync.RWMutex
 	*sql.DB
 }
 
 // TODO test me
+
+// GetUsers returns the users defined in the database
 func (udb UserDB) GetUsers() ([]User, error) {
 	var res []User
 
@@ -56,6 +61,7 @@ func (udb UserDB) GetUsers() ([]User, error) {
 	return res, nil
 }
 
+// GetUserByName looks up the user with the specified name
 func (udb UserDB) GetUserByName(name string) (User, error) {
 	udb.mutex.RLock()
 	defer udb.mutex.RUnlock()
@@ -102,6 +108,7 @@ func (udb UserDB) GetPasswordHash(userName string) (string, error) {
 	return res, nil
 }
 
+// InsertUser is used to insert a user into the database
 func (udb UserDB) InsertUser(u User, password string) error {
 
 	udb.mutex.Lock()
@@ -132,6 +139,7 @@ func (udb UserDB) InsertUser(u User, password string) error {
 	return nil
 }
 
+// DeleteUser is used to delete a user from the database
 func (udb UserDB) DeleteUser(userName string) error {
 
 	udb.mutex.Lock()
@@ -162,7 +170,6 @@ func (udb UserDB) DeleteUser(userName string) error {
 // Update updates the fields of User except for User.ID and User.Name.
 // Zero valued fields (empty string) will be treated as acceptable
 // values, and updated to the empty string in the DB.
-
 func (udb UserDB) Update(user User) error {
 
 	udb.mutex.Lock()
@@ -190,6 +197,7 @@ func (udb UserDB) Update(user User) error {
 
 //TODO UpdatePassword
 
+// Authorized is used to check if the password matches the specified user name
 func (udb UserDB) Authorized(userName, password string) (bool, error) {
 
 	udb.mutex.RLock()
@@ -223,6 +231,7 @@ var userDBSchema = `CREATE TABLE IF NOT EXISTS user (
   roles TEXT,
   dbs TEXT);`
 
+// CreateEmptyUserDB is used to create an empty user database
 func CreateEmptyUserDB(fName string) error {
 	if _, err := os.Stat(fName); !os.IsNotExist(err) {
 		return fmt.Errorf("Cannot create file that already exists: '%s'", fName)
@@ -241,6 +250,7 @@ func CreateEmptyUserDB(fName string) error {
 	return nil
 }
 
+// InitUserDB is used to setup the initial user database
 func InitUserDB(fName string) (UserDB, error) {
 	if _, err := os.Stat(fName); os.IsNotExist(err) {
 		return UserDB{}, fmt.Errorf("db file doesn't exist: '%s'", fName)

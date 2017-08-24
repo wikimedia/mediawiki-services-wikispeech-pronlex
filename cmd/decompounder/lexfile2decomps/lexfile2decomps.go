@@ -60,7 +60,7 @@ func SvNSTTransAlign(decomps []string, trans string) []string {
 }
 
 // TODO Only care about first transcription variant
-func SvNSTDecopmTransAlign(lexiconLine string) ([]string, []string) {
+func SvNSTDecompTransAlign(lexiconLine string) ([]string, []string) {
 	fs := strings.Split(lexiconLine, "\t")
 	decomps := strings.Split(strings.Trim(fs[3], "+"), "+")
 	fmt.Printf("%#v\n", decomps)
@@ -102,7 +102,7 @@ func main() {
 
 	for s.Scan() {
 		l := s.Text()
-		SvNSTDecopmTransAlign(l)
+		SvNSTDecompTransAlign(l)
 		fs := strings.Split(l, "\t")
 		decomp := strings.ToLower(strings.TrimSpace(fs[3]))
 		wordParts := strings.Split(decomp, "+")

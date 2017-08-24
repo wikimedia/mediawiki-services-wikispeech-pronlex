@@ -174,7 +174,7 @@ func canMatchPrefix(p string) string {
 }
 
 func canMatchChar(c rune) (string, error) {
-	var res string = "XXXXZZZXXX"
+	var res = "XXXXZZZXXX"
 	var err error
 
 	if phon, ok := char2phon[c]; ok {
@@ -209,7 +209,7 @@ func makeRes(matchStrings ...string) string {
 	return res
 }
 
-func canMatchLhs(lhs string) (string, error) {
+func canMatchLHS(lhs string) (string, error) {
 	var res string
 	var err error
 	if lhs == "" {
@@ -229,7 +229,7 @@ func canMatchLhs(lhs string) (string, error) {
 	return res, err
 }
 
-func canMatchRhs(rhs string) (string, error) {
+func canMatchRHS(rhs string) (string, error) {
 	var res string
 	var err error
 	if rhs == "" {
@@ -369,13 +369,13 @@ func doubleChar(lhs, rhs string) (rune, bool) {
 	}
 
 	lhsRunes := []rune(lhs)
-	lastLhs := lhsRunes[len(lhsRunes)-1]
+	lastLHS := lhsRunes[len(lhsRunes)-1]
 
 	rhsRunes := []rune(rhs)
-	firstRhs := rhsRunes[0]
+	firstRHS := rhsRunes[0]
 
-	if lastLhs == firstRhs {
-		return lastLhs, true
+	if lastLHS == firstRHS {
+		return lastLHS, true
 	}
 
 	return res, isSame
@@ -417,7 +417,7 @@ func splitTrans(lhs, rhs, trans string) (string, string, error) {
 	// 	lhs0 = lhs0[0 : len(lhs0)-1]
 	// }
 
-	lhsM, lErr := canMatchLhs(lhs0)
+	lhsM, lErr := canMatchLHS(lhs0)
 	//fmt.Printf("lhsM: %s\n", lhsM)
 	//fmt.Printf("lErr: %v\n", lErr)
 
@@ -430,7 +430,7 @@ func splitTrans(lhs, rhs, trans string) (string, string, error) {
 	//		lhsM = lhsM + "(?: " + +")?"
 	//	}
 
-	rhsM, rErr := canMatchRhs(rhs)
+	rhsM, rErr := canMatchRHS(rhs)
 
 	// TODO This is not how you handle disjunctive errors
 	var errr error
@@ -495,7 +495,7 @@ func HerusticSvNSTTransDecomp(orthDecomp, trans string) ([]string, error) {
 			continue
 		}
 
-		tLhs, tRhs, err0 := splitTrans(lhs, rhs, transSoFar)
+		tLHS, tRHS, err0 := splitTrans(lhs, rhs, transSoFar)
 		if err0 != nil {
 			if err == nil {
 				err = err0
@@ -503,10 +503,10 @@ func HerusticSvNSTTransDecomp(orthDecomp, trans string) ([]string, error) {
 				err = fmt.Errorf("%v : %v", err, err0)
 			}
 		}
-		if tLhs != "" {
-			res = append(res, tLhs)
+		if tLHS != "" {
+			res = append(res, tLHS)
 		}
-		transSoFar = tRhs
+		transSoFar = tRHS
 	}
 	res = append(res, transSoFar)
 	//fmt.Println()
