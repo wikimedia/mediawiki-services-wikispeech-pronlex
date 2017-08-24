@@ -34,9 +34,9 @@ Insert the `--no-cache` switch after the `build` tag if you encounter caching is
 
 1. Setup the server 
 
-  `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> setup`
+    `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> setup`
 
-  Set up the server's required file structure in the specified `<APPDIR>`
+    Set up the server's required file structure in the specified `<APPDIR>`
   
 
 2. Import lexicon files (optional)
