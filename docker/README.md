@@ -53,7 +53,7 @@ Insert the `--no-cache` switch after the `build` tag if you encounter caching is
 
 You can also investigate the server environment using `bash`:   
 
-     `$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> bash`
+`$ docker_run.sh -a <APPDIR> -t <DOCKERTAG> bash`
   
 
 ###
