@@ -39,6 +39,7 @@ WORK IN PROGRESS
   
 
 
+<!-- to pass on system user to the docker environment:
 <!---   $ docker build --build-arg USER=$USER https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t stts-lexserver-local	 --->
 
 <!---       $ docker build --build-arg USER=$USER $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local --->
