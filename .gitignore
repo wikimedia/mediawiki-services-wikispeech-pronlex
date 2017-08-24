@@ -1,7 +1,5 @@
 *~
 *.db
-lexserver/symbol_sets
-lexserver/db_files
 
 OLDdecompounder/test_word_parts_out.txt
 lexserver/user_db/test_server/node_modules/
