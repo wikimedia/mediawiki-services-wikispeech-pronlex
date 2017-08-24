@@ -235,7 +235,7 @@ func Test_DBManager(t *testing.T) {
 	apaE := lookUpApa["db1"][0]
 	w1 := "zzzu: p a"
 	w2 := "Svetzzz"
-	apaE.Transcriptions = []lex.Transcription{lex.Transcription{Strn: w1, Language: w2}}
+	apaE.Transcriptions = []lex.Transcription{{Strn: w1, Language: w2}}
 
 	//_, _, err = dbm.UpdateEntry(lex.DBRef("db1"), apaE)
 	_, _, err = dbm.UpdateEntry(apaE)

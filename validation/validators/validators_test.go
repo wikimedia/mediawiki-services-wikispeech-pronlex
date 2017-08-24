@@ -15,56 +15,56 @@ func newNSTSvHardWired_ForTesting() (symbolset.SymbolSet, error) {
 	name := "sv.se.nst-SAMPA"
 
 	syms := []symbolset.Symbol{
-		symbolset.Symbol{Desc: "sil", String: "i:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "sill", String: "I", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "full", String: "u0", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "ful", String: "}:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "matt", String: "a", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "mat", String: "A:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "bot", String: "u:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "bott", String: "U", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "häl", String: "E:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "häll", String: "E", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "aula", String: "au", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "syl", String: "y:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "syll", String: "Y", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "hel", String: "e:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "herr,hett", String: "e", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "nöt", String: "2:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "mött,förra", String: "9", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "mål", String: "o:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "moll,håll", String: "O", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "bättre", String: "@", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "europa", String: "eu", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "pol", String: "p", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "bok", String: "b", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "tok", String: "t", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "bort", String: "rt", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "mod", String: "m", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "nod", String: "n", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "dop", String: "d", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "bord", String: "rd", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "fot", String: "k", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "våt", String: "g", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "lång", String: "N", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "forna", String: "rn", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "fot", String: "f", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "våt", String: "v", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "kjol", String: "C", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "fors", String: "rs", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "rov", String: "r", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "lov", String: "l", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "sot", String: "s", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "sjok", String: "x", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "hot", String: "h", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "porla", String: "rl", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "jord", String: "j", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "syllable delimiter", String: ".", Cat: symbolset.SyllableDelimiter, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "accent I", String: `"`, Cat: symbolset.Stress, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "accent II", String: `""`, Cat: symbolset.Stress, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "secondary stress", String: "%", Cat: symbolset.Stress, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{Desc: "phoneme delimiter", String: " ", Cat: symbolset.PhonemeDelimiter, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "+", Cat: symbolset.CompoundDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "sil", String: "i:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "sill", String: "I", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "full", String: "u0", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "ful", String: "}:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "matt", String: "a", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "mat", String: "A:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "bot", String: "u:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "bott", String: "U", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "häl", String: "E:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "häll", String: "E", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "aula", String: "au", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "syl", String: "y:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "syll", String: "Y", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "hel", String: "e:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "herr,hett", String: "e", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "nöt", String: "2:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "mött,förra", String: "9", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "mål", String: "o:", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "moll,håll", String: "O", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "bättre", String: "@", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "europa", String: "eu", Cat: symbolset.Syllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "pol", String: "p", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "bok", String: "b", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "tok", String: "t", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "bort", String: "rt", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "mod", String: "m", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "nod", String: "n", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "dop", String: "d", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "bord", String: "rd", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "fot", String: "k", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "våt", String: "g", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "lång", String: "N", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "forna", String: "rn", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "fot", String: "f", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "våt", String: "v", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "kjol", String: "C", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "fors", String: "rs", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "rov", String: "r", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "lov", String: "l", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "sot", String: "s", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "sjok", String: "x", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "hot", String: "h", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "porla", String: "rl", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "jord", String: "j", Cat: symbolset.NonSyllabic, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "syllable delimiter", String: ".", Cat: symbolset.SyllableDelimiter, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "accent I", String: `"`, Cat: symbolset.Stress, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "accent II", String: `""`, Cat: symbolset.Stress, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "secondary stress", String: "%", Cat: symbolset.Stress, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{Desc: "phoneme delimiter", String: " ", Cat: symbolset.PhonemeDelimiter, IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "+", Cat: symbolset.CompoundDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
 	}
 
 	return symbolset.NewSymbolSet(name, syms)
@@ -74,87 +74,87 @@ func newNSTSvHardWired_ForTesting() (symbolset.SymbolSet, error) {
 func newNSTNbvHardWired_ForTesting() (symbolset.SymbolSet, error) {
 	name := "NST nob sampa"
 	symbols := []symbolset.Symbol{
-		symbolset.Symbol{String: "@", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "A", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "E", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "O", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "U", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "u0", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "Y", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "\\{", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "9", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "A:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "e:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "i:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "o:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "u:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "\\}:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "y:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "{:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "2:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "9:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "\\{\\*I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "9\\*Y", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "A\\*I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "E\\*\\}", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "O\\*Y", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "o~", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "n=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "l=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "n`=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "l`=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "}*I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "a\\*U", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "@\\*U", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "e~", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "3:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "a", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "a:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "U:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "V", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "U4", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "I@", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "@", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "A", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "E", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "O", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "U", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "u0", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "Y", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "\\{", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "9", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "A:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "e:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "i:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "o:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "u:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "\\}:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "y:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "{:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "2:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "9:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "\\{\\*I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "9\\*Y", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "A\\*I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "E\\*\\}", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "O\\*Y", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "o~", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "n=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "l=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "n`=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "l`=", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "}*I", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "a\\*U", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "@\\*U", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "e~", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "3:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "a", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "a:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "U:", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "V", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "U4", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "I@", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
 
-		symbolset.Symbol{String: "p", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "t", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "k", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "b", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "d", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "g", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "f", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "v", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "h", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "j", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "s", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "l", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "r", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "n", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "m", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "N", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "t`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "d`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "s`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "n`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "l`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "S", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "C", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "tS", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "dZ", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "w", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "x", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "T", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "D", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "r3", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "Z", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "z", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "p", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "t", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "k", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "b", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "d", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "g", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "f", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "v", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "h", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "j", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "s", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "l", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "r", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "n", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "m", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "N", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "t`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "d`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "s`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "n`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "l`", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "S", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "C", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "tS", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "dZ", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "w", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "x", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "T", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "D", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "r3", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "Z", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "z", Cat: symbolset.NonSyllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
 
-		symbolset.Symbol{String: "%", Cat: symbolset.Stress, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "\"\"", Cat: symbolset.Stress, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "\"", Cat: symbolset.Stress, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: " ", Cat: symbolset.PhonemeDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "$", Cat: symbolset.SyllableDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
-		symbolset.Symbol{String: "-", Cat: symbolset.CompoundDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "%", Cat: symbolset.Stress, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "\"\"", Cat: symbolset.Stress, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "\"", Cat: symbolset.Stress, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: " ", Cat: symbolset.PhonemeDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "$", Cat: symbolset.SyllableDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
+		{String: "-", Cat: symbolset.CompoundDelimiter, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
 	}
 	return symbolset.NewSymbolSet(name, symbols)
 }
@@ -194,7 +194,7 @@ func TestWhitespace(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\" b A: . n @ n",
 				Language: "swe",
 			},
@@ -217,7 +217,7 @@ func TestWhitespace(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\" b A: . n @ n ",
 				Language: "swe",
 			},
@@ -228,7 +228,7 @@ func TestWhitespace(t *testing.T) {
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
-		lex.EntryValidation{
+		{
 			RuleName: "SymbolSet",
 			Level:    "Fatal",
 			Message:  "[...]"},
@@ -245,7 +245,7 @@ func TestWhitespace(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\" b A: . n @  n",
 				Language: "swe",
 			},
@@ -256,7 +256,7 @@ func TestWhitespace(t *testing.T) {
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
-		lex.EntryValidation{
+		{
 			RuleName: "SymbolSet",
 			Level:    "Fatal",
 			Message:  "[...]"},
@@ -287,7 +287,7 @@ func TestRepeated(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\" b A: . n @ n",
 				Language: "swe",
 			},
@@ -310,7 +310,7 @@ func TestRepeated(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\" b A: n . n @ n",
 				Language: "swe",
 			},
@@ -321,7 +321,7 @@ func TestRepeated(t *testing.T) {
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
-		lex.EntryValidation{
+		{
 			RuleName: "repeated_phonemes",
 			Level:    "Fatal",
 			Message:  "[...]"},
@@ -351,7 +351,7 @@ func TestNst1(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\" b A: . n @ n",
 				Language: "swe",
 			},
@@ -374,7 +374,7 @@ func TestNst1(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "ban+torget",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\" b A: n + % t O r . j @ t",
 				Language: "swe",
 			},
@@ -398,7 +398,7 @@ func TestNst1(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "bat+torget",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\" b A: t + % t O r . j @ t",
 				Language: "swe",
 			},
@@ -422,7 +422,7 @@ func TestNst1(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "batt+torget",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\" b a t + % t O r . j @ t",
 				Language: "swe",
 			},
@@ -446,7 +446,7 @@ func TestNst1(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "batt+torget",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\" b a t + % t O r . j @ t",
 				Language: "swe",
 			},
@@ -457,7 +457,7 @@ func TestNst1(t *testing.T) {
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
-		lex.EntryValidation{
+		{
 			RuleName: "Decomp2Orth",
 			Level:    "Fatal",
 			Message:  "[...]"},
@@ -475,7 +475,7 @@ func TestNst1(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "ap+nos",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "Aa: p n u: s",
 				Language: "swe",
 			},
@@ -486,19 +486,19 @@ func TestNst1(t *testing.T) {
 	result = e.EntryValidations
 
 	expect = []lex.EntryValidation{
-		lex.EntryValidation{
+		{
 			RuleName: "primary_stress",
 			Level:    "Fatal",
 			Message:  "[...]"},
-		lex.EntryValidation{
+		{
 			RuleName: "syllabic",
 			Level:    "Format",
 			Message:  "[...]"},
-		lex.EntryValidation{
+		{
 			RuleName: "symbolset",
 			Level:    "Format",
 			Message:  "[...]"},
-		lex.EntryValidation{
+		{
 			RuleName: "MaxOneSyllabic",
 			Level:    "Fatal",
 			Message:  "[...]"},

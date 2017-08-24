@@ -103,7 +103,7 @@ func Test1(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "anka",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\" a N . k a",
 				Language: "swe",
 			},
@@ -133,7 +133,7 @@ func Test2(t *testing.T) {
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
-		lex.EntryValidation{
+		{
 			RuleName: "MustHaveTrans",
 			Level:    "Format",
 			Message:  "[...]",
@@ -159,7 +159,7 @@ func Test3(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "ank+sjärt",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\" a N k + % x { rt",
 				Language: "swe",
 			},
@@ -170,7 +170,7 @@ func Test3(t *testing.T) {
 	var result = e.EntryValidations
 
 	var expect = []lex.EntryValidation{
-		lex.EntryValidation{
+		{
 			RuleName: "Decomp2Orth",
 			Level:    "Fatal",
 			Message:  "[...]",
@@ -195,7 +195,7 @@ func Test4(t *testing.T) {
 		PartOfSpeech: "NN",
 		WordParts:    "ank+stjärts+bad",
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{
+			{
 				Strn:     "\"\" a N k + x { rt rs + % b A: d",
 				Language: "swe",
 			},
