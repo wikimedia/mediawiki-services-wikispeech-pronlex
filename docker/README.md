@@ -7,19 +7,19 @@ The `<DOCKERTAG>` variable represents the name of the Docker installation image.
 
 Obtain a Docker image using one of the following methods
 
-* from a Dockerfile URL:
+* Build from a Dockerfile URL:
 
    `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
 
    `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
 
-* from local Dockerfile:
+* Build from local Dockerfile:
 
    `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
 
    `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
 
-* download from https://hub.docker.com/r/sttsse/wikispeech:
+* Download from https://hub.docker.com/r/sttsse/wikispeech:
 
    `$ git pull docker pull sttsse/wikispeech`
 
