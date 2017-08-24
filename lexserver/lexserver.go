@@ -474,7 +474,7 @@ func webSockRegHandler(ws *websocket.Conn) {
 
 func keepClientsAlive() {
 	c := time.Tick(67 * time.Second)
-	for _ = range c {
+	for range c {
 
 		webSocks.Lock()
 		//log.Printf("keepClientsAlive: pinging number of clients: %v\n", len(webSocks.clients))
@@ -496,7 +496,7 @@ var dbm = dbapi.NewDBManager()
 
 func keepAlive(wsC chan string) {
 	c := time.Tick(57 * time.Second)
-	for _ = range c {
+	for range c {
 		wsC <- "WS_KEEPALIVE"
 	}
 }
