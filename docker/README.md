@@ -2,8 +2,15 @@
 
 The `<DOCKERTAG>` variable represents the name of the Docker installation image.
 
+### I. Install Docker CE
 
-### I. Obtain a Docker image
+1. Install Docker CE for your OS: https://docs.docker.com/engine/installation/   
+   * Ubuntu installation: https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+
+2. Make sure you also set all permissions and groups if needed, and logout and log in again.
+
+
+### II. Obtain a Docker image
 
 Obtain a Docker image using one of the following methods
 
@@ -29,7 +36,7 @@ Obtain a Docker image using one of the following methods
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
 
 
-### II. Run the Docker app
+### III. Run the Docker app
 
 Do set up and run the lexicon server, you need the [docker_run.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/docker_run.sh) script. It is a convenience script for calling `docker run` with a few switches.
 
