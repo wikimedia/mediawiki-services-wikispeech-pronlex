@@ -31,7 +31,7 @@ Insert the `--no-cache` switch after the `build` tag if you encounter caching is
 
 ### II. Run the Docker app
 
-Do set up and run the lexicon server, you need the [docker_run.sh](https://github.com/stts-se/pronlex/blob/master/docker/docker_run.sh) script. It is a convenience script for calling `docker run` with a few switches.
+Do set up and run the lexicon server, you need the [docker_run.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/docker_run.sh) script. It is a convenience script for calling `docker run` with a few switches.
 
 1. Setup the lexicon server 
 
