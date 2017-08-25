@@ -7,7 +7,7 @@ The `<DOCKERTAG>` variable represents the name of the Docker installation image.
 1. Install Docker CE for your OS: https://docs.docker.com/engine/installation/   
    * Ubuntu installation: https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
 
-2. Make sure you also set all permissions and groups if needed, and logout and log in again.
+2. Make sure you set all permissions and groups as specified in the installation instructions above. Log out and log in again.
 
 
 ### II. Obtain a Docker image
