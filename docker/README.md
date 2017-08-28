@@ -18,13 +18,13 @@ Obtain a Docker image using one of the following methods
 
    `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
 
-   `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
+   `<DOCKERTAG>` should normally be set to `stts-pronlex-local`.
 
 * Build from local Dockerfile:
 
    `$ docker build $(go env GOPATH)/src/github.com/stts-se/pronlex -t <DOCKERTAG>`
 
-   `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
+   `<DOCKERTAG>` should normally be set to `stts-pronlex-local`.
 
 * Download from Docker (not guaranteed to be updated on a regular basis):
  
