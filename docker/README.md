@@ -29,11 +29,11 @@ Obtain a Docker image using one of the following methods
 * Download from Docker (not guaranteed to be updated on a regular basis):
  
   1. Visit the following URL and decide which version (_Tag Name_) you want to install    
-     https://hub.docker.com/r/sttsse/wikispeech/tags
+     https://hub.docker.com/r/sttsse/pronlex/tags/
  
-  2. `$ docker pull sttsse/wikispeech:<TAGNAME>`
+  2. `$ docker pull sttsse/pronlex:<TAGNAME>`
 
-  Make a note that your `<DOCKERTAG>` for this version is `sttsse/wikispeech:<TAGNAME>`.
+  Make a note that your `<DOCKERTAG>` for this version is `sttsse/pronlex:<TAGNAME>`.
    	
 
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
