@@ -3,6 +3,8 @@
 CMD=`basename $0`
 APPDIR=`dirname $0`
 KEEP=0
+export GOPATH=`go env GOPATH`
+export PATH=$PATH:$GOPATH/bin
 
 while getopts ":hka:" opt; do
   case $opt in

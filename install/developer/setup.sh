@@ -2,7 +2,8 @@
 
 CMD=`basename $0`
 SCRIPTDIR=`dirname $0`
-GOPATH=`go env GOPATH`
+export GOPATH=`go env GOPATH`
+export PATH=$PATH:$GOPATH/bin
 
 if [ $# -ne 1 ]; then
     echo "USAGE: sh $CMD <APPDIR>

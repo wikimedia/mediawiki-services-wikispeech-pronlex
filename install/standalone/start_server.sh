@@ -10,6 +10,8 @@
 CMD=`basename $0`
 APPDIR=`dirname $0`
 PORT="8787"
+export GOPATH=`go env GOPATH`
+export PATH=$PATH:$GOPATH/bin
 
 while getopts ":hp:a:" opt; do
   case $opt in
