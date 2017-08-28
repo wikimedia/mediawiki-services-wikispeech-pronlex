@@ -14,6 +14,7 @@ RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
 RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
 ENV APPDIR appdir
+ENV GOPATH `go env GOPATH`
 
 ## CHANGE USER FROM ROOT TO SYSTEM USER
 #ARG USER

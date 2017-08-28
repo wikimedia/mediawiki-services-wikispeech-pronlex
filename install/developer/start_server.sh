@@ -9,6 +9,7 @@
 
 CMD=`basename $0`
 PORT="8787"
+GOPATH=`go env GOPATH`
 
 while getopts ":hp:a:" opt; do
   case $opt in

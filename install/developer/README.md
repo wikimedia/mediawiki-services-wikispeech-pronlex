@@ -13,8 +13,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 2. Set up `go`
 
      Download: https://golang.org/dl/ (1.8 or higher)   
-     Installation instructions: https://golang.org/doc/install        
-     Make sure the GOPATH variable is set: `$ echo $GOPATH` 
+     Installation instructions: https://golang.org/doc/install             
 
 3. Install [Sqlite3](https://www.sqlite.org/)
 
@@ -24,6 +23,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 1. Clone the source code
 
+   ``$ GOPATH=`go env GOPATH` ``   
    `$ mkdir -p $GOPATH/src/github.com/stts-se`   
    `$ cd $GOPATH/src/github.com/stts-se`   
    `$ git clone https://github.com/stts-se/pronlex.git`

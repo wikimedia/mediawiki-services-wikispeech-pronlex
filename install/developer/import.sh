@@ -1,6 +1,7 @@
 #!/bin/bash 
 
 CMD=`basename $0`
+GOPATH=`go env GOPATH`
 
 if [ $# -ne 2 ]; then
     echo "USAGE: sh $CMD <LEXDATA-GIT> <APPDIR>

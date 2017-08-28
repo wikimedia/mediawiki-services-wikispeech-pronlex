@@ -1,6 +1,6 @@
 #/bin/bash
 
-DOCKERTAG="stts-lexserver-local"
+#DOCKERTAG="stts-lexserver-local"
 
 CMD=`basename $0`
 
@@ -51,7 +51,12 @@ shift $(expr $OPTIND - 1 )
 
 
 if [ -z "$APPDIR" ] ; then
-    echo "[$CMD] FAILED: APPDIR must be specified!" >&2
+    echo "[$CMD] FAILED: APPDIR must be specified using -a!" >&2
+    exit 1
+fi
+
+if [ -z "$DOCKERTAG" ] ; then
+    echo "[$CMD] FAILED: DOCKERTAG must be specified using -t!" >&2
     exit 1
 fi
 
