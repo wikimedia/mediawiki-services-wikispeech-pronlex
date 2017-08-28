@@ -13,7 +13,11 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 2. Set up `go`
 
      Download: https://golang.org/dl/ (1.8 or higher)  
-     Installation instructions: https://golang.org/doc/install   
+     Installation instructions: https://golang.org/doc/install
+ 
+     Add your GOPATH to your PATH environment variable. Your GOPATH can be found using the following command:
+     `$ go env GOPATH`
+
         
 3. Install [Sqlite3](https://www.sqlite.org/)
 
