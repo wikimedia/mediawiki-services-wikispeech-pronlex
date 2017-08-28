@@ -32,7 +32,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
    `$ mkdir -p $(go env GOPATH)/src/github.com/stts-se`   
    `$ cd $(go env GOPATH)/src/github.com/stts-se`   
-   `$ git clone https://github.com/stts-se/pronlex.git`
+   `stts-se$ git clone https://github.com/stts-se/pronlex.git`
 
 
 2. Download dependencies
