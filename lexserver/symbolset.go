@@ -118,7 +118,7 @@ func symbolsetReloadAllHandler(w http.ResponseWriter, r *http.Request) {
 func symbolsetReloadOneHandler(w http.ResponseWriter, r *http.Request) {
 	name := getParam("name", r)
 	mMut.Lock()
-	err := mMut.service.Delete(name)
+	err := mMut.service.DeleteSymbolSet(name)
 	mMut.Unlock()
 	if err != nil {
 		msg := fmt.Sprintf("couldn't delete symbolset : %v", err)
@@ -174,7 +174,7 @@ var symbolsetDelete = urlHandler{
 			return
 		}
 		mMut.Lock()
-		err := mMut.service.Delete(name)
+		err := mMut.service.DeleteSymbolSet(name)
 		mMut.Unlock()
 		if err != nil {
 			msg := fmt.Sprintf("couldn't delete symbolset : %v", err)

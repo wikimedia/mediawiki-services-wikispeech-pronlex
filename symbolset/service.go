@@ -23,8 +23,8 @@ func (m MapperService) MapperNames() []string {
 	return names
 }
 
-// Delete is used to delete a named symbol set from the cache. Deletes the named symbol set, and all mappers using this symbol set.
-func (m MapperService) Delete(ssName string) error {
+// DeleteSymbolSet is used to delete a named symbol set from the cache. Deletes the named symbol set, and all mappers using this symbol set.
+func (m MapperService) DeleteSymbolSet(ssName string) error {
 	_, ok := m.SymbolSets[ssName]
 	if !ok {
 		return fmt.Errorf("no existing symbol set named %s", ssName)
