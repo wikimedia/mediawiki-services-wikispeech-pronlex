@@ -14,7 +14,6 @@ RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
 RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
 ENV APPDIR appdir
-ENV GOPATH `go env GOPATH`
 
 ## CHANGE USER FROM ROOT TO SYSTEM USER
 #ARG USER
@@ -24,10 +23,10 @@ ENV GOPATH `go env GOPATH`
 
 # setup script
 RUN echo "#!/bin/bash" > bin/setup
-RUN echo "cp -r $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files $APPDIR/symbol_sets" >> bin/setup
+RUN echo "cp -r /go/src/github.com/stts-se/pronlex/lexserver/demo_files $APPDIR/symbol_sets" >> bin/setup
 
 # import script
-RUN ln -s $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh bin/import_all0
+RUN ln -s /go/src/github.com/stts-se/pronlex/install/standalone/import.sh bin/import_all0
 RUN echo "#!/bin/bash" > bin/import_all
 RUN echo "sh bin/import_all0 -a $APPDIR" >> bin/import_all
 
