@@ -28,7 +28,7 @@ Obtain a Docker image using one of the following methods
 
 * Download from Docker (not guaranteed to be updated on a regular basis):
  
-  1. Visit the following URL and decide which version you want to install    
+  1. Visit the following URL and decide which version ('Tag Name') you want to install    
      https://hub.docker.com/r/sttsse/wikispeech/tags
  
   2. `$ docker pull sttsse/wikispeech:<TAGNAME>`
