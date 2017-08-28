@@ -176,7 +176,7 @@ func initFolders() error {
 		if os.IsNotExist(err) {
 			err2 := os.Mkdir(uploadFileArea, 0755)
 			if err2 != nil {
-				fmt.Printf("lexserver.init: failed to create %s : %v", uploadFileArea, err2)
+				fmt.Printf("lexserver.init: failed to create %s : %v\n", uploadFileArea, err2)
 			}
 		} else {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
@@ -188,7 +188,7 @@ func initFolders() error {
 		if os.IsNotExist(err) {
 			err2 := os.Mkdir(downloadFileArea, 0755)
 			if err2 != nil {
-				fmt.Printf("lexserver.init: failed to create %s : %v", downloadFileArea, err2)
+				fmt.Printf("lexserver.init: failed to create %s : %v\n", downloadFileArea, err2)
 			}
 		} else {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)
@@ -212,7 +212,7 @@ func initFolders() error {
 		if os.IsNotExist(err) {
 			err2 := os.Mkdir(dbFileArea, 0755)
 			if err2 != nil {
-				fmt.Printf("lexserver.init: failed to create %s : %v", dbFileArea, err2)
+				fmt.Printf("lexserver.init: failed to create %s : %v\n", dbFileArea, err2)
 			}
 		} else {
 			fmt.Printf("lexserver.init: peculiar error : %v", err)

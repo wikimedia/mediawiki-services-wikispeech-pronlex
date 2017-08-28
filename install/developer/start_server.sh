@@ -68,6 +68,6 @@ if [ $# -ne 0 ]; then
     exit 1
 fi
 
-
-switches="-ss_files $APPDIR/symbol_sets/ -db_files $APPDIR/db_files/ -static static"
+CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
+switches="-ss_files $(pwd)/$APPDIR/symbol_sets/ -db_files $(pwd)/$APPDIR/db_files/ -static $CMDDIR/static"
 cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
