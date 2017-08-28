@@ -22,7 +22,7 @@ Obtain a Docker image using one of the following methods
 
 * Build from local Dockerfile:
 
-   `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
+   `$ docker build $(go env GOPATH)/src/github.com/stts-se/pronlex -t <DOCKERTAG>`
 
    `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
 
@@ -30,7 +30,7 @@ Obtain a Docker image using one of the following methods
 
    `$ docker pull sttsse/wikispeech`
 
-   `<DOCKERTAG>` is set to `sttsse/wikispeech`.
+   Please note that `<DOCKERTAG>` is set to `sttsse/wikispeech`.
    
    To find out when the Docker hub image was built, see https://hub.docker.com/r/sttsse/wikispeech/tags
 	

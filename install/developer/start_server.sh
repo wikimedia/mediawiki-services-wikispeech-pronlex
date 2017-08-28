@@ -52,7 +52,7 @@ done
 
 
 if [ -z "$APPDIR" ] ; then
-    echo "[$CMD] APPDIR must be specified!" >&2
+    echo "[$CMD] APPDIR must be specified using -a!" >&2
     exit 1
 fi
 

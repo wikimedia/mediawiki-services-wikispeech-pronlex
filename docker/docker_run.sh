@@ -28,7 +28,7 @@ Options:
   -h help
   -a appdir     (required)
   -p port       (default: $PORT)
-  -t docker-tag (default: $DOCKERTAG)
+  -t docker-tag (required)
 " >&2
 	exit 1
       ;;
@@ -60,9 +60,9 @@ if [ -z "$DOCKERTAG" ] ; then
     exit 1
 fi
 
-echo "[$CMD] APPDIR    : $APPDIR" >%2
-echo "[$CMD] PORT      : $PORT" >%2
-echo "[$CMD] DOCKERTAG : $DOCKERTAg" >%2
+echo "[$CMD] APPDIR    : $APPDIR" >&2
+echo "[$CMD] PORT      : $PORT" >&2
+echo "[$CMD] DOCKERTAG : $DOCKERTAG" >&2
 
 #mkdir -p $APPDIR
 #chgrp docker $APPDIR
