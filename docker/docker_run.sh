@@ -1,6 +1,6 @@
 #/bin/bash
 
-#DOCKERTAG="stts-lexserver-local"
+#DOCKERTAG="stts-pronlex-local"
 
 CMD=`basename $0`
 
