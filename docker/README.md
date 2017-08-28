@@ -26,14 +26,15 @@ Obtain a Docker image using one of the following methods
 
    `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.
 
-* Download from https://hub.docker.com/r/sttsse/wikispeech (not guaranteed to be updated on a regular basis):
+* Download from Docker (not guaranteed to be updated on a regular basis):
+ 
+  1. Visit the following URL and decide which version you want to install    
+     https://hub.docker.com/r/sttsse/wikispeech/tags
+ 
+  2. `$ docker pull sttsse/wikispeech:<TAGNAME>`
 
-   `$ docker pull sttsse/wikispeech`
-
-   Please note that `<DOCKERTAG>` is set to `sttsse/wikispeech`.
-   
-   To find out when the Docker hub image was built, see https://hub.docker.com/r/sttsse/wikispeech/tags
-	
+  Make a note that your `<DOCKERTAG>` for this version is `sttsse/wikispeech:<TAGNAME>`.
+   	
 
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
 
