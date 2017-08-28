@@ -32,7 +32,7 @@ Obtain a Docker image using one of the following methods
 
    `<DOCKERTAG>` is set to `sttsse/wikispeech`.
    
-   To find out when the Docker hub image was built, see https://hub.docker.com/r/sttsse/wikispeech/tags/
+   To find out when the Docker hub image was built, see https://hub.docker.com/r/sttsse/wikispeech/tags
 	
 
 Insert the `--no-cache` switch after the `build` tag if you encounter caching issues (e.g., with updated git repos, etc).
