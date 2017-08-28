@@ -22,7 +22,6 @@ Obtain a Docker image using one of the following methods
 
 * Build from local Dockerfile:
 
-   ``$ GOPATH=`go env GOPATH` ``   
    `$ docker build $GOPATH/src/github.com/stts-se/pronlex -t stts-lexserver-local`
 
    `<DOCKERTAG>` should normally be set to `stts-lexserver-local`.

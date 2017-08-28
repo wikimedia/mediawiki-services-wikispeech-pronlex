@@ -23,7 +23,7 @@ Below are instructions on how to set up the lexicon server for development. For 
 
 1. Clone the source code
 
-   ``$ GOPATH=`go env GOPATH` ``   
+   ``$ GOPATH=`go env GOPATH` # temp variable``   
    `$ mkdir -p $GOPATH/src/github.com/stts-se`   
    `$ cd $GOPATH/src/github.com/stts-se`   
    `$ git clone https://github.com/stts-se/pronlex.git`
