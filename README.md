@@ -23,4 +23,4 @@ Git folder: [install/developer/](https://github.com/stts-se/pronlex/blob/master/
 ---
 
 Wikimedia's installation instructions for Wikispeech:
-https://phabricator.wikimedia.org/T161094
+https://www.mediawiki.org/wiki/Extension:Wikispeech
