@@ -43,7 +43,7 @@ fi
 ### LEXDATA SETUP
 
 if [ ! -d $APPDIR/symbol_sets ] ; then
-    echo "FAILED: $APPDIR is not configured for the lexserver" >&2
+    echo "FAILED: $APPDIR is not configured for the lexserver!" >&2
     exit 1
 fi
 
