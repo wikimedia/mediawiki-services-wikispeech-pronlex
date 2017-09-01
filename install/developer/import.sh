@@ -19,7 +19,7 @@ APPDIR=`realpath $2`
 ### LEXDATA SETUP
 
 
-if [ ! -d $APPDIR ] ; then
+if [ ! -d $APPDIR/symbol_sets ] ; then
 	echo "[$CMD] $APPDIR is not configured for the lexserver. Run setup.sh first!" >&2
     exit 1
 fi
