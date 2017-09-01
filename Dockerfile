@@ -28,7 +28,7 @@ RUN echo $GOPATH
 
 # setup script
 RUN echo "#!/bin/bash" > bin/setup
-RUN echo "cp -r /go/src/github.com/stts-se/pronlex/lexserver/demo_files $APPDIR/symbol_sets" >> bin/setup
+RUN echo "mkdir -p $APPDIR/symbol_sets && cp -r /go/src/github.com/stts-se/pronlex/lexserver/demo_files $APPDIR/symbol_sets" >> bin/setup
 
 # import script
 RUN ln -s /go/src/github.com/stts-se/pronlex/install/standalone/import.sh bin/import_all0

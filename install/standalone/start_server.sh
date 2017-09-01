@@ -46,7 +46,8 @@ Options:
         PORT=$OPTARG
       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+	echo "Invalid option: -$OPTARG" >&2
+	exit 1
       ;;
   esac
 done

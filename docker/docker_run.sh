@@ -69,8 +69,19 @@ echo "[$CMD] DOCKERTAG : $DOCKERTAG" >&2
 
 APPDIRABS=`realpath $APPDIR`
 
+NETWORKARGS="--network=wikispeech"
+
+CNAME="pronlex"
+if docker container inspect $CNAME &> /dev/null ; then
+    echo -n "STOPPING CONTAINER "
+    docker stop $CNAME
+    echo -n "DELETING CONTAINER "
+    docker rm $CNAME
+fi
+
+
 ## => use system user inside container
 # docker run -u $USER -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
 
 ## => root user
-docker run -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
+docker run --name=pronlex $NETWORKARGS -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG  $*
