@@ -19,3 +19,8 @@ Git folder: [install/standalone/](https://github.com/stts-se/pronlex/blob/master
 
 Readme: install/developer/README.md   
 Git folder: [install/developer/](https://github.com/stts-se/pronlex/blob/master/install/developer)
+
+---
+
+Wikimedia's installation instructions for Wikispeech:
+https://www.mediawiki.org/wiki/Extension:Wikispeech
