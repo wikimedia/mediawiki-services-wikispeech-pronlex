@@ -18,7 +18,11 @@ APPDIR=`realpath $2`
 
 ### LEXDATA SETUP
 
-mkdir -p $APPDIR || exit 1
+
+if [ ! -d $APPDIR ] ; then
+	echo "[$CMD] $APPDIR is not configured for the lexserver. Run setup.sh first!" >&2
+    exit 1
+fi
 
 if [ -d $LEXDATA ]; then
     cd $LEXDATA && git pull && cd - || exit 1

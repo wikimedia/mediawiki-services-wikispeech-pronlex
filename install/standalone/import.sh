@@ -43,14 +43,9 @@ fi
 ### LEXDATA SETUP
 
 if [ ! -d "$APPDIR" ]; then
-    echo "FAILED: $APPDIR is not configured for lexserver" >&2
+    echo "FAILED: $APPDIR is not configured for the lexserver" >&2
     exit 1
 fi
-
-if [ ! -d "$APPDIR" ]; then
-    mkdir -p $APPDIR || exit 1
-fi
-
 
 if [ -d "$APPDIR/lexdata" ]; then
     cd $APPDIR/lexdata && git pull && cd -
