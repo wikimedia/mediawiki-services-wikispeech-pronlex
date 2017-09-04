@@ -16,7 +16,7 @@ fi
 APPDIR=$1
 
 if [ -d $APPDIR/symbol_sets ] ; then
-    echo "[$CMD] Folder<$APPDIR> is already configured. No setup needed." >&2
+    echo "[$CMD] Folder <$APPDIR> is already configured. No setup needed." >&2
     exit 0
 fi
 
