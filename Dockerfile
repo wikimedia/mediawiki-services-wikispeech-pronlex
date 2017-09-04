@@ -21,12 +21,12 @@ RUN export PATH=$PATH:$(go env GOPATH)/bin
 # setup script
 RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup bin/setup0
 RUN echo "#!/bin/bash" > bin/setup
-RUN echo "sh bin/setup -a $APPDIR" >> bin/setup
+RUN echo "sh bin/setup0 -a $APPDIR" >> bin/setup
 
 # import script
 RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import bin/import_all0
 RUN echo "#!/bin/bash" > bin/import_all
-RUN echo "setup -a $APPDIR && import_all0 -a $APPDIR" >> bin/import_all
+RUN echo "setup && import_all0 -a $APPDIR" >> bin/import_all
 
 RUN chmod --silent +x bin/*
 
