@@ -1,7 +1,5 @@
 #/bin/bash
 
-#DOCKERTAG="stts-pronlex-local"
-
 CMD=`basename $0`
 
 PORT="8787"
@@ -65,7 +63,6 @@ echo "[$CMD] PORT      : $PORT" >&2
 echo "[$CMD] DOCKERTAG : $DOCKERTAG" >&2
 
 #mkdir -p $APPDIR
-#chgrp docker $APPDIR
 
 APPDIRABS=`realpath $APPDIR`
 
@@ -80,8 +77,4 @@ if docker container inspect $CNAME &> /dev/null ; then
 fi
 
 
-## => use system user inside container
-# docker run -u $USER -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
-
-## => root user
-docker run --name=pronlex $NETWORKARGS -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG  $*
+docker run --name=pronlex $NETWORKARGS -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
