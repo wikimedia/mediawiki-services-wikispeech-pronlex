@@ -19,14 +19,12 @@ RUN export GOPATH=$(go env GOPATH)
 RUN export PATH=$PATH:$(go env GOPATH)/bin
 
 # setup script
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup bin/setup0
-RUN echo "#!/bin/bash" > bin/setup
-RUN echo "sh bin/setup0 -a $APPDIR" >> bin/setup
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup bin/setup
 
 # import script
 RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import bin/import_all0
 RUN echo "#!/bin/bash" > bin/import_all
-RUN echo "setup && import_all0 -a $APPDIR" >> bin/import_all
+RUN echo "setup -a $APPDIR && import_all0 -a $APPDIR" >> bin/import_all
 
 RUN chmod --silent +x bin/*
 
@@ -34,5 +32,5 @@ EXPOSE 8787
 
 RUN echo "Mount external host dir to $APPDIR"
 
-CMD (setup && lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static 8787)
+CMD (setup -a $APPDIR && lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static 8787)
 
