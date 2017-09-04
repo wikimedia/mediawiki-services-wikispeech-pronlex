@@ -41,18 +41,4 @@ cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $
 
 ### COMPLETED
 
-echo "
-BUILD COMPLETED! YOU CAN NOW START THE LEXICON SERVER BY INVOKING:
-  $ sh $SCRIPTDIR/start_server.sh -a $APPDIR
-
-  USAGE INFO:
-  $ sh $SCRIPTDIR/start_server.sh -h
-
-
-OR IMPORT STANDARD LEXICON DATA:
-  $ sh $SCRIPTDIR/import.sh <LEXDATA-GIT> $APPDIR
-
-  USAGE INFO:
-  $ sh $SCRIPTDIR/import.sh
-
-" >&2
+echo "[$CMD] COMPLETED" >&2

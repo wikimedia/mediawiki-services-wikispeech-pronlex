@@ -13,22 +13,18 @@ RUN go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
 RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
 RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
-RUN ls -l /go/src/github.com/stts-se/pronlex/docker/import.sh
-
 ENV APPDIR appdir
 
 RUN export GOPATH=$(go env GOPATH)
 RUN export PATH=$PATH:$(go env GOPATH)/bin
 
-RUN echo $GOPATH
-
 # setup script
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup.sh bin/setup0
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup bin/setup0
 RUN echo "#!/bin/bash" > bin/setup
 RUN echo "sh bin/setup -a $APPDIR" >> bin/setup
 
 # import script
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import.sh bin/import_all0
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import bin/import_all0
 RUN echo "#!/bin/bash" > bin/import_all
 RUN echo "setup -a $APPDIR && import_all0 -a $APPDIR" >> bin/import_all
 
