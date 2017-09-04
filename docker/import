@@ -1,5 +1,7 @@
 #!/bin/bash 
 
+## INTERNAL SCRIPT FOR USE INSIDE OF DOCKER CONTAINER
+
 CMD=`basename $0`
 APPDIR=`dirname $0`
 KEEP=0

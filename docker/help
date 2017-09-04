@@ -1,5 +1,7 @@
 #!/bin/bash 
 
+## INTERNAL SCRIPT FOR USE INSIDE OF DOCKER CONTAINER
+
 echo "Available commands:
   - help          : print usage info
   - import_all    : import default lexicon data

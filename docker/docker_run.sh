@@ -66,8 +66,6 @@ echo "[$CMD] DOCKERTAG : $DOCKERTAG" >&2
 
 APPDIRABS=`realpath $APPDIR`
 
-NETWORKARGS="--network=wikispeech"
-
 CNAME="pronlex"
 if docker container inspect $CNAME &> /dev/null ; then
     echo -n "STOPPING CONTAINER "
@@ -77,4 +75,4 @@ if docker container inspect $CNAME &> /dev/null ; then
 fi
 
 
-docker run --name=pronlex $NETWORKARGS -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
+docker run --name=pronlex -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
