@@ -68,9 +68,9 @@ APPDIRABS=`realpath $APPDIR`
 
 CNAME="pronlex"
 if docker container inspect $CNAME &> /dev/null ; then
-    echo -n "STOPPING CONTAINER "
+    echo -n "[$CMD] STOPPING CONTAINER "
     docker stop $CNAME
-    echo -n "DELETING CONTAINER "
+    echo -n "[$CMD] DELETING CONTAINER "
     docker rm $CNAME
 fi
 
