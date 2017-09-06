@@ -186,7 +186,7 @@ SAMPLE INVOCATION:
 	}
 
 	var logger dbapi.Logger
-	var stderrLogger = dbapi.StderrLogger{-1}
+	var stderrLogger = dbapi.StderrLogger{20000}
 
 	if *quiet {
 		logger = dbapi.SilentLogger{}
