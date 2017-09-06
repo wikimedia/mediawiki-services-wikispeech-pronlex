@@ -42,8 +42,8 @@ type StdoutLogger struct {
 
 // Progress logs progress info
 func (l StdoutLogger) Progress(s string) {
-	//fmt.Fprintf(os.Stdout, fmt.Sprintf("\r%s\r", s))
-	fmt.Print(".")
+	fmt.Fprintf(os.Stdout, fmt.Sprintf("\r%s\r", s))
+	//fmt.Print(".")
 }
 
 // Write logs a message string
