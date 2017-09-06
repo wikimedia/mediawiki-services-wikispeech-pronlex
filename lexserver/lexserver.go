@@ -243,7 +243,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	html = html + `<hr/><h2>Create db and start server</h2>
-Instructions on how to create a lexicon database and start the server are available from the <a target="blank" href="https://github.com/stts-se/lexdata/wiki/Create-lexicon-database">Lexdata git Wiki</a>.
+Instructions on how to create a lexicon database and start the server are available from the <a target="blank" href="https://github.com/stts-se/lexdata/blob/master/README.md">Lexdata git repository</a>.
 `
 	fmt.Fprint(w, html)
 }
