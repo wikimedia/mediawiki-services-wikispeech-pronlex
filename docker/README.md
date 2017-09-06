@@ -16,7 +16,7 @@ Obtain a Docker image using one of the following methods
 
 * Build from a Dockerfile URL:
 
-   `$ docker build https://raw.githubusercontent.com/stts-se/pronlex/master/Dockerfile -t <DOCKERTAG>`   
+   `$ docker build https://github.com/stts-se/pronlex.git -t <DOCKERTAG>`   
 
    `<DOCKERTAG>` should normally be set to `stts-pronlex-local`.
 
