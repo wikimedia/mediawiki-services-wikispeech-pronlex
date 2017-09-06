@@ -4,6 +4,9 @@ RUN apt-get update -y && apt-get upgrade -y && apt-get install apt-utils -y
 
 RUN apt-get update -y && apt-get upgrade -y && apt-get install sqlite3 -y && apt-get install git -y && apt-get install gcc -y && apt-get install build-essential -y
 
+# FOR DEBUGGING
+RUN apt-get install -y libnet-ifconfig-wrapper-perl/stable
+
 RUN go get github.com/stts-se/pronlex/lexserver 
 RUN go install github.com/stts-se/pronlex/lexserver 
 
