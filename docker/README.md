@@ -16,15 +16,15 @@ Obtain a Docker image using one of the following methods
 
 * Build from GitHub:
 
-   `$ docker build https://github.com/stts-se/pronlex.git -t <DOCKERTAG>`   
+   `$ docker build https://github.com/stts-se/pronlex.git -t pronlex`   
 
-   `<DOCKERTAG>` should normally be set to `stts-pronlex-local`.
+   `<DOCKERTAG>` is set to `pronlex`.
 
 * Build from local Dockerfile:
 
-   `$ docker build $(go env GOPATH)/src/github.com/stts-se/pronlex -t <DOCKERTAG>`
+   `$ docker build $(go env GOPATH)/src/github.com/stts-se/pronlex -t pronlex`
 
-   `<DOCKERTAG>` should normally be set to `stts-pronlex-local`.
+   `<DOCKERTAG>` is set to `pronlex`.
 
 * Download from Docker (not guaranteed to be updated on a regular basis):
  
