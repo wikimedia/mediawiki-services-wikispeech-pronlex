@@ -1,3 +1,5 @@
+_For information on how to build the complete wikispeech server, please see the [wikispeech_compose](https://github.com/stts-se/wikispeech_compose/) repository._
+
 ## Docker installation
 
 The `<DOCKERTAG>` variable represents the name of the Docker installation image.
