@@ -25,14 +25,14 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 2. Install the pronlex server
 
-     `$ sh install.sh <APPDIR>`
+     `$ bash install.sh <APPDIR>`
 
    Installs the pronlex server in the folder specified by `<APPDIR>`.
 
 
 3. Import lexicon data (optional)
 
-    `$ sh <APPDIR>/import.sh`
+    `$ bash <APPDIR>/import.sh`
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 
@@ -41,16 +41,16 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 The server is started using this script
 
-`$ sh <APPDIR>/start_server.sh`
+`$ bash <APPDIR>/start_server.sh`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
 When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
 
 To specify port, run:   
-`$ sh <APPDIR>/start_server.sh -p <PORT>`
+`$ bash <APPDIR>/start_server.sh -p <PORT>`
 
 
 For a complete set of options, run:  
-`$ sh <APPDIR>/start_server.sh -h`
+`$ bash <APPDIR>/start_server.sh -h`
 
