@@ -25,6 +25,12 @@ Any lexicon files you want to import into the lexicon database must be in this f
 17. StatusName: Status of the lexicon entry
 18. StatusSource: Source of the status
 
+Sample line:
+
+   ``finalspelet	NN	SIN|DEF|NOM|NEU	final+spelet	finalspel	s7n-övriga ex träd	sv-se	false	f I . "" n A: l . % s p e: . l e t	sv-se							imported	nst``
+
+
+
 ### NST lexicon file format
 
 This format is used for converting NST lexicon files to the Wikispeech lexicon file format
