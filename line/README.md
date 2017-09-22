@@ -2,7 +2,7 @@
 
 ### Wikispeech lexicon file format
 
-[Description of the Wikispeech lexicon file format](https://github.com/stts-se/pronlex/blob/master/line/README.md)
+[Description of the Wikispeech lexicon file format](https://godoc.org/github.com/stts-se/pronlex/line)
 
 
 ### NST lexicon file format
