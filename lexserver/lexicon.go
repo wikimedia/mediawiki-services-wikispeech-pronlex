@@ -31,7 +31,7 @@ var lexiconValidationPage = urlHandler{
 var lexiconUpdateEntry = urlHandler{
 	name:     "updateentry",
 	url:      "/updateentry",
-	help:     " Updates an entry in the database. Input in JSON format. For examples, see package documentation https://godoc.org/github.com/stts-se/pronlex/lex",
+	help:     " Updates an entry in the database. Input in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>",
 	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entryJSON := getParam("entry", r)
@@ -221,27 +221,6 @@ var lexiconStats = urlHandler{
 	},
 }
 
-var lexiconAddEntryURL = `/addentry?lexicon_name=demodb:demolex&entry={
-    "strn": "flesk",
-    "language": "sv-se",
-    "partOfSpeech": "NN",
-    "morphology": "SIN-PLU|IND|NOM|NEU",
-    "wordParts": "flesk",
-    "lemma": {
-	"strn": "flesk",
-	"reading": "",
-	"paradigm": "s7n-övriga ex träd"
-    },
-    "transcriptions": [
-	{
-	    
-	    "strn": "\" f l E s k",
-	    "language": "sv-se"
-	}
-    ]
-}
-`
-
 var lexiconLookup = urlHandler{
 	name:     "lookup",
 	url:      "/lookup",
@@ -298,10 +277,31 @@ var lexiconLookup = urlHandler{
 	},
 }
 
+var lexiconAddEntryURL = `/addentry?lexicon_name=demodb:demolex&entry={
+    "strn": "flesk",
+    "language": "sv-se",
+    "partOfSpeech": "NN",
+    "morphology": "SIN-PLU|IND|NOM|NEU",
+    "wordParts": "flesk",
+    "lemma": {
+	"strn": "flesk",
+	"reading": "",
+	"paradigm": "s7n-övriga ex träd"
+    },
+    "transcriptions": [
+	{
+	    
+	    "strn": "\" f l E s k",
+	    "language": "sv-se"
+	}
+    ]
+}
+`
+
 var lexiconAddEntry = urlHandler{
 	name:     "addentry",
 	url:      "/addentry",
-	help:     "Add an entry to the database. Input in JSON format. For examples, see package documentation https://godoc.org/github.com/stts-se/pronlex/lex",
+	help:     "Add an entry to the database. Input in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>",
 	examples: []string{lexiconAddEntryURL},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
