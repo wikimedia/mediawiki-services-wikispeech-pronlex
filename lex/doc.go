@@ -5,10 +5,9 @@ It is implemented as a go struct, and it can automatically be mapped into a JSON
 
 The Entry struct is defined here: https://godoc.org/github.com/stts-se/pronlex/lex#Entry
 
-The corresponding JSON may look like this:
+A few JSON examples:
 
-Entry "things" from the CMU (US English) lexicon
-
+   /// Entry "things" from the CMU (US English) lexicon
    {
       id: 112326,
       lexRef: {
@@ -44,11 +43,11 @@ Entry "things" from the CMU (US English) lexicon
       },
       entryValidations: [ ],
       preferred: false
-}
+   }
 
 
-Entry "hästar" from the Swedish demo lexicon:
 
+   // Entry "hästar" from the Swedish demo lexicon
    {
    id: 6,
    lexRef: {
