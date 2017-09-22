@@ -31,7 +31,7 @@ var lexiconValidationPage = urlHandler{
 var lexiconUpdateEntry = urlHandler{
 	name:     "updateentry",
 	url:      "/updateentry",
-	help:     " Updates an entry in the database.",
+	help:     " Updates an entry in the database. Input in JSON format. For examples, see package documentation https://godoc.org/github.com/stts-se/pronlex/lex",
 	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entryJSON := getParam("entry", r)
@@ -301,7 +301,7 @@ var lexiconLookup = urlHandler{
 var lexiconAddEntry = urlHandler{
 	name:     "addentry",
 	url:      "/addentry",
-	help:     "Add an entry to the database.",
+	help:     "Add an entry to the database. Input in JSON format. For examples, see package documentation https://godoc.org/github.com/stts-se/pronlex/lex",
 	examples: []string{lexiconAddEntryURL},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)

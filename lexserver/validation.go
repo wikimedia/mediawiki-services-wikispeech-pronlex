@@ -40,7 +40,7 @@ func loadValidators(symsetDirName string) error {
 var validationValidateEntry = urlHandler{
 	name:     "validateentry",
 	url:      "/validateentry",
-	help:     "Validates one entry.",
+	help:     "Validates one entry. Input in JSON format. For examples, see package documentation https://godoc.org/github.com/stts-se/pronlex/lex",
 	examples: []string{`/validateentry?symbolsetname=sv-se_ws-sampa-DEMO&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entryJSON := getParam("entry", r)
@@ -131,7 +131,7 @@ var validationStats = urlHandler{
 var validationValidateEntries = urlHandler{
 	name:     "validateentries",
 	url:      "/validateentries",
-	help:     "Validates a list of entries.",
+	help:     "Validates a list of entries. Input as a list JSON format. For examples, see package documentation https://godoc.org/github.com/stts-se/pronlex/lex",
 	examples: []string{`/validateentries?symbolsetname=sv-se_ws-sampa-DEMO&entries=[{%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}},{%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22host%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22host%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20U%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}]`},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entriesJSON := getParam("entries", r)
