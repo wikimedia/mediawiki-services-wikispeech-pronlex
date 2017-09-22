@@ -1,7 +1,5 @@
 package line
 
-// TODO Better definition of general line format (Reading field? Any number of transcriptions?)
-
 import (
 	"fmt"
 	"strconv"
