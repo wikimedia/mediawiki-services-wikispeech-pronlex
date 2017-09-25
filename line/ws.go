@@ -50,7 +50,27 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 		return res, fmt.Errorf("parse to entry failed : %v", err)
 	}
 
+	err = ws.sanityChecks(res)
+	if err != nil {
+		return res, fmt.Errorf("parse to entry failed for line %s: %v", line, err)
+	}
+
 	return res, nil
+}
+
+func (ws WS) sanityChecks(e lex.Entry) error {
+	if strings.TrimSpace(e.Strn) == "" {
+		return fmt.Errorf("input orthography cannot be empty")
+	}
+	if len(e.Transcriptions) == 0 {
+		return fmt.Errorf("there must be at least one input transcription")
+	}
+	for _, t := range e.Transcriptions {
+		if strings.TrimSpace(t.Strn) == "" {
+			return fmt.Errorf("input transcription cannot be empty")
+		}
+	}
+	return nil
 }
 
 // String is used to generate an output line from a set of fields (calls underlying Format.String)
