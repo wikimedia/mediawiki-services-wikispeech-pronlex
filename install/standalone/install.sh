@@ -24,13 +24,13 @@ fi
 
 echo "[$CMD] Installing pronlex/lexserver ... " >&2
 
-go get github.com/stts-se/pronlex/lexserver || exit 1
+go get -u github.com/stts-se/pronlex/lexserver || exit 1
 go install github.com/stts-se/pronlex/lexserver || exit 1
 
-go get github.com/stts-se/pronlex/cmd/lexio/importLex || exit 1
+go get -u github.com/stts-se/pronlex/cmd/lexio/importLex || exit 1
 go install github.com/stts-se/pronlex/cmd/lexio/importLex || exit 1
 
-go get github.com/stts-se/pronlex/cmd/lexio/createEmptyDB || exit 1
+go get -u github.com/stts-se/pronlex/cmd/lexio/createEmptyDB || exit 1
 go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB || exit 1
 
 ### LEXDATA PREPS
