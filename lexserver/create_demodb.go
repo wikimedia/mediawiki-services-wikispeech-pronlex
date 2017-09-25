@@ -111,7 +111,7 @@ func demoEntries() []lex.Entry {
 		Morphology:     "NEU IND PLU",
 		WordParts:      "hästar",
 		Language:       "sv",
-		Preferred:      true,
+		Preferred:      false,
 		Transcriptions: []lex.Transcription{t1},
 		EntryStatus:    lex.EntryStatus{Name: "demo", Source: "auto"},
 		Lemma:          lex.Lemma{Strn: "häst"},
@@ -139,7 +139,21 @@ func demoEntries() []lex.Entry {
 		Morphology:     "UTR IND SIN",
 		WordParts:      "dom",
 		Language:       "sv",
-		Preferred:      true,
+		Preferred:      false,
+		Transcriptions: []lex.Transcription{t1},
+		EntryStatus:    lex.EntryStatus{Name: "demo", Source: "auto"},
+		Lemma:          lex.Lemma{Strn: "dom"},
+	}
+	entries = append(entries, e)
+
+	//
+	t1 = lex.Transcription{Strn: "\" d O m", Language: "sv"}
+	e = lex.Entry{Strn: "dom",
+		PartOfSpeech:   "PM",
+		Morphology:     "",
+		WordParts:      "de",
+		Language:       "sv",
+		Preferred:      false,
 		Transcriptions: []lex.Transcription{t1},
 		EntryStatus:    lex.EntryStatus{Name: "demo", Source: "auto"},
 		Lemma:          lex.Lemma{Strn: "dom"},
