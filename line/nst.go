@@ -68,20 +68,20 @@ func (nst NST) ParseToEntry(line string) (lex.Entry, error) {
 	return res, nil
 }
 
-func appendTrans(ts []lex.Transcription, t string, l string) []lex.Transcription {
-	if "" == strings.TrimSpace(t) {
+func appendTrans(ts []lex.Transcription, trans string, lang string, source string) []lex.Transcription {
+	if "" == strings.TrimSpace(trans) {
 		return ts
 	}
-	ts = append(ts, lex.Transcription{Strn: t, Language: l})
+	ts = append(ts, lex.Transcription{Strn: trans, Language: lang, Sources: []string{source}})
 	return ts
 }
 
 func getTranses(fs map[Field]string) []lex.Transcription {
 	var res []lex.Transcription
-	res = appendTrans(res, fs[Trans1], fs[Translang1])
-	res = appendTrans(res, fs[Trans2], fs[Translang2])
-	res = appendTrans(res, fs[Trans3], fs[Translang3])
-	res = appendTrans(res, fs[Trans4], fs[Translang4])
+	res = appendTrans(res, fs[Trans1], fs[Translang1], fs[StatusSource])
+	res = appendTrans(res, fs[Trans2], fs[Translang2], fs[StatusSource])
+	res = appendTrans(res, fs[Trans3], fs[Translang3], fs[StatusSource])
+	res = appendTrans(res, fs[Trans4], fs[Translang4], fs[StatusSource])
 	return res
 }
 
