@@ -75,9 +75,11 @@ LEXIMPORT.ImportFileModel = function () {
     self.lexiconDBs = ko.observableArray();
 
     self.loadSymbolSetNames = function () {
+	console.log(LEXIMPORT.baseURL + "/symbolset/list")
 	$.getJSON(LEXIMPORT.baseURL +"/symbolset/list")
 	    .done(function (data) {
-		self.symbolSetNames(data.symbol_set_names);
+		console.log(data);
+		self.symbolSetNames(data);
 	    })
     	    .fail(function (xhr, textStatus, errorThrown) {
 		alert("loadSymbolSetNames says: "+ xhr.responseText);
