@@ -67,12 +67,6 @@ if [ ! -d $APPDIR/symbol_sets ]; then
     exit 1
 fi
 
-if [ ! -d $APPDIR/db_files ]; then
-    echo "[$CMD] no such file or directory: $APPDIR/db_files" >&2
-    echo "[$CMD] Use -h for usage info" >&2
-    exit 1
-fi
-
 if [ ! -d $APPDIR/.static ]; then
     echo "[$CMD] no such file or directory: $APPDIR/.static" >&2
     echo "[$CMD] Use -h for usage info" >&2
