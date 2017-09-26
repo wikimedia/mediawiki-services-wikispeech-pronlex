@@ -49,8 +49,9 @@ if [ ! -d $APPDIR/symbol_sets ] ; then
     exit 1
 fi
 
-nSymSets=`ls $APPDIR/lexdata/*/*/*.sym|wc -l`
-if [ -d "$APPDIR/lexdata" && $nSymSets == 0 ]; then
+nConverters=`ls $APPDIR/lexdata/convertersx/*.cnv 2> /dev/null |wc -l`
+nSymSets=`ls $APPDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
+if [ -d "$APPDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
     cd $APPDIR/lexdata && git pull && cd -
     KEEP=1
 else
