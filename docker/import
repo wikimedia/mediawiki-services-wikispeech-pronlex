@@ -49,7 +49,8 @@ if [ ! -d $APPDIR/symbol_sets ] ; then
     exit 1
 fi
 
-if [ -d "$APPDIR/lexdata" ]; then
+nSymSets=`ls $APPDIR/lexdata/*/*/*.sym|wc -l`
+if [ -d "$APPDIR/lexdata" && $nSymSets == 0 ]; then
     cd $APPDIR/lexdata && git pull && cd -
     KEEP=1
 else
