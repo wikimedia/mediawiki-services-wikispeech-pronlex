@@ -307,7 +307,7 @@ func LoadMapper(s1 SymbolSet, s2 SymbolSet) (Mapper, error) {
 			mapped, err := mapper.MapTranscription(symbol.String)
 			if len(mapped) > 0 {
 				if err != nil {
-					return mapper, fmt.Errorf("couldn't test mapper: %v\n", err)
+					return mapper, fmt.Errorf("couldn't test mapper: %v", err)
 				}
 			}
 		}

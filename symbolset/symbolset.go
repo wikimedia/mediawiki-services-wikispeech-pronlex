@@ -169,7 +169,7 @@ func (ss SymbolSet) SplitTranscription(input string) ([]string, error) {
 			return []string{}, err
 		}
 		if len(unknown) > 0 {
-			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%s/: %v\n", input, unknown)
+			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%s/: %v", input, unknown)
 		}
 		return splitted, nil
 	}
@@ -198,7 +198,7 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 			return []string{}, err
 		}
 		if len(unknown) > 0 {
-			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%s/: %v\n", input, unknown)
+			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%s/: %v", input, unknown)
 		}
 		return splitted, nil
 	}
