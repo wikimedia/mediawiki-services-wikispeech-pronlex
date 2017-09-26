@@ -57,6 +57,15 @@ var langCodes = map[string]string{
 	"spa": "es-es",
 }
 
+var upperCase = regexp.MustCompile("^[A-ZÅÄÖ]+$")
+
+func removableLine(origOrth string, e lex.Entry) bool {
+	if upperCase.MatchString(origOrth) && e.PartOfSpeech == "RG" {
+		return true
+	}
+	return false
+}
+
 func validPos(pos string) bool {
 	if pos == "" {
 		return true
@@ -208,11 +217,16 @@ func main() {
 		}
 		line := nst.Text()
 
-		e, err := nstFmt.ParseToEntry(line)
+		e, origOrth, err := nstFmt.ParseToEntry(line)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "general error	failed to convert line %v to entry : %v\n", n, err)
 			fmt.Fprintf(os.Stderr, "general error	failing line: %v\n", line)
 			hasError = true
+		}
+
+		if removableLine(origOrth, e) {
+			fmt.Fprintf(os.Stderr, "skipping line	%v\n", line)
+			continue
 		}
 
 		e.EntryStatus.Name = "imported"

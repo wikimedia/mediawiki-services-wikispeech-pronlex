@@ -24,11 +24,12 @@ func (nst NST) Parse(line string) (map[Field]string, error) {
 	return nst.format.Parse(line)
 }
 
-// ParseToEntry is used for parsing input lines (calls underlying Format.Parse)
-func (nst NST) ParseToEntry(line string) (lex.Entry, error) {
+// ParseToEntry is used for parsing input lines (calls underlying Format.Parse).
+// Orthography will be lower cased, but 2nd return argument is the input orthography with its original case
+func (nst NST) ParseToEntry(line string) (lex.Entry, string, error) {
 	fs, err := nst.format.Parse(line)
 	if err != nil {
-		return lex.Entry{}, err
+		return lex.Entry{}, "", err
 	}
 
 	splitted := strings.SplitN(fs[Pos], "|", 2)
@@ -65,7 +66,7 @@ func (nst NST) ParseToEntry(line string) (lex.Entry, error) {
 		res.Lemma = lemmaStruct
 	}
 
-	return res, nil
+	return res, fs[Orth], nil
 }
 
 func appendTrans(ts []lex.Transcription, trans string, lang string, source string) []lex.Transcription {

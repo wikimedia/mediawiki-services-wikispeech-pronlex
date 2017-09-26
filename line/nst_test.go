@@ -76,7 +76,7 @@ func Test_NSTParse_01(t *testing.T) {
 			},
 		},
 	}
-	result, err := nst.ParseToEntry(input)
+	result, _, err := nst.ParseToEntry(input)
 	if err != nil {
 		t.Errorf("didn't expect error here : %v", err)
 	} else {
@@ -112,7 +112,7 @@ func Test_NSTParse_WithPosConversion(t *testing.T) {
 			},
 		},
 	}
-	result, err := nst.ParseToEntry(input)
+	result, _, err := nst.ParseToEntry(input)
 	if err != nil {
 		t.Errorf("didn't expect error here : %v", err)
 	} else {
