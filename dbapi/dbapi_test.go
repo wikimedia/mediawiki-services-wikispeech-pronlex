@@ -661,6 +661,97 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 }
 
+func Test_ImportLexiconFileWithDupLines(t *testing.T) {
+
+	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.sym")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	defer db.Close()
+
+	_, err = execSchema(db) // Creates new lexicon database
+	ff("Failed to create lexicon db: %v", err)
+
+	logger := StderrLogger{}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
+
+	l, err = defineLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	// actual tests start here
+	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest-dups.txt", &validation.Validator{})
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	q := Query{Words: []string{"sprängstoff"}}
+
+	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o := res[0].Strn
+	if o != "sprängstoff" {
+		t.Errorf(fs, "sprängstoff", o)
+	}
+
+	q = Query{Words: []string{"sittriktiga"}}
+	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o = res[0].Strn
+	if o != "sittriktiga" {
+		t.Errorf(fs, "sittriktiga", o)
+	}
+
+	q = Query{Words: []string{"vadare"}}
+	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o = res[0].Strn
+	if o != "vadare" {
+		t.Errorf(fs, "vadare", o)
+	}
+
+	q = Query{}
+	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(res) != 19 {
+		t.Errorf(fs, "19", len(res))
+	}
+}
+
 func Test_ImportLexiconFileInvalid(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.sym")

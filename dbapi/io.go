@@ -66,8 +66,12 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 	msg := fmt.Sprintf("Trying to load file: %s", lexiconFileName)
 	logger.Write(msg)
 
-	n := 0
+	var nImported = 0
+	var nSkipped = 0
+	var nTotal = 0
 	var eBuf []lex.Entry
+	var readLines = make(map[string]bool)
+	var readEntries = make(map[string]bool)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			var msg = fmt.Sprintf("error when reading lines from lexicon file : %v", err)
@@ -83,32 +87,54 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 			continue
 		}
 
+		nTotal++
+		if _, ok := readLines[l]; ok {
+			var msg = fmt.Sprintf("Skipping duplicate input line : %s", l)
+			nSkipped++
+			logger.Write(msg)
+			continue
+		}
 		e, err := wsFmt.ParseToEntry(l)
 		if err != nil {
 			var msg = fmt.Sprintf("couldn't parse line to entry : %v", err)
 			logger.Write(msg)
 			return fmt.Errorf("%v", msg)
 		}
+		readLines[l] = true
+		eToString, err := wsFmt.Entry2String(e)
+		if err != nil {
+			var msg = fmt.Sprintf("couldn't convert entry to string : %v", err)
+			logger.Write(msg)
+			return fmt.Errorf("%v", msg)
+		}
+		if _, ok := readEntries[eToString]; ok {
+			var msg = fmt.Sprintf("Skipping duplicate input entry : %v", e)
+			nSkipped++
+			logger.Write(msg)
+			continue
+		}
+
+		readEntries[eToString] = true
 
 		if validator != nil && validator.IsDefined() {
 			validator.ValidateEntry(&e)
 		}
 
 		eBuf = append(eBuf, e)
-		n++
-		if n%1000 == 0 {
+		if nTotal%1000 == 0 {
 			_, err = insertEntries(db, lexicon, eBuf)
 			if err != nil {
 				var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 				logger.Write(msg)
 				return fmt.Errorf("%v", msg)
 			}
-			msg2 := fmt.Sprintf("ImportLexiconFile: Inserted entries (total lines read: %d)", n)
+			nImported = nImported + len(eBuf)
+			msg2 := fmt.Sprintf("ImportLexiconFile: Inserted entries (total lines imported: %d)", nImported)
 			logger.Progress(msg2)
 			eBuf = make([]lex.Entry, 0)
 		}
-		if logger.LogInterval() > 0 && n%logger.LogInterval() == 0 {
-			msg2 := fmt.Sprintf("ImportLexiconFile: Lines read: %d                         ", n)
+		if logger.LogInterval() > 0 && nTotal%logger.LogInterval() == 0 {
+			msg2 := fmt.Sprintf("ImportLexiconFile: Lines read: %d                         ", nTotal)
 			logger.Progress(msg2)
 		}
 	}
@@ -118,7 +144,8 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		logger.Write(msg)
 		return fmt.Errorf("%v", msg)
 	} // else
-	msg2 := fmt.Sprintf("ImportLexiconFile: Inserted entries (total lines read: %d)", n)
+	nImported = nImported + len(eBuf)
+	msg2 := fmt.Sprintf("ImportLexiconFile: Inserted entries (total lines imported: %d)", nImported)
 	logger.Write(msg2)
 
 	logger.Write("Finalizing import ... ")
@@ -130,7 +157,9 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		return fmt.Errorf("%v", msg)
 	}
 
-	msg3 := fmt.Sprintf("Lines imported:\t%d", n)
+	msg3 := fmt.Sprintf("Lines imported:\t%d", nImported)
+	logger.Write(msg3)
+	msg3 = fmt.Sprintf("Lines skipped:\t%d", nSkipped)
 	logger.Write(msg3)
 
 	if err := s.Err(); err != nil {

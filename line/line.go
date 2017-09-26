@@ -149,7 +149,7 @@ func (f Format) Parse(line string) (map[Field]string, error) {
 	var res = make(map[Field]string)
 	for field, i := range f.Fields {
 		if i < len(inputFields) {
-			res[field] = inputFields[i]
+			res[field] = strings.TrimSpace(inputFields[i])
 		} else {
 			return make(map[Field]string), fmt.Errorf("couldn't find field %v with index %v in line %v", field, i, line)
 		}
