@@ -89,7 +89,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 
 		nTotal++
 		if _, ok := readLines[l]; ok {
-			var msg = fmt.Sprintf("Skipping duplicate input line : %s", l)
+			//var msg = fmt.Sprintf("Skipping duplicate input line : %s", l)
 			nSkipped++
 			//logger.Write(msg)
 			continue
@@ -108,7 +108,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 			return fmt.Errorf("%v", msg)
 		}
 		if _, ok := readEntries[eToString]; ok {
-			var msg = fmt.Sprintf("Skipping duplicate input entry : %v", e)
+			//var msg = fmt.Sprintf("Skipping duplicate input entry : %v", e)
 			nSkipped++
 			//logger.Write(msg)
 			continue
