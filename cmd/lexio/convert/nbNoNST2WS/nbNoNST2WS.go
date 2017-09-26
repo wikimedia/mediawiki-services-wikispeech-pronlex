@@ -79,9 +79,12 @@ var langCodes = map[string]string{
 }
 
 var upperCase = regexp.MustCompile("^[A-ZÅÄÖ]+$")
+var garbLine = regexp.MustCompile(".*;GARB;.*")
 
-func removableLine(origOrth string, e lex.Entry) bool {
+func removableLine(origOrth string, line string, e lex.Entry) bool {
 	if upperCase.MatchString(origOrth) && e.PartOfSpeech == "RG" {
+		return true
+	} else if garbLine.MatchString(line) {
 		return true
 	}
 	return false
@@ -176,7 +179,7 @@ func main() {
 			hasError = true
 		}
 
-		if removableLine(origOrth, e) {
+		if removableLine(origOrth, line, e) {
 			fmt.Fprintf(os.Stderr, "skipping line	%v\n", line)
 			continue
 		}
