@@ -157,9 +157,11 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		return fmt.Errorf("%v", msg)
 	}
 
-	msg3 := fmt.Sprintf("Lines imported:\t%d", nImported)
+	msg3 := fmt.Sprintf("Lines read:      %d", nTotal)
 	logger.Write(msg3)
-	msg3 = fmt.Sprintf("Lines skipped:\t%d", nSkipped)
+	msg3 = fmt.Sprintf("Lines imported:  %d", nImported)
+	logger.Write(msg3)
+	msg3 = fmt.Sprintf("Lines skipped:   %d", nSkipped)
 	logger.Write(msg3)
 
 	if err := s.Err(); err != nil {
