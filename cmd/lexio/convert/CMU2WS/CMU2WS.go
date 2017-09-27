@@ -48,7 +48,7 @@ func main() {
 
 	if len(os.Args) != 5 {
 		fmt.Fprintln(os.Stderr, "<INPUT CMU LEX FILE> <CMU SYMBOLSET> <WS-SAMPA SYMBOLSET> <SYLLDEF FILE>")
-		fmt.Fprintln(os.Stderr, "\tsample invokation: CMU2WS cmudict-0.7b.utf8 en-us_cmu.sym en_us_sampa_mary.sym enu_cmu_syll.g2p")
+		fmt.Fprintln(os.Stderr, "\tsample invokation: CMU2WS cmudict-0.7b.utf8 en-us_cmu.sym en_us_sampa_mary.sym enu_cmu.syll")
 		return
 	}
 
