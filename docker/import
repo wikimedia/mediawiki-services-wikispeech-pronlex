@@ -49,6 +49,30 @@ if [ ! -d $APPDIR/symbol_sets ] ; then
     exit 1
 fi
 
+### LEXDATA PATHS
+
+SVLEX=sv_se_nst_lex.db
+NOBLEX=no_nob_nst_lex.db
+AMELEX=en_am_cmu_lex.db
+ARLEX=ar_ar_tst_lex.db
+if [ -e $APPDIR/db_files/$SVLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$SVLEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$NOBLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$NOBLEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$AMELEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$AMELEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$ARLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$ARLEX" >&2
+    exit 1
+fi
+
+
 nConverters=`ls $APPDIR/lexdata/convertersx/*.cnv 2> /dev/null |wc -l`
 nSymSets=`ls $APPDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
 if [ -d "$APPDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
@@ -74,13 +98,9 @@ cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
 ### LEXDATA IMPORT
 
-SVLEX=sv_se_nst_lex.db
-NOBLEX=no_nob_nst_lex.db
-AMELEX=en_am_cmu_lex.db
-ARLEX=ar_ar_tst_lex.db
-
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
+
 if createEmptyDB $APPDIR/db_files/$SVLEX ; then
     importLex $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets
 else
