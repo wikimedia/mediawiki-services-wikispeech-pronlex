@@ -4,15 +4,12 @@
 
 CMD=`basename $0`
 APPDIR=`dirname $0`
-KEEP=0
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
-while getopts ":hka:" opt; do
-  case $opt in
-    h)
+if [ $# -ne 2 ]; then
 	echo "
-USAGE: sh $CMD <OPTIONS>
+USAGE: sh $CMD <ACTUAL_DIR> <MOUNTED_DIR>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 
@@ -22,25 +19,9 @@ Options:
   -k keep lexdata files after import
 " >&2
 	exit 1
-      ;;
-    a)
-        APPDIR=$OPTARG
-      ;;
-    k)
-        KEEP=1
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG" >&2
-      ;;
-  esac
-done
-
-shift $(expr $OPTIND - 1 )
-
-if [ $# -ne 0 ]; then
-    echo "[$CMD] invalid option(s): $*" >&2
-    exit 1
 fi
+LOCALDIR=$1
+APPDIR=$2
 
 ### LEXDATA SETUP
 
@@ -135,12 +116,8 @@ else
     exit 1
 fi
 
-if [ $KEEP -eq 0 ]; then
-    echo "[$CMD] Clearing lexdata cache" >&2
-    rm -fr $APPDIR/lexdata
-else
-    echo "[$CMD] Keeping lexdata cache" >&2  
-fi
+echo "[$CMD] Clearing lexdata cache" >&2
+rm -fr $APPDIR/lexdata
 
 echo "[$CMD] Done. BYE!" >&2
 

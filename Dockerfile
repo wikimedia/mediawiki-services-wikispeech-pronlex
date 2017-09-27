@@ -25,9 +25,9 @@ RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup bin/setup
 RUN ln -s /go/src/github.com/stts-se/pronlex/docker/help bin/help
 
 # import script
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import bin/import_all0
-RUN echo "#!/bin/bash" > bin/import_all
-RUN echo "setup $APPDIR && import_all0 -a $APPDIR" >> bin/import_all
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all bin/import_all
+#RUN echo "#!/bin/bash" > bin/import_all_with_appdir
+#RUN echo "setup $APPDIR && import_all -a $APPDIR" >> bin/import_all_with_appdir
 
 RUN chmod --silent +x bin/*
 
