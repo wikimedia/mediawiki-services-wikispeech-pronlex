@@ -26,14 +26,15 @@ echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 ### LEXDATA SETUP
 
 if [ ! -d $APPDIR/symbol_sets ] ; then
-    echo "[$CMD] APPDIR <$LOCALDIR> is not configured for the lexserver! Will run setup before importing." >&2
-    #exit 1
-    if sh $CMDDIR/setup $LOCALDIR $APPDIR ; then
-	echo -n ""
-    else
-	echo "FAILED: APPDIR <$LOCALDIR> is not configured for the lexserver and setup failed!" >&2
-	exit 1
-    fi
+    echo "FAILED: APPDIR <$LOCALDIR> is not configured for the lexserver! Run setup before import!" >&2
+    exit 1
+    # echo "[$CMD] APPDIR <$LOCALDIR> is not configured for the lexserver! Will run setup before importing." >&2
+    # if sh $CMDDIR/setup $LOCALDIR $APPDIR ; then
+    # 	echo -n ""
+    # else
+    # 	echo "FAILED: APPDIR <$LOCALDIR> is not configured for the lexserver and setup failed!" >&2
+    # 	exit 1
+    # fi
 fi
 
 ### LEXDATA PATHS
