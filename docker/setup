@@ -21,8 +21,8 @@ Setup files will be added to the destination folder APPDIR_IN_DOCKER/APPDIR_ON_D
 fi
 
 
-echo "[$CMD] APPDIR=$APPDIR" >&2
-echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
+#echo "[$CMD] APPDIR=$APPDIR" >&2
+#echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 
 
 if [ -d $APPDIR/symbol_sets ] ; then
@@ -38,7 +38,7 @@ fi
 
 ### LEXDATA PREPS
 
-echo "[$CMD] Setting up basic files ... " >&2
+#echo "[$CMD] Setting up basic files ... " >&2
 
 mkdir -p $APPDIR || exit 1
 mkdir -p $APPDIR/symbol_sets || exit 1
@@ -51,4 +51,4 @@ cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $
 
 ### COMPLETED
 
-echo "[$CMD] COMPLETED" >&2
+#echo "[$CMD] COMPLETED" >&2
