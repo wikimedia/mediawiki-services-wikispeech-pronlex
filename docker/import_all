@@ -9,14 +9,14 @@ export PATH=$PATH:$GOPATH/bin
 
 if [ $# -ne 2 ]; then
 	echo "
-USAGE: sh $CMD <APPDIR_ON_DISK> <APPDIR_IN_DOCKER>
+USAGE: sh $CMD <APPDIR_IN_DOCKER> <APPDIR_ON_DISK>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 " >&2
 	exit 1
 fi
-LOCALDIR=$1
-APPDIR=$2
+APPDIR=$1
+LOCALDIR=$2
 
 ### LEXDATA SETUP
 

@@ -7,16 +7,19 @@ SCRIPTDIR=`dirname $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
-if [ $# -ne 2 ]; then
-    echo "USAGE: sh $CMD <APPDIR_ON_DISK> <APPDIR_IN_DOCKER>
+if [ $# -eq 2 ]; then
+    APPDIR=$1
+    LOCALDIR=$2
+elif [ $# -eq 1 ]; then
+    APPDIR=$1
+    LOCALDIR=$1
+else
+    echo "USAGE: sh $CMD <APPDIR_IN_DOCKER> (<APPDIR_ON_DISK> - optional)
 
-Setup files will be added to the destination folder APPDIR.
+Setup files will be added to the destination folder APPDIR_IN_DOCKER/APPDIR_ON_DISK.
 " >&2
-    exit 1
 fi
 
-LOCALDIR=$1
-APPDIR=$2
 
 if [ -d $APPDIR/symbol_sets ] ; then
     echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
