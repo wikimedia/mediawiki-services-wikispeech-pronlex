@@ -18,6 +18,11 @@ fi
 APPDIR=$1
 LOCALDIR=$2
 
+
+echo "[$CMD] APPDIR=$APPDIR" >&2
+echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
+
+
 ### LEXDATA SETUP
 
 if [ ! -d $APPDIR/symbol_sets ] ; then

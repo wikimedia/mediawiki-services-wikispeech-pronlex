@@ -21,6 +21,10 @@ Setup files will be added to the destination folder APPDIR_IN_DOCKER/APPDIR_ON_D
 fi
 
 
+echo "[$CMD] APPDIR=$APPDIR" >&2
+echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
+
+
 if [ -d $APPDIR/symbol_sets ] ; then
     echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
     exit 0
