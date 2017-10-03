@@ -4,5 +4,6 @@
 
 echo "Available commands:
   - help          : print usage info
+  - setup         : setup lexicon server (without importing data)
   - import_all    : import default lexicon data
   - <no argument> : start lexicon server" >&2

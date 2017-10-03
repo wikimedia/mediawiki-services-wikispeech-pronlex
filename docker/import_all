@@ -3,20 +3,15 @@
 ## INTERNAL SCRIPT FOR USE INSIDE OF DOCKER CONTAINER
 
 CMD=`basename $0`
-APPDIR=`dirname $0`
+CMDDIR=`dirname $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
 if [ $# -ne 2 ]; then
 	echo "
-USAGE: sh $CMD <ACTUAL_DIR> <MOUNTED_DIR>
+USAGE: sh $CMD <APPDIR_ON_DISK> <APPDIR_IN_DOCKER>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
-
-Options:
-  -h help
-  -a appdir (default: this script's folder)
-  -k keep lexdata files after import
 " >&2
 	exit 1
 fi
@@ -26,8 +21,14 @@ APPDIR=$2
 ### LEXDATA SETUP
 
 if [ ! -d $APPDIR/symbol_sets ] ; then
-    echo "FAILED: $APPDIR is not configured for the lexserver! Setup needs to be run first!" >&2
-    exit 1
+    echo "[$CMD] APPDIR <$LOCALDIR> is not configured for the lexserver! Will run setup before importing." >&2
+    #exit 1
+    if sh $CMDDIR/setup $LOCALDIR $APPDIR ; then
+	echo -n ""
+    else
+	echo "FAILED: APPDIR <$LOCALDIR> is not configured for the lexserver and setup failed!" >&2
+	exit 1
+    fi
 fi
 
 ### LEXDATA PATHS
