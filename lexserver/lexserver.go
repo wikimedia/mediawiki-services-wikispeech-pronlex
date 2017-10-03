@@ -728,9 +728,6 @@ func createServer(port string) (*http.Server, error) {
 	}
 	log.Printf("lexserver: loaded validators : %v", validatorNames())
 
-	rout.HandleFunc("/", indexHandler)
-	rout.HandleFunc("/ping", pingHandler)
-
 	lexicon := newSubRouter(rout, "/lexicon", "Lexicon management/admin, including full validation")
 	lexicon.addHandler(lexiconList)
 	lexicon.addHandler(lexiconLookup) // has its own index page in static/
@@ -782,6 +779,8 @@ func createServer(port string) (*http.Server, error) {
 	// but it takes a while to perform. TODO: Re-add this call?
 	//rout.HandleFunc("/admin/sqlite3_analyze", sqlite3AnalyzeHandler)
 
+	rout.HandleFunc("/", indexHandler)
+	rout.HandleFunc("/ping", pingHandler)
 	rout.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
 	// typescript experiments

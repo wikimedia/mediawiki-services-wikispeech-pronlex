@@ -128,7 +128,7 @@ var mapperMaptable = urlHandler{
 		mapper0, err := mMut.service.GetMapTable(fromName, toName)
 		mMut.Unlock()
 		if err != nil {
-			msg := fmt.Sprintf("failed getting map table: %v", err)
+			msg := fmt.Sprintf("failed getting map table : %v", err)
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
@@ -138,7 +138,7 @@ var mapperMaptable = urlHandler{
 		for _, from := range mapper0.SymbolSet1.Symbols {
 			to, err := mapper0.MapSymbol(from)
 			if err != nil {
-				msg := fmt.Sprintf("failed getting map table: %v", err)
+				msg := fmt.Sprintf("failed getting map table : %v", err)
 				log.Println(msg)
 				http.Error(w, msg, http.StatusInternalServerError)
 				return
