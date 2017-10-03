@@ -1,11 +1,7 @@
-FROM golang
+# Download wikispeech_base from hub.docker.com | source repository: https://github.com/stts-se/wikispeech_base.git
+FROM wikispeech_base
 
-RUN apt-get update -y && apt-get upgrade -y && apt-get install apt-utils -y
-
-RUN apt-get install -y sqlite3 git gcc build-essential
-
-# FOR DEBUGGING
-RUN apt-get install -y libnet-ifconfig-wrapper-perl/stable
+WORKDIR "/"
 
 RUN go get github.com/stts-se/pronlex/lexserver 
 RUN go install github.com/stts-se/pronlex/lexserver 
@@ -21,19 +17,20 @@ ENV APPDIR appdir
 RUN export GOPATH=$(go env GOPATH)
 RUN export PATH=$PATH:$(go env GOPATH)/bin
 
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup bin/setup
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/help bin/help
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup /bin/setup
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/help /bin/help
 
 # import script
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all bin/import_all
-#RUN echo "#!/bin/bash" > bin/import_all_with_appdir
-#RUN echo "setup $APPDIR && import_all -a $APPDIR" >> bin/import_all_with_appdir
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all /bin/import_all
 
-RUN chmod --silent +x bin/*
+RUN chmod --silent +x /bin/*
+
+
+# RUNTIME SETTINGS
 
 EXPOSE 8787
 
-RUN echo "Mount external host dir to $APPDIR"
+# RUN echo "Mount external host dir to $APPDIR"
 
 CMD (setup $APPDIR && lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static 8787)
 
