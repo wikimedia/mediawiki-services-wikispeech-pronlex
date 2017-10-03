@@ -518,7 +518,7 @@ func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
 }
 
 func isStaticPage(url string) bool {
-	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt"
+	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt" || url == "/ping"
 }
 
 func main() {
