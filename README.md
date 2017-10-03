@@ -2,7 +2,7 @@
 pronlex is a pronunciation lexicon database with a server behind a simple HTTP API.
 
 [![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://godoc.org/github.com/stts-se/pronlex)
-[![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex) [![Sourcegraph](https://sourcegraph.com/github.com/stts-se/rbg2p/-/badge.svg)](https://sourcegraph.com/github.com/stts-se/rbg2p?badge)
+[![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex) [![Sourcegraph](https://sourcegraph.com/github.com/stts-se/pronlex/-/badge.svg)](https://sourcegraph.com/github.com/stts-se/pronlex?badge)
 
 
 ## Lexicon server / Docker installation
