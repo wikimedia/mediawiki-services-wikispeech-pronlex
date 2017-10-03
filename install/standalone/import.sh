@@ -47,11 +47,11 @@ if [ ! -d $APPDIR/symbol_sets ] ; then
     exit 1
 fi
 
-if [ -d "$APPDIR/lexdata" ]; then
-    cd $APPDIR/lexdata && git pull && cd -
+if [ -d "$APPDIR/lexdata.git" ]; then
+    cd $APPDIR/lexdata.git && git pull && cd -
     KEEP=1
 else
-    if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata; then
+    if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata.git; then
 	echo -n "" # OK
     else
 	echo "[$CMD] git clone failed" >&2
@@ -62,10 +62,10 @@ fi
 mkdir -p $APPDIR/db_files || exit 1
 mkdir -p $APPDIR/symbol_sets || exit 1
 
-cp $APPDIR/lexdata/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
+cp $APPDIR/lexdata.git/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
 echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
-cat $APPDIR/lexdata/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
-cp $APPDIR/lexdata/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
+cat $APPDIR/lexdata.git/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
+cp $APPDIR/lexdata.git/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
 
 ### LEXDATA IMPORT
@@ -95,7 +95,7 @@ fi
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
 if createEmptyDB $APPDIR/db_files/$SVLEX ; then
-    importLex $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets
+    importLex $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets
 else
     echo "$SVLEX FAILED" >&2
     exit 1
@@ -104,7 +104,7 @@ fi
 echo "" >&2
 echo "IMPORT: $NOBLEX" >&2
 if createEmptyDB $APPDIR/db_files/$NOBLEX ; then
-    importLex $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APPDIR/symbol_sets
+    importLex $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APPDIR/symbol_sets
 else
     echo "$NOBLEX FAILED" >&2
     exit 1
@@ -113,7 +113,7 @@ fi
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
 if createEmptyDB $APPDIR/db_files/$AMELEX ; then 
-    importLex $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets
+    importLex $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets
 else
     echo "$AMELEX FAILED" >&2
     exit 1
@@ -122,7 +122,7 @@ fi
 echo "" >&2
 echo "IMPORT: $ARLEX" >&2
 if createEmptyDB $APPDIR/db_files/$ARLEX ; then
-    importLex $APPDIR/db_files/$ARLEX ar-test $APPDIR/lexdata/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
+    importLex $APPDIR/db_files/$ARLEX ar-test $APPDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
 else
     echo "$ARLEX FAILED" >&2
     exit 1
@@ -130,7 +130,7 @@ fi
 
 if [ $KEEP -eq 0 ]; then
     echo "[$CMD] Clearing lexdata cache" >&2
-    rm -fr $APPDIR/lexdata
+    rm -fr $APPDIR/lexdata.git
 else
     echo "[$CMD] Keeping lexdata cache" >&2  
 fi
