@@ -1,0 +1,149 @@
+#!/bin/bash 
+
+## INTERNAL SCRIPT FOR USE INSIDE OF DOCKER CONTAINER
+
+CMD=`basename $0`
+export GOPATH=`go env GOPATH`
+export PATH=$PATH:$GOPATH/bin
+
+if [ $# -ne 2 ]; then
+	echo "
+USAGE: sh $CMD <APPDIR_IN_DOCKER> <APPDIR_ON_DISK>
+
+Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
+" >&2
+	exit 1
+fi
+APPDIR=$1
+LOCALDIR=$2
+
+
+echo "[$CMD] APPDIR=$APPDIR" >&2
+echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
+
+function do_setup {
+    if [ -d $APPDIR/symbol_sets ] ; then
+	echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
+    fi
+
+
+    if [ -z "$GOPATH" ] ; then
+	echo "[$CMD] The GOPATH environment variable is required!" >&2
+	exit 1
+    fi
+
+    ### LEXDATA PREPS
+
+    echo "[$CMD] Setting up basic files in LEXDATA dir $LOCALDIR ($APPDIR inside docker)... " >&2
+
+    mkdir -p $APPDIR || exit 1
+    mkdir -p $APPDIR/symbol_sets || exit 1
+
+    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $APPDIR/symbol_sets/ || exit 1
+    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $APPDIR/symbol_sets/ || exit 1
+    echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
+    cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
+
+
+    ### COMPLETED
+
+    echo "[$CMD] COMPLETED" >&2
+}
+
+
+
+### LEXDATA SETUP
+do_setup
+
+### LEXDATA PATHS
+
+SVLEX=sv_se_nst_lex.db
+NOBLEX=no_nob_nst_lex.db
+AMELEX=en_am_cmu_lex.db
+ARLEX=ar_ar_tst_lex.db
+if [ -e $APPDIR/db_files/$SVLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $LOCALDIR/db_files/$SVLEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$NOBLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $LOCALDIR/db_files/$NOBLEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$AMELEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $LOCALDIR/db_files/$AMELEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$ARLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $LOCALDIR/db_files/$ARLEX" >&2
+    exit 1
+fi
+
+
+nConverters=`ls $APPDIR/lexdata/convertersx/*.cnv 2> /dev/null |wc -l`
+nSymSets=`ls $APPDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
+if [ -d "$APPDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
+    cd $APPDIR/lexdata && git pull && cd -
+    KEEP=1
+else
+    if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata.git; then
+	echo -n "" # OK
+    else
+	echo "[$CMD] git clone failed" >&2
+	exit 1
+    fi
+fi
+
+mkdir -p $APPDIR/db_files || exit 1
+mkdir -p $APPDIR/symbol_sets || exit 1
+
+cp $APPDIR/lexdata.git/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
+echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
+cat $APPDIR/lexdata.git/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
+cp $APPDIR/lexdata.git/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
+
+
+### LEXDATA IMPORT
+
+echo "" >&2
+echo "IMPORT: $SVLEX" >&2
+
+if createEmptyDB $APPDIR/db_files/$SVLEX ; then
+    zcat $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | head -50000 $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.lightweight && importLex $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.lightweight sv-se_ws-sampa $APPDIR/symbol_sets
+else
+    echo "$SVLEX FAILED" >&2
+    exit 1
+fi
+
+echo "" >&2
+echo "IMPORT: $NOBLEX" >&2
+if createEmptyDB $APPDIR/db_files/$NOBLEX ; then
+        zcat $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | head -50000 $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.lightweight && importLex $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.lightweight nb-no_ws-sampa $APPDIR/symbol_sets
+else
+    echo "$NOBLEX FAILED" >&2
+    exit 1
+fi
+
+echo "" >&2
+echo "IMPORT: $AMELEX" >&2
+if createEmptyDB $APPDIR/db_files/$AMELEX ; then 
+    importLex $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets
+else
+    echo "$AMELEX FAILED" >&2
+    exit 1
+fi
+
+echo "" >&2
+echo "IMPORT: $ARLEX" >&2
+if createEmptyDB $APPDIR/db_files/$ARLEX ; then
+    importLex $APPDIR/db_files/$ARLEX ar-test $APPDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
+else
+    echo "$ARLEX FAILED" >&2
+    exit 1
+fi
+
+echo "[$CMD] Clearing lexdata cache" >&2
+rm -fr $APPDIR/lexdata.git
+
+echo "[$CMD] Done. BYE!" >&2
+
+
