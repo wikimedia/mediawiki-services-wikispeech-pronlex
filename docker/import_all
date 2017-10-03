@@ -3,7 +3,6 @@
 ## INTERNAL SCRIPT FOR USE INSIDE OF DOCKER CONTAINER
 
 CMD=`basename $0`
-CMDDIR=`dirname $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
@@ -22,20 +21,39 @@ LOCALDIR=$2
 echo "[$CMD] APPDIR=$APPDIR" >&2
 echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 
+function do_setup {
+    if [ -d $APPDIR/symbol_sets ] ; then
+	echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
+    fi
+
+
+    if [ -z "$GOPATH" ] ; then
+	echo "[$CMD] The GOPATH environment variable is required!" >&2
+	exit 1
+    fi
+
+    ### LEXDATA PREPS
+
+    echo "[$CMD] Setting up basic files in LEXDATA dir $LOCALDIR ($APPDIR inside docker)... " >&2
+
+    mkdir -p $APPDIR || exit 1
+    mkdir -p $APPDIR/symbol_sets || exit 1
+
+    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $APPDIR/symbol_sets/ || exit 1
+    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $APPDIR/symbol_sets/ || exit 1
+    echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
+    cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
+
+
+    ### COMPLETED
+
+    echo "[$CMD] COMPLETED" >&2
+}
+
+
 
 ### LEXDATA SETUP
-
-if [ ! -d $APPDIR/symbol_sets ] ; then
-    echo "FAILED: APPDIR <$LOCALDIR> is not configured for the lexserver! Run setup before import!" >&2
-    exit 1
-    # echo "[$CMD] APPDIR <$LOCALDIR> is not configured for the lexserver! Will run setup before importing." >&2
-    # if sh $CMDDIR/setup $LOCALDIR $APPDIR ; then
-    # 	echo -n ""
-    # else
-    # 	echo "FAILED: APPDIR <$LOCALDIR> is not configured for the lexserver and setup failed!" >&2
-    # 	exit 1
-    # fi
-fi
+do_setup
 
 ### LEXDATA PATHS
 

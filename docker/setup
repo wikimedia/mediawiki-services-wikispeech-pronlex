@@ -3,7 +3,6 @@
 ## INTERNAL SCRIPT FOR USE INSIDE OF DOCKER CONTAINER
 
 CMD=`basename $0`
-SCRIPTDIR=`dirname $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
@@ -20,9 +19,6 @@ Setup files will be added to the destination folder APPDIR_IN_DOCKER/APPDIR_ON_D
 " >&2
 fi
 
-
-#echo "[$CMD] APPDIR=$APPDIR" >&2
-#echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 
 
 if [ -d $APPDIR/symbol_sets ] ; then
@@ -51,4 +47,4 @@ cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $
 
 ### COMPLETED
 
-#echo "[$CMD] COMPLETED" >&2
+echo "[$CMD] COMPLETED" >&2

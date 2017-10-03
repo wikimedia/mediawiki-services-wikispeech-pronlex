@@ -46,6 +46,24 @@ NOBLEX=no_nob_nst_lex.db
 AMELEX=en_am_cmu_lex.db
 ARLEX=ar_ar_tst_lex.db
 
+if [ -e $APPDIR/db_files/$SVLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$SVLEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$NOBLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$NOBLEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$AMELEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$AMELEX" >&2
+    exit 1
+fi
+if [ -e $APPDIR/db_files/$ARLEX ]; then
+    echo "[$CMD] cannot create db if it already exists: $APPDIR/db_files/$ARLEX" >&2
+    exit 1
+fi
+
+
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
 
 echo "" >&2
