@@ -232,6 +232,10 @@ func marshal(v interface{}, r *http.Request) ([]byte, error) {
 	return json.Marshal(v)
 }
 
+func pingHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "pronlex")
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	html := `<h1>Lexserver</h1>`
@@ -725,6 +729,7 @@ func createServer(port string) (*http.Server, error) {
 	log.Printf("lexserver: loaded validators : %v", validatorNames())
 
 	rout.HandleFunc("/", indexHandler)
+	rout.HandleFunc("/ping", pingHandler)
 
 	lexicon := newSubRouter(rout, "/lexicon", "Lexicon management/admin, including full validation")
 	lexicon.addHandler(lexiconList)
