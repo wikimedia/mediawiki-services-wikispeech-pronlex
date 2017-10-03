@@ -108,7 +108,7 @@ echo "" >&2
 echo "IMPORT: $SVLEX" >&2
 
 if createEmptyDB $APPDIR/db_files/$SVLEX ; then
-    zcat $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | head -50000 $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.lightweight && importLex $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.lightweight sv-se_ws-sampa $APPDIR/symbol_sets
+    zcat $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | head -50000 > $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.lightweight && importLex $APPDIR/db_files/$SVLEX sv-se.nst $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.lightweight sv-se_ws-sampa $APPDIR/symbol_sets
 else
     echo "$SVLEX FAILED" >&2
     exit 1
@@ -117,7 +117,7 @@ fi
 echo "" >&2
 echo "IMPORT: $NOBLEX" >&2
 if createEmptyDB $APPDIR/db_files/$NOBLEX ; then
-        zcat $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | head -50000 $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.lightweight && importLex $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.lightweight nb-no_ws-sampa $APPDIR/symbol_sets
+        zcat $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | head -50000 > $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.lightweight && importLex $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.lightweight nb-no_ws-sampa $APPDIR/symbol_sets
 else
     echo "$NOBLEX FAILED" >&2
     exit 1
