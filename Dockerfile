@@ -25,8 +25,6 @@ RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all /bin/import_all
 
 RUN chmod --silent +x /bin/*
 
-RUN /bin/setup $APPDIR
-
 # RUNTIME SETTINGS
 
 EXPOSE 8787
