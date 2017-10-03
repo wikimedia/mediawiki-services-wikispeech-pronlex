@@ -38,7 +38,7 @@ fi
 
 ### LEXDATA PREPS
 
-#echo "[$CMD] Setting up basic files ... " >&2
+echo "[$CMD] Setting up basic files in LEXDATA dir $LOCALDIR ($APPDIR inside docker)... " >&2
 
 mkdir -p $APPDIR || exit 1
 mkdir -p $APPDIR/symbol_sets || exit 1
