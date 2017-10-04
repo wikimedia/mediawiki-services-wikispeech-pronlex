@@ -136,7 +136,7 @@ fi
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
 if createEmptyDB $APPDIR/db_files/$AMELEX ; then 
-    if cat $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | head -1000 > $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $APPDIR/symbol_sets ; then
+    if cat $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | head -1000 > $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $APPDIR/db_files/$AMELEX en-us.cmu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $APPDIR/symbol_sets ; then
 	echo -n ""
     else
 	echo "$AMELEX FAILED" >&2
