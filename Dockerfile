@@ -23,6 +23,9 @@ RUN ln -s /go/src/github.com/stts-se/pronlex/docker/help /bin/help
 # import script
 RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all /bin/import_all
 
+# import script for wikispeech tests
+RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_for_ws_tests /bin/import_for_ws_test
+
 RUN chmod --silent +x /bin/*
 
 # RUNTIME SETTINGS
