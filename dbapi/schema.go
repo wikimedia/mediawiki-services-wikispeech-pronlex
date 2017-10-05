@@ -72,6 +72,40 @@ CREATE INDEX idx4a250778 on Entry (strn,language);
 CREATE INDEX estrnpref on Entry (strn,preferred);
 CREATE INDEX idid on Entry (id, lexiconId);
 
+
+-- CREATE TABLE Tag (
+--     strn text not null,
+--     id integer not null primary key autoincrement,
+-- );
+-- CREATE UNIQUE INDEX tagindex ON Tag (strn);
+
+-- Entry tag is a string used to distinguish between homographs.
+-- Unique for an entry of a specific word forms, but not for different
+-- word forms. NOTE: This can be futher normalized into a separate Tag
+-- table, for resuable tags.
+CREATE TABLE EntryTag (
+    -- id integer not null primary key autoincrement,
+    entryId integer not null,
+    tag text not null,
+    wordForm text -- not null
+);
+
+-- A single tag per entry
+CREATE UNIQUE INDEX tageid ON EntryTag(entryId);
+CREATE UNIQUE INDEX tagentwf ON EntryTag(tag, wordForm);
+
+-- Pick the entry word form from the Entry table
+CREATE TRIGGER entryTagTrigger AFTER INSERT ON entryTag
+   BEGIN
+     UPDATE EntryTag SET wordForm = (select strn from entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
+   END;
+
+CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON entryTag
+   BEGIN
+     UPDATE EntryTag SET wordForm = (select strn from entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
+   END;
+
+
 -- Validiation results of entries
 CREATE TABLE EntryValidation (
     id integer not null primary key autoincrement,
