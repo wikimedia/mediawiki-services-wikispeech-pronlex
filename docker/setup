@@ -6,23 +6,23 @@ CMD=`basename $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 1 ]; then
 	echo "
-USAGE: sh $CMD <APPDIR_IN_DOCKER> <APPDIR_ON_DISK>
+USAGE: sh $CMD <APPDIR>
 
-Setup files will be added to the destination folder APPDIR_IN_DOCKER/APPDIR_ON_DISK and imports a small set of lexicon data needed for the Wikispeech startup tests.
+Setup files will be added to the destination folder <APPDIR> and imports a small set of lexicon data needed for the Wikispeech startup tests.
 " >&2
 	exit 1
 fi
-APPDIR=$1
+DOCKERDIR="/appdir"
 LOCALDIR=$2
 
 
-echo "[$CMD] APPDIR=$APPDIR" >&2
-echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
+#echo "[$CMD] DOCKERDIR=$DOCKERDIR" >&2
+#echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 
 function do_setup {
-    if [ -d $APPDIR/symbol_sets ] ; then
+    if [ -d $DOCKERDIR/symbol_sets ] ; then
 	echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
     fi
 
@@ -34,15 +34,15 @@ function do_setup {
 
     ### LEXDATA PREPS
 
-    echo "[$CMD] Setting up basic files in LEXDATA dir $LOCALDIR ($APPDIR inside docker)... " >&2
+    echo "[$CMD] Setting up basic files in folder $LOCALDIR (as $DOCKERDIR inside docker)... " >&2
 
-    mkdir -p $APPDIR || exit 1
-    mkdir -p $APPDIR/symbol_sets || exit 1
+    mkdir -p $DOCKERDIR || exit 1
+    mkdir -p $DOCKERDIR/symbol_sets || exit 1
 
-    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $APPDIR/symbol_sets/ || exit 1
-    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $APPDIR/symbol_sets/ || exit 1
-    echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
-    cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
+    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $DOCKERDIR/symbol_sets/ || exit 1
+    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
+    echo "" >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
+    cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
 
 
     ### COMPLETED
@@ -58,12 +58,12 @@ do_setup
 ### LEXDATA PATHS
 
 LEXDB=wikispeech_testdb.db
-if [ -e $APPDIR/db_files/$LEXDB ]; then
+if [ -e $DOCKERDIR/db_files/$LEXDB ]; then
     echo "[$CMD] cannot create db if it already exists: $LOCALDIR/db_files/$LEXDB" >&2
     exit 1
 fi
 
-if createEmptyDB $APPDIR/db_files/$LEXDB ; then
+if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then
     echo "[$CMD] created empty db: $LOCALDIR/db_files/$LEXDB" >&2
 else
     echo "[$CMD] couldn't create empty db: $LOCALDIR/db_files/$LEXDB" >&2
@@ -71,13 +71,13 @@ else
 fi
 
 
-nConverters=`ls $APPDIR/lexdata/convertersx/*.cnv 2> /dev/null |wc -l`
-nSymSets=`ls $APPDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
-if [ -d "$APPDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
-    cd $APPDIR/lexdata && git pull && cd -
+nConverters=`ls $DOCKERDIR/lexdata/convertersx/*.cnv 2> /dev/null |wc -l`
+nSymSets=`ls $DOCKERDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
+if [ -d "$DOCKERDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
+    cd $DOCKERDIR/lexdata && git pull && cd -
     KEEP=1
 else
-    if git clone https://github.com/stts-se/lexdata.git $APPDIR/lexdata.git; then
+    if git clone https://github.com/stts-se/lexdata.git $DOCKERDIR/lexdata.git; then
 	echo -n "" # OK
     else
 	echo "[$CMD] git clone failed" >&2
@@ -85,13 +85,13 @@ else
     fi
 fi
 
-mkdir -p $APPDIR/db_files || exit 1
-mkdir -p $APPDIR/symbol_sets || exit 1
+mkdir -p $DOCKERDIR/db_files || exit 1
+mkdir -p $DOCKERDIR/symbol_sets || exit 1
 
-cp $APPDIR/lexdata.git/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
-echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
-cat $APPDIR/lexdata.git/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
-cp $APPDIR/lexdata.git/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
+cp $DOCKERDIR/lexdata.git/*/*/*.sym $DOCKERDIR/symbol_sets/ || exit 1
+echo "" >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
+cat $DOCKERDIR/lexdata.git/mappers.txt >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
+cp $DOCKERDIR/lexdata.git/converters/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
 
 
 ### LEXDATA IMPORT
@@ -99,8 +99,8 @@ cp $APPDIR/lexdata.git/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 echo "" >&2
 echo "IMPORT: $LEXDB:sv" >&2
 
-if createEmptyDB $APPDIR/db_files/$LEXDB ; then
-    if zcat $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB sv $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $APPDIR/symbol_sets ; then
+if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then
+    if zcat $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB sv $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $DOCKERDIR/symbol_sets ; then
 	echo -n ""
     else
 	echo "$LEXDB FAILED" >&2
@@ -113,8 +113,8 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if createEmptyDB $APPDIR/db_files/$LEXDB ; then 
-    if cat $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -wi "test|a|children" > $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB enu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $APPDIR/symbol_sets ; then
+if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then 
+    if cat $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -wi "test|a|children" > $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB enu $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
 	echo -n ""
     else
 	echo "$LEXDB FAILED" >&2
@@ -127,8 +127,8 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:ar" >&2
-if createEmptyDB $APPDIR/db_files/$LEXDB ; then
-    if importLex $APPDIR/db_files/$LEXDB ar $APPDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets ; then
+if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then
+    if importLex $DOCKERDIR/db_files/$LEXDB ar $DOCKERDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $DOCKERDIR/symbol_sets ; then
 	echo -n ""
     else
 	echo "$LEXDB FAILED" >&2
@@ -140,7 +140,7 @@ else
 fi
 
 echo "[$CMD] Clearing lexdata cache" >&2
-rm -fr $APPDIR/lexdata.git
+rm -fr $DOCKERDIR/lexdata.git
 
 echo "[$CMD] Done. BYE!" >&2
 
