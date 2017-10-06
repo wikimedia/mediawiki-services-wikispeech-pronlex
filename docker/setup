@@ -19,9 +19,10 @@ DOCKERDIR=$1
 
 #echo "[$CMD] DOCKERDIR=$DOCKERDIR" >&2
 
-function do_setup {
+function initial_setup {
     if [ -d $DOCKERDIR/symbol_sets ] ; then
 	echo "[$CMD] Docker folder $DOCKERDIR is already configured. No setup needed." >&2
+	exit 1
     fi
 
 
@@ -52,7 +53,7 @@ function do_setup {
 
 
 ### LEXDATA SETUP
-do_setup
+initial_setup
 
 ### LEXDATA PATHS
 
