@@ -98,13 +98,8 @@ cp $DOCKERDIR/lexdata.git/converters/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
 echo "" >&2
 echo "IMPORT: $LEXDB:sv" >&2
 
-if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then
-    if zcat $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB sv $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $DOCKERDIR/symbol_sets ; then
-	echo -n ""
-    else
-	echo "$LEXDB FAILED" >&2
-	exit 1
-    fi
+if zcat $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB sv $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $DOCKERDIR/symbol_sets ; then
+    echo -n ""
 else
     echo "$LEXDB FAILED" >&2
     exit 1
@@ -112,27 +107,17 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then 
-    if cat $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -wi "test|a|children" > $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB enu $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
-	echo -n ""
-    else
-	echo "$LEXDB FAILED" >&2
-	exit 1
-    fi
+if cat $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -wi "test|a|children" > $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB enu $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
+    echo -n ""
 else
     echo "$LEXDB FAILED" >&2
     exit 1
-fi
+    fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:ar" >&2
-if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then
-    if importLex $DOCKERDIR/db_files/$LEXDB ar $DOCKERDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $DOCKERDIR/symbol_sets ; then
-	echo -n ""
-    else
-	echo "$LEXDB FAILED" >&2
-	exit 1
-    fi
+if importLex $DOCKERDIR/db_files/$LEXDB ar $DOCKERDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $DOCKERDIR/symbol_sets ; then
+    echo -n ""
 else
     echo "$LEXDB FAILED" >&2
     exit 1
