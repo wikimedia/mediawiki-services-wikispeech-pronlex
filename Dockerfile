@@ -12,7 +12,7 @@ RUN go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
 RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
 RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
-ENV APPDIR appdir
+ENV APPDIR /appdir
 
 RUN export GOPATH=$(go env GOPATH)
 RUN export PATH=$PATH:$(go env GOPATH)/bin

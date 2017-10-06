@@ -64,7 +64,7 @@ fi
 if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then
     echo "[$CMD] created empty db in docker: $DOCKERDIR/db_files/$LEXDB" >&2
 else
-    echo "[$CMD] couldn't create empty db in docker:: $DOCKERDIR/db_files/$LEXDB" >&2
+    echo "[$CMD] couldn't create empty db in docker: $DOCKERDIR/db_files/$LEXDB" >&2
     exit 1
 fi
 
