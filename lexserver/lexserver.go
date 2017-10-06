@@ -163,7 +163,7 @@ var staticFolder string      // = "."
 func initFolders() error {
 	// TODO sane error handling
 
-	tmpDir, err := ioutil.TempDir("", "lexserver-")
+	tmpDir, err := ioutil.TempDir("lexserver", "tmp-")
 	if err != nil {
 		return err
 	}
