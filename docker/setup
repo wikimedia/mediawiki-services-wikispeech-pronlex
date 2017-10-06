@@ -14,8 +14,8 @@ Setup files will be added to the destination folder <APPDIR> and imports a small
 " >&2
 	exit 1
 fi
+LOCALDIR=$1
 DOCKERDIR="/appdir"
-LOCALDIR=$2
 
 
 #echo "[$CMD] DOCKERDIR=$DOCKERDIR" >&2

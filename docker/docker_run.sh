@@ -75,4 +75,4 @@ if docker container inspect $CNAME &> /dev/null ; then
 fi
 
 
-docker run --name=pronlex -v $APPDIRABS:/go/appdir -p $PORT:8787 -it $DOCKERTAG $*
+docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG $*
