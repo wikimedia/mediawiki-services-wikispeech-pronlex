@@ -36,6 +36,7 @@ function do_setup {
 
     mkdir -p $DOCKERDIR || exit 1
     mkdir -p $DOCKERDIR/symbol_sets || exit 1
+    mkdir -p $DOCKERDIR/db_files || exit 1
 
     cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $DOCKERDIR/symbol_sets/ || exit 1
     cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
