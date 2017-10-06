@@ -104,7 +104,7 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 	name:     "list_current_entry_statuses",
 	url:      "/list_current_entry_statuses/{lexicon_name}",
 	help:     "List current entry statuses.",
-	examples: []string{"/list_current_entry_statuses/demodb:demolex"},
+	examples: []string{"/list_current_entry_statuses/lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -133,7 +133,7 @@ var lexiconListAllEntryStatuses = urlHandler{
 	name:     "list_all_entry_statuses",
 	url:      "/list_all_entry_statuses/{lexicon_name}",
 	help:     "List all entry statuses.",
-	examples: []string{"/list_all_entry_statuses/demodb:demolex"},
+	examples: []string{"/list_all_entry_statuses/lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -167,7 +167,7 @@ var lexiconInfo = urlHandler{
 	name:     "info",
 	url:      "/info/{lexicon_name}",
 	help:     "Get some basic lexicon info.",
-	examples: []string{"/info/demodb:demolex"},
+	examples: []string{"/info/lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -196,7 +196,7 @@ var lexiconStats = urlHandler{
 	name:     "stats",
 	url:      "/stats/{lexicon_name}",
 	help:     "Lists lexicon stats.",
-	examples: []string{"/stats/demodb:demolex"},
+	examples: []string{"/stats/lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -277,7 +277,7 @@ var lexiconLookup = urlHandler{
 	},
 }
 
-var lexiconAddEntryURL = `/addentry?lexicon_name=demodb:demolex&entry={
+var lexiconAddEntryURL = `/addentry?lexicon_name=lexserver_testdb:sv&entry={
     "strn": "flesk",
     "language": "sv-se",
     "partOfSpeech": "NN",

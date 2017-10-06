@@ -57,10 +57,10 @@ do_setup
 
 ### LEXDATA PATHS
 
-SVLEX=sv_se_nst_lex.db
-#NOBLEX=no_nob_nst_lex.db
-AMELEX=en_am_cmu_lex.db
-ARLEX=ar_ar_tst_lex.db
+SVLEX=wikispeech_testdb_sv.db
+#NOBLEX=wikispeech_testdb_nb.db
+AMELEX=wikispeech_testdb_enu.db
+ARLEX=wikispeech_testdb_ar.db
 if [ -e $APPDIR/db_files/$SVLEX ]; then
     echo "[$CMD] cannot create db if it already exists: $LOCALDIR/db_files/$SVLEX" >&2
     exit 1

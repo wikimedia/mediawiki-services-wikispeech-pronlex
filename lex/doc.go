@@ -51,8 +51,8 @@ A few JSON examples:
    {
    id: 6,
    lexRef: {
-      DBRef: "demodb",
-      LexName: "demolex"
+      DBRef: "lexserver_testdb",
+      LexName: "sv"
    },
       strn: "hästar",
       language: "sv",

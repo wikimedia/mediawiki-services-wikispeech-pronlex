@@ -166,8 +166,8 @@ func demoEntries() []lex.Entry {
 func setupDemoDB() error {
 	log.Println("demo_setup: creating demo database ...")
 
-	dbName := "demodb"
-	lexRef := lex.NewLexRef(dbName, "demolex")
+	dbName := "lexserver_testdb"
+	lexRef := lex.NewLexRef(dbName, "sv")
 	dbPath := filepath.Join(dbFileArea, dbName+".db")
 
 	var dbmx = dbapi.NewDBManager()

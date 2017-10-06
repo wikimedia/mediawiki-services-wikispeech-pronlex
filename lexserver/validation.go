@@ -99,7 +99,7 @@ var validationStats = urlHandler{
 	name:     "stats",
 	url:      "/stats/{lexicon_name}",
 	help:     "Lists validation stats.",
-	examples: []string{"/stats/demodb:demolex"},
+	examples: []string{"/stats/lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
