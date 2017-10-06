@@ -106,14 +106,14 @@ else
     exit 1
 fi
 
-echo "" >&2
-echo "IMPORT: $LEXDB:nb" >&2
-if zcat $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.gz | head -1000 > $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $APPDIR/symbol_sets ; then
-    echo -n ""
-else
-    echo "$NOBLEX FAILED" >&2
-    exit 1
-fi
+#echo "" >&2
+#echo "IMPORT: $LEXDB:nb" >&2
+#if zcat $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.gz | head -1000 > $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $APPDIR/symbol_sets ; then
+#    echo -n ""
+#else
+#    echo "$NOBLEX FAILED" >&2
+#    exit 1
+#fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
