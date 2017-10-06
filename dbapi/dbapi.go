@@ -657,6 +657,31 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 	return ids, err
 }
 
+var insertEntryTag = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
+
+//TODO Add tests
+//TODO Add db look-up to see if db uniqueness constraints are violated, to
+//return more gentle error instead of failing and rolling back.
+func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
+
+	tag = strings.TrimSpace(strings.ToLower(tag))
+
+	insert, err := tx.Prepare(insertEntryTag)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed prepare : %v", err)
+	}
+
+	_, err = tx.Stmt(insert).Exec(entryID, tag)
+	if err != nil {
+		// TODO Maybe no rollback?
+		tx.Rollback()
+		return fmt.Errorf("failed insert entry tag : %v", err)
+	}
+
+	return nil
+}
+
 // InsertLemma saves a lex.Lemma to the db, but does not associate it with anlex.Entry
 // TODO do we need both InsertLemma and SetOrGetLemma?
 func insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
