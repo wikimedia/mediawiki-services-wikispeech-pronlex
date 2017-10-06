@@ -660,11 +660,32 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 var insertEntryTag = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
 
 //TODO Add tests
-//TODO Add db look-up to see if db uniqueness constraints are violated, to
-//return more gentle error instead of failing and rolling back.
+
+//TODO Add db look-up to see if db uniqueness constraints are
+//violated, to return more gentle error (or no error) instead of
+//failing and rolling back.
 func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 	tag = strings.TrimSpace(strings.ToLower(tag))
+
+	var eId int64
+	var eTag, wordForm string
+	// Check if it is already there, then silently do nuttin'
+	chkResErr := tx.QueryRow("SELECT entryId, tag, wordForm FROM EntryTag WHERE entryId = ?", entryID).Scan(&eId, &eTag, &wordForm)
+	_ = chkResErr
+	//sdkjjks :=
+
+	// Entry already has wanted tag, silently accept the fact
+	if eId == entryID && eTag == tag {
+		return nil
+	}
+
+	// Entry had different tag, report error but do nothing
+	if eTag != "" && tag != eTag {
+		return fmt.Errorf("insertEntryTag: failed to insert tag '%s' because entry already had tag '%s'", tag, eTag)
+	}
+
+	//err == sql.ErrNoRows
 
 	insert, err := tx.Prepare(insertEntryTag)
 	if err != nil {
