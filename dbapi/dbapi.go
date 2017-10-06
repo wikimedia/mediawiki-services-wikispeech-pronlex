@@ -685,6 +685,8 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 		return fmt.Errorf("insertEntryTag: failed to insert tag '%s' because entry already had tag '%s'", tag, eTag)
 	}
 
+	// TODO Check that another entry of the same wordform has this tag
+
 	//err == sql.ErrNoRows
 
 	insert, err := tx.Prepare(insertEntryTag)
