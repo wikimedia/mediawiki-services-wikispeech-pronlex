@@ -14,16 +14,14 @@ Setup files will be added to the destination folder <APPDIR> and imports a small
 " >&2
 	exit 1
 fi
-LOCALDIR=$1
-DOCKERDIR="/appdir"
+DOCKERDIR=$1
 
 
 #echo "[$CMD] DOCKERDIR=$DOCKERDIR" >&2
-#echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 
 function do_setup {
     if [ -d $DOCKERDIR/symbol_sets ] ; then
-	echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
+	echo "[$CMD] Docker folder $DOCKERDIR is already configured. No setup needed." >&2
     fi
 
 
@@ -34,7 +32,7 @@ function do_setup {
 
     ### LEXDATA PREPS
 
-    echo "[$CMD] Setting up basic files in folder $LOCALDIR (as $DOCKERDIR inside docker)... " >&2
+    echo "[$CMD] Setting up basic files in docker folder $DOCKERDIR... " >&2
 
     mkdir -p $DOCKERDIR || exit 1
     mkdir -p $DOCKERDIR/symbol_sets || exit 1
@@ -59,14 +57,14 @@ do_setup
 
 LEXDB=wikispeech_testdb.db
 if [ -e $DOCKERDIR/db_files/$LEXDB ]; then
-    echo "[$CMD] cannot create db if it already exists: $LOCALDIR/db_files/$LEXDB" >&2
+    echo "[$CMD] cannot create db if it already exists in docker folder $DOCKERDIR/db_files/$LEXDB" >&2
     exit 1
 fi
 
 if createEmptyDB $DOCKERDIR/db_files/$LEXDB ; then
-    echo "[$CMD] created empty db: $LOCALDIR/db_files/$LEXDB" >&2
+    echo "[$CMD] created empty db in docker: $DOCKERDIR/db_files/$LEXDB" >&2
 else
-    echo "[$CMD] couldn't create empty db: $LOCALDIR/db_files/$LEXDB" >&2
+    echo "[$CMD] couldn't create empty db in docker:: $DOCKERDIR/db_files/$LEXDB" >&2
     exit 1
 fi
 
