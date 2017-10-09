@@ -1199,7 +1199,12 @@ func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 		return updated7, err
 	}
 
-	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7, err
+	updated8, err := updateEntryTag(tx, e, dbEntries[0])
+	if err != nil {
+		return updated8, err
+	}
+
+	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7 || updated8, err
 }
 
 func getTIDs(ts []lex.Transcription) []int64 {
@@ -1298,6 +1303,24 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 		tx.Rollback()
 		return false, fmt.Errorf("failed to update lemma : %v", err)
 	}
+	return true, nil
+}
+
+func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+	if e.ID != dbE.ID {
+		tx.Rollback()
+		return false, fmt.Errorf("updateEntryTag: new and old entries have different ids")
+	}
+	if e.Tag == dbE.Tag {
+		return false, nil
+	}
+
+	_, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", e.Tag, e.ID)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("updateEntryTag failed : %v", err)
+	}
+
 	return true, nil
 }
 
