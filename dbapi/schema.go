@@ -87,7 +87,8 @@ CREATE TABLE EntryTag (
     -- id integer not null primary key autoincrement,
     entryId integer not null,
     tag text not null,
-    wordForm text -- not null
+    wordForm text, -- not null,
+    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
 );
 
 -- A single tag per entry
