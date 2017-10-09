@@ -1311,8 +1311,19 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		tx.Rollback()
 		return false, fmt.Errorf("updateEntryTag: new and old entries have different ids")
 	}
+	// Nothing to do
 	if e.Tag == dbE.Tag {
 		return false, nil
+	}
+
+	// Delete current tag if new tag is empty
+	if e.Tag == "" { // && dbE.Tag != ""
+		_, err := tx.Exec("DELETE FROM entrytag WHERE entryid = ?", e.ID)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("updateEntryTag failed to delete old tag : %v", err)
+		}
+		return true, nil
 	}
 
 	_, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", e.Tag, e.ID)
