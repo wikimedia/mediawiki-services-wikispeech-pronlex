@@ -628,6 +628,15 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 				return ids, fmt.Errorf("Failed lemma to entry assoc: %v", err)
 			}
 		}
+
+		if "" != e.Tag {
+			err = insertEntryTagTx(tx, e.ID, e.Tag)
+			if err != nil {
+				tx.Rollback()
+				return ids, fmt.Errorf("Failed to insert entry tag '%s' for '%s': %v", e.Tag, e.Strn, err)
+			}
+		}
+
 		if trm(e.EntryStatus.Name) != "" {
 			//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
 			//var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
@@ -691,14 +700,16 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 	insert, err := tx.Prepare(insertEntryTag)
 	if err != nil {
-		tx.Rollback()
+		// Let caller be responsible for rollback
+		//tx.Rollback()
 		return fmt.Errorf("failed prepare : %v", err)
 	}
 
 	_, err = tx.Stmt(insert).Exec(entryID, tag)
 	if err != nil {
 		// TODO Maybe no rollback?
-		tx.Rollback()
+		// Let caller be responsible for rollback
+		//tx.Rollback()
 		return fmt.Errorf("failed insert entry tag : %v", err)
 	}
 
@@ -878,7 +889,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 	// Optional/nullable values
 
 	var lemmaID sql.NullInt64
-	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
+	var lemmaStrn, lemmaReading, lemmaParadigm, entryTag sql.NullString
 
 	var entryStatusID sql.NullInt64
 	var entryStatusName, entryStatusSource sql.NullString
@@ -920,6 +931,8 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 			&lemmaReading,
 			&lemmaParadigm,
 
+			&entryTag,
+
 			&entryStatusID,
 			&entryStatusName,
 			&entryStatusSource,
@@ -953,6 +966,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 				Morphology:   morphology,
 				WordParts:    wordParts,
 				Preferred:    pref,
+				Tag:          entryTag.String,
 			}
 			// max one lemma per entry
 			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
