@@ -1317,8 +1317,8 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return false, fmt.Errorf("updateEntryTag: new and old entries have different ids")
 	}
 
-	newTag = strings.TrimSpace(strings.ToLower(e.Tag))
-	oldTag = strings.TrimSpace(strings.ToLower(dbE.Tag))
+	newTag := strings.TrimSpace(strings.ToLower(e.Tag))
+	oldTag := strings.TrimSpace(strings.ToLower(dbE.Tag))
 	// Nothing to do
 	if newTag == oldTag {
 		return false, nil

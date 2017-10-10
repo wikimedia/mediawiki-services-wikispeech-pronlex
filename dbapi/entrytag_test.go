@@ -100,6 +100,7 @@ func TestEntryTag(t *testing.T) {
 	}
 
 	var ent1 lex.Entry
+	var ent2 lex.Entry
 	// We assume that the entry IDs are 1 and 2
 	for _, e := range entries["apa"] {
 		w1 := "entrytag_1"
@@ -114,7 +115,13 @@ func TestEntryTag(t *testing.T) {
 		if e.ID == 2 && e.Tag != w2 {
 			t.Errorf("Expected '%s' got '%s'", w2, e.Tag)
 		}
+		if e.ID == 2 {
+			ent2 = e // Save for update test
+		}
+
 	}
+
+	_ = ent2
 
 	// Change tag before update
 	w := "entrytag_1b"
@@ -131,6 +138,8 @@ func TestEntryTag(t *testing.T) {
 	if entUpdate.Tag != w {
 		t.Errorf("Wanted '%s' got '%s'", w, entUpdate.Tag)
 	}
+
+	// It should not be possible to assign the same Tag to two different entries
 
 	//t.Errorf("NOOOOOOOOOOOOOOOOoooooooooooooo")
 }
