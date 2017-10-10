@@ -102,25 +102,25 @@ echo "IMPORT: $LEXDB:sv" >&2
 if zcat $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB sv $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
-    echo "$LEXDB FAILED" >&2
+    echo "$LEXDB:sv FAILED" >&2
     exit 1
 fi
 
-#echo "" >&2
-#echo "IMPORT: $LEXDB:nb" >&2
-#if zcat $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.gz | head -1000 > $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $APPDIR/symbol_sets ; then
-#    echo -n ""
-#else
-#    echo "$NOBLEX FAILED" >&2
-#    exit 1
-#fi
+echo "" >&2
+echo "IMPORT: $LEXDB:nb" >&2
+if zcat $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|det|ær|test" > $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && importLex $APPDIR/db_files/$NOBLEX nb-no.nst $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $APPDIR/symbol_sets ; then
+    echo -n ""
+else
+    echo "$LEXDB:nb FAILED" >&2
+    exit 1
+fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
 if cat $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -wi "test|a|children" > $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB enu $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
-    echo "$LEXDB FAILED" >&2
+    echo "$LEXDB:enu FAILED" >&2
     exit 1
     fi
 
@@ -129,7 +129,7 @@ echo "IMPORT: $LEXDB:ar" >&2
 if importLex $DOCKERDIR/db_files/$LEXDB ar $DOCKERDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
-    echo "$LEXDB FAILED" >&2
+    echo "$LEXDB:ar FAILED" >&2
     exit 1
 fi
 
