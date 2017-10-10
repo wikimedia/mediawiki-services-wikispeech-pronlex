@@ -121,8 +121,6 @@ func TestEntryTag(t *testing.T) {
 
 	}
 
-	_ = ent2
-
 	// Change tag before update
 	w := "entrytag_1b"
 	ent1.Tag = w
@@ -140,6 +138,12 @@ func TestEntryTag(t *testing.T) {
 	}
 
 	// It should not be possible to assign the same Tag to two different entries
-
-	//t.Errorf("NOOOOOOOOOOOOOOOOoooooooooooooo")
+	ent2.Tag = w //No-no!
+	_, updated2, err2 := updateEntry(db, ent2)
+	if updated2 {
+		t.Errorf("did not expect entry to be updated. disappointed.")
+	}
+	if err2 == nil {
+		t.Errorf("Expected error, got nil")
+	}
 }
