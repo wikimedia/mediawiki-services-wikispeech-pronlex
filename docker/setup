@@ -108,7 +108,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:nb" >&2
-if zcat $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|det|ær|test" > $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$NOBLEX nb-no.nst $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $DOCKERDIR/symbol_sets ; then
+if zcat $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|det|ær|test" > $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$NOBLEX nb $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:nb FAILED" >&2
