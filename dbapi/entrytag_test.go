@@ -137,7 +137,7 @@ func TestEntryTag(t *testing.T) {
 		t.Errorf("Wanted '%s' got '%s'", w, entUpdate.Tag)
 	}
 
-	// It should not be possible to assign the same Tag to two different entries
+	// It should not be possible to assign the same Entry.Tag to two different entries
 	ent2.Tag = w //No-no!
 	_, updated2, err2 := updateEntry(db, ent2)
 	if updated2 {
