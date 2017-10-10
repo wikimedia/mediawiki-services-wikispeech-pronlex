@@ -677,6 +677,11 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 	tag = strings.TrimSpace(strings.ToLower(tag))
 
+	// No tag, silently do nothing:
+	if tag == "" {
+		return nil
+	}
+
 	var eId int64
 	var eTag, wordForm string
 	// Check if it is already there, then silently do nuttin'
@@ -1311,13 +1316,16 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		tx.Rollback()
 		return false, fmt.Errorf("updateEntryTag: new and old entries have different ids")
 	}
+
+	newTag = strings.TrimSpace(strings.ToLower(e.Tag))
+	oldTag = strings.TrimSpace(strings.ToLower(dbE.Tag))
 	// Nothing to do
-	if e.Tag == dbE.Tag {
+	if newTag == oldTag {
 		return false, nil
 	}
 
 	// Delete current tag if new tag is empty
-	if e.Tag == "" { // && dbE.Tag != ""
+	if newTag == "" { // && oldTag != ""
 		_, err := tx.Exec("DELETE FROM entrytag WHERE entryid = ?", e.ID)
 		if err != nil {
 			tx.Rollback()
@@ -1326,7 +1334,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return true, nil
 	}
 
-	_, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", e.Tag, e.ID)
+	_, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", newTag, e.ID)
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("updateEntryTag failed : %v", err)
