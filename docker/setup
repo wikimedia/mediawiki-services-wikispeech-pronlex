@@ -22,7 +22,7 @@ DOCKERDIR=$1
 function initial_setup {
     if [ -d $DOCKERDIR/symbol_sets ] ; then
 	echo "[$CMD] Docker folder $DOCKERDIR is already configured. No setup needed." >&2
-	exit 1
+	exit 0
     fi
 
 
