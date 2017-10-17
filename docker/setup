@@ -116,7 +116,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if cat $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -wi "test|a|children" > $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB enu $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
+if cat $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -w "test|a|children" > $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB enu $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:enu FAILED" >&2
