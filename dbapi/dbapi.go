@@ -628,6 +628,15 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 				return ids, fmt.Errorf("Failed lemma to entry assoc: %v", err)
 			}
 		}
+
+		if "" != e.Tag {
+			err = insertEntryTagTx(tx, e.ID, e.Tag)
+			if err != nil {
+				tx.Rollback()
+				return ids, fmt.Errorf("Failed to insert entry tag '%s' for '%s': %v", e.Tag, e.Strn, err)
+			}
+		}
+
 		if trm(e.EntryStatus.Name) != "" {
 			//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
 			//var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
@@ -668,6 +677,11 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 	tag = strings.TrimSpace(strings.ToLower(tag))
 
+	// No tag, silently do nothing:
+	if tag == "" {
+		return nil
+	}
+
 	var eId int64
 	var eTag, wordForm string
 	// Check if it is already there, then silently do nuttin'
@@ -691,14 +705,16 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 	insert, err := tx.Prepare(insertEntryTag)
 	if err != nil {
-		tx.Rollback()
+		// Let caller be responsible for rollback
+		//tx.Rollback()
 		return fmt.Errorf("failed prepare : %v", err)
 	}
 
 	_, err = tx.Stmt(insert).Exec(entryID, tag)
 	if err != nil {
 		// TODO Maybe no rollback?
-		tx.Rollback()
+		// Let caller be responsible for rollback
+		//tx.Rollback()
 		return fmt.Errorf("failed insert entry tag : %v", err)
 	}
 
@@ -878,7 +894,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 	// Optional/nullable values
 
 	var lemmaID sql.NullInt64
-	var lemmaStrn, lemmaReading, lemmaParadigm sql.NullString
+	var lemmaStrn, lemmaReading, lemmaParadigm, entryTag sql.NullString
 
 	var entryStatusID sql.NullInt64
 	var entryStatusName, entryStatusSource sql.NullString
@@ -920,6 +936,8 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 			&lemmaReading,
 			&lemmaParadigm,
 
+			&entryTag,
+
 			&entryStatusID,
 			&entryStatusName,
 			&entryStatusSource,
@@ -953,6 +971,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 				Morphology:   morphology,
 				WordParts:    wordParts,
 				Preferred:    pref,
+				Tag:          entryTag.String,
 			}
 			// max one lemma per entry
 			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
@@ -1185,7 +1204,12 @@ func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 		return updated7, err
 	}
 
-	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7, err
+	updated8, err := updateEntryTag(tx, e, dbEntries[0])
+	if err != nil {
+		return updated8, err
+	}
+
+	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7 || updated8, err
 }
 
 func getTIDs(ts []lex.Transcription) []int64 {
@@ -1284,6 +1308,38 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 		tx.Rollback()
 		return false, fmt.Errorf("failed to update lemma : %v", err)
 	}
+	return true, nil
+}
+
+func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+	if e.ID != dbE.ID {
+		tx.Rollback()
+		return false, fmt.Errorf("updateEntryTag: new and old entries have different ids")
+	}
+
+	newTag := strings.TrimSpace(strings.ToLower(e.Tag))
+	oldTag := strings.TrimSpace(strings.ToLower(dbE.Tag))
+	// Nothing to do
+	if newTag == oldTag {
+		return false, nil
+	}
+
+	// Delete current tag if new tag is empty
+	if newTag == "" { // && oldTag != ""
+		_, err := tx.Exec("DELETE FROM entrytag WHERE entryid = ?", e.ID)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("updateEntryTag failed to delete old tag : %v", err)
+		}
+		return true, nil
+	}
+
+	_, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", newTag, e.ID)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("updateEntryTag failed : %v", err)
+	}
+
 	return true, nil
 }
 

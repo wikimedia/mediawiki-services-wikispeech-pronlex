@@ -144,7 +144,12 @@ type Lemma struct {
 
 // Entry defines a lexical entry. It does not correspond one-to-one to
 // the entry db table, since it contains data also from associated
-// tables (Lemma, Transcription)
+// tables (Lemma, Tag, Transcription, EntryValidations).  The Tag
+// field holds an arbitrary, optional, lower case string to
+// disambiguate between different lex.Entries charing the same
+// othograpy. Two different lex.Entries cannot have identical
+// lex.Entry.Tags (the database should not allow this).
+
 type Entry struct {
 	ID               int64             `json:"id"`
 	LexRef           LexRef            `json:"lexRef"`
@@ -154,6 +159,7 @@ type Entry struct {
 	Morphology       string            `json:"morphology"`
 	WordParts        string            `json:"wordParts"`
 	Lemma            Lemma             `json:"lemma"`
+	Tag              string            `json:"tag"`
 	Transcriptions   []Transcription   `json:"transcriptions"`
 	EntryStatus      EntryStatus       `json:"status"` // TODO Probably should be a slice of statuses?
 	EntryValidations []EntryValidation `json:"entryValidations"`
