@@ -71,7 +71,7 @@ else
 fi
 
 
-nConverters=`ls $DOCKERDIR/lexdata/convertersx/*.cnv 2> /dev/null |wc -l`
+nConverters=`ls $DOCKERDIR/lexdata/converters/*.cnv 2> /dev/null |wc -l`
 nSymSets=`ls $DOCKERDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
 if [ -d "$DOCKERDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
     cd $DOCKERDIR/lexdata && git pull && cd -

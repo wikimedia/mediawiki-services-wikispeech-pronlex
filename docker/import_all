@@ -24,6 +24,7 @@ echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 function do_setup {
     if [ -d $APPDIR/symbol_sets ] ; then
 	echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
+	return
     fi
 
 
@@ -38,6 +39,7 @@ function do_setup {
 
     mkdir -p $APPDIR || exit 1
     mkdir -p $APPDIR/symbol_sets || exit 1
+    mkdir -p $APPDIR/db_files || exit 1
 
     cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $APPDIR/symbol_sets/ || exit 1
     cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $APPDIR/symbol_sets/ || exit 1
@@ -79,7 +81,7 @@ if [ -e $APPDIR/db_files/$ARLEX ]; then
 fi
 
 
-nConverters=`ls $APPDIR/lexdata/convertersx/*.cnv 2> /dev/null |wc -l`
+nConverters=`ls $APPDIR/lexdata/converters/*.cnv 2> /dev/null |wc -l`
 nSymSets=`ls $APPDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
 if [ -d "$APPDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
     cd $APPDIR/lexdata && git pull && cd -
