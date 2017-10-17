@@ -6,8 +6,8 @@ KEEP=0
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
-#echo "[$CMD] temporarily disabled, please use docker for now" >&2
-#exit 1
+echo "[$CMD] temporarily disabled, please use docker for now" >&2
+exit 1
 
 while getopts ":hka:" opt; do
   case $opt in
