@@ -16,11 +16,16 @@ Setup files will be added to the destination folder <APPDIR> and imports a small
 fi
 DOCKERDIR=$1
 
+LEXDB=wikispeech_testdb.db
 
 #echo "[$CMD] DOCKERDIR=$DOCKERDIR" >&2
 
 function initial_setup {
-    if [ -d $DOCKERDIR/symbol_sets ] ; then
+    if [ -f $DOCKERDIR/db_files/wikispeech_testdb.db ] ; then
+	echo "[$CMD] Docker folder $DOCKERDIR is already configured. No setup needed." >&2
+	exit 0
+    fi
+    if [ -f $DOCKERDIR/db_files/lexserver_testdb.db ] ; then
 	echo "[$CMD] Docker folder $DOCKERDIR is already configured. No setup needed." >&2
 	exit 0
     fi
@@ -57,7 +62,6 @@ initial_setup
 
 ### LEXDATA PATHS
 
-LEXDB=wikispeech_testdb.db
 if [ -e $DOCKERDIR/db_files/$LEXDB ]; then
     echo "[$CMD] cannot create db if it already exists in docker folder $DOCKERDIR/db_files/$LEXDB" >&2
     exit 1
