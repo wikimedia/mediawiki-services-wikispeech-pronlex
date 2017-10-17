@@ -23,40 +23,12 @@ echo "[$CMD] APPDIR=$APPDIR" >&2
 echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 
 function do_setup {
-    if $scriptdir/setup ; then
+    if $scriptdir/setup $APPDIR; then
 	echo "[$CMD] Setup completed" >&2
     else
 	echo "[$CMD] Couldn't run setup" >&2
 	exit 1
     fi
-    # if [ -d $APPDIR/symbol_sets ] ; then
-    # 	echo "[$CMD] APPDIR <$LOCALDIR> is already configured. No setup needed." >&2
-    # 	return
-    # fi
-
-
-    # if [ -z "$GOPATH" ] ; then
-    # 	echo "[$CMD] The GOPATH environment variable is required!" >&2
-    # 	exit 1
-    # fi
-
-    # ### LEXDATA PREPS
-
-    # echo "[$CMD] Setting up basic files in LEXDATA dir $LOCALDIR ($APPDIR inside docker)... " >&2
-
-    # mkdir -p $APPDIR || exit 1
-    # mkdir -p $APPDIR/symbol_sets || exit 1
-    # mkdir -p $APPDIR/db_files || exit 1
-
-    # cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $APPDIR/symbol_sets/ || exit 1
-    # cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $APPDIR/symbol_sets/ || exit 1
-    # echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
-    # cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
-
-
-    # ### COMPLETED
-
-    # echo "[$CMD] COMPLETED" >&2
 }
 
 
