@@ -9,16 +9,16 @@ function echo_usage {
 USAGE:
 
 # SETUP lex server
-  $ $CMD -a <APPDIR> setup
+  $ $CMD -a <APPDIR> -t <DOCKERTAG> setup
 
 # IMPORT lexicon data (optional)
-  $ $CMD -a <APPDIR> lex_import
+  $ $CMD -a <APPDIR> -t <DOCKERTAG> lex_import
 
 # RUN lex server
-  $ $CMD -a <APPDIR> 
+  $ $CMD -a <APPDIR> -t <DOCKERTAG>
 
 # BASH inspect lex server
-  $ $CMD -a <APPDIR> bash
+  $ $CMD -a <APPDIR> -t <DOCKERTAG> bash
 
 Options:
   -h help
