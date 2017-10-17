@@ -90,7 +90,7 @@ if [ $# -eq 0 ]; then
     shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG
 elif [ $# -eq 1 ] && [ $1 == "setup" ]; then
     shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG setup /appdir
-elif [ $# -eq 1 ] && [ $1 == "import_all" ]; then
+elif [ $# -eq 1 ] && [ $1 == "lex_import" ]; then
     shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG import_all /appdir $APPDIRABS
 elif [ $# -eq 1 ] && [ $1 == "bash" ]; then
     shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG bash
