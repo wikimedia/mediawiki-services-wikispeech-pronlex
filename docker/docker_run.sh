@@ -4,11 +4,9 @@ CMD=`basename $0`
 
 PORT="8787"
 
-while getopts ":ha:p:t:" opt; do
-  case $opt in
-    h)
+function echo_usage {
 	echo "
-USAGES:
+USAGE:
 
 # SETUP lex server
   $ $CMD -a <APPDIR> setup
@@ -28,6 +26,18 @@ Options:
   -p port       (default: $PORT)
   -t docker-tag (required)
 " >&2
+}
+
+if [ $# -eq 0 ]; then
+    echo_usage
+    exit 1
+fi
+
+
+while getopts ":ha:p:t:" opt; do
+  case $opt in
+    h)
+	echo_usage
 	exit 1
       ;;
     a)
@@ -46,7 +56,6 @@ Options:
 done
 
 shift $(expr $OPTIND - 1 )
-
 
 if [ -z "$APPDIR" ] ; then
     echo "[$CMD] FAILED: APPDIR must be specified using -a!" >&2
@@ -67,12 +76,26 @@ echo "[$CMD] DOCKERTAG : $DOCKERTAG" >&2
 APPDIRABS=`realpath $APPDIR`
 
 CNAME="pronlex"
-if docker container inspect $CNAME &> /dev/null ; then
-    echo -n "[$CMD] STOPPING CONTAINER "
-    docker stop $CNAME
-    echo -n "[$CMD] DELETING CONTAINER "
-    docker rm $CNAME
+
+function shutdown_previos {
+    if docker container inspect $CNAME &> /dev/null ; then
+	echo -n "[$CMD] STOPPING CONTAINER "
+	docker stop $CNAME
+	echo -n "[$CMD] DELETING CONTAINER "
+	docker rm $CNAME
+    fi
+}
+
+if [ $# -eq 0 ]; then
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG
+elif [ $# -eq 1 ] && [ $1 == "setup" ]; then
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG setup /appdir
+elif [ $# -eq 1 ] && [ $1 == "import_all" ]; then
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG import_all /appdir $APPDIRABS
+elif [ $# -eq 1 ] && [ $1 == "bash" ]; then
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG bash
+else
+    echo "[$CMD] Unknown command: $*" >&2
+    exit 1
 fi
 
-
-docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG $*
