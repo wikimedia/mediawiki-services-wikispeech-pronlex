@@ -4,5 +4,5 @@ go:
   - 1.9.x
  
 script:
- - go test -v ./... && sh install/standalone/install.sh /tmp/appdir && lexserver -ss_files /tmp/appdir/symbol_sets/ -db_files /tmp/appdir/db_files/ -static /tmp/appdir/.static/ -test 
+ - go test -v ./... && bash sh install/standalone/install.sh /tmp/appdir && lexserver -ss_files /tmp/appdir/symbol_sets/ -db_files /tmp/appdir/db_files/ -static /tmp/appdir/.static/ -test 
 
