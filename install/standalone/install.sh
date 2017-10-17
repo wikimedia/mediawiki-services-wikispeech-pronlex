@@ -4,6 +4,9 @@ CMD=`basename $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
+echo "[$CMD] temporarily disabled, please use docker-compose for now" >&2
+exit 1
+
 if [ $# -ne 1 ]; then
     echo "USAGE: sh $CMD <APPDIR>
 
