@@ -27,7 +27,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
      `$ sh install.sh <APPDIR>`
 
-   Installs the pronlex server in the folder specified by `<APPDIR>`.
+   Installs the pronlex server and a set of test data into the folder specified by `<APPDIR>`.
 
 
 3. Import lexicon data (optional)
