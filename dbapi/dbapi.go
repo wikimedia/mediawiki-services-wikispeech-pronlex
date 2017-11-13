@@ -20,8 +20,7 @@ import (
 	"sync"
 
 	// installs sqlite3 driver
-	_ "github.com/mattn/go-sqlite3"
-
+	"github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/lex"
 	//"github.com/stts-se/pronlex/validation"
 )
@@ -1313,7 +1312,6 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 }
 
 func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
-	fmt.Printf("Updating entry tag for %#v\n", e)
 	if e.ID != dbE.ID {
 		tx.Rollback()
 		return false, fmt.Errorf("updateEntryTag: new and old entries have different ids")

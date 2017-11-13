@@ -26,15 +26,13 @@ var lexiconValidationPage = urlHandler{
 	},
 }
 
-var lexiconUpdateEntryURL = `/lexicon/updateentry?entry={"id": 195170,"lexRef": {"DBRef": "sv_se_nst_lex","LexName": "sv-se.nst"},"strn": "do","language": "sv-se","partOfSpeech": "","morphology": "","wordParts": "do","lemma": {"id": 0,"strn": "","reading": "","paradigm": ""},"tag": "the_acronym","transcriptions": [{"id": 200676,"entryId": 195170,"strn": "\" d i: . t U","language": "sv-se","sources": ["nst"]}],"status": {"id": 919479,"name": "imported","source": "nst","timestamp": "2017-11-13T13:34:34Z","current": true},"entryValidations": [ ],"preferred": false}`
-
 //var lexiconUpdateEntryURL = "/lexicon/updateentry?entry={...}"
 
 var lexiconUpdateEntry = urlHandler{
 	name:     "updateentry",
 	url:      "/updateentry",
 	help:     " Updates an entry in the database. Input is an `entry` variable in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>",
-	examples: []string{lexiconUpdateEntryURL},
+	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entryJSON := getParam("entry", r)
 		//body, err := ioutil.ReadAll(r.Body)
