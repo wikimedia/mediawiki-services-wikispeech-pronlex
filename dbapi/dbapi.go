@@ -1334,10 +1334,29 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return true, nil
 	}
 
-	_, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", newTag, e.ID)
+	sqlRes, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", newTag, e.ID)
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("updateEntryTag failed : %v", err)
+	}
+	rows, err := sqlRes.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("updateEntryTag failed (couldn't count rows affected) : %v", err)
+	}
+	if rows == 0 {
+		_, err := tx.Exec("INSERT into entrytag (tag, entryid) values (?, ?)", newTag, e.ID)
+		if err != nil {
+			tx.Rollback()
+			return false, fmt.Errorf("updateEntryTag failed : %v", err)
+		}
+	}
+
+	var tagged string
+	tx.QueryRow("SELECT tag FROM entrytag WHERE entryid = ?", e.ID).Scan(&tagged)
+	if tagged != newTag {
+		tx.Rollback()
+		return false, fmt.Errorf("Failed to set new entrytag to %s (found %s)", newTag, tagged)
 	}
 
 	return true, nil
