@@ -96,7 +96,7 @@ fi
 echo "" >&2
 echo "IMPORT: $ARLEX" >&2
 if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$ARLEX ; then
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$ARLEX ar-test ar_AR A$LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
+    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$ARLEX ar-test ar_AR $LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
 else
     echo "$ARLEX FAILED" >&2
     exit 1
