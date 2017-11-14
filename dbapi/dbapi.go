@@ -121,7 +121,7 @@ func listEntryTableColumnNames(db *sql.DB) ([]string, error) {
 // funcName(db *sql.DB, ...) into methods of the new struct.
 func listLexicons(db *sql.DB) ([]lexicon, error) {
 	var res []lexicon
-	sql := "select id, name, symbolsetname from lexicon"
+	sql := "select id, name, symbolsetname, locale from lexicon"
 	rows, err := db.Query(sql)
 	if err != nil {
 		return res, fmt.Errorf("db query failed : %v", err)
@@ -130,7 +130,7 @@ func listLexicons(db *sql.DB) ([]lexicon, error) {
 
 	for rows.Next() {
 		l := lexicon{}
-		err = rows.Scan(&l.id, &l.name, &l.symbolSetName)
+		err = rows.Scan(&l.id, &l.name, &l.symbolSetName, &l.locale)
 		if err != nil {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
@@ -194,14 +194,14 @@ func getLexicons(db *sql.DB, names []string) ([]lexicon, error) {
 		return res, nil
 	}
 
-	rows, err := db.Query("select id, name, symbolsetname from lexicon where name in "+nQs(len(names)), convS(names)...)
+	rows, err := db.Query("select id, name, symbolsetname, locale from lexicon where name in "+nQs(len(names)), convS(names)...)
 	if err != nil {
 		return res, fmt.Errorf("failed db select on lexicon table : %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		l := lexicon{}
-		err := rows.Scan(&l.id, &l.name, &l.symbolSetName)
+		err := rows.Scan(&l.id, &l.name, &l.symbolSetName, &l.locale)
 		if err != nil {
 			return res, fmt.Errorf("failed rows scan : %v", err)
 		}
@@ -247,7 +247,7 @@ func lexiconFromID(db *sql.DB, id int64) (lexicon, error) {
 // the lexicon table with the given id
 func lexiconFromIDTx(tx *sql.Tx, id int64) (lexicon, error) {
 	res := lexicon{}
-	err := tx.QueryRow("select id, name, symbolsetname from lexicon where id = ?", id).Scan(&res.id, &res.name, &res.symbolSetName)
+	err := tx.QueryRow("select id, name, symbolsetname, locale from lexicon where id = ?", id).Scan(&res.id, &res.name, &res.symbolSetName, &res.locale)
 	if err == sql.ErrNoRows {
 		return res, fmt.Errorf("no lexicon with id %d : %v", id, err)
 	}
@@ -388,10 +388,21 @@ func defineLexicon(db *sql.DB, l lexicon) (lexicon, error) {
 // DefineLexiconTx saves the name of a new lexicon to the db.
 func defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 
-	res, err := tx.Exec("insert into lexicon (name, symbolsetname) values (?, ?)", strings.ToLower(l.name), l.symbolSetName)
+	// TODO: downcase the two first characters in l.locale ?
+
+	if strings.TrimSpace(l.locale) == "" {
+		tx.Rollback()
+		return l, fmt.Errorf("failed to define lexicon with empty locale : %v", l)
+	}
+	if strings.TrimSpace(l.symbolSetName) == "" {
+		tx.Rollback()
+		return l, fmt.Errorf("failed to define lexicon with empty symbolSetName : %v", l)
+	}
+
+	res, err := tx.Exec("insert into lexicon (name, symbolsetname, locale) values (?, ?, ?)", strings.ToLower(l.name), l.symbolSetName, l.locale)
 	if err != nil {
 		tx.Rollback()
-		return l, fmt.Errorf("failed to insert lexicon name + symbolset name : %v", err)
+		return l, fmt.Errorf("failed to define lexicon : %v", err)
 	}
 
 	id, err := res.LastInsertId()
@@ -1570,9 +1581,25 @@ func entryCount(db *sql.DB, lexiconName string) (int64, error) {
 	var entries int64
 	err = tx.QueryRow("SELECT COUNT(*) FROM entry, lexicon WHERE entry.lexiconid = lexicon.id and lexicon.name = ?", lexiconName).Scan(&entries)
 	if err != nil || err == sql.ErrNoRows {
-		return -1, fmt.Errorf("dbapi.EntryCount failed QueryRow : %v", err)
+		return -1, fmt.Errorf("dbapi.entryCount failed QueryRow : %v", err)
 	}
 	return entries, nil
+}
+
+func locale(db *sql.DB, lexiconName string) (string, error) {
+	tx, err := db.Begin()
+	defer tx.Commit()
+
+	if err != nil {
+		return "", fmt.Errorf("dbapi.EntryCount failed opening db transaction : %v", err)
+	}
+
+	var locale string
+	err = tx.QueryRow("SELECT locale FROM lexicon WHERE lexicon.name = ?", lexiconName).Scan(&locale)
+	if err != nil || err == sql.ErrNoRows {
+		return "", fmt.Errorf("dbapi.locale failed QueryRow : %v", err)
+	}
+	return locale, nil
 }
 
 // EntryCount counts the number of lines in a lexicon

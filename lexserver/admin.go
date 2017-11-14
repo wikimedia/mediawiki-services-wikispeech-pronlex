@@ -76,6 +76,13 @@ var adminLexImport = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
+		locale := r.PostFormValue("locale")
+		if strings.TrimSpace(locale) == "" {
+			msg := "input param <locale> must not be empty"
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
 			log.Println(err)
@@ -146,8 +153,7 @@ var adminLexImport = urlHandler{
 		// 	return
 		// }
 
-		//lexicon := dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-		err = dbm.DefineLexicon(lexRef, symbolSetName)
+		err = dbm.DefineLexicon(lexRef, symbolSetName, locale)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)

@@ -114,7 +114,7 @@ func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
 	_, err = execSchema(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
-	l := lexicon{name: lexName, symbolSetName: "ZZ"}
+	l := lexicon{name: lexName, symbolSetName: "ZZ", locale: "ll"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {

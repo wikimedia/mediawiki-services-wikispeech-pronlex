@@ -192,7 +192,7 @@ func (dbm *DBManager) LexiconStats(lexRef lex.LexRef) (LexStats, error) {
 }
 
 // DefineLexicons saves the names of the new lexicons to the db.
-func (dbm *DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, lexes ...lex.LexName) error {
+func (dbm *DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, locale string, lexes ...lex.LexName) error {
 
 	dbm.RLock()
 	defer dbm.RUnlock()
@@ -202,7 +202,7 @@ func (dbm *DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, lexe
 		if !ok {
 			return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", dbRef)
 		}
-		_, err := defineLexicon(db, lexicon{name: string(l), symbolSetName: symbolSetName})
+		_, err := defineLexicon(db, lexicon{name: string(l), symbolSetName: symbolSetName, locale: locale})
 		if err != nil {
 			return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s:%s' : %v", dbRef, l, err)
 		}
@@ -212,7 +212,7 @@ func (dbm *DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, lexe
 }
 
 // DefineLexicon saves the name of a new lexicon to the db.
-func (dbm *DBManager) DefineLexicon(lexRef lex.LexRef, symbolSetName string) error {
+func (dbm *DBManager) DefineLexicon(lexRef lex.LexRef, symbolSetName string, locale string) error {
 
 	dbm.RLock()
 	defer dbm.RUnlock()
@@ -221,7 +221,7 @@ func (dbm *DBManager) DefineLexicon(lexRef lex.LexRef, symbolSetName string) err
 	if !ok {
 		return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", lexRef.DBRef)
 	}
-	_, err := defineLexicon(db, lexicon{name: string(lexRef.LexName), symbolSetName: symbolSetName})
+	_, err := defineLexicon(db, lexicon{name: string(lexRef.LexName), symbolSetName: symbolSetName, locale: locale})
 	if err != nil {
 		return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s' : %v", lexRef.String(), err)
 	}
@@ -452,6 +452,17 @@ func (dbm *DBManager) EntryCount(lexRef lex.LexRef) (int64, error) {
 		return 0, fmt.Errorf("DBManager.ImportLexiconFile: no such db '%s'", lexRef.DBRef)
 	}
 	return entryCount(db, string(lexRef.LexName))
+}
+
+// Locale looks up the locale for a specific lexicon
+func (dbm *DBManager) Locale(lexRef lex.LexRef) (string, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return "", fmt.Errorf("DBManager.ImportLexiconFile: no such db '%s'", lexRef.DBRef)
+	}
+	return locale(db, string(lexRef.LexName))
 }
 
 // ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).

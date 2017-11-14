@@ -41,19 +41,19 @@ func Test_MoveNewEntries(t *testing.T) {
 		log.Fatalf("Failed to create lexicon db: %v", err)
 	}
 
-	l1 := lexicon{name: "test1", symbolSetName: "ZZ"}
+	l1 := lexicon{name: "test1", symbolSetName: "ZZ", locale: "ll"}
 	l1, err = defineLexicon(db, l1)
 	if err != nil {
 		t.Errorf("holy cow (1)! : %v", err)
 	}
 
-	l2 := lexicon{name: "test2", symbolSetName: "ZZ"}
+	l2 := lexicon{name: "test2", symbolSetName: "ZZ", locale: "ll"}
 	l2, err = defineLexicon(db, l2)
 	if err != nil {
 		t.Errorf("holy cow (2)! : %v", err)
 	}
 
-	l3 := lexicon{name: "test3", symbolSetName: "ZZ"}
+	l3 := lexicon{name: "test3", symbolSetName: "ZZ", locale: "ll"}
 	l3, err = defineLexicon(db, l3)
 	if err != nil {
 		t.Errorf("holy cow (3)! : %v", err)

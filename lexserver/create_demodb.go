@@ -190,7 +190,7 @@ func setupDemoDB() error {
 		return fmt.Errorf("failed to define db: %v", err)
 	}
 
-	err = dbmx.DefineLexicon(lexRef, "sv-se_ws-sampa")
+	err = dbmx.DefineLexicon(lexRef, "sv-se_ws-sampa", "sv")
 	if err != nil {
 		return fmt.Errorf("failed to create lexicon: %v", err)
 	}

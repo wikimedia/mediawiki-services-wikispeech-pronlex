@@ -136,6 +136,7 @@ type lexicon struct {
 	id            int64  // `json:"id"`
 	name          string // `json:"name"`
 	symbolSetName string // `json:"symbolSetName"`
+	locale        string // `json:"locale"`
 }
 
 // Symbol corresponds to the symbol db table, and holds a phonetic

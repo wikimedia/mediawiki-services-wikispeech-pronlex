@@ -63,7 +63,7 @@ func main() {
 	var help = f.Bool("help", false, "print help message")
 
 	usage := `USAGE:
- importLex <FLAGS> <DB FILE> <LEXICON NAME> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
+ importLex <FLAGS> <DB FILE> <LEXICON NAME> <LOCALE> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
 
 FLAGS:
    -validate bool  validate each entry, and save the validation in the database (default: false)
@@ -73,7 +73,7 @@ FLAGS:
    -help     bool  print help message
 
 SAMPLE INVOCATION:
-  importLex -validate pronlex.db sv-se.nst [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
+  importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage)
@@ -95,18 +95,19 @@ SAMPLE INVOCATION:
 		os.Exit(1)
 	}
 
-	if len(args) != 5 {
+	if len(args) != 6 {
 		fmt.Println(usage)
 		os.Exit(1)
 	}
 
 	dbFile := args[0]
 	lexName := args[1]
-	inFile := args[2]
-	symbolSetName := args[3]
+	locale := args[2]
+	inFile := args[3]
+	symbolSetName := args[4]
 
 	validator := &validation.Validator{}
-	symsetDirName := args[4]
+	symsetDirName := args[5]
 	if *validate {
 
 		err := loadValidators(symsetDirName)
@@ -178,8 +179,7 @@ SAMPLE INVOCATION:
 		}
 	}
 
-	//lexicon = dbapi.Lexicon{Name: lexName, SymbolSetName: symbolSetName}
-	err = dbm.DefineLexicon(lexRef, symbolSetName)
+	err = dbm.DefineLexicon(lexRef, symbolSetName, locale)
 	if err != nil {
 		log.Fatal(err)
 		return

@@ -78,11 +78,11 @@ func Test_DBManager(t *testing.T) {
 	l2_2 := lex.LexName("zuperlex2")
 	l2_3 := lex.LexName("zuperduperlex")
 
-	err = dbm.DefineLexicons(lex.DBRef("db1"), "sv_sampa", l1_1, l1_2, l1_3)
+	err = dbm.DefineLexicons(lex.DBRef("db1"), "sv_sampa", "sv", l1_1, l1_2, l1_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}
-	err = dbm.DefineLexicons(lex.DBRef("db2"), "sv_sampa", l2_1, l2_2, l2_3)
+	err = dbm.DefineLexicons(lex.DBRef("db2"), "sv_sampa", "sv_SE", l2_1, l2_2, l2_3)
 	if err != nil {
 		t.Errorf("Quack! %v", err)
 	}

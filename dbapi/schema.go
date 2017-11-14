@@ -6,10 +6,11 @@ var Schema = `
 PRAGMA user_version = 1;
 
 -- Each lexical entry belongs to a lexicon.
--- The Lexicon table defines a lexicon through a unique name, along with the name a of symbol set
+-- The Lexicon table defines a lexicon through a unique name, along with the name a of symbol set and a locale
 CREATE TABLE Lexicon (
     name varchar(128) not null,
     symbolSetName varchar(128) not null,
+    locale varchar(128) not null,
     id integer not null primary key autoincrement
   );
 CREATE UNIQUE INDEX idx1e0404a1 on Lexicon (name);

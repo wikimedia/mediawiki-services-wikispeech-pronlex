@@ -105,6 +105,7 @@ var lexiconUpdateEntry = urlHandler{
 type LexWithEntryCount struct {
 	Name          string `json:"name"`
 	SymbolSetName string `json:"symbolSetName"`
+	Locale        string `json:"locale"`
 	EntryCount    int64  `json:"entryCount"`
 }
 
@@ -122,11 +123,12 @@ var lexiconList = urlHandler{
 		var lexs []LexWithEntryCount = []LexWithEntryCount{}
 		for _, lex := range lexs0 {
 			entryCount, err := dbm.EntryCount(lex.LexRef)
+			locale, err := dbm.Locale(lex.LexRef)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("lexicon stats failed : %v", err), http.StatusInternalServerError)
 				return
 			}
-			lexs = append(lexs, LexWithEntryCount{Name: lex.LexRef.String(), SymbolSetName: lex.SymbolSetName, EntryCount: entryCount})
+			lexs = append(lexs, LexWithEntryCount{Name: lex.LexRef.String(), SymbolSetName: lex.SymbolSetName, Locale: locale, EntryCount: entryCount})
 		}
 		jsn, err := marshal(lexs, r)
 		if err != nil {

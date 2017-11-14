@@ -39,7 +39,7 @@ func TestEntryTag1(t *testing.T) {
 		t.Errorf("Failed to create lexicon db: %v", err)
 	}
 
-	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ"}
+	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
 	l, err = defineLexicon(db, l)
 
 	tx, err := db.Begin()
@@ -179,7 +179,7 @@ func TestEntryTag2(t *testing.T) {
 		t.Errorf("Failed to create lexicon db: %v", err)
 	}
 
-	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ"}
+	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
 	l, err = defineLexicon(db, l)
 
 	tx, err := db.Begin()

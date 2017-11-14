@@ -115,7 +115,7 @@ cp $APPDIR/lexdata.git/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 echo "" >&2
 echo "IMPORT: $LEXDB:sv" >&2
 
-if zcat $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB sv $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $APPDIR/symbol_sets ; then
+if zcat $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB sv sv_SE $APPDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $APPDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:sv FAILED" >&2
@@ -124,7 +124,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:nb" >&2
-if zcat $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|det|ær|test|banebrytende" > $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB nb $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $APPDIR/symbol_sets ; then
+if zcat $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|det|ær|test|banebrytende" > $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB nb nb_NO $APPDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $APPDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:nb FAILED" >&2
@@ -133,7 +133,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if cat $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -w "test|a|children" > $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB enu $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $APPDIR/symbol_sets ; then
+if cat $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -w "test|a|children" > $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $APPDIR/db_files/$LEXDB enu en_US $APPDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $APPDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:enu FAILED" >&2
@@ -142,7 +142,7 @@ else
 
 echo "" >&2
 echo "IMPORT: $LEXDB:ar" >&2
-if importLex $APPDIR/db_files/$LEXDB ar $APPDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets ; then
+if importLex $APPDIR/db_files/$LEXDB ar ar_AR $APPDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:ar FAILED" >&2

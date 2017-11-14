@@ -59,6 +59,7 @@ LEXIMPORT.ImportFileModel = function () {
     self.lexiconName = ko.observable(null);
     self.lexiconDB = ko.observable(null);
     self.symbolSetName = ko.observable(null);
+    self.locale = ko.observable(null);
     self.selectedFile = ko.observable(null);
     self.validForm = ko.computed(function() {
 	return (self.lexiconName() != null && self.symbolSetName() != null && self.selectedFile() != null &&
@@ -138,6 +139,7 @@ LEXIMPORT.ImportFileModel = function () {
 	fd.append("client_uuid", self.uuid);
 	fd.append("symbolset_name", self.symbolSetName());
 	fd.append("lexicon_name", self.lexiconDB() + ":" + self.lexiconName());
+	fd.append("locale", self.locale());
 	fd.append("validate", self.validate());
 	fd.append("file", self.selectedFile());
 	self.message("Importing, please wait ...");

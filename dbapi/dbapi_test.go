@@ -68,7 +68,7 @@ func Test_SuperDeleteLexicon(t *testing.T) {
 	// TODO Borde returnera error
 	//CreateTables(db, cmds)
 
-	l := lexicon{name: "test", symbolSetName: "ZZ"}
+	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -200,7 +200,7 @@ func Test_insertEntries(t *testing.T) {
 	// TODO Borde returnera error
 	//CreateTables(db, cmds)
 
-	l := lexicon{name: "test", symbolSetName: "ZZ"}
+	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -622,7 +622,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
-	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -692,7 +692,7 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
-	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -786,7 +786,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
-	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
@@ -832,7 +832,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
-	l := lexicon{name: "test", symbolSetName: symbolSet.Name}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
 	l, err = defineLexicon(db, l)
 	if err != nil {
