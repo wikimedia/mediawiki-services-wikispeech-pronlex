@@ -159,14 +159,14 @@ type Entry struct {
 	Morphology       string            `json:"morphology"`
 	WordParts        string            `json:"wordParts"`
 	Lemma            Lemma             `json:"lemma"`
-	Tag              string            `json:"tag"`
 	Transcriptions   []Transcription   `json:"transcriptions"`
 	EntryStatus      EntryStatus       `json:"status"` // TODO Probably should be a slice of statuses?
 	EntryValidations []EntryValidation `json:"entryValidations"`
 
 	// Preferred flag: 1=true, 0=false; schema triggers only one preferred per orthographic word
 	//Preferred        int64             `json:"preferred"`
-	Preferred bool `json:"preferred"`
+	Preferred bool   `json:"preferred"`
+	Tag       string `json:"tag"`
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.

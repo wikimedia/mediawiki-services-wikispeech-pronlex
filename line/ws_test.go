@@ -25,7 +25,7 @@ func Test_WSParse_01(t *testing.T) {
 		return
 	}
 
-	input := `anka	NN	SIN|IND|NOM|UTR	anka	anka	s1a-flicka	sv-se	false	"" a N . k a	sv-se							imported	hanna`
+	input := `anka	NN	SIN|IND|NOM|UTR	anka	anka	s1a-flicka	sv-se	"" a N . k a	sv-se							imported	hanna	false	duck`
 
 	expect := lex.Entry{
 		Strn:         "anka",
@@ -45,6 +45,7 @@ func Test_WSParse_01(t *testing.T) {
 				Sources:  []string{"hanna"},
 			},
 		},
+		Tag: "duck",
 	}
 	result, err := ws.ParseToEntry(input)
 	if err != nil {
