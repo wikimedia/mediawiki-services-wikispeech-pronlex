@@ -28,14 +28,49 @@ var lexiconValidationPage = urlHandler{
 
 //var lexiconUpdateEntryURL = "/updateentry?entry={...}"
 // TODO: Use a lexicon that exists!
-//var lexiconUpdateEntryURL = `/updateentry?entry={%22id%22:%20195170,%22lexRef%22:%20{%22DBRef%22:%20%22sv_se_nst_lex%22,%22LexName%22:%20%22sv-se.nst%22},%22strn%22:%20%22do%22,%22language%22:%20%22sv-se%22,%22partOfSpeech%22:%20%22%22,%22morphology%22:%20%22%22,%22wordParts%22:%20%22do%22,%22lemma%22:%20{%22id%22:%200,%22strn%22:%20%22%22,%22reading%22:%20%22%22,%22paradigm%22:%20%22%22},%22tag%22:%20%22is_an_acronym%22,%22transcriptions%22:%20[{%22id%22:%20200676,%22entryId%22:%20195170,%22strn%22:%20%22\%22%20d%20i:%20.%20t%20U%22,%22language%22:%20%22sv-se%22,%22sources%22:%20[%22nst%22]}],%22status%22:%20{%22id%22:%20919479,%22name%22:%20%22imported%22,%22source%22:%20%22nst%22,%22timestamp%22:%20%222017-11-13T13:34:34Z%22,%22current%22:%20true},%22entryValidations%22:%20[%20],%22preferred%22:%20false}`
+var lexiconUpdateEntryURL = `/updateentry?entry={
+    "id": 9,
+    "lexRef": {
+        "DBRef": "lexserver_testdb",
+        "LexName": "sv"
+    },
+    "strn": "dom",
+    "language": "sv",
+    "partOfSpeech": "NN",
+    "morphology": "UTR IND SIN",
+    "wordParts": "dom",
+        "lemma": {
+        "id": 5,
+        "strn": "dom",
+        "reading": "",
+        "paradigm": ""
+    },
+    "tag": "building",
+    "transcriptions": [
+    {
+        "id": 12,
+        "entryId": 9,
+        "strn": "\" d o: m",
+        "language": "sv",
+        "sources": [ ]
+    }
+    ],
+    "status": {
+    "id": 9,
+    "name": "demo",
+    "source": "auto",
+    "timestamp": "2017-11-14T09:34:30Z",
+        "current": true
+    },
+    "entryValidations": [ ],
+    "preferred": false
+}`
 
 var lexiconUpdateEntry = urlHandler{
-	name: "updateentry",
-	url:  "/updateentry",
-	help: "Updates an entry in the database. Input is an `entry` variable in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>",
-	//examples: []string{lexiconUpdateEntryURL},
-	examples: []string{},
+	name:     "updateentry",
+	url:      "/updateentry",
+	help:     "Updates an entry in the database. Input is an entry variable in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>.",
+	examples: []string{lexiconUpdateEntryURL},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entryJSON := getParam("entry", r)
 		//body, err := ioutil.ReadAll(r.Body)
@@ -293,7 +328,6 @@ var lexiconAddEntryURL = `/addentry?lexicon_name=lexserver_testdb:sv&entry={
     },
     "transcriptions": [
 	{
-	    
 	    "strn": "\" f l E s k",
 	    "language": "sv-se"
 	}
@@ -304,7 +338,7 @@ var lexiconAddEntryURL = `/addentry?lexicon_name=lexserver_testdb:sv&entry={
 var lexiconAddEntry = urlHandler{
 	name:     "addentry",
 	url:      "/addentry",
-	help:     "Add an entry to the database. Input entry in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>",
+	help:     "Add an entry to the database. Input entry in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>.",
 	examples: []string{lexiconAddEntryURL},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
