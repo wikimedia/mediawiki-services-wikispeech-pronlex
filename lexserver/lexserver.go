@@ -242,17 +242,25 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Build timestamp: "+vInfo.buildTimestamp+"\nServer started at: "+vInfo.startedTimestamp)
+	fmt.Fprintf(w, "Application name: "+vInfo.applicationName+"\nBuild timestamp: "+vInfo.buildTimestamp+"\nBuilt by: "+vInfo.builtBy+"\nServer started at: "+vInfo.startedTimestamp)
 }
 
 type versionInfo struct {
 	buildTimestamp   string
 	startedTimestamp string
+	builtBy          string
+	applicationName  string
+	//releaseNumber      string
 }
 
 func getVersionInfo() versionInfo {
 	var buildTimestamp = "undefined"
+	var builtBy = "go compiler"
+	var applicationName = "pronlex"
 	var startedTimestamp = time.Now().Format(time.UnixDate)
+	var appNamePrefix = "Application name: "
+	var builtByPrefix = "Built by: "
+	var buildTimePrefix = "Build timestamp: "
 	var timestampFile = "/.docker_build_timestamp.txt"
 	if _, err := os.Stat(timestampFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("build timestamp was not defined : %v", err)
@@ -272,12 +280,20 @@ func getVersionInfo() versionInfo {
 			if strings.TrimSpace(l) == "" {
 				continue
 			}
-			buildTimestamp = l
+			if strings.HasPrefix(l, appNamePrefix) {
+				applicationName = strings.Replace(l, appNamePrefix, "", -1)
+			} else if strings.HasPrefix(l, builtByPrefix) {
+				builtBy = strings.Replace(l, builtBy, "", -1)
+			} else if strings.HasPrefix(l, buildTimePrefix) {
+				buildTimestamp = strings.Replace(l, buildTimePrefix, "", -1)
+			} else {
+				fmt.Printf("unknown build info line", l)
+			}
 			break
 		}
 
 	}
-	return versionInfo{buildTimestamp: buildTimestamp, startedTimestamp: startedTimestamp}
+	return versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, startedTimestamp: startedTimestamp, builtBy: builtBy}
 }
 
 var vInfo versionInfo
@@ -291,7 +307,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html + "<p/><br/><hr>Build timestamp: " + vInfo.buildTimestamp + "<br/>Server started at: " + vInfo.startedTimestamp
+	html = html + "<p/><br/><hr>Application name: " + vInfo.applicationName + "<br/>Build timestamp: " + vInfo.buildTimestamp + "<br/>Built by: " + vInfo.builtBy + "<br/>Server started at: " + vInfo.startedTimestamp
 	fmt.Fprint(w, html)
 }
 

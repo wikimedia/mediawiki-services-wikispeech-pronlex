@@ -25,9 +25,11 @@ RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all /bin/import_all
 RUN chmod +x /bin/*
 
 
-# BUILD TIMESTAMP
-RUN date > /.docker_build_timestamp.txt
-RUN echo 'cat /.docker_build_timestamp.txt' > /bin/docker_build_timestamp && chmod +x /bin/docker_build_timestamp
+# BUILD INFO
+RUN echo -n "Build timestamp: " > /.build_info.txt
+RUN date >> /.build_info.txt
+RUN echo "Built by: docker" >> /.build_info.txt
+RUN echo "Application name: pronlex"  >> /.build_info.txt
 
 
 # RUNTIME SETTINGS
