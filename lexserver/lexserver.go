@@ -289,7 +289,6 @@ func getVersionInfo() versionInfo {
 				} else {
 					log.Printf("lexserver: unknown build info line", l)
 				}
-				break
 			}
 		}
 	}
