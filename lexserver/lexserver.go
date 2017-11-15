@@ -252,11 +252,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var buildTimestamp = "<undefined>"
+	var startedTimestamp = time.Now().Format(time.UnixDate)
 	var timestampFile = "/.docker_build_timestamp.txt"
 	if _, err := os.Stat(timestampFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("build timestamp was not defined : %v", err)
 		fmt.Printf(msg)
-		buildTimestamp = "error2"
 	}
 
 	fh, err := os.Open(timestampFile)
@@ -266,7 +266,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if _, err = os.Stat(timestampFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("error when reading content from timestamp file : %v", err)
 		fmt.Printf(msg)
-		buildTimestamp = "error2"
 	} else {
 		var lines = strings.Split(string(fBytes), "\n")
 		for _, l := range lines {
@@ -277,7 +276,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		html = html + "<p/>Build timestamp: " + buildTimestamp
+		html = html + "<p/><br/><hr>Build timestamp: " + buildTimestamp + "<br/>Server started at: " + startedTimestamp
 	}
 
 	fmt.Fprint(w, html)
