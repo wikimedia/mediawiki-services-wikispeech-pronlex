@@ -279,7 +279,6 @@ func getVersionInfo() versionInfo {
 				if strings.TrimSpace(l) == "" {
 					continue
 				}
-				log.Println("???", l)
 				if strings.HasPrefix(l, appNamePrefix) {
 					applicationName = strings.Replace(l, appNamePrefix, "", -1)
 				} else if strings.HasPrefix(l, builtByPrefix) {
