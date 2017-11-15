@@ -22,8 +22,13 @@ RUN ln -s /go/src/github.com/stts-se/pronlex/docker/help /bin/help
 
 # import script
 RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all /bin/import_all
-
 RUN chmod +x /bin/*
+
+
+# BUILD TIMESTAMP
+RUN date > /.docker_build_timestamp.txt
+RUN echo 'cat /.docker_build_timestamp.txt' > /bin/docker_build_timestamp && chmod +x /bin/docker_build_timestamp
+
 
 # RUNTIME SETTINGS
 

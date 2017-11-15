@@ -251,9 +251,35 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	//html = html + `<hr/><h2>Create db and start server</h2>
-	//Instructions on how to create a lexicon database and start the server are available from the <a target="blank" href="https://github.com/stts-se/pronlex">Pronlex git repository</a>.
-	//`
+	var buildTimestamp = "<undefined>"
+	var timestampFile = "/.docker_build_timestamp.txt"
+	if _, err := os.Stat(timestampFile); os.IsNotExist(err) {
+		var msg = fmt.Sprintf("build timestamp was not defined : %v", err)
+		fmt.Printf(msg)
+		buildTimestamp = "error2"
+	}
+
+	fh, err := os.Open(timestampFile)
+	defer fh.Close()
+
+	fBytes, err := ioutil.ReadFile(timestampFile)
+	if _, err = os.Stat(timestampFile); os.IsNotExist(err) {
+		var msg = fmt.Sprintf("error when reading content from timestamp file : %v", err)
+		fmt.Printf(msg)
+		buildTimestamp = "error2"
+	} else {
+		var lines = strings.Split(string(fBytes), "\n")
+		for _, l := range lines {
+			if strings.TrimSpace(l) == "" {
+				continue
+			}
+			buildTimestamp = l
+			break
+		}
+
+		html = html + "<p/>Build timestamp: " + buildTimestamp
+	}
+
 	fmt.Fprint(w, html)
 }
 
@@ -832,6 +858,7 @@ func createServer(port string) (*http.Server, error) {
 	meta := newSubRouter(rout, "/meta", "Meta API calls (list served URLs, etc)")
 	meta.addHandler(metaURLsHandler(urls))
 	meta.addHandler(metaExamplesHandler)
+	meta.addHandler(pingHandler)
 
 	// Pinging connected websocket clients
 	go keepClientsAlive()
