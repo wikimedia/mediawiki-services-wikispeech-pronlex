@@ -181,10 +181,10 @@ func initFolders() error {
 		if os.IsNotExist(err) {
 			err2 := os.Mkdir(uploadFileArea, 0755)
 			if err2 != nil {
-				fmt.Printf("lexserver.init: failed to create %s : %v\n", uploadFileArea, err2)
+				log.Printf("lexserver.init: failed to create %s : %v\n", uploadFileArea, err2)
 			}
 		} else {
-			fmt.Printf("lexserver.init: peculiar error : %v", err)
+			log.Printf("lexserver.init: peculiar error : %v", err)
 		}
 	} // else: already exists, hopefully
 
@@ -193,10 +193,10 @@ func initFolders() error {
 		if os.IsNotExist(err) {
 			err2 := os.Mkdir(downloadFileArea, 0755)
 			if err2 != nil {
-				fmt.Printf("lexserver.init: failed to create %s : %v\n", downloadFileArea, err2)
+				log.Printf("lexserver.init: failed to create %s : %v\n", downloadFileArea, err2)
 			}
 		} else {
-			fmt.Printf("lexserver.init: peculiar error : %v", err)
+			log.Printf("lexserver.init: peculiar error : %v", err)
 		}
 	} // else: already exists, hopefully
 
@@ -217,10 +217,10 @@ func initFolders() error {
 		if os.IsNotExist(err) {
 			err2 := os.Mkdir(dbFileArea, 0755)
 			if err2 != nil {
-				fmt.Printf("lexserver.init: failed to create %s : %v\n", dbFileArea, err2)
+				log.Printf("lexserver.init: failed to create %s : %v\n", dbFileArea, err2)
 			}
 		} else {
-			fmt.Printf("lexserver.init: peculiar error : %v", err)
+			log.Printf("lexserver.init: peculiar error : %v", err)
 		}
 	} // else: already exists, hopefully
 	return nil
@@ -261,39 +261,40 @@ func getVersionInfo() versionInfo {
 	var appNamePrefix = "Application name: "
 	var builtByPrefix = "Built by: "
 	var buildTimePrefix = "Build timestamp: "
-	var timestampFile = "/.build_info.txt"
-	if _, err := os.Stat(timestampFile); os.IsNotExist(err) {
-		var msg = fmt.Sprintf("build timestamp was not defined : %v", err)
-		fmt.Printf(msg)
-	}
-
-	fh, err := os.Open(timestampFile)
-	defer fh.Close()
-
-	fBytes, err := ioutil.ReadFile(timestampFile)
-	if _, err = os.Stat(timestampFile); os.IsNotExist(err) {
-		var msg = fmt.Sprintf("error when reading content from timestamp file : %v", err)
-		fmt.Printf(msg)
+	var buildInfoFile = "/.build_info.txt"
+	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
+		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
+		log.Printf(msg)
 	} else {
-		var lines = strings.Split(string(fBytes), "\n")
-		for _, l := range lines {
-			if strings.TrimSpace(l) == "" {
-				continue
-			}
-			if strings.HasPrefix(l, appNamePrefix) {
-				applicationName = strings.Replace(l, appNamePrefix, "", -1)
-			} else if strings.HasPrefix(l, builtByPrefix) {
-				builtBy = strings.Replace(l, builtBy, "", -1)
-			} else if strings.HasPrefix(l, buildTimePrefix) {
-				buildTimestamp = strings.Replace(l, buildTimePrefix, "", -1)
-			} else {
-				fmt.Printf("unknown build info line", l)
-			}
-			break
-		}
+		fh, err := os.Open(buildInfoFile)
+		defer fh.Close()
 
+		fBytes, err := ioutil.ReadFile(buildInfoFile)
+		if _, err = os.Stat(buildInfoFile); os.IsNotExist(err) {
+			var msg = fmt.Sprintf("lexserver: error when reading content from timestamp file : %v", err)
+			log.Printf(msg)
+		} else {
+			var lines = strings.Split(string(fBytes), "\n")
+			for _, l := range lines {
+				if strings.TrimSpace(l) == "" {
+					continue
+				}
+				if strings.HasPrefix(l, appNamePrefix) {
+					applicationName = strings.Replace(l, appNamePrefix, "", -1)
+				} else if strings.HasPrefix(l, builtByPrefix) {
+					builtBy = strings.Replace(l, builtByPrefix, "", -1)
+				} else if strings.HasPrefix(l, buildTimePrefix) {
+					buildTimestamp = strings.Replace(l, buildTimePrefix, "", -1)
+				} else {
+					log.Printf("lexserver: unknown build info line", l)
+				}
+				break
+			}
+		}
 	}
-	return versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, startedTimestamp: startedTimestamp, builtBy: builtBy}
+	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, startedTimestamp: startedTimestamp, builtBy: builtBy}
+	log.Println("lexserver: parsed version info", res)
+	return res
 }
 
 var vInfo versionInfo
