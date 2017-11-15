@@ -279,11 +279,11 @@ func getVersionInfo() versionInfo {
 				if strings.TrimSpace(l) == "" {
 					continue
 				}
+				log.Println("???", l)
 				if strings.HasPrefix(l, appNamePrefix) {
 					applicationName = strings.Replace(l, appNamePrefix, "", -1)
 				} else if strings.HasPrefix(l, builtByPrefix) {
 					builtBy = strings.Replace(l, builtByPrefix, "", -1)
-					log.Println("???", builtBy)
 				} else if strings.HasPrefix(l, buildTimePrefix) {
 					buildTimestamp = strings.Replace(l, buildTimePrefix, "", -1)
 				} else {
@@ -309,7 +309,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html + "<p/><br/><hr>Application name: " + vInfo.applicationName + "<br/>Build timestamp: " + vInfo.buildTimestamp + "<br/>Built by: " + vInfo.builtBy + "<br/>Server started at: " + vInfo.startedTimestamp
+	html = html + "<p/><br/><hr/>Application name: " + vInfo.applicationName + "<br/>Build timestamp: " + vInfo.buildTimestamp + "<br/>Built by: " + vInfo.builtBy + "<br/>Server started at: " + vInfo.startedTimestamp
 	fmt.Fprint(w, html)
 }
 
