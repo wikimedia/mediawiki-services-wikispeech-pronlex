@@ -26,10 +26,10 @@ RUN chmod +x /bin/*
 
 
 # BUILD INFO
-RUN echo -n "Build timestamp: " > /.build_info.txt
-RUN date >> /.build_info.txt
-RUN echo "Built by: docker" >> /.build_info.txt
-RUN echo "Application name: pronlex"  >> /.build_info.txt
+RUN echo -n "Build timestamp: " > /var/.pronlex_build_info.txt
+RUN date >> /var/.pronlex_build_info.txt
+RUN echo "Built by: docker" >> /var/.pronlex_build_info.txt
+RUN echo "Application name: pronlex"  >> /var/.pronlex_build_info.txt
 
 
 # RUNTIME SETTINGS
