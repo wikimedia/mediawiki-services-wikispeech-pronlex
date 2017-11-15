@@ -283,6 +283,7 @@ func getVersionInfo() versionInfo {
 					applicationName = strings.Replace(l, appNamePrefix, "", -1)
 				} else if strings.HasPrefix(l, builtByPrefix) {
 					builtBy = strings.Replace(l, builtByPrefix, "", -1)
+					log.Println("???", builtBy)
 				} else if strings.HasPrefix(l, buildTimePrefix) {
 					buildTimestamp = strings.Replace(l, buildTimePrefix, "", -1)
 				} else {
