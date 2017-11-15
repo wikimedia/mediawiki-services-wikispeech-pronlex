@@ -241,17 +241,17 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "pronlex")
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	html := `<h1>Lexserver</h1>`
+func versionHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Build timestamp: "+vInfo.buildTimestamp+"\nServer started at: "+vInfo.startedTimestamp)
+}
 
-	for _, subRouter := range subRouters {
-		html = html + `<p><a href="` + subRouter.root + `"><b>` + removeInitialSlash(subRouter.root) + `</b></a>`
-		html = html + " | " + subRouter.desc + "</p>\n\n"
+type versionInfo struct {
+	buildTimestamp   string
+	startedTimestamp string
+}
 
-	}
-
-	var buildTimestamp = "<undefined>"
+func getVersionInfo() versionInfo {
+	var buildTimestamp = "undefined"
 	var startedTimestamp = time.Now().Format(time.UnixDate)
 	var timestampFile = "/.docker_build_timestamp.txt"
 	if _, err := os.Stat(timestampFile); os.IsNotExist(err) {
@@ -276,9 +276,22 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		html = html + "<p/><br/><hr>Build timestamp: " + buildTimestamp + "<br/>Server started at: " + startedTimestamp
 	}
+	return versionInfo{buildTimestamp: buildTimestamp, startedTimestamp: startedTimestamp}
+}
 
+var vInfo versionInfo
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	html := `<h1>Lexserver</h1>`
+
+	for _, subRouter := range subRouters {
+		html = html + `<p><a href="` + subRouter.root + `"><b>` + removeInitialSlash(subRouter.root) + `</b></a>`
+		html = html + " | " + subRouter.desc + "</p>\n\n"
+
+	}
+	html = html + "<p/><br/><hr>Build timestamp: " + vInfo.buildTimestamp + "<br/>Server started at: " + vInfo.startedTimestamp
 	fmt.Fprint(w, html)
 }
 
@@ -548,7 +561,7 @@ func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
 }
 
 func isStaticPage(url string) bool {
-	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt" || url == "/ping"
+	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt" || url == "/ping" || url == "/version"
 }
 
 func main() {
@@ -556,6 +569,7 @@ func main() {
 	port := ":8787"
 	testPort := ":8799"
 	tag := "standard"
+	vInfo = getVersionInfo()
 
 	var test = flag.Bool("test", false, "run server tests")
 	var ssFiles = flag.String("ss_files", filepath.Join(".", "symbol_sets"), "location for symbol set files")
@@ -811,6 +825,7 @@ func createServer(port string) (*http.Server, error) {
 
 	rout.HandleFunc("/", indexHandler)
 	rout.HandleFunc("/ping", pingHandler)
+	rout.HandleFunc("/version", versionHandler)
 	rout.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
 	// typescript experiments
