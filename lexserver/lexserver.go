@@ -261,7 +261,7 @@ func getVersionInfo() versionInfo {
 	var appNamePrefix = "Application name: "
 	var builtByPrefix = "Built by: "
 	var buildTimePrefix = "Build timestamp: "
-	var timestampFile = "/.docker_build_timestamp.txt"
+	var timestampFile = "/.build_info.txt"
 	if _, err := os.Stat(timestampFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("build timestamp was not defined : %v", err)
 		fmt.Printf(msg)
