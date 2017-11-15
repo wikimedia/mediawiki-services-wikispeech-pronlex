@@ -20,8 +20,6 @@ Any lexicon files you want to import into the lexicon database must be in this f
      Lemma          The word's lemma form
      Paradigm       The name of the paradigm used for inflections
      Lang           The word's language label
-     Preferred      Takes values 1/0, and is used to defined which reading for a specific
-                    orthography should be the standard one (in case of homographs)
      Trans1         The first transcription (default for TTS)
      Translang1     The language of the Trans1
      Trans2         Alternative transcription
@@ -32,10 +30,13 @@ Any lexicon files you want to import into the lexicon database must be in this f
      Translang4     The language of the Trans4
      StatusName     Status of the lexicon entry
      StatusSource   Source of the status
+     Preferred      Takes values 1/0, and is used to defined which reading for a specific
+                    orthography should be the standard one (in case of homographs)
+     Tag            A tag (string) that can be used to disambiguate between homographs if needed (default: empty)
 
 Sample line:
 
-  finalspelet	NN	SIN|DEF|NOM|NEU	final+spelet	finalspel	s7n-övriga ex träd	sv-se	false	f I . "" n A: l . % s p e: . l e t	sv-se							imported	nst
+  finalspelet	NN	SIN|DEF|NOM|NEU	final+spelet	finalspel	s7n-övriga ex träd	sv-se	f I . "" n A: l . % s p e: . l e t	sv-se							imported	nst	false	dummytag
 
 */
 package line
