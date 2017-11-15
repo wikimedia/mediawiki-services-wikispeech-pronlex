@@ -27,7 +27,7 @@ RUN chmod +x /bin/*
 
 # BUILD INFO
 RUN echo -n "Build timestamp: " > /var/.pronlex_build_info.txt
-RUN date >> /var/.pronlex_build_info.txt
+RUN date --utc "+%Y-%m-%d %H:%M:%S %Z" >> /var/.pronlex_build_info.txt
 RUN echo "Built by: docker" >> /var/.pronlex_build_info.txt
 RUN echo "Application name: pronlex"  >> /var/.pronlex_build_info.txt
 

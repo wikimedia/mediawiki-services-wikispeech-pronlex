@@ -242,22 +242,23 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Application name: "+vInfo.applicationName+"\nBuild timestamp: "+vInfo.buildTimestamp+"\nBuilt by: "+vInfo.builtBy+"\nStarted at: "+vInfo.startedTimestamp)
+	fmt.Fprintf(w, vInfo.applicationName+"\n"+vInfo.buildTimestamp+"\n"+vInfo.builtBy+"\n"+vInfo.startedTimestamp)
 }
 
 type versionInfo struct {
-	buildTimestamp   string
-	startedTimestamp string
-	builtBy          string
 	applicationName  string
-	//releaseNumber      string
+	buildTimestamp   string
+	builtBy          string
+	startedTimestamp string
 }
 
+// UTC time with format: yyyy-MM-dd HH:mm:ss z | %Y-%m-%d %H:%M:%S %Z
+var startedTimestamp = "Started at: " + time.Now().UTC().Format("2006-01-02 15:04:05 MST")
+
 func getVersionInfo() versionInfo {
-	var buildTimestamp = "undefined"
-	var builtBy = "go compiler"
-	var applicationName = "pronlex"
-	var startedTimestamp = time.Now().Format(time.UnixDate)
+	var buildTimestamp = "Build timestamp: undefined"
+	var builtBy = "Built by: go standalone"
+	var applicationName = "Application name: pronlex"
 	var appNamePrefix = "Application name: "
 	var builtByPrefix = "Built by: "
 	var buildTimePrefix = "Build timestamp: "
@@ -280,18 +281,18 @@ func getVersionInfo() versionInfo {
 					continue
 				}
 				if strings.HasPrefix(l, appNamePrefix) {
-					applicationName = strings.Replace(l, appNamePrefix, "", -1)
+					applicationName = l
 				} else if strings.HasPrefix(l, builtByPrefix) {
-					builtBy = strings.Replace(l, builtByPrefix, "", -1)
+					builtBy = l
 				} else if strings.HasPrefix(l, buildTimePrefix) {
-					buildTimestamp = strings.Replace(l, buildTimePrefix, "", -1)
+					buildTimestamp = l
 				} else {
 					log.Printf("lexserver: unknown build info line", l)
 				}
 			}
 		}
 	}
-	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, startedTimestamp: startedTimestamp, builtBy: builtBy}
+	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, builtBy: builtBy, startedTimestamp: startedTimestamp}
 	log.Println("lexserver: parsed version info", res)
 	return res
 }
@@ -307,7 +308,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html + "<p/><br/><hr/>Application name: " + vInfo.applicationName + "<br/>Build timestamp: " + vInfo.buildTimestamp + "<br/>Built by: " + vInfo.builtBy + "<br/>Started at: " + vInfo.startedTimestamp
+	html = html + "<p/><br/><hr/>" + vInfo.applicationName + "<br/>" + vInfo.buildTimestamp + "<br/>" + vInfo.builtBy + "<br/>" + vInfo.startedTimestamp
 	fmt.Fprint(w, html)
 }
 
