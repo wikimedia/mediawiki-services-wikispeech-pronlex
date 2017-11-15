@@ -858,7 +858,6 @@ func createServer(port string) (*http.Server, error) {
 	meta := newSubRouter(rout, "/meta", "Meta API calls (list served URLs, etc)")
 	meta.addHandler(metaURLsHandler(urls))
 	meta.addHandler(metaExamplesHandler)
-	meta.addHandler(pingHandler)
 
 	// Pinging connected websocket clients
 	go keepClientsAlive()
