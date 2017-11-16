@@ -262,7 +262,7 @@ func getVersionInfo() versionInfo {
 	var appNamePrefix = "Application name: "
 	var builtByPrefix = "Built by: "
 	var buildTimePrefix = "Build timestamp: "
-	var buildInfoFile = "/var/.pronlex_build_info.txt"
+	var buildInfoFile = "/wikispeech/.pronlex_build_info.txt"
 	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
 		log.Printf(msg)

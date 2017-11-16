@@ -24,11 +24,11 @@ fi
 
 function initial_setup {
     if [ -f $APPDIR/db_files/$LEXDB ] ; then
-	echo "[$CMD] Docker folder $APPDIR is already configured. No setup needed." >&2
+	echo "[$CMD] Folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
     if [ -f $APPDIR/db_files/lexserver_testdb.db ] ; then
-	echo "[$CMD] Docker folder $APPDIR is already configured. No setup needed." >&2
+	echo "[$CMD] Folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
 
@@ -40,7 +40,7 @@ function initial_setup {
 
     ### LEXDATA PREPS
 
-    echo "[$CMD] Setting up basic files in docker folder $APPDIR... " >&2
+    echo "[$CMD] Setting up basic files in folder $APPDIR... " >&2
 
     mkdir -p $APPDIR || exit 1
     mkdir -p $APPDIR/symbol_sets || exit 1
@@ -65,9 +65,9 @@ initial_setup
 ### LEXDATA PATHS
 
 if createEmptyDB $APPDIR/db_files/$LEXDB ; then
-    echo "[$CMD] Created empty db in docker: $APPDIR/db_files/$LEXDB" >&2
+    echo "[$CMD] Created empty db: $APPDIR/db_files/$LEXDB" >&2
 else
-    echo "[$CMD] couldn't create empty db in docker: $APPDIR/db_files/$LEXDB" >&2
+    echo "[$CMD] couldn't create empty db: $APPDIR/db_files/$LEXDB" >&2
     exit 1
 fi
 
