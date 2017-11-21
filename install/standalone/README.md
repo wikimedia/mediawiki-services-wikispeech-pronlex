@@ -21,7 +21,8 @@ Below are instructions on how to set up the lexicon server for standalone use. F
 
 ## II. Installation
 
-1. Download the install script: [install.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/install.sh)
+1. Download the install script for the release you want, or get it from this README's git folder.    
+   Download for the master branch: [install.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/install/standalone/install.sh)
 
 2. Install the pronlex server
 
