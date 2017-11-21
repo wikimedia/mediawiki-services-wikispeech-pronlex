@@ -49,12 +49,12 @@ Do set up and run the lexicon server, you need the [docker_run.sh](https://raw.g
 
     `$ bash docker_run.sh -a <APPDIR> -t <DOCKERTAG> import_all`
 
-      Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
+        Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 
 
 3. Run lex server
 
-    `$ bash docker_run.sh -a <APPDIR> -t <DOCKERTAG>`
+      `$ bash docker_run.sh -a <APPDIR> -t <DOCKERTAG>`
 
 
 You can also investigate the server environment using `bash`:   
