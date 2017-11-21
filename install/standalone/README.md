@@ -17,6 +17,7 @@ Below are instructions on how to set up the lexicon server for standalone use. F
         
 3. Install [Sqlite3](https://www.sqlite.org/)
 
+   On Linux systems with `apt`, run `sudo apt install sqlite3`
 
 ## II. Installation
 
