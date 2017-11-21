@@ -45,14 +45,14 @@ Below are instructions on how to set up the lexicon server for development. For 
 3. Setup the pronlex server
 
    `pronlex$ cd install/developer`   
-   `developer$ sh setup.sh <APPDIR>`
+   `developer$ bash setup.sh <APPDIR>`
 
    Sets up the pronlex server and a set of test data in the folder specified by `<APPDIR>`.
 
 
 4. Import lexicon data (optional)
 
-   `developer$ sh import.sh <LEXDATA-GIT> <APPDIR>`   
+   `developer$ bash import.sh <LEXDATA-GIT> <APPDIR>`   
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
 If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github.
@@ -62,16 +62,16 @@ If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github.
 
 The server is started using this script
 
-`developer$ sh start_server.sh -a <APPDIR>`
+`developer$ bash start_server.sh -a <APPDIR>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
 When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
 
 To specify port, run:   
-`$ sh start_server.sh -a <APPDIR> -p <PORT>`
+`$ bash start_server.sh -a <APPDIR> -p <PORT>`
 
 
 For a complete set of options, run:  
-`$ sh start_server.sh -h`
+`$ bash start_server.sh -h`
 
