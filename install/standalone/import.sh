@@ -10,7 +10,7 @@ while getopts ":hka:" opt; do
   case $opt in
     h)
 	echo "
-USAGE: sh $CMD <OPTIONS>
+USAGE: bash $CMD <OPTIONS>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 

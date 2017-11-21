@@ -5,7 +5,7 @@ export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
 if [ $# -ne 2 ]; then
-    echo "USAGE: sh $CMD <LEXDATA-GIT> <APPDIR>
+    echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
 If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github.

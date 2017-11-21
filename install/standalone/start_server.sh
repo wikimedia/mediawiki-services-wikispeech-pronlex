@@ -28,7 +28,7 @@ Options:
 
 EXAMPLE INVOCATION: $CMD -a lexserver_files
 
-USAGE: sh $CMD <OPTIONS>
+USAGE: bash $CMD <OPTIONS>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
 

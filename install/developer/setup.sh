@@ -7,7 +7,7 @@ export PATH=$PATH:$GOPATH/bin
 
 
 if [ $# -ne 1 ]; then
-    echo "USAGE: sh $CMD <APPDIR>
+    echo "USAGE: bash $CMD <APPDIR>
 
 Setup files will be added to the destination folder APPDIR.
 " >&2
@@ -140,16 +140,16 @@ rm -fr $APPDIR/lexdata.git
 
 echo "
 BUILD COMPLETED! YOU CAN NOW START THE LEXICON SERVER BY INVOKING:
-  $ sh $SCRIPTDIR/start_server.sh -a $APPDIR
+  $ bash $SCRIPTDIR/start_server.sh -a $APPDIR
 
   USAGE INFO:
-  $ sh $SCRIPTDIR/start_server.sh -h
+  $ bash $SCRIPTDIR/start_server.sh -h
 
 
 OR IMPORT STANDARD LEXICON DATA:
-  $ sh $SCRIPTDIR/import.sh <LEXDATA-GIT> $APPDIR
+  $ bash $SCRIPTDIR/import.sh <LEXDATA-GIT> $APPDIR
 
   USAGE INFO:
-  $ sh $SCRIPTDIR/import.sh
+  $ bash $SCRIPTDIR/import.sh
 
 " >&2

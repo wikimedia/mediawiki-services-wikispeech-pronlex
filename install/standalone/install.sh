@@ -6,7 +6,7 @@ export PATH=$PATH:$GOPATH/bin
 
 
 if [ $# -ne 1 ]; then
-    echo "USAGE: sh $CMD <APPDIR>
+    echo "USAGE: bash $CMD <APPDIR>
 
  Pronlex will be installed in the destination folder APPDIR.
 ">&2
@@ -158,17 +158,17 @@ rm -fr $APPDIR/lexdata.git
 
 echo "
 BUILD COMPLETED! YOU CAN NOW START THE LEXICON SERVER BY INVOKING:
-  $ sh $APPDIR/start_server.sh
+  $ bash $APPDIR/start_server.sh
 
   USAGE INFO:
-  $ sh $APPDIR/start_server.sh -h
+  $ bash $APPDIR/start_server.sh -h
 
 
 OR IMPORT STANDARD LEXICON DATA:
-  $ sh $APPDIR/import.sh
+  $ bash $APPDIR/import.sh
 
   USAGE INFO:
-  $ sh $APPDIR/import.sh -h
+  $ bash $APPDIR/import.sh -h
 
 " >&2
 
