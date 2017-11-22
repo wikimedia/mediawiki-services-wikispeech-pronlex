@@ -6,10 +6,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/go-errors/errors"
+	"github.com/gorilla/mux"
+	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/symbolset"
+	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"regexp"
@@ -17,13 +24,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/go-errors/errors"
-	"github.com/gorilla/mux"
-	"github.com/stts-se/pronlex/dbapi"
-	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
-	"golang.org/x/net/websocket"
 )
 
 func getParam(paramName string, r *http.Request) string {
