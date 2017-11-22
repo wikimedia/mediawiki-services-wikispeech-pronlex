@@ -311,7 +311,7 @@ func getVersionInfo() versionInfo {
 		}
 	}
 	if strings.HasSuffix(gitTimestamp, ": unknown") {
-		out, err := exec.Command("git", "log", "-1", "--pretty=format:%ad %h", "--date=format:%Y-%m-%d %H:%M:%S %z").Output()
+		out, err := exec.Command("git", "log", "-1", "--pretty=format:%ai %h").Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git timestamp: %v", err)
 		} else {
