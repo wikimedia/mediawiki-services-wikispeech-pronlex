@@ -242,7 +242,7 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, vInfo.applicationName+"\n"+vInfo.buildTimestamp+"\n"+vInfo.gitRelease+"\n"+vInfo.gitTimestamp+"\n"+vInfo.builtBy+"\n"+vInfo.startedTimestamp)
+	fmt.Fprintf(w, vInfo.applicationName+"\n"+vInfo.buildTimestamp+"\n<"+vInfo.gitRelease+">\n"+vInfo.gitTimestamp+"\n"+vInfo.builtBy+"\n"+vInfo.startedTimestamp)
 }
 
 type versionInfo struct {
