@@ -255,7 +255,7 @@ type versionInfo struct {
 }
 
 // UTC time with format: yyyy-MM-dd HH:mm:ss z | %Y-%m-%d %H:%M:%S %Z
-var startedTimestamp = "Started: " + time.Now().UTC().Format("2006-01-02 15:04:05 MST")
+var startedTimestamp = time.Now().UTC().Format("2006-01-02 15:04:05 MST")
 
 func getVersionInfo() versionInfo {
 	var buildTimestamp = "Build timestamp: " + startedTimestamp
@@ -320,7 +320,7 @@ func getVersionInfo() versionInfo {
 			gitTimestamp = fmt.Sprintf("Git timestamp: %s", out)
 		}
 	}
-	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, gitRelease: gitRelease, gitTimestamp: gitTimestamp, builtBy: builtBy, startedTimestamp: startedTimestamp}
+	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, gitRelease: gitRelease, gitTimestamp: gitTimestamp, builtBy: builtBy, startedTimestamp: "Started: " + startedTimestamp}
 	log.Println("lexserver: parsed version info", res)
 	return res
 }
