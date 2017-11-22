@@ -308,7 +308,7 @@ func getVersionInfo() versionInfo {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
 			gitRelease = "Git release: unknown"
 		} else {
-			gitRelease = fmt.Sprintf("Git release: %s", out)
+			gitRelease = strings.TrimSpace(fmt.Sprintf("Git release: %s", out))
 		}
 	}
 	if gitTimestamp == "" {
