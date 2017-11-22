@@ -250,18 +250,24 @@ type versionInfo struct {
 	buildTimestamp   string
 	builtBy          string
 	startedTimestamp string
+	gitRelease       string
+	gitTimestamp     string
 }
 
 // UTC time with format: yyyy-MM-dd HH:mm:ss z | %Y-%m-%d %H:%M:%S %Z
-var startedTimestamp = "Started at: " + time.Now().UTC().Format("2006-01-02 15:04:05 MST")
+var startedTimestamp = "Started: " + time.Now().UTC().Format("2006-01-02 15:04:05 MST")
 
 func getVersionInfo() versionInfo {
 	var buildTimestamp = "Build timestamp: undefined"
 	var builtBy = "Built by: go standalone"
 	var applicationName = "Application name: pronlex"
+	var gitRelease = "Git release: undefined"
+	var gitTimestamp = "Git timestamp: undefined"
 	var appNamePrefix = "Application name: "
 	var builtByPrefix = "Built by: "
 	var buildTimePrefix = "Build timestamp: "
+	var gitReleasePrefix = "Git release: "
+	var gitTimestampPrefix = "Git timestamp: "
 	var buildInfoFile = "/wikispeech/.pronlex_build_info.txt"
 	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
@@ -286,13 +292,17 @@ func getVersionInfo() versionInfo {
 					builtBy = l
 				} else if strings.HasPrefix(l, buildTimePrefix) {
 					buildTimestamp = l
+				} else if strings.HasPrefix(l, gitReleasePrefix) {
+					gitRelease = l
+				} else if strings.HasPrefix(l, gitTimestampPrefix) {
+					gitTimestamp = l
 				} else {
 					log.Printf("lexserver: unknown build info line", l)
 				}
 			}
 		}
 	}
-	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, builtBy: builtBy, startedTimestamp: startedTimestamp}
+	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, gitRelease: gitRelease, gitTimestamp: gitTimestamp, builtBy: builtBy, startedTimestamp: startedTimestamp}
 	log.Println("lexserver: parsed version info", res)
 	return res
 }

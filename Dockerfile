@@ -13,7 +13,7 @@ RUN go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
 RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
 RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
-ENV APPDIR /appdir
+ENV APPDIR /wikispeech/appdir
 
 RUN export GOPATH=$(go env GOPATH)
 RUN export PATH=$PATH:$(go env GOPATH)/bin
@@ -23,11 +23,15 @@ RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all /wikispeech/bin/i
 RUN chmod +x /wikispeech/bin/*
 
 # BUILD INFO
-RUN echo -n "Build timestamp: " > /wikispeech/.pronlex_build_info.txt
-RUN date --utc "+%Y-%m-%d %H:%M:%S %Z" >> /wikispeech/.pronlex_build_info.txt
-RUN echo "Built by: docker" >> /wikispeech/.pronlex_build_info.txt
-RUN echo "Application name: pronlex"  >> /wikispeech/.pronlex_build_info.txt
-
+ENV BUILD_INFO_FILE /wikispeech/.pronlex_build_info.txt
+RUN echo -n "Build timestamp: " > BUILD_INFO_FILE
+RUN date --utc "+%Y-%m-%d %H:%M:%S %Z" >> BUILD_INFO_FILE
+RUN echo "Built by: docker" >> BUILD_INFO_FILE
+RUN echo "Application name: pronlex" >> BUILD_INFO_FILE
+RUN echo -n "Git release:" >> BUILD_INFO_FILE
+RUN cd /go/src/github.com/stts-se/pronlex/ && git describe --tags >> BUILD_INFO_FILE
+RUN echo -n "Git timestamp:" >> BUILD_INFO_FILE
+RUN cd /go/src/github.com/stts-se/pronlex && git log -1 "--pretty=format:%ad %h" "--date=format:%Y-%m-%d %H:%M:%S %z" >> BUILD_INFO_FILE
 
 # RUNTIME SETTINGS
 

@@ -87,13 +87,13 @@ function shutdown_previos {
 }
 
 if [ $# -eq 0 ]; then
-    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/wikispeech/appdir -p $PORT:8787 -it $DOCKERTAG
 elif [ $# -eq 1 ] && [ $1 == "setup" ]; then
-    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG /wikispeech/bin/setup /appdir
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/wikispeech/appdir -p $PORT:8787 -it $DOCKERTAG /wikispeech/bin/setup /wikispeech/appdir
 elif [ $# -eq 1 ] && [ $1 == "lex_import" ]; then
-    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG /wikispeech/bin/import_all /appdir $APPDIRABS
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/wikispeech/appdir -p $PORT:8787 -it $DOCKERTAG /wikispeech/bin/import_all /wikispeech/appdir $APPDIRABS
 elif [ $# -eq 1 ] && [ $1 == "bash" ]; then
-    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/appdir -p $PORT:8787 -it $DOCKERTAG bash
+    shutdown_previos && docker run --name=pronlex -v $APPDIRABS:/wikispeech/appdir -p $PORT:8787 -it $DOCKERTAG bash
 else
     echo "[$CMD] Unknown command: $*" >&2
     exit 1
