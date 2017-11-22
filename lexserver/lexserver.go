@@ -258,7 +258,7 @@ type versionInfo struct {
 var startedTimestamp = "Started: " + time.Now().UTC().Format("2006-01-02 15:04:05 MST")
 
 func getVersionInfo() versionInfo {
-	var buildTimestamp = "Build timestamp: undefined"
+	var buildTimestamp = "Build timestamp: " + startedTimestamp
 	var builtBy = "Built by: go standalone"
 	var applicationName = "Application name: pronlex"
 	var gitRelease = ""
