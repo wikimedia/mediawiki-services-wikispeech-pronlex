@@ -261,8 +261,8 @@ func getVersionInfo() versionInfo {
 	var buildTimestamp = "Build timestamp: undefined"
 	var builtBy = "Built by: go standalone"
 	var applicationName = "Application name: pronlex"
-	var gitRelease = "Git release: undefined"
-	var gitTimestamp = "Git timestamp: undefined"
+	var gitRelease = ""
+	var gitTimestamp = ""
 	var appNamePrefix = "Application name: "
 	var builtByPrefix = "Built by: "
 	var buildTimePrefix = "Build timestamp: "
@@ -300,6 +300,22 @@ func getVersionInfo() versionInfo {
 					log.Printf("lexserver: unknown build info line", l)
 				}
 			}
+		}
+	}
+	if gitRelease == "" {
+		out, err := exec.Command("git describe --tags").Output()
+		if err != nil {
+			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
+		} else {
+			gitRelease = "Git release: " + out
+		}
+	}
+	if gitTimestamp == "" {
+		out, err := exec.Command(`git log -1 "--pretty=format:%ad %h" "--date=format:%Y-%m-%d %H:%M:%S %z"`).Output()
+		if err != nil {
+			log.Printf("lexserver: couldn't retrieve git timestamp: %v", err)
+		} else {
+			gitTimestamp = "Git timestamp: " + out
 		}
 	}
 	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, gitRelease: gitRelease, gitTimestamp: gitTimestamp, builtBy: builtBy, startedTimestamp: startedTimestamp}
