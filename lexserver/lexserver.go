@@ -307,7 +307,7 @@ func getVersionInfo() versionInfo {
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
 		} else {
-			gitRelease = "Git release: " + out
+			gitRelease = fmt.Sprintf("Git release: %s", out)
 		}
 	}
 	if gitTimestamp == "" {
@@ -315,7 +315,7 @@ func getVersionInfo() versionInfo {
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git timestamp: %v", err)
 		} else {
-			gitTimestamp = "Git timestamp: " + out
+			gitTimestamp = fmt.Sprintf("Git timestamp: %s", out)
 		}
 	}
 	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, gitRelease: gitRelease, gitTimestamp: gitTimestamp, builtBy: builtBy, startedTimestamp: startedTimestamp}
