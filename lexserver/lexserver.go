@@ -306,6 +306,7 @@ func getVersionInfo() versionInfo {
 		out, err := exec.Command("git describe --tags").Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
+			gitRelease = "Git release: unknown"
 		} else {
 			gitRelease = fmt.Sprintf("Git release: %s", out)
 		}
@@ -314,6 +315,7 @@ func getVersionInfo() versionInfo {
 		out, err := exec.Command(`git log -1 "--pretty=format:%ad %h" "--date=format:%Y-%m-%d %H:%M:%S %z"`).Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git timestamp: %v", err)
+			gitRelease = "Git timestamp: unknown"
 		} else {
 			gitTimestamp = fmt.Sprintf("Git timestamp: %s", out)
 		}
