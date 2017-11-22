@@ -258,16 +258,16 @@ type versionInfo struct {
 var startedTimestamp = time.Now().UTC().Format("2006-01-02 15:04:05 MST")
 
 func getVersionInfo() versionInfo {
-	var buildTimestamp = "Build timestamp: " + startedTimestamp
-	var builtBy = "Built by: go standalone"
-	var applicationName = "Application name: pronlex"
-	var gitRelease = "Git release: unknown"
-	var gitTimestamp = "Git timestamp: unknown"
 	var appNamePrefix = "Application name: "
 	var builtByPrefix = "Built by: "
 	var buildTimePrefix = "Build timestamp: "
 	var gitReleasePrefix = "Git release: "
 	var gitTimestampPrefix = "Git timestamp: "
+	var buildTimestamp = buildTimePrefix + startedTimestamp
+	var builtBy = builtByPrefix + "go standalone"
+	var applicationName = appNamePrefix + "pronlex"
+	var gitRelease = gitReleasePrefix + "unknown"
+	var gitTimestamp = gitTimestampPrefix + "unknown"
 	var buildInfoFile = "/wikispeech/.pronlex_build_info.txt"
 	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
@@ -307,7 +307,7 @@ func getVersionInfo() versionInfo {
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
 		} else {
-			gitRelease = strings.TrimSpace(fmt.Sprintf("Git release: %s", out))
+			gitRelease = strings.TrimSpace(gitReleasePrefix + fmt.Sprintf("%s", out))
 		}
 	}
 	if strings.HasSuffix(gitTimestamp, ": unknown") {
@@ -315,7 +315,7 @@ func getVersionInfo() versionInfo {
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git timestamp: %v", err)
 		} else {
-			gitTimestamp = fmt.Sprintf("Git timestamp: %s", out)
+			gitTimestamp = gitTimestampPrefix + fmt.Sprintf("%s", out)
 		}
 	}
 	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, gitRelease: gitRelease, gitTimestamp: gitTimestamp, builtBy: builtBy, startedTimestamp: "Started: " + startedTimestamp}
