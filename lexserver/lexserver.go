@@ -242,7 +242,7 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, vInfo.applicationName+"\n"+vInfo.buildTimestamp+"\n"+vInfo.builtBy+"\n"+vInfo.startedTimestamp)
+	fmt.Fprintf(w, vInfo.applicationName+"\n"+vInfo.buildTimestamp+"\n"+vInfo.gitRelease+"\n"+vInfo.gitTimestamp+"\n"+vInfo.builtBy+"\n"+vInfo.startedTimestamp)
 }
 
 type versionInfo struct {
@@ -334,7 +334,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html + "<p/><br/><hr/>" + vInfo.applicationName + "<br/>" + vInfo.buildTimestamp + "<br/>" + vInfo.builtBy + "<br/>" + vInfo.startedTimestamp
+	html = html + "<p/><br/><hr/>" + vInfo.applicationName + "<br/>" + vInfo.buildTimestamp + "<br/>" + vInfo.gitRelease + "<br/>" + vInfo.gitTimestamp + "<br/>" + vInfo.builtBy + "<br/>" + vInfo.startedTimestamp
 	fmt.Fprint(w, html)
 }
 
