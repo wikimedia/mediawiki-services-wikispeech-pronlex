@@ -273,7 +273,7 @@ func getVersionInfo() []string {
 			var msg = fmt.Sprintf("lexserver: error when reading content from timestamp file : %v", err)
 			log.Printf(msg)
 		} else {
-			res = strings.Split(string(fBytes), "\n")
+			res = strings.Split(strings.TrimSpace(string(fBytes)), "\n")
 		}
 	}
 	res = append(res, "Started: "+startedTimestamp)
