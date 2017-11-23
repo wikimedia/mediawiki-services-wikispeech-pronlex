@@ -273,23 +273,7 @@ func getVersionInfo() []string {
 			var msg = fmt.Sprintf("lexserver: error when reading content from timestamp file : %v", err)
 			log.Printf(msg)
 		} else {
-			var lines = strings.Split(string(fBytes), "\n")
-			for _, l := range lines {
-				if strings.TrimSpace(l) == "" {
-					continue
-				}
-				if strings.HasPrefix(l, appNamePrefix) {
-					applicationName = l
-				} else if strings.HasPrefix(l, builtByPrefix) {
-					builtBy = l
-				} else if strings.HasPrefix(l, buildTimePrefix) {
-					buildTimestamp = l
-				} else if strings.HasPrefix(l, gitReleasePrefix) {
-					gitRelease = l
-				} else {
-					log.Printf("lexserver: unknown build info line", l)
-				}
-			}
+			res = strings.Split(string(fBytes), "\n")
 		}
 	}
 	res = append(res, "Started: "+startedTimestamp)
