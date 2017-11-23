@@ -292,7 +292,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html + "<p/><br/><hr/>" + strings.Join(vInfo, "<br/>")
+	html = html // + "<p/><br/><hr/>" + strings.Join(vInfo, "<br/>")
 	fmt.Fprint(w, html)
 }
 
