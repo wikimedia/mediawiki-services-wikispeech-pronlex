@@ -242,36 +242,28 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, vInfo.applicationName+"\n"+vInfo.buildTimestamp+"\n"+vInfo.gitRelease+"\n"+vInfo.gitTimestamp+"\n"+vInfo.builtBy+"\n"+vInfo.startedTimestamp)
-}
-
-type versionInfo struct {
-	applicationName  string
-	buildTimestamp   string
-	builtBy          string
-	startedTimestamp string
-	gitRelease       string
-	gitTimestamp     string
+	fmt.Fprintf(w, strings.Join(vInfo, "\n"))
 }
 
 // UTC time with format: yyyy-MM-dd HH:mm:ss z | %Y-%m-%d %H:%M:%S %Z
 var startedTimestamp = time.Now().UTC().Format("2006-01-02 15:04:05 MST")
 
-func getVersionInfo() versionInfo {
-	var appNamePrefix = "Application name: "
-	var builtByPrefix = "Built by: "
-	var buildTimePrefix = "Build timestamp: "
-	var gitReleasePrefix = "Git release: "
-	var gitTimestampPrefix = "Git timestamp: "
-	var buildTimestamp = buildTimePrefix + startedTimestamp
-	var builtBy = builtByPrefix + "go standalone"
-	var applicationName = appNamePrefix + "pronlex"
-	var gitRelease = gitReleasePrefix + "unknown"
-	var gitTimestamp = gitTimestampPrefix + "unknown"
+func getVersionInfo() []string {
+	res := []string{}
 	var buildInfoFile = "/wikispeech/.pronlex_build_info.txt"
 	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
 		log.Printf(msg)
+		res = append(res, "Build timestamp: "+startedTimestamp)
+		res = append(res, "Built by: go standalone")
+		res = append(res, "Application name: pronlex")
+		out, err := exec.Command("git", "describe", "--tags").Output()
+		if err != nil {
+			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
+			res = append(res, "Git release: unknown")
+		} else {
+			res = append(res, strings.TrimSpace(fmt.Sprintf("Git release: %s", out)))
+		}
 	} else {
 		fh, err := os.Open(buildInfoFile)
 		defer fh.Close()
@@ -294,36 +286,18 @@ func getVersionInfo() versionInfo {
 					buildTimestamp = l
 				} else if strings.HasPrefix(l, gitReleasePrefix) {
 					gitRelease = l
-				} else if strings.HasPrefix(l, gitTimestampPrefix) {
-					gitTimestamp = l
 				} else {
 					log.Printf("lexserver: unknown build info line", l)
 				}
 			}
 		}
 	}
-	if strings.HasSuffix(gitRelease, ": unknown") {
-		out, err := exec.Command("git", "describe", "--tags").Output()
-		if err != nil {
-			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
-		} else {
-			gitRelease = strings.TrimSpace(gitReleasePrefix + fmt.Sprintf("%s", out))
-		}
-	}
-	if strings.HasSuffix(gitTimestamp, ": unknown") {
-		out, err := exec.Command("git", "log", "-1", "--pretty=format:%ai %h").Output()
-		if err != nil {
-			log.Printf("lexserver: couldn't retrieve git timestamp: %v", err)
-		} else {
-			gitTimestamp = gitTimestampPrefix + fmt.Sprintf("%s", out)
-		}
-	}
-	res := versionInfo{applicationName: applicationName, buildTimestamp: buildTimestamp, gitRelease: gitRelease, gitTimestamp: gitTimestamp, builtBy: builtBy, startedTimestamp: "Started: " + startedTimestamp}
+	res = append(res, "Started: "+startedTimestamp)
 	log.Println("lexserver: parsed version info", res)
 	return res
 }
 
-var vInfo versionInfo
+var vInfo []string
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -334,7 +308,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html + "<p/><br/><hr/>" + vInfo.applicationName + "<br/>" + vInfo.buildTimestamp + "<br/>" + vInfo.gitRelease + "<br/>" + vInfo.gitTimestamp + "<br/>" + vInfo.builtBy + "<br/>" + vInfo.startedTimestamp
+	html = html + "<p/><br/><hr/>" + strings.Join(vInfo, "<br/>")
 	fmt.Fprint(w, html)
 }
 

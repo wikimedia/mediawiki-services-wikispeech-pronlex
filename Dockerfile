@@ -32,8 +32,6 @@ RUN echo "Built by: docker" >> $BUILD_INFO_FILE
 RUN echo "Application name: pronlex" >> $BUILD_INFO_FILE
 RUN echo -n "Git release: " >> $BUILD_INFO_FILE
 RUN cd /go/src/github.com/stts-se/pronlex/ && git describe --tags >> $BUILD_INFO_FILE
-RUN echo -n "Git timestamp: " >> $BUILD_INFO_FILE
-RUN cd /go/src/github.com/stts-se/pronlex && git log -1 "--pretty=format:%ai %h" >> $BUILD_INFO_FILE
 
 # RUNTIME SETTINGS
 
