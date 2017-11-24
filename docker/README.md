@@ -22,7 +22,7 @@ For info on recommended installation procedure(s), see the <a href="http://stts-
 
 ### III. Run the Docker app
 
-To set up and run the lexicon server, you will use the [docker_run.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/docker_run.sh) script. It is a convenience script for calling `docker run` with a few switches. Requires a working `bash` installation.
+To set up and run the lexicon server, you will use the [docker_run.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/docker_run.sh) script. It is a convenience script for calling `docker run` with a few switches. Requires a working `bash` installation on Linux.
 
 
 1. Import lexicon files (optional)
