@@ -51,8 +51,8 @@ function initial_setup {
     echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
     cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
 
-    cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/import.sh $APPDIR || exit 1
-    cp $GOPATH/src/github.com/stts-se/pronlex/install/standalone/start_server.sh $APPDIR || exit 1
+    cp $GOPATH/src/github.com/stts-se/pronlex/install/import.sh $APPDIR || exit 1
+    cp $GOPATH/src/github.com/stts-se/pronlex/install/start_server.sh $APPDIR || exit 1
 }
 
 ### INITIAL SETUP
