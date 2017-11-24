@@ -1,6 +1,6 @@
 # Installation instructions for pronlex server
 
-Utility scripts below (setup, import, start_server) require a working `bash` installation on Linux.
+Utility scripts below (setup, import, start_server) require a working `bash` installation (preferably on a Linux system).
 
 ## I. Preparation steps
 
