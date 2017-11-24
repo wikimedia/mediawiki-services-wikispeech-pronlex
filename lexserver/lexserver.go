@@ -292,7 +292,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html // + "<p/><br/><hr/>" + strings.Join(vInfo, "<br/>")
+	html = html + "<p/><hr/><a href='/version'>Pronlex version info</a>"
 	fmt.Fprint(w, html)
 }
 
