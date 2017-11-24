@@ -1,6 +1,6 @@
 Instructions for expermental use, may not be updated with each release.
 
-For info om recommended installation procedure, see the <a href="http://stts-se.github.io/wikispeech/">main doc page for Wikispeech</a>.
+For info on recommended installation procedure(s), see the <a href="http://stts-se.github.io/wikispeech/">main doc page for Wikispeech</a>.
 
 ## Docker installation
 
