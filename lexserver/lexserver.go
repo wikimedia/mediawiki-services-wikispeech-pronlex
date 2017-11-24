@@ -256,7 +256,7 @@ func getVersionInfo() []string {
 		log.Printf(msg)
 		res = append(res, "Application name: pronlex")
 		res = append(res, "Build timestamp: n/a")
-		res = append(res, "Built by: go standalone")
+		res = append(res, "Built by: go runtime")
 		out, err := exec.Command("git", "describe", "--tags").Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
