@@ -14,7 +14,7 @@ _For information on how to install pronlex for standalone use (without Docker), 
 
 ### II. Obtain a Docker image
 
-1. Visit the following URL and decide which release (`TAGNAME`) you want to install   
+1. Visit the following URL and decide which release (`<TAGNAME>` below) you want to install   
    https://hub.docker.com/r/sttsse/pronlex/tags/
 
 2. `$ docker pull sttsse/pronlex:<TAGNAME>`
