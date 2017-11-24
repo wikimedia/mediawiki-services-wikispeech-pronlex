@@ -4,8 +4,6 @@ _For information on how to install pronlex for standalone use (without Docker), 
 
 ## Docker installation
 
-The `<DOCKERTAG>` variable represents the name of the Docker installation image.
-
 ### I. Install Docker CE
 
 1. Install Docker CE for your OS: https://docs.docker.com/engine/installation/   
