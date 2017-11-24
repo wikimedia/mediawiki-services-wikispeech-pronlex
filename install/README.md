@@ -1,5 +1,11 @@
 # Installation instructions for pronlex server
 
+_Installations for standalone setup. For information on how to build the complete wikispeech server, please see the [wikispeech_compose](https://github.com/stts-se/wikispeech_compose/) repository._
+
+
+Readme: docker/README.md   
+Git folder: [docker/](https://github.com/stts-se/pronlex/blob/master/docker/)
+
 ## I. Preparation steps
 
 1. Prerequisites
