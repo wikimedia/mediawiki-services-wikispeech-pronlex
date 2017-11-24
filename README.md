@@ -12,13 +12,8 @@ Git folder: [docker/](https://github.com/stts-se/pronlex/blob/master/docker/)
 
 ## Lexicon server / Setup for standalone use
 
-Readme: install/standalone/README.md   
-Git folder: [install/standalone/](https://github.com/stts-se/pronlex/blob/master/install/standalone)
-
-## Lexicon server / Setup for developers
-
-Readme: install/developer/README.md   
-Git folder: [install/developer/](https://github.com/stts-se/pronlex/blob/master/install/developer)
+Readme: install/README.md   
+Git folder: [install/](https://github.com/stts-se/pronlex/blob/master/install)
 
 ---
 
