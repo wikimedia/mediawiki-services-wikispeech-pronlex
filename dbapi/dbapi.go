@@ -372,6 +372,8 @@ func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 	return nil
 }
 
+//TODO: Check that lexName exists, or report error
+//TODO: Check that entryID exists, or report error
 func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	tx, err := db.Begin()
 	if err != nil {
