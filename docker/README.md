@@ -1,6 +1,6 @@
-_For information on how to build the complete wikispeech server with Docker, please see the [wikispeech_compose](https://github.com/stts-se/wikispeech_compose/) repository._
+Instructions for expermental use, may not be updated with each release.
 
-_For information on how to install pronlex for standalone use (without Docker), see the [install](https://github.com/stts-se/pronlex/tree/master/install) folder_ 
+For info om recommended installation procedure, see the <a href="http://stts-se.github.io/wikispeech/">main doc page for Wikispeech</a>.
 
 ## Docker installation
 
