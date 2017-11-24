@@ -4,5 +4,5 @@ go:
   - 1.9.x
 
 script:
- - go test -v ./... && bash install/setup.sh /tmp/appdir && bash install/start_server.sh -a /tmp/appdir -test 
+ - go test -v ./... && bash install/setup.sh /tmp/appdir && bash install/start_server.sh -a /tmp/appdir
 
