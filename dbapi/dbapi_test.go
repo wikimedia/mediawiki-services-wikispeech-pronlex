@@ -608,6 +608,8 @@ func Test_ImportLexiconFile(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//defer db.Commit()
+	defer db.Close()
 
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
@@ -657,6 +659,19 @@ func Test_ImportLexiconFile(t *testing.T) {
 	o = res[0].Strn
 	if o != "sittriktiga" {
 		t.Errorf(fs, "sittriktiga", o)
+	}
+
+	//Let's throw in a test of deleteEntry as well:
+	eX := res[0]
+	deleteEntry(db, eX.ID, l.name)
+
+	// Run same query again, efter deleting Entry
+	resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(resX) != 0 {
+		t.Errorf(fs, "0", len(res))
 	}
 
 }
@@ -870,6 +885,19 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	o = res[0].Strn
 	if o != "sittriktiga" {
 		t.Errorf(fs, "sittriktiga", o)
+	}
+
+	//Let's throw in a test of deleteEntry as well:
+	eX := res[0]
+	deleteEntry(db, eX.ID, l.name)
+
+	// Run same query again, efter deleting Entry
+	resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(resX) != 0 {
+		t.Errorf(fs, "0", len(res))
 	}
 
 }

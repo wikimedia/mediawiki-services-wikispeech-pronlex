@@ -372,6 +372,23 @@ func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 	return nil
 }
 
+func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
+	tx, err := db.Begin()
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("dbapi.deleteEntry failed to start db transaction : %v", err)
+	}
+	defer tx.Commit()
+
+	_, err = tx.Exec("DELETE FROM entry WHERE  id = ? AND lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", entryID, lexName)
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("dbapi.deleteEntry failed to delete entry with id '%d' from lexicon '%s' : %v", entryID, lexName, err)
+	}
+
+	return entryID, nil
+}
+
 // DefineLexicon saves the name of a new lexicon to the db.
 func defineLexicon(db *sql.DB, l lexicon) (lexicon, error) {
 	tx, err := db.Begin()
