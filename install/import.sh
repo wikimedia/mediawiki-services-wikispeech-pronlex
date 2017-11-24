@@ -14,7 +14,7 @@ If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github.
 fi
 
 LEXDATA=$1
-APPDIR=`realpath $2`
+APPDIR=`readlink -f $2`
 
 ### LEXDATA SETUP
 

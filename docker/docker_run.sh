@@ -73,7 +73,7 @@ echo "[$CMD] DOCKERTAG : $DOCKERTAG" >&2
 
 #mkdir -p $APPDIR
 
-APPDIRABS=`realpath $APPDIR`
+APPDIRABS=`readlink -f $APPDIR`
 
 CNAME="pronlex"
 
