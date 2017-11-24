@@ -69,10 +69,7 @@ if [ $# -ne 0 ]; then
     exit 1
 fi
 
-APPDIRABS=`realpath $APPDIR`
-
-echo "$CMD debug APPDIR=$APPDIR\n"
-echo "$CMD debug APPDIRABS=$APPDIRABS\n"
+APPDIRABS=`readlink -f $APPDIR`
 
 
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
