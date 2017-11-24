@@ -71,6 +71,10 @@ fi
 
 APPDIRABS=`realpath $APPDIR`
 
+echo "$CMD debug APPDIR=$APPDIR\n"
+echo "$CMD debug APPDIRABS=$APPDIRABS\n"
+
+
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
 switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
 cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
