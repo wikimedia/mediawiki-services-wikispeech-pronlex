@@ -1,5 +1,7 @@
 # Installation instructions for pronlex server
 
+Utility scripts below (setup, import, start_server) require a working `bash` installation.
+
 ## I. Preparation steps
 
 1. Prerequisites
@@ -53,7 +55,7 @@
    `install$ bash import.sh <LEXDATA-GIT> <APPDIR>`   
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
-If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github.
+If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github. The import takes some time to finish.
 
 
 ## III. Start the lexicon server
