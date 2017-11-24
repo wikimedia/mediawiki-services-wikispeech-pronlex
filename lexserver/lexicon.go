@@ -371,9 +371,7 @@ var lexiconAddEntry = urlHandler{
 	},
 }
 
-// TODO Review by HL
 var deleteEntry = func(w http.ResponseWriter, r *http.Request) {
-	//lexName := getParam("lexicon_name", r)
 	lexRef, err := getLexRefParam(r)
 
 	if err != nil {
@@ -400,10 +398,12 @@ var deleteEntry = func(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "deleted entry id '%d' from lexicon '%s'\n", idRes, lexRef.LexName)
 }
 
-// TODO Review by HL
 var lexiconDeleteEntry = urlHandler{
-	url:     "/delete_entry/{lexicon_name}/{entry_id}",
-	handler: deleteEntry,
+	name:     "delete_entry",
+	url:      "/delete_entry/{lexicon_name}/{entry_id}",
+	help:     "Delete an entry from the database.",
+	examples: []string{},
+	handler:  deleteEntry,
 }
 
 var lexiconValidation = urlHandler{
