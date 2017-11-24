@@ -42,15 +42,15 @@
 
 3. Setup the pronlex server
 
-   `pronlex$ cd install/developer`   
-   `developer$ bash setup.sh <APPDIR>`
+   `pronlex$ cd install`   
+   `install$ bash setup.sh <APPDIR>`
 
    Sets up the pronlex server and a set of test data in the folder specified by `<APPDIR>`.
 
 
 4. Import lexicon data (optional)
 
-   `developer$ bash import.sh <LEXDATA-GIT> <APPDIR>`   
+   `install$ bash import.sh <LEXDATA-GIT> <APPDIR>`   
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
 If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github.
@@ -60,7 +60,7 @@ If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github.
 
 The server is started using this script
 
-`developer$ bash start_server.sh -a <APPDIR>`
+`install$ bash start_server.sh -a <APPDIR>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
