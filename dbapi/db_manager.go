@@ -432,6 +432,17 @@ func (dbm *DBManager) UpdateEntry(e lex.Entry) (lex.Entry, bool, error) {
 	return updateEntry(db, e)
 }
 
+func (dbm *DBManager) DeleteEntry(entryID int64, lexRef lex.LexRef) (int64, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return 0, fmt.Errorf("DBManager.DeleteEntry: no such db '%s'", lexRef.DBRef)
+	}
+
+	return deleteEntry(db, entryID, string(lexRef.LexName))
+}
+
 // ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
 func (dbm *DBManager) ImportLexiconFile(lexRef lex.LexRef, logger Logger, lexiconFileName string, validator *validation.Validator) error {
 	dbm.Lock()

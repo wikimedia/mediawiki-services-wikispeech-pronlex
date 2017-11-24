@@ -784,6 +784,7 @@ func createServer(port string) (*http.Server, error) {
 	lexicon.addHandler(lexiconValidation)
 	lexicon.addHandler(lexiconUpdateEntry)
 	lexicon.addHandler(lexiconAddEntry)
+	lexicon.addHandler(lexiconDeleteEntry)
 
 	validation := newSubRouter(rout, "/validation", "Transcription/entry validation")
 	validation.addHandler(validationValidateEntry)

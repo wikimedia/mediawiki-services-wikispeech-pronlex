@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -368,6 +369,41 @@ var lexiconAddEntry = urlHandler{
 		}
 		fmt.Fprint(w, ids)
 	},
+}
+
+// TODO Review by HL
+var deleteEntry = func(w http.ResponseWriter, r *http.Request) {
+	//lexName := getParam("lexicon_name", r)
+	lexRef, err := getLexRefParam(r)
+
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+		return
+	}
+
+	entryID := getParam("entry_id", r)
+	id, err := strconv.ParseInt(entryID, 10, 64)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("failed to parse entry id %d : %v", entryID, err), http.StatusInternalServerError)
+		return
+	}
+
+	idRes, err := dbm.DeleteEntry(id, lexRef)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("failed to detele entry id '%s' in lexicon '%s' : %v", entryID, lexRef.LexName, err), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "deleted entry id '%d' from lexicon '%s'\n", idRes, lexRef.LexName)
+}
+
+// TODO Review by HL
+var lexiconDeleteEntry = urlHandler{
+	url:     "/delete_entry/{lexicon_name}/{entry_id}",
+	handler: deleteEntry,
 }
 
 var lexiconValidation = urlHandler{

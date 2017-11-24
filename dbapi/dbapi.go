@@ -397,7 +397,7 @@ func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	// No db error, entry id or lexicon name may be wrong
 	if i == 0 {
 
-		return 0, fmt.Errorf("dbapi.deleteEntry failed to delete entry with id '%d' from lexicon '%s' : %v", entryID, lexName, err)
+		return 0, fmt.Errorf("dbapi.deleteEntry failed to delete entry with id '%d' from lexicon '%s'", entryID, lexName)
 	}
 
 	return entryID, nil
