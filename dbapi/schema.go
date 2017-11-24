@@ -55,7 +55,7 @@ CREATE UNIQUE INDEX idx407206e8 on Lemma (strn,reading);
 CREATE TABLE Entry (
     -- wordParts varchar(128),
     wordParts text,
-    label varchar(128),
+    label varchar(128), -- TODO What's this?!
     id integer not null primary key autoincrement,
     language varchar(128) not null,
     -- strn varchar(128) not null,
