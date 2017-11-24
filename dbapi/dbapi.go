@@ -380,9 +380,21 @@ func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	}
 	defer tx.Commit()
 
-	_, err = tx.Exec("DELETE FROM entry WHERE  id = ? AND lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", entryID, lexName)
+	res, err := tx.Exec("DELETE FROM entry WHERE  id = ? AND lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", entryID, lexName)
 	if err != nil {
 		tx.Rollback()
+		return 0, fmt.Errorf("dbapi.deleteEntry failed to delete entry with id '%d' from lexicon '%s' : %v", entryID, lexName, err)
+	}
+
+	i, err := res.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("dbapi.deleteEntry failed to call RowsAffected after trying to delete entry with id '%d' from lexicon '%s' : %v", entryID, lexName, err)
+	}
+
+	// No db error, entry id or lexicon name may be wrong
+	if i == 0 {
+
 		return 0, fmt.Errorf("dbapi.deleteEntry failed to delete entry with id '%d' from lexicon '%s' : %v", entryID, lexName, err)
 	}
 
