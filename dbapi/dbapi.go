@@ -382,6 +382,13 @@ func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	}
 	defer tx.Commit()
 
+	// Check that lexicon exists
+	_, err = getLexiconTx(tx, lexName)
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("dbapi.deleteEntry failed to find lexicon '%s' : %v", lexName, err)
+	}
+
 	res, err := tx.Exec("DELETE FROM entry WHERE  id = ? AND lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", entryID, lexName)
 	if err != nil {
 		tx.Rollback()
