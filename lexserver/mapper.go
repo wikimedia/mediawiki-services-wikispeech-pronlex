@@ -43,8 +43,8 @@ func trimTrans(trans string) string {
 var mapperMap = urlHandler{
 	name:     "map",
 	url:      "/map/{from}/{to}/{trans}",
-	help:     "Maps a transcription from one symbolset to another.",
-	examples: []string{"/map/sv-se_ws-sampa-DEMO/sv-se_sampa_mary-DEMO/%22%22 p O j . k @"},
+	help:     "Maps a transcription from one symbolset to another. You can always use 'ipa' instead of naming the to/from symbolset, to get a mapping to/from the internal IPA mapping from a transcription",
+	examples: []string{"/map/sv-se_ws-sampa-DEMO/sv-se_sampa_mary-DEMO/%22%22 p O j . k @", "/map/sv-se_ws-sampa-DEMO/ipa/%22%22 p O j . k @", "/map/ipa/sv-se_ws-sampa-DEMO/ˈpɔ̀j.kə"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		fromName := getParam("from", r)
 		toName := getParam("to", r)
