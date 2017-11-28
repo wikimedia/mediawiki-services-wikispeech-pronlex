@@ -94,7 +94,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if importLex $DOCKERDIR/db_files/$LEXDB enu en_US $DEMOFILES/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
+if importLex $DOCKERDIR/db_files/$LEXDB enu en_US $DEMOFILES/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:enu FAILED" >&2
