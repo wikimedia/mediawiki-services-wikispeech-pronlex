@@ -14,7 +14,9 @@ Setup files will be added to the destination folder <APPDIR> and imports a small
 " >&2
 	exit 1
 fi
+
 DOCKERDIR=$1
+DEMOFILES=$GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files
 
 LEXDB=wikispeech_testdb.db
 
@@ -44,10 +46,9 @@ function initial_setup {
     mkdir -p $DOCKERDIR/symbol_sets || exit 1
     mkdir -p $DOCKERDIR/db_files || exit 1
 
-    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.sym $DOCKERDIR/symbol_sets/ || exit 1
-    cp $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
-    echo "" >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
-    cat $GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files/mappers.txt >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
+    cp $DEMOFILES/*.sym $DOCKERDIR/symbol_sets/ || exit 1
+    cp $DEMOFILES/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
+    cp $DEMOFILES/mappers.txt $DOCKERDIR/symbol_sets/ || exit 1
 }
 
 
@@ -70,35 +71,12 @@ else
 fi
 
 
-nConverters=`ls $DOCKERDIR/lexdata/converters/*.cnv 2> /dev/null |wc -l`
-nSymSets=`ls $DOCKERDIR/lexdata/*/*/*.sym 2> /dev/null |wc -l`
-if [ -d "$DOCKERDIR/lexdata" ] && [ $nSymSets != 0 ] || [ $nConverters != 0 ]; then
-    cd $DOCKERDIR/lexdata && git pull && cd -
-    KEEP=1
-else
-    if git clone https://github.com/stts-se/lexdata.git $DOCKERDIR/lexdata.git; then
-	echo -n "" # OK
-    else
-	echo "[$CMD] git clone failed" >&2
-	exit 1
-    fi
-fi
-
-mkdir -p $DOCKERDIR/db_files || exit 1
-mkdir -p $DOCKERDIR/symbol_sets || exit 1
-
-cp $DOCKERDIR/lexdata.git/*/*/*.sym $DOCKERDIR/symbol_sets/ || exit 1
-echo "" >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
-cat $DOCKERDIR/lexdata.git/mappers.txt >> $DOCKERDIR/symbol_sets/mappers.txt || exit 1
-cp $DOCKERDIR/lexdata.git/converters/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
-
-
 ### LEXDATA IMPORT
 
 echo "" >&2
 echo "IMPORT: $LEXDB:sv" >&2
 
-if zcat $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|färöarna|det|här|är|ett|test" > $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB sv sv_SE $DOCKERDIR/lexdata.git/sv-se/nst/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $DOCKERDIR/symbol_sets ; then
+if importLex $DOCKERDIR/db_files/$LEXDB sv sv_SE $DEMOFILES/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:sv FAILED" >&2
@@ -107,7 +85,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:nb" >&2
-if zcat $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.gz | egrep -wi "apa|hund|det|ær|test|banebrytende" > $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB nb nb_NO $DOCKERDIR/lexdata.git/nb-no/nst/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $DOCKERDIR/symbol_sets ; then
+if importLex $DOCKERDIR/db_files/$LEXDB nb nb_NO $DEMOFILES/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:nb FAILED" >&2
@@ -116,7 +94,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if cat $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8 | egrep -w "test|a|children" > $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing && importLex $DOCKERDIR/db_files/$LEXDB enu en_US $DOCKERDIR/lexdata.git/en-us/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
+if importLex $DOCKERDIR/db_files/$LEXDB enu en_US $DEMOFILES/cmudict/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:enu FAILED" >&2
@@ -125,7 +103,7 @@ else
 
 echo "" >&2
 echo "IMPORT: $LEXDB:ar" >&2
-if importLex $DOCKERDIR/db_files/$LEXDB ar ar_AR $DOCKERDIR/lexdata.git/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $DOCKERDIR/symbol_sets ; then
+if importLex $DOCKERDIR/db_files/$LEXDB ar ar_AR $DEMOFILES/ar_TEST.pron-ws.utf8.for_testing ar_ws-sampa $DOCKERDIR/symbol_sets ; then
     echo -n ""
 else
     echo "$LEXDB:ar FAILED" >&2
