@@ -160,7 +160,7 @@ var mapperMaptable = urlHandler{
 var mapperList = urlHandler{
 	name:     "list",
 	url:      "/list",
-	help:     "Lists cached mappers.",
+	help:     "List cached mappers.",
 	examples: []string{"/list"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		mMut.Lock()
