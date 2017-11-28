@@ -1,0 +1,806 @@
+barentsrådet	NN	|||NEU	Barentsrådet			nb-no	" b A: . n`= rt S . % r O: . d @	nb-no							imported	nst	false	
+beirut-området	NN	|||NEU	Beirut+-+området			nb-no	" b {i . r } t . O m . % r O: . d @	nb-no							imported	nst	false	
+bergensområdet	NN	|||NEU	Bergen+s+området			nb-no	" b { r . g @ n s . O m . % r O: . d @	nb-no							imported	nst	false	
+ddr-området	NN	|||NEU	DDR+-+området			nb-no	% d e: . d e: . " { r . O m . % r O: . d @	nb-no							imported	nst	false	
+dna-test	NN	|||MAS	DNA+-+test			nb-no	% d e: . e n . " A: . % t e s t	nb-no							imported	nst	false	
+dovrefjell-området	NN	|||NEU	Dovrefjell+-+området			nb-no	"" d O . v r @ . f j @ l . O m . % r O: . d @	nb-no							imported	nst	false	
+drammensområdet	NN	|||NEU	!drammen+s+området			nb-no	" d r A . m @ n s . O m . % r O: . d @	nb-no							imported	nst	false	
+draumkvædet	PM	 |UNS	Draumkvædet			nb-no	"" d r A} m . % k v e: . @	nb-no							imported	nst	false	
+ef-rådet	NN	|||NEU	EF+-+rådet			nb-no	"" e: . @ f . % r O: . d @	nb-no							imported	nst	false	
+eu-området	NN	|||NEU	EU+-+området			nb-no	"" e: . } . O m . % r O: . d @	nb-no							imported	nst	false	
+ekofiskområdet	NN	|||NEU	Ekofisk+området			nb-no	" e . k u . f i s k . O m . % r O: . d @	nb-no							imported	nst	false	
+europarådet	NN	|||NEU	!europa+rådet			nb-no	A} . " r u: . p A . % r O: . d @	nb-no							imported	nst	false	
+eøs-området	NN	|||NEU	EØS+-+området			nb-no	% e: . 2: . " e s . O m . % r O: . d @	nb-no							imported	nst	false	
+eøs-rådet	NN	|||NEU	EØS+-+rådet			nb-no	% e: . 2: . " e s . % r O: . d @	nb-no							imported	nst	false	
+gulf-området	NN	|||NEU	Gulf+-+området			nb-no	" g } l f . O m . % r O: . d @	nb-no							imported	nst	false	
+havforskningsrådet	PM	 |UNS	hav+forskning+s+rådet			nb-no	"" h A: v . f O rs . k n i N s . % r O: . d @	nb-no							imported	nst	false	
+hundepensjonatet	PM	 group|COM	hund+e+pensjonatet			nb-no	"" h } . n @ . p A N . S u . % n A: . t @	nb-no	"" h } . n @ . p @ n . S u . % n A: . t @	nb-no					imported	nst	false	
+hundhamaren	PM	 place|GEO	hund+hamaren			nb-no	"" h } n . % h A . m A n`=	nb-no							imported	nst	false	
+hundhammer	PM	 person|SUR	hund+hammer			nb-no	"" h } n . % h A . m @ r	nb-no							imported	nst	false	
+hundholmen	PM	 place|GEO	hund+holmen			nb-no	"" h } n . % h O l . m @ n	nb-no							imported	nst	false	
+hundholmveien	PM	 place|STR	hund+holm+veien			nb-no	"" h } n . h O l m . % v {i . @ n	nb-no							imported	nst	false	
+hundsnes	PM	 person|SUR	hund+s+nes			nb-no	" h } n s . % n e: s	nb-no	"" h } n s . % n e: s	nb-no					imported	nst	false	
+hundsundveien	PM	 place|STR	hund+sund+veien			nb-no	"" h } n . s } n . % v {i . @ n	nb-no							imported	nst	false	
+hundvåg	PM	 place|GEO	hund+våg			nb-no	"" h } n . % v O: g	nb-no							imported	nst	false	
+hundvågveien	PM	 place|STR	hund+våg+veien			nb-no	"" h } n . v O: g . % v {i . @ n	nb-no							imported	nst	false	
+høyre-byrådet	NN	|||NEU	Høyre+-+byrådet			nb-no	" h 2 y . r @ . b y: . % r O: . d @	nb-no							imported	nst	false	
+ks-området	NN	|||NEU	KS-området			nb-no	"" k O: . @ s . O m . % r O: . d @	nb-no							imported	nst	false	
+lillehammerområdet	NN	|||NEU	Lillehammer+området			nb-no	"" l i . l @ . h A . m @ r . O m . % r O: . d @	nb-no							imported	nst	false	
+middelhavsområdet	NN	|||NEU	Middelhav+s+området			nb-no	" m i . d l= . h A: v s . O m . % r O: . d @	nb-no							imported	nst	false	
+mjøs-området	NN	|||NEU	Mjøs+-+området			nb-no	" m j 2: s . O m . % r O: . d @	nb-no							imported	nst	false	
+murmansk-området	NN	|||NEU	Murmansk+-+området			nb-no	" m } r . m A n s k . O m . % r O: . d @	nb-no							imported	nst	false	
+nato-området	NN	|||NEU	NATO+-+området			nb-no	" n A: . t u . O m . % r O: . d @	nb-no							imported	nst	false	
+nato-rådet	NN	|||NEU	NATO+-+rådet			nb-no	" n A: . t u . % r O: . d @	nb-no							imported	nst	false	
+nordsjøområdet	NN	|||NEU	Nordsjø+området			nb-no	"" n u: r . S 2: . O m . % r O: . d @	nb-no							imported	nst	false	
+oecd-området	NN	|||NEU	OECD+-+området			nb-no	% u: . e: . s e: . " d e: . O m . % r O: . d @	nb-no							imported	nst	false	
+ol-området	NN	|||NEU	OL+-+området			nb-no	"" u: . @ l . O m . % r O: . d @	nb-no							imported	nst	false	
+oslo-området	NN	|||NEU	Oslo+-+området			nb-no	"" u . S l u . O m . % r O: . d @	nb-no							imported	nst	false	
+ruhr-området	NN	|||NEU	Ruhr+-+området			nb-no	" r u: r . O m . % r O: . d @	nb-no							imported	nst	false	
+sv-byrådet	NN	|||NEU	SV+-+by+rådet			nb-no	"" e . s v @ . % b y: . r O: . d @	nb-no							imported	nst	false	
+sv-byrådet	NN	|||NEU	SV+-+by+rådet			nb-no	"" e . s v @ . b y: . % r O: . d @	nb-no							imported	nst	false	
+schengen-området	NN	|||NEU	Schengen+-+området			nb-no	" S e N . @ n . O m . % r O: . d @	nb-no							imported	nst	false	
+stavanger-området	NN	|||NEU	Stavanger+-+området			nb-no	s t A . " v A N . @ r . O m . % r O: . d @	nb-no							imported	nst	false	
+strædet	PM	 place|GEO	Strædet			nb-no	" s t r {: . d @	nb-no							imported	nst	false	
+svalbardrådet	NN	|||NEU	!svalbard+rådet			nb-no	"" s v A: l . b A . % r O: . d @	nb-no							imported	nst	false	
+trondheimsområdet	NN	|||NEU	Trondheim+s+området			nb-no	"" t r O n . h {i m s . O m . % r O: . d @	nb-no							imported	nst	false	
+trædet	PM	 place|GEO	Trædet			nb-no	"" t r e: . d @	nb-no							imported	nst	false	
+vestbaneområdet	NN	|||NEU	Vest+bane+området			nb-no	"" v e s t . b A: . n @ . O m . % r O: . d @	nb-no							imported	nst	false	
+a-test	NN	|||MAS	a+-+test			nb-no	" A: . % t e s t	nb-no							imported	nst	false	
+administrasjonsrådet	NN	|||NEU	administrasjon+s+rådet			nb-no	A d . m i . n i . s t r A . " S u: n s . % r O: . d @	nb-no							imported	nst	false	
+aer	NN	|||MAS	ær			nb-no	"" A: . @ r	nb-no							imported	nst	false	
+aidstest	NN	|||MAS	aids+test			nb-no	" {i d s . % t e s t	nb-no							imported	nst	false	
+allmenkringkastingsrådet	NN	|||NEU	allmen+kringkasting+s+rådet			nb-no	"" A l . m @ n . k r i N . k A . s t i N s . % r O: . d @	nb-no							imported	nst	false	
+alterbrødet	NN	SIN|DEF|NOM|NEU	alter+brødet	alterbrød	s13a1-år	nb-no	"" A l . t @ r . % b r 2: . @	nb-no							imported	nst	false	
+ambassadeområdet	NN	|||NEU	ambassade+området			nb-no	A m . b A . "" s A: . d @ . O m . % r O: . d @	nb-no							imported	nst	false	
+amtsrådet	NN	|||NEU	amt+s+rådet			nb-no	" A m t s . % r O: . d @	nb-no							imported	nst	false	
+anisbrødet	NN	SIN|DEF|NOM|NEU	anis+brødet	anisbrød	s13a1-år	nb-no	"" A: . n i s . % b r 2: . @	nb-no							imported	nst	false	
+ankringsområdet	NN	|||NEU	ankring+s+området			nb-no	"" A N . k r i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+anleggsområdet	NN	|||NEU	anlegg+s+området			nb-no	"" A n . l @ g s . O m . % r O: . d @	nb-no							imported	nst	false	
+ansettelsesrådet	NN	SIN|DEF|NOM|NEU	ansettelse+s+rådet	ansettelsesråd	s13a1-år	nb-no	" A n . s @ . t l= . s @ s . % r O: . d @	nb-no							imported	nst	false	
+ansettelsesrådet	NN	|||NEU	ansettelse+s+rådet			nb-no	" A n . s e . t l= . s @ s . % r O: . d @	nb-no							imported	nst	false	
+ansvarsområdet	NN	SIN|DEF|NOM|NEU	ansvar+s+området	ansvarsområde	s11b-eple	nb-no	"" A n . s v A rs . O m . % r O: . d @	nb-no							imported	nst	false	
+anvendelsesområdet	NN	SIN|DEF|NOM|NEU	anvendelse+s+området	anvendelsesområde	s11b-eple	nb-no	" A n . v @ . n l= . s @ s . O m . % r O: . d @	nb-no							imported	nst	false	
+apa	NN	SIN|DEF|NOM|FEM	apa	ape	s6c-gate	nb-no	"" A: . p A	nb-no							imported	nst	false	
+apa	VB	AKT|PF|SIN-PLU|DEF|NOM	apa	ape	v0a-lempe	nb-no	"" A: . p A	nb-no							imported	nst	false	
+apa	VB	AKT|PF|SIN|IND|NOM	apa	ape	v0a-lempe	nb-no	"" A: . p A	nb-no							imported	nst	false	
+apa	VB	AKT|PRT	apa	ape	v0a-lempe	nb-no	"" A: . p A	nb-no							imported	nst	false	
+apebrødet	NN	SIN|DEF|NOM|NEU	ape+brødet	apebrød	s13a1-år	nb-no	"" A: . p @ . % b r 2: . @	nb-no							imported	nst	false	
+applikasjonsområdet	NN	SIN|DEF|NOM|NEU	applikasjon+s+området	applikasjonsområde	s11b-eple	nb-no	A . p l i . k A . " S u: n s . O m . % r O: . d @	nb-no							imported	nst	false	
+arbeiderrådet	NN	SIN|DEF|NOM|NEU	arbeider+rådet	arbeiderråd	s13a1-år	nb-no	A r . " b {i . d @ r . % r O: . d @	nb-no							imported	nst	false	
+arbeidsområdet	NN	SIN|DEF|NOM|NEU	arbeid+s+området	arbeidsområde	s11b-eple	nb-no	"" A r . b {i d s . O m . % r O: . d @	nb-no							imported	nst	false	
+arbeidsrettsrådet	NN	|||NEU	arbeid+s+rett+s+rådet			nb-no	"" A r . b {i d s . r @ t s . % r O: . d @	nb-no							imported	nst	false	
+avsetningsområdet	NN	SIN|DEF|NOM|NEU	avsetning+s+området	avsetningsområde	s11b-eple	nb-no	" A: v . s @ t . n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+avvirkingsområdet	NN	SIN|DEF|NOM|NEU	avvirking+s+området	avvirkingsområde	s11b-eple	nb-no	" A: . v i r . k i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+avvirkningsområdet	NN	SIN|DEF|NOM|NEU	avvirkning+s+området	avvirkningsområde	s11b-eple	nb-no	" A: . v i r k . n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+badeområdet	NN	|||NEU	bade+området			nb-no	"" b A: . d @ . O m . % r O: . d @	nb-no							imported	nst	false	
+bandhund	NN	SIN|IND|NOM|MAS	band+hund	bandhund	s1a1-dag	nb-no	"" b A n . % h } n	nb-no							imported	nst	false	
+banebrytende	JJ	SIN-PLU|DEF|NOM||POS	bane+brytende	banebrytende	a4e3-altetende	nb-no	"" b A: . n @ . % b r y: . t n= . @	nb-no							imported	nst	false	
+banebrytende	JJ	SIN-PLU|IND|NOM|NEU|POS	bane+brytende	banebrytende	a4e3-altetende	nb-no	"" b A: . n @ . % b r y: . t n= . @	nb-no							imported	nst	false	
+banebrytende	JJ	SIN|IND|NOM|MAS-FEM|POS	bane+brytende	banebrytende	a4e3-altetende	nb-no	"" b A: . n @ . % b r y: . t n= . @	nb-no							imported	nst	false	
+banebrytendes	JJ	SIN-PLU|DEF|GEN||POS	bane+brytendes	banebrytende	a4e3-altetende	nb-no	"" b A: . n @ . % b r y: . t n= . @ s	nb-no							imported	nst	false	
+banebrytendes	JJ	SIN-PLU|IND|GEN|NEU|POS	bane+brytendes	banebrytende	a4e3-altetende	nb-no	"" b A: . n @ . % b r y: . t n= . @ s	nb-no							imported	nst	false	
+banebrytendes	JJ	SIN|IND|GEN|MAS-FEM|POS	bane+brytendes	banebrytende	a4e3-altetende	nb-no	"" b A: . n @ . % b r y: . t n= . @ s	nb-no							imported	nst	false	
+barkebrødet	NN	SIN|DEF|NOM|NEU	bark+e+brødet	barkebrød	s13a1-år	nb-no	"" b A r . k @ . % b r 2: . @	nb-no							imported	nst	false	
+bassengområdet	NN	|||NEU	basseng+området			nb-no	b A . " s e N . O m . % r O: . d @	nb-no							imported	nst	false	
+beiteområdet	NN	SIN|DEF|NOM|NEU	beite+området	beiteområde	s11b-eple	nb-no	"" b {i . t @ . O m . % r O: . d @	nb-no							imported	nst	false	
+benådet	JJ		benådet			nb-no	b @ . " n O: . d @ t	nb-no							imported	nst	false	
+benådet	VB	AKT|PF-PRT|SIN|IND|NOM	benådet	benåde	v1a-lempe	nb-no	b @ . " n O: . d @ t	nb-no							imported	nst	false	
+bevaringsområdet	NN	|||NEU	bevaring+s+området			nb-no	b @ . " v A: . r i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+bioteknologiområdet	NN	|||NEU	bioteknologi+området			nb-no	" b i: . u . t @ . k n u . l u . g i: . O m . % r O: . d @	nb-no							imported	nst	false	
+bispedømmerådet	NN	SIN|DEF|NOM|NEU	bispedømme+rådet	bispedømmeråd	s13a1-år	nb-no	"" b i . s p @ . d 2 . m @ . % r O: . d @	nb-no							imported	nst	false	
+blandingshund	NN	|||MAS	blanding+s+hund			nb-no	"" b l A . n i N s . % h } n	nb-no							imported	nst	false	
+blodhund	NN	SIN|IND|NOM|MAS	blod+hund	blodhund	s1a1-dag	nb-no	"" b l u: . % h } n	nb-no							imported	nst	false	
+bløtest	JJ	SIN|IND|NOM||SUV	bløtest	bløt	a1a6A-hvit	nb-no	" b l 2: . t @ s t	nb-no							imported	nst	false	
+boligområdet	NN	SIN|DEF|NOM|NEU	bolig+området	boligområde	s11b-eple	nb-no	"" b u: . l i . O m . % r O: . d @	nb-no							imported	nst	false	
+bombehund	NN	|||MAS	bombe+hund			nb-no	"" b u m . b @ . % h } n	nb-no							imported	nst	false	
+boområdet	NN	|||NEU	bo+området			nb-no	" b u: . O m . % r O: . d @	nb-no							imported	nst	false	
+borgområdet	NN	|||NEU	borg+området			nb-no	"" b O r g . O m . % r O: . d @	nb-no							imported	nst	false	
+boterådet	NN	SIN|DEF|NOM|NEU	bote+rådet	boteråd	s11a1-blad|s13a1-år	nb-no	"" b u: . t @ . % r O: . d @	nb-no							imported	nst	false	
+brannområdet	NN		brann+området			nb-no	" b r A n . O m . % r O: . d @	nb-no							imported	nst	false	
+bransjerådet	NN	SIN|DEF|NOM|NEU	bransje+rådet	bransjeråd	s13a1-år	nb-no	"" b r A N . S @ . % r O: . d @	nb-no	"" b r A n . S @ . % r O: . d @	nb-no					imported	nst	false	
+bruksområdet	NN	SIN|DEF|NOM|NEU	bruk+s+området	bruksområde	s11b-eple	nb-no	" b r } k s . O m . % r O: . d @	nb-no							imported	nst	false	
+brødet	NN	SIN|DEF|NOM|NEU	brødet	brød	s13a1-år	nb-no	" b r 2: . @	nb-no							imported	nst	false	
+brølapa	NN	SIN|DEF|NOM|FEM	brøl+apa	brølape	s6c-gate	nb-no	"" b r 2: l . % A: . p A	nb-no							imported	nst	false	
+brøleapa	NN	SIN|DEF|NOM|FEM	brøle+apa	brøleape	s6c-gate	nb-no	"" b r 2: . l @ . % A: . p A	nb-no							imported	nst	false	
+buhund	NN	SIN|IND|NOM|MAS	bu+hund	buhund	s1a1-dag	nb-no	"" b }: . % h } n	nb-no							imported	nst	false	
+bygdebruksområdet	NN	|||NEU	bygd+e+bruk+s+området			nb-no	"" b y g . d @ . b r } k s . O m . % r O: . d @	nb-no							imported	nst	false	
+byggefagrådet	NN	|||NEU	bygge+fag+rådet			nb-no	"" b y . g @ . f A: g . % r O: . d @	nb-no							imported	nst	false	
+bygningsrådet	NN	SIN|DEF|NOM|NEU	bygning+s+rådet	bygningsråd	s13a1-år	nb-no	"" b y . g n i N s . % r O: . d @	nb-no							imported	nst	false	
+byområdet	NN	|||NEU	by+området			nb-no	" b y: . O m . % r O: . d @	nb-no							imported	nst	false	
+byplanrådet	NN	SIN|DEF|NOM|NEU	by+plan+rådet	byplanråd	s13a1-år	nb-no	" b y: . p l A: n . % r O: . d @	nb-no							imported	nst	false	
+byrådet	NN	SIN|DEF|NOM|NEU	by+rådet	byråd	s13a1-år	nb-no	" b y: . % r O: . d @	nb-no							imported	nst	false	
+børsrådet	NN	|||NEU	børs+rådet			nb-no	" b 2: rs . % r O: . d @	nb-no							imported	nst	false	
+dekningsområdet	NN	|||NEU	dekning+s+området			nb-no	"" d e . k n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+departementsrådet	NN	SIN|DEF|NOM|NEU	departement+s+rådet	departementsråd	s13a1-år	nb-no	d @ . p A . rt @ . " m A N s . % r O: . d @	nb-no							imported	nst	false	
+det	PN		det			nb-no	" d e:	nb-no	d @	nb-no					imported	nst	false	
+dopingtest	NN	|||MAS	doping+test			nb-no	" d u: . p i N . % t e s t	nb-no							imported	nst	false	
+dødet	VB	AKT|PF-PRT|SIN|IND|NOM	dødet	døde	v1a-lempe	nb-no	"" d 2: . d @ t	nb-no							imported	nst	false	
+døveområdet	NN	|||NEU	døve+området			nb-no	"" d 2: . v @ . O m . % r O: . d @	nb-no							imported	nst	false	
+edruskapsrådet	NN	SIN|DEF|NOM|NEU	edruskap+s+rådet	edruskapsråd	s13a1-år	nb-no	"" e: . d r } . s k A: p s . % r O: . d @	nb-no							imported	nst	false	
+ekspansjonsområdet	NN	SIN|DEF|NOM|NEU	ekspansjon+s+området	ekspansjonsområde	s11b-eple	nb-no	e k . s p A N . " S u: n s . O m . % r O: . d @	nb-no							imported	nst	false	
+eksportrådet	NN	|||NEU	eksport+rådet			nb-no	e k . " s p O rt . % r O: . d @	nb-no							imported	nst	false	
+eldrerådet	NN	|||NEU	eldre+rådet			nb-no	" e l . d r @ . % r O: . d @	nb-no							imported	nst	false	
+eldsterådet	NN	|||NEU	eldst+e+rådet			nb-no	"" e l . s t @ . % r O: . d @	nb-no							imported	nst	false	
+elevrådet	NN	SIN|DEF|NOM|NEU	elev+rådet	elevråd	s13a1-år	nb-no	e . " l e: v . % r O: . d @	nb-no							imported	nst	false	
+emneområdet	NN	SIN|DEF|NOM|NEU	emne+området	emneområde	s11b-eple	nb-no	"" e m . n @ . O m . % r O: . d @	nb-no							imported	nst	false	
+energiområdet	NN	|||NEU	energi+området			nb-no	e . n @ . " S i: . O m . % r O: . d @	nb-no	e . n @ r . " g i: . O m . % r O: . d @	nb-no					imported	nst	false	
+ernæringsrådet	NN	|||NEU	ernæring+s+rådet			nb-no	{ . " rn {: . r i N s . % r O: . d @	nb-no							imported	nst	false	
+eskimohund	NN	SIN|IND|NOM|MAS	eskimo+hund	eskimohund	s1a1-dag	nb-no	e . s k i . " m u: . % h } n	nb-no							imported	nst	false	
+etterapa	VB	AKT|PF|SIN-PLU|DEF|NOM	etter+apa	etterape	v0a-lempe	nb-no	"" e . t @ r . % A: . p A	nb-no							imported	nst	false	
+etterapa	VB	AKT|PF|SIN|IND|NOM	etter+apa	etterape	v0a-lempe	nb-no	"" e . t @ r . % A: . p A	nb-no							imported	nst	false	
+etterapa	VB	AKT|PRT	etter+apa	etterape	v0a-lempe	nb-no	"" e . t @ r . % A: . p A	nb-no							imported	nst	false	
+fabrikkområdet	NN	|||NEU	fabrikk+området			nb-no	f A . " b r i k . O m . % r O: . d @	nb-no							imported	nst	false	
+fagområdet	NN	SIN|DEF|NOM|NEU	fag+området	fagområde	s11b-eple	nb-no	"" f A: g . O m . % r O: . d @	nb-no							imported	nst	false	
+fagrådet	NN	|||NEU	fag+rådet			nb-no	"" f A: g . % r O: . d @	nb-no							imported	nst	false	
+fakultetsrådet	NN	SIN|DEF|NOM|NEU	fakultet+s+rådet	fakultetsråd	s13a1-år	nb-no	f A . k } l . " t e: t s . % r O: . d @	nb-no							imported	nst	false	
+familiehund	NN	|||MAS	familie+hund			nb-no	f A . " m i: . l i . @ . % h } n	nb-no							imported	nst	false	
+fasaderådet	NN	|||NEU	fasade+rådet			nb-no	f A . "" s A: . d @ . % r O: . d @	nb-no							imported	nst	false	
+faunaområdet	NN	|||NEU	fauna+området			nb-no	" f A} . n A . O m . % r O: . d @	nb-no							imported	nst	false	
+fellesrådet	NN	|||NEU	felles+rådet			nb-no	" f e . l @ s . % r O: . d @	nb-no							imported	nst	false	
+festivalområdet	NN	|||NEU	festival+området			nb-no	f @ . s t i . " v A: l . O m . % r O: . d @	nb-no							imported	nst	false	
+festningsområdet	NN	|||NEU	festning+s+området			nb-no	"" f e s t . n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+finbrødet	NN	SIN|DEF|NOM|NEU	fin+brødet	finbrød	s13a1-år	nb-no	"" f i: n . % b r 2: . @	nb-no							imported	nst	false	
+fiskeriområdet	NN	|||NEU	fiskeri+området			nb-no	f i . s k @ . " r i: . O m . % r O: . d @	nb-no							imported	nst	false	
+fjellområdet	NN	|||NEU	fjell+området			nb-no	"" f j e l . O m . % r O: . d @	nb-no							imported	nst	false	
+flatbrødet	NN	SIN|DEF|NOM|NEU	flatbrødet	flatbrød	s13a1-år	nb-no	" f l A t . % b r 2: . @	nb-no							imported	nst	false	
+flyktningerådet	NN	|||NEU	flyktning+e+rådet			nb-no	"" f l y k t . n i N . @ . % r O: . d @	nb-no							imported	nst	false	
+flyplassområdet	NN	|||NEU	fly+plass+området			nb-no	" f l y: . p l A s . O m . % r O: . d @	nb-no							imported	nst	false	
+forbrukerrådet	NN	SIN|DEF|NOM|NEU	forbruker+rådet	forbrukerråd	s13a1-år	nb-no	f O r . " b r }: . k @ r . % r O: . d @	nb-no							imported	nst	false	
+forbundsrådet	NN	|||NEU	forbund+s+rådet			nb-no	"" f O r . b } n s . % r O: . d @	nb-no							imported	nst	false	
+foreldrerådet	NN	SIN|DEF|NOM|NEU	foreldre+rådet	foreldreråd	s13a1-år	nb-no	f O . " r e l . d r @ . % r O: . d @	nb-no							imported	nst	false	
+forliksrådet	NN	SIN|DEF|NOM|NEU	forlik+s+rådet	forliksråd	s13a1-år	nb-no	"" f O . rl i: k s . % r O: . d @	nb-no							imported	nst	false	
+forretningsområdet	NN	|||NEU	forretning+s+området			nb-no	f O . " r e t . n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+forrådet	NN	SIN|DEF|NOM|NEU	forrådet	forråd	s13a1-år	nb-no	"" f O . % r O: . d @	nb-no							imported	nst	false	
+forsikringsrådet	NN	|||NEU	forsikring+s+rådet			nb-no	f O . " rs i . k r i N s . % r O: . d @	nb-no							imported	nst	false	
+forskingsrådet	NN	SIN|DEF|NOM|NEU	forsking+s+rådet	forskingsråd	s13a1-år	nb-no	"" f O . rs k i N s . % r O: . d @	nb-no							imported	nst	false	
+forskningsområdet	NN	|||NEU	forskning+s+området			nb-no	"" f O rs . k n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+forskningsrådet	NN	SIN|DEF|NOM|NEU	forskning+s+rådet	forskningsråd	s13a1-år	nb-no	"" f O rs . k n i N s . % r O: . d @	nb-no							imported	nst	false	
+forsvarsrådet	NN	|||NEU	forsvar+s+rådet			nb-no	"" f O . rs v A: rs . % r O: . d @	nb-no							imported	nst	false	
+forsøksrådet	NN		forsøk+s+rådet			nb-no	"" f O . rs 2: k s . % r O: . d @	nb-no							imported	nst	false	
+forvaltningsområdet	NN	|||NEU	forvaltning+s+området			nb-no	f O r . " v A l t . n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+forødet	VB	AKT|PF-PRT|SIN|IND|NOM	forødet	forøde	v1a-lempe	nb-no	f O . " r 2: . d @ t	nb-no							imported	nst	false	
+fraflytningsområdet	NN	SIN|DEF|NOM|NEU	fraflytning+s+området	fraflytningsområde	s11b-eple	nb-no	" f r A: . f l y t . n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+fraflyttingsområdet	NN	SIN|DEF|NOM|NEU	fraflytting+s+området	fraflyttingsområde	s11b-eple	nb-no	" f r A: . f l y . t i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+franskbrødet	NN	SIN|DEF|NOM|NEU	fransk+brødet	franskbrød	s13a1-år	nb-no	" f r A n s k . % b r 2: . @	nb-no							imported	nst	false	
+frarådet	VB		fra+rådet			nb-no	" f r A: . % r O: . d @ t	nb-no							imported	nst	false	
+frekvensområdet	NN	|||NEU	frekvens+området			nb-no	f r @ . " k v e n s . O m . % r O: . d @	nb-no							imported	nst	false	
+frihandelsområdet	NN	SIN|DEF|NOM|NEU	fri+handel+s+området	frihandelsområde	s11b-eple	nb-no	" f r i: . h A n . d l= s . O m . % r O: . d @	nb-no							imported	nst	false	
+frikirkerådet	NN	|||NEU	frikirke+rådet			nb-no	" f r i: . C i r . k @ . % r O: . d @	nb-no							imported	nst	false	
+friluftsområdet	NN	SIN|DEF|NOM|NEU	fri+luft+s+området	friluftsområde	s11b-eple	nb-no	" f r i: . l } f t s . O m . % r O: . d @	nb-no							imported	nst	false	
+friluftsrådet	NN	|||NEU	fri+luft+s+rådet			nb-no	" f r i: . l } f t s . % r O: . d @	nb-no							imported	nst	false	
+friområdet	NN	SIN|DEF|NOM|NEU	fri+området	friområde	s11b-eple	nb-no	" f r i: . O m . % r O: . d @	nb-no							imported	nst	false	
+fritidsområdet	NN	SIN|DEF|NOM|NEU	fri+tid+s+området	fritidsområde	s11b-eple	nb-no	" f r i: . t i: d s . O m . % r O: . d @	nb-no							imported	nst	false	
+frådet	VB	AKT|PF-PRT|SIN|IND|NOM	frådet	fråde	v1a-lempe	nb-no	"" f r O: . d @ t	nb-no							imported	nst	false	
+frøbrødet	NN	SIN|DEF|NOM|NEU	frø+brødet	frøbrød	s13a1-år	nb-no	"" f r 2: . % b r 2: . @	nb-no							imported	nst	false	
+fuglehund	NN	SIN|IND|NOM|MAS	fugl+e+hund	fuglehund	s1a1-dag	nb-no	"" f }: . l @ . % h } n	nb-no	"" f } . g l @ . % h } n	nb-no					imported	nst	false	
+fuglehundklubben	NN	|||MAS	fugl+e+hund+klubben			nb-no	"" f }: . l @ . h } N . % k l } . b @ n	nb-no	"" f } . g l @ . h } N . % k l } . b @ n	nb-no					imported	nst	false	
+fuglehundsport	NN	|||MAS	fugl+e+hund+sport			nb-no	"" f }: . l @ . h } n . % s p O rt	nb-no	"" f } . g l @ . h } n . % s p O rt	nb-no					imported	nst	false	
+fårehund	NN	SIN|IND|NOM|MAS	får+e+hund	fårehund	s1a1-dag	nb-no	"" f O: . r @ . % h } n	nb-no							imported	nst	false	
+føderasjonsrådet	NN	|||NEU	føderasjon+s+rådet			nb-no	f 2 . d @ . r A . " S u: n s . % r O: . d @	nb-no							imported	nst	false	
+føderådet	NN	SIN|DEF|NOM|NEU	føde+rådet	føderåd	s13a1-år	nb-no	"" f 2: . d @ . % r O: . d @	nb-no							imported	nst	false	
+førerhund	NN	SIN|IND|NOM|MAS	fører+hund	førerhund	s1a1-dag	nb-no	"" f 2: . r @ r . % h } n	nb-no							imported	nst	false	
+førerhundskole	NN	|||MAS	fører+hund+skole			nb-no	"" f 2: . r @ r . h } n . % s k u: . l @	nb-no							imported	nst	false	
+gardshund	NN	SIN|IND|NOM|MAS	gard+s+hund	gardshund	s1a1-dag	nb-no	" g A: rs . % h } n	nb-no							imported	nst	false	
+gentest	NN	|||MAS	gen+test			nb-no	"" g e: n . % t e s t	nb-no							imported	nst	false	
+gerådet	VB	AKT|PF-PRT|SIN|IND|NOM	gerådet	geråde	v1a-lempe	nb-no	g @ . " r O: . d @ t	nb-no							imported	nst	false	
+glødet	JJ		glødet			nb-no	"" g l 2: . d @ t	nb-no							imported	nst	false	
+glødet	NN	|||NEU	glødet			nb-no	" g l 2: . d @	nb-no							imported	nst	false	
+glødet	VB	AKT|PF-PRT|SIN|IND|NOM	glødet	gløde	v1a-lempe	nb-no	"" g l 2: . d @ t	nb-no							imported	nst	false	
+godsområdet	NN	|||NEU	gods+området			nb-no	" g u d s . O m . % r O: . d @	nb-no							imported	nst	false	
+golfområdet	NN	|||NEU	golf+området			nb-no	" g O l f . O m . % r O: . d @	nb-no							imported	nst	false	
+grahambrødet	NN	SIN|DEF|NOM|NEU	grahambrødet	grahambrød	s13a1-år	nb-no	" g r A: . h A m . % b r 2: . @	nb-no							imported	nst	false	
+grenseområdet	NN	SIN|DEF|NOM|NEU	grense+området	grenseområde	s11b-eple	nb-no	"" g r e n . s @ . O m . % r O: . d @	nb-no							imported	nst	false	
+grevlinghund	NN	SIN|IND|NOM|MAS	grevling+hund	grevlinghund	s1a1-dag	nb-no	"" g r e v . l i N . % h } n	nb-no							imported	nst	false	
+grislebrødet	NN	SIN|DEF|NOM|NEU	grisle+brødet	grislebrød	s13a1-år	nb-no	"" g r i . s l @ . % b r 2: . @	nb-no							imported	nst	false	
+grovbrødet	NN	SIN|DEF|NOM|NEU	grov+brødet	grovbrød	s13a1-år	nb-no	"" g r O: v . % b r 2: . @	nb-no							imported	nst	false	
+grunnområdet	NN	|||NEU	grunnområdet			nb-no	"" g r } . n O m . % r O: . d @	nb-no							imported	nst	false	
+grunnskolerådet	NN	|||NEU	grunnskole+rådet			nb-no	"" g r } n . s k u: . l @ . % r O: . d @	nb-no							imported	nst	false	
+gruppetest	NN	SIN|IND|NOM|MAS	gruppe+test	gruppetest	s1a1-dag	nb-no	"" g r } . p @ . % t e s t	nb-no							imported	nst	false	
+grøntområdet	NN	SIN|DEF|NOM|NEU	grønt+området	grøntområde	s11b-eple	nb-no	" g r 2 n t . O m . % r O: . d @	nb-no							imported	nst	false	
+gudbenådede	JJ	PLU|IND|NOM||POS	gud+benådede	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . d @	nb-no							imported	nst	false	
+gudbenådede	JJ	SIN-PLU|DEF|NOM||POS	gud+benådede	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . d @	nb-no							imported	nst	false	
+gudbenådedes	JJ	PLU|IND|GEN||POS	gud+benådedes	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . d @ s	nb-no							imported	nst	false	
+gudbenådedes	JJ	SIN-PLU|DEF|GEN||POS	gud+benådedes	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . d @ s	nb-no							imported	nst	false	
+gudbenådet	JJ	SIN|IND|NOM|NEU-MAS-FEM|POS	gud+benådet	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ t	nb-no							imported	nst	false	
+gudbenådete	JJ	PLU|IND|NOM||POS	gud+benådete	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . t @	nb-no							imported	nst	false	
+gudbenådete	JJ	SIN-PLU|DEF|NOM||POS	gud+benådete	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . t @	nb-no							imported	nst	false	
+gudbenådetes	JJ	PLU|IND|GEN||POS	gud+benådetes	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . t @ s	nb-no							imported	nst	false	
+gudbenådetes	JJ	SIN-PLU|DEF|GEN||POS	gud+benådetes	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ . t @ s	nb-no							imported	nst	false	
+gudbenådets	JJ	SIN|IND|GEN|NEU-MAS-FEM|POS	gud+benådets	gudbenådet	a4a-farget	nb-no	" g }: d . b @ . % n O: . d @ t s	nb-no							imported	nst	false	
+gulfsamarbeidsrådet	NN	|||NEU	gulf+samarbeid+s+rådet			nb-no	" g } l f . s A . m A r . b {i d s . % r O: . d @	nb-no							imported	nst	false	
+gårdshund	NN	SIN|IND|NOM|MAS	gård+s+hund	gårdshund	s1a1-dag	nb-no	" g O: rs . % h } n	nb-no							imported	nst	false	
+halvapa	NN	SIN|DEF|NOM|FEM	halv+apa	halvape	s6c-gate	nb-no	"" h A l . % A: . p A	nb-no							imported	nst	false	
+handelsområdet	NN	SIN|DEF|NOM|NEU	handel+s+området	handelsområde	s11b-eple	nb-no	" h A n . d l= s . O m . % r O: . d @	nb-no							imported	nst	false	
+harehund	NN	SIN|IND|NOM|MAS	hare+hund	harehund	s1a1-dag	nb-no	"" h A: . r @ . % h } n	nb-no							imported	nst	false	
+havneområdet	NN	|||NEU	havn+e+området			nb-no	"" h A v . n @ . O m . % r O: . d @	nb-no							imported	nst	false	
+havområdet	NN	|||NEU	hav+området			nb-no	"" h A: v . O m . % r O: . d @	nb-no							imported	nst	false	
+havrebrødet	NN	|||NEU	havre+brødet			nb-no	"" h A . v r @ . % b r 2: . @	nb-no							imported	nst	false	
+heilkornbrødet	NN	SIN|DEF|NOM|NEU	heil+korn+brødet	heilkornbrød	s13a1-år	nb-no	"" h {i l . k u: rn . % b r 2: . @	nb-no							imported	nst	false	
+helkornbrødet	NN	SIN|DEF|NOM|NEU	hel+korn+brødet	helkornbrød	s13a1-år	nb-no	"" h e: l . k u: rn . % b r 2: . @	nb-no							imported	nst	false	
+helserådet	NN	SIN|DEF|NOM|NEU	helse+rådet	helseråd	s13a1-år	nb-no	"" h e l . s @ . % r O: . d @	nb-no							imported	nst	false	
+hiv-test	NN	|||MAS	hiv+-+test			nb-no	" h i: v . % t e s t	nb-no	% h O: . i: . " v e: . % t e s t	nb-no					imported	nst	false	
+hjelperådet	NN	SIN|DEF|NOM|NEU	hjelpe+rådet	hjelperåd	s11a1-blad|s13a1-år	nb-no	"" j e l . p @ . % r O: . d @	nb-no							imported	nst	false	
+hovedarbeidsområdet	NN	|||NEU	hovedarbeid+s+området			nb-no	"" h u: . v @ . d A r . b {i d s . O m . % r O: . d @	nb-no							imported	nst	false	
+hovedområdet	NN	|||NEU	hovedområdet			nb-no	"" h u: . v @ . d O m . % r O: . d @	nb-no							imported	nst	false	
+hovedstadsområdet	NN	|||NEU	hovedstad+s+området			nb-no	"" h u: . v @ d . s t A: d s . O m . % r O: . d @	nb-no							imported	nst	false	
+hund	NN	SIN|IND|NOM|MAS	hund	hund	s1a1-dag	nb-no	" h } n	nb-no							imported	nst	false	
+hundeavgift	NN	SIN|IND|NOM|MAS-FEM	hund+e+avgift	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f t	nb-no							imported	nst	false	
+hundeavgifta	NN	SIN|DEF|NOM|FEM	hund+e+avgifta	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t A	nb-no							imported	nst	false	
+hundeavgiftas	NN	SIN|DEF|GEN|FEM	hund+e+avgiftas	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t A s	nb-no							imported	nst	false	
+hundeavgiften	NN	SIN|DEF|NOM|MAS	hund+e+avgiften	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t n=	nb-no							imported	nst	false	
+hundeavgiftene	NN	PLU|DEF|NOM|MAS-FEM	hund+e+avgiftene	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t n= . @	nb-no							imported	nst	false	
+hundeavgiftenes	NN	PLU|DEF|GEN|MAS-FEM	hund+e+avgiftenes	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t n= . @ s	nb-no							imported	nst	false	
+hundeavgiftens	NN	SIN|DEF|GEN|MAS	hund+e+avgiftens	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t n= s	nb-no							imported	nst	false	
+hundeavgifter	NN	PLU|IND|NOM|MAS-FEM	hund+e+avgifter	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t @ r	nb-no							imported	nst	false	
+hundeavgifters	NN	PLU|IND|GEN|MAS-FEM	hund+e+avgifters	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f . t @ rs	nb-no							imported	nst	false	
+hundeavgifts	NN	SIN|IND|GEN|MAS-FEM	hund+e+avgifts	hundeavgift	s6a1-dør	nb-no	"" h } . n @ . A: v . % j i f t s	nb-no							imported	nst	false	
+hundebitt	NN	SIN-PLU|IND|NOM|NEU	hund+e+bitt	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i t	nb-no							imported	nst	false	
+hundebitta	NN	PLU|DEF|NOM|NEU	hund+e+bitta	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i . t A	nb-no							imported	nst	false	
+hundebittas	NN	PLU|DEF|GEN|NEU	hund+e+bittas	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i . t A s	nb-no							imported	nst	false	
+hundebittene	NN	PLU|DEF|NOM|NEU	hund+e+bittene	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i . t n= . @	nb-no							imported	nst	false	
+hundebittenes	NN	PLU|DEF|GEN|NEU	hund+e+bittenes	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i . t n= . @ s	nb-no							imported	nst	false	
+hundebittet	NN	SIN|DEF|NOM|NEU	hund+e+bittet	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i . t @	nb-no							imported	nst	false	
+hundebittets	NN	SIN|DEF|GEN|NEU	hund+e+bittets	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i . t @ t s	nb-no							imported	nst	false	
+hundebitts	NN	SIN-PLU|IND|GEN|NEU	hund+e+bitts	hundebitt	s13a1-år	nb-no	"" h } . n @ . % b i t s	nb-no							imported	nst	false	
+hundeburet	NN	|||NEU	hund+e+buret			nb-no	"" h } . n @ . % b }: . r @	nb-no							imported	nst	false	
+hundedag	NN	SIN|IND|NOM|MAS	hund+e+dag	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: g	nb-no							imported	nst	false	
+hundedagen	NN	SIN|DEF|NOM|MAS	hund+e+dagen	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: . g @ n	nb-no							imported	nst	false	
+hundedagene	NN	PLU|DEF|NOM|MAS	hund+e+dagene	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: . g @ . n @	nb-no							imported	nst	false	
+hundedagenes	NN	PLU|DEF|GEN|MAS	hund+e+dagenes	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: . g @ . n @ s	nb-no							imported	nst	false	
+hundedagens	NN	SIN|DEF|GEN|MAS	hund+e+dagens	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: . g @ n s	nb-no							imported	nst	false	
+hundedager	NN	PLU|IND|NOM|MAS	hund+e+dager	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: . g @ r	nb-no							imported	nst	false	
+hundedagers	NN	PLU|IND|GEN|MAS	hund+e+dagers	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: . g @ rs	nb-no							imported	nst	false	
+hundedags	NN	SIN|IND|GEN|MAS	hund+e+dags	hundedag	s1a1-dag	nb-no	"" h } . n @ . % d A: g s	nb-no							imported	nst	false	
+hundedyrene	NN	|||NEU	hund+e+dyrene			nb-no	"" h } . n @ . % d y: . n`= . @	nb-no							imported	nst	false	
+hundeeiere	NN	|||MAS	hund+e+eiere			nb-no	"" h } . n @ . % {i . @ . r @	nb-no							imported	nst	false	
+hundeeieren	NN	|||MAS	hund+e+eieren			nb-no	"" h } . n @ . % {i . @ rn	nb-no							imported	nst	false	
+hundefører	NN	|||MAS	hund+e+fører			nb-no	"" h } . n @ . % f 2: . r @ r	nb-no							imported	nst	false	
+hundeglam	NN		hund+e+glam			nb-no	"" h } . n @ . % g l A m	nb-no							imported	nst	false	
+hundegras'	NN	SIN-PLU|IND|GEN|NEU	hund+e+gras'	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: s	nb-no							imported	nst	false	
+hundegras	NN	SIN-PLU|IND|NOM|NEU	hund+e+gras	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: s	nb-no							imported	nst	false	
+hundegrasa	NN	PLU|DEF|NOM|NEU	hund+e+grasa	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: . s A	nb-no							imported	nst	false	
+hundegrasas	NN	PLU|DEF|GEN|NEU	hund+e+grasas	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: . s A s	nb-no							imported	nst	false	
+hundegrasene	NN	PLU|DEF|NOM|NEU	hund+e+grasene	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: . s n= . @	nb-no							imported	nst	false	
+hundegrasenes	NN	PLU|DEF|GEN|NEU	hund+e+grasenes	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: . s n= . @ s	nb-no							imported	nst	false	
+hundegraset	NN	SIN|DEF|NOM|NEU	hund+e+graset	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: . s @	nb-no							imported	nst	false	
+hundegrasets	NN	SIN|DEF|GEN|NEU	hund+e+grasets	hundegras	s13a2-glass	nb-no	"" h } . n @ . % g r A: . s @ t s	nb-no							imported	nst	false	
+hundegress'	NN	SIN-PLU|IND|GEN|NEU	hund+e+gress'	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e s	nb-no							imported	nst	false	
+hundegress	NN	SIN-PLU|IND|NOM|NEU	hund+e+gress	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e s	nb-no							imported	nst	false	
+hundegressa	NN	PLU|DEF|NOM|NEU	hund+e+gressa	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e . s A	nb-no							imported	nst	false	
+hundegressas	NN	PLU|DEF|GEN|NEU	hund+e+gressas	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e . s A s	nb-no							imported	nst	false	
+hundegressene	NN	PLU|DEF|NOM|NEU	hund+e+gressene	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e . s n= . @	nb-no							imported	nst	false	
+hundegressenes	NN	PLU|DEF|GEN|NEU	hund+e+gressenes	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e . s n= . @ s	nb-no							imported	nst	false	
+hundegresset	NN	SIN|DEF|NOM|NEU	hund+e+gresset	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e . s @	nb-no							imported	nst	false	
+hundegressets	NN	SIN|DEF|GEN|NEU	hund+e+gressets	hundegress	s13a2-glass	nb-no	"" h } . n @ . % g r e . s @ t s	nb-no							imported	nst	false	
+hundeholdet	NN	|||NEU	hund+e+holdet			nb-no	"" h } . n @ . % h O . l @	nb-no							imported	nst	false	
+hundehus'	NN	SIN-PLU|IND|GEN|NEU	hund+e+hus'	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: s	nb-no							imported	nst	false	
+hundehus	NN	SIN-PLU|IND|NOM|NEU	hund+e+hus	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: s	nb-no							imported	nst	false	
+hundehusa	NN	PLU|DEF|NOM|NEU	hund+e+husa	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: . s A	nb-no							imported	nst	false	
+hundehusas	NN	PLU|DEF|GEN|NEU	hund+e+husas	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: . s A s	nb-no							imported	nst	false	
+hundehusene	NN	PLU|DEF|NOM|NEU	hund+e+husene	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: . s n= . @	nb-no							imported	nst	false	
+hundehusenes	NN	PLU|DEF|GEN|NEU	hund+e+husenes	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: . s n= . @ s	nb-no							imported	nst	false	
+hundehuset	NN	SIN|DEF|NOM|NEU	hund+e+huset	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: . s @	nb-no							imported	nst	false	
+hundehusets	NN	SIN|DEF|GEN|NEU	hund+e+husets	hundehus	s13a2-glass	nb-no	"" h } . n @ . % h }: . s @ t s	nb-no							imported	nst	false	
+hundehår	NN	|||NEU	hund+e+hår			nb-no	"" h } . n @ . % h O: r	nb-no							imported	nst	false	
+hundeinstruktør	NN	|||MAS	hund+e+instruktør			nb-no	"" h } . n @ . i n . s t r } k . % t 2: r	nb-no							imported	nst	false	
+hundeinstruktøren	NN	|||MAS	hund+e+instruktøren			nb-no	"" h } . n @ . i n . s t r } k . % t 2: . n`=	nb-no							imported	nst	false	
+hundekamper	NN	|||MAS	hund+e+kamper			nb-no	"" h } . n @ . % k A m . p @ r	nb-no							imported	nst	false	
+hundekjeks'	NN	SIN-PLU|IND|GEN|MAS	hund+e+kjeks'	hundekjeks	s3a2-chips	nb-no	"" h } . n @ . % C e k s	nb-no							imported	nst	false	
+hundekjeks	NN	SIN-PLU|IND|NOM|MAS	hund+e+kjeks	hundekjeks	s3a2-chips	nb-no	"" h } . n @ . % C e k s	nb-no							imported	nst	false	
+hundekjeks	NN	|||NEU	hund+e+kjeks			nb-no	"" h } . n @ . % C e k s	nb-no							imported	nst	false	
+hundekjeksen	NN	SIN|DEF|NOM|MAS	hund+e+kjeksen	hundekjeks	s3a2-chips	nb-no	"" h } . n @ . % C e k . s n=	nb-no							imported	nst	false	
+hundekjeksene	NN	PLU|DEF|NOM|MAS	hund+e+kjeksene	hundekjeks	s3a2-chips	nb-no	"" h } . n @ . % C e k . s n= . @	nb-no							imported	nst	false	
+hundekjeksenes	NN	PLU|DEF|GEN|MAS	hund+e+kjeksenes	hundekjeks	s3a2-chips	nb-no	"" h } . n @ . % C e k . s n= . @ s	nb-no							imported	nst	false	
+hundekjeksens	NN	SIN|DEF|GEN|MAS	hund+e+kjeksens	hundekjeks	s3a2-chips	nb-no	"" h } . n @ . % C e k . s n= s	nb-no							imported	nst	false	
+hundekjører	NN	|||MAS	hund+e+kjører			nb-no	" h } . n @ . % C 2: . r @ r	nb-no							imported	nst	false	
+hundekjørere	NN	|||MAS	hund+e+kjørere			nb-no	"" h } . n @ . % C 2: . r @ . r @	nb-no							imported	nst	false	
+hundekjøring	NN	SIN|IND|NOM|MAS-FEM	hund+e+kjøring	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N	nb-no							imported	nst	false	
+hundekjøringa	NN	SIN|DEF|NOM|FEM	hund+e+kjøringa	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . A	nb-no							imported	nst	false	
+hundekjøringas	NN	SIN|DEF|GEN|FEM	hund+e+kjøringas	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . A s	nb-no							imported	nst	false	
+hundekjøringen	NN	SIN|DEF|NOM|MAS	hund+e+kjøringen	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . @ n	nb-no							imported	nst	false	
+hundekjøringene	NN	PLU|DEF|NOM|MAS-FEM	hund+e+kjøringene	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . @ . n @	nb-no							imported	nst	false	
+hundekjøringenes	NN	PLU|DEF|GEN|MAS-FEM	hund+e+kjøringenes	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . @ . n @ s	nb-no							imported	nst	false	
+hundekjøringens	NN	SIN|DEF|GEN|MAS	hund+e+kjøringens	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . @ n s	nb-no							imported	nst	false	
+hundekjøringer	NN	PLU|IND|NOM|MAS-FEM	hund+e+kjøringer	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . @ r	nb-no							imported	nst	false	
+hundekjøringers	NN	PLU|IND|GEN|MAS-FEM	hund+e+kjøringers	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N . @ rs	nb-no							imported	nst	false	
+hundekjørings	NN	SIN|IND|GEN|MAS-FEM	hund+e+kjørings	hundekjøring	s6a1-dør	nb-no	"" h } . n @ . % C 2: . r i N s	nb-no							imported	nst	false	
+hundeklør	NN	|||MAS-FEM	hund+e+klør			nb-no	"" h } . n @ . % k l 2: r	nb-no							imported	nst	false	
+hundekropp	NN	|||MAS	hund+e+kropp			nb-no	"" h } . n @ . % k r O p	nb-no							imported	nst	false	
+hundeleven	NN		hund+e+leven			nb-no	"" h } . n @ . % l e: . v @ n	nb-no							imported	nst	false	
+hundemann	NN	|||MAS	hund+e+mann			nb-no	"" h } . n @ . % m A n	nb-no							imported	nst	false	
+hunden	NN	SIN|DEF|NOM|MAS	hunden	hund	s1a1-dag	nb-no	" h } . n n=	nb-no							imported	nst	false	
+hundene	NN	PLU|DEF|NOM|MAS	hundene	hund	s1a1-dag	nb-no	"" h } . n n= . @	nb-no							imported	nst	false	
+hundenes	NN	PLU|DEF|GEN|MAS	hundenes	hund	s1a1-dag	nb-no	"" h } . n n= . @ s	nb-no							imported	nst	false	
+hundens	NN	SIN|DEF|GEN|MAS	hundens	hund	s1a1-dag	nb-no	" h } . n n= s	nb-no							imported	nst	false	
+hundeorganisasjoner	NN	|||MAS	hund+e+organisasjoner			nb-no	"" h } . n @ . O r . g A . n i . s A . % S u: . n @ r	nb-no							imported	nst	false	
+hundepatruljen	NN	|||MAS	hund+e+patruljen			nb-no	"" h } . n @ . p A . % t r } l . j @ n	nb-no							imported	nst	false	
+hundepensjonater	NN	|||NEU	hund+e+pensjonater			nb-no	"" h } . n @ . p A N . S u . % n A: . t @ r	nb-no	"" h } . n @ . p @ n . S u . % n A: . t @ r	nb-no					imported	nst	false	
+hundepersilla	NN	SIN|DEF|NOM|FEM	hund+e+persilla	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l A	nb-no							imported	nst	false	
+hundepersillas	NN	SIN|DEF|GEN|FEM	hund+e+persillas	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l A s	nb-no							imported	nst	false	
+hundepersille	NN	SIN|IND|NOM|MAS-FEM	hund+e+persille	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l @	nb-no							imported	nst	false	
+hundepersillen	NN	SIN|DEF|NOM|MAS	hund+e+persillen	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l n=	nb-no							imported	nst	false	
+hundepersillene	NN	PLU|DEF|NOM|MAS-FEM	hund+e+persillene	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l n= . @	nb-no							imported	nst	false	
+hundepersillenes	NN	PLU|DEF|GEN|MAS-FEM	hund+e+persillenes	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l n= . @ s	nb-no							imported	nst	false	
+hundepersillens	NN	SIN|DEF|GEN|MAS	hund+e+persillens	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l n= s	nb-no							imported	nst	false	
+hundepersiller	NN	PLU|IND|NOM|MAS-FEM	hund+e+persiller	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l @ r	nb-no							imported	nst	false	
+hundepersillers	NN	PLU|IND|GEN|MAS-FEM	hund+e+persillers	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l @ rs	nb-no							imported	nst	false	
+hundepersilles	NN	SIN|IND|GEN|MAS-FEM	hund+e+persilles	hundepersille	s6c-gate	nb-no	"" h } . n @ . p @ . % rs i . l @ s	nb-no							imported	nst	false	
+hundeposer	NN	|||MAS	hund+e+poser			nb-no	"" h } . n @ . % p u: . s @ r	nb-no							imported	nst	false	
+hunder	NN	PLU|IND|NOM|MAS	hunder	hund	s1a1-dag	nb-no	"" h } . n @ r	nb-no							imported	nst	false	
+hunderasene	NN	|||MAS	hund+e+rasene			nb-no	"" h } . n @ . % r A: . s n= . @	nb-no							imported	nst	false	
+hunders	NN	PLU|IND|GEN|MAS	hunders	hund	s1a1-dag	nb-no	"" h } . n @ rs	nb-no							imported	nst	false	
+hundesele	NN	SIN|IND|NOM|MAS	hund+e+sele	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l @	nb-no							imported	nst	false	
+hundeselen	NN	SIN|DEF|NOM|MAS	hund+e+selen	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l n=	nb-no							imported	nst	false	
+hundeselene	NN	PLU|DEF|NOM|MAS	hund+e+selene	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l n= . @	nb-no							imported	nst	false	
+hundeselenes	NN	PLU|DEF|GEN|MAS	hund+e+selenes	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l n= . @ s	nb-no							imported	nst	false	
+hundeselens	NN	SIN|DEF|GEN|MAS	hund+e+selens	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l n= s	nb-no							imported	nst	false	
+hundeseler	NN	PLU|IND|NOM|MAS	hund+e+seler	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l @ r	nb-no							imported	nst	false	
+hundeselers	NN	PLU|IND|GEN|MAS	hund+e+selers	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l @ rs	nb-no							imported	nst	false	
+hundeseles	NN	SIN|IND|GEN|MAS	hund+e+seles	hundesele	s1c1-hage	nb-no	"" h } . n @ . % s e: . l @ s	nb-no							imported	nst	false	
+hundeskatt	NN	SIN|IND|NOM|MAS	hund+e+skatt	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A t	nb-no							imported	nst	false	
+hundeskatten	NN	SIN|DEF|NOM|MAS	hund+e+skatten	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A . t n=	nb-no							imported	nst	false	
+hundeskattene	NN	PLU|DEF|NOM|MAS	hund+e+skattene	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A . t n= . @	nb-no							imported	nst	false	
+hundeskattenes	NN	PLU|DEF|GEN|MAS	hund+e+skattenes	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A . t n= . @ s	nb-no							imported	nst	false	
+hundeskattens	NN	SIN|DEF|GEN|MAS	hund+e+skattens	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A . t n= s	nb-no							imported	nst	false	
+hundeskatter	NN	PLU|IND|NOM|MAS	hund+e+skatter	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A . t @ r	nb-no							imported	nst	false	
+hundeskatters	NN	PLU|IND|GEN|MAS	hund+e+skatters	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A . t @ rs	nb-no							imported	nst	false	
+hundeskatts	NN	SIN|IND|GEN|MAS	hund+e+skatts	hundeskatt	s1a1-dag	nb-no	"" h } . n @ . % s k A t s	nb-no							imported	nst	false	
+hundeslede	NN	SIN|IND|NOM|MAS	hund+e+slede	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % S l e: . @	nb-no							imported	nst	false	
+hundesleden	NN	SIN|DEF|NOM|MAS	hund+e+sleden	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % S l e: . @ n	nb-no							imported	nst	false	
+hundesleden	NN	|||MAS	hund+e+sleden			nb-no	"" h } . n @ . % S l e: . d n=	nb-no							imported	nst	false	
+hundesledene	NN	PLU|DEF|NOM|MAS	hund+e+sledene	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % S l e: . @ . n @	nb-no							imported	nst	false	
+hundesledenes	NN	PLU|DEF|GEN|MAS	hund+e+sledenes	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % S l e: . @ . n @ s	nb-no							imported	nst	false	
+hundesledens	NN	SIN|DEF|GEN|MAS	hund+e+sledens	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % S l e: . @ n s	nb-no							imported	nst	false	
+hundesleder	NN	PLU|IND|NOM|MAS	hund+e+sleder	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % S l e: . @ r	nb-no							imported	nst	false	
+hundesleders	NN	PLU|IND|GEN|MAS	hund+e+sleders	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % rs l e: . @ rs	nb-no							imported	nst	false	
+hundesledes	NN	SIN|IND|GEN|MAS	hund+e+sledes	hundeslede	s1c1-hage	nb-no	"" h } . n @ . % S l e: . @ s	nb-no							imported	nst	false	
+hundesløka	NN	SIN|DEF|NOM|FEM	hund+e+sløka	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k A	nb-no							imported	nst	false	
+hundesløkas	NN	SIN|DEF|GEN|FEM	hund+e+sløkas	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k A s	nb-no							imported	nst	false	
+hundesløke	NN	SIN|IND|NOM|MAS-FEM	hund+e+sløke	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @	nb-no							imported	nst	false	
+hundesløken	NN	SIN|DEF|NOM|MAS	hund+e+sløken	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ n	nb-no							imported	nst	false	
+hundesløkene	NN	PLU|DEF|NOM|FEM	hund+e+sløkene	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ . n @	nb-no							imported	nst	false	
+hundesløkene	NN	PLU|DEF|NOM|MAS	hund+e+sløkene	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ . n @	nb-no							imported	nst	false	
+hundesløkenes	NN	PLU|DEF|GEN|FEM	hund+e+sløkenes	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ . n @ s	nb-no							imported	nst	false	
+hundesløkenes	NN	PLU|DEF|GEN|MAS	hund+e+sløkenes	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ . n @ s	nb-no							imported	nst	false	
+hundesløkens	NN	SIN|DEF|GEN|MAS	hund+e+sløkens	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ n s	nb-no							imported	nst	false	
+hundesløker	NN	PLU|IND|NOM|FEM	hund+e+sløker	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ r	nb-no							imported	nst	false	
+hundesløker	NN	PLU|IND|NOM|MAS	hund+e+sløker	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ r	nb-no							imported	nst	false	
+hundesløkers	NN	PLU|IND|GEN|FEM	hund+e+sløkers	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % rs l 2: . k @ rs	nb-no							imported	nst	false	
+hundesløkers	NN	PLU|IND|GEN|MAS	hund+e+sløkers	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % rs l 2: . k @ rs	nb-no							imported	nst	false	
+hundesløkes	NN	SIN|IND|GEN|FEM	hund+e+sløkes	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ s	nb-no							imported	nst	false	
+hundesløkes	NN	SIN|IND|GEN|MAS	hund+e+sløkes	hundesløke	s25a4-jente	nb-no	"" h } . n @ . % S l 2: . k @ s	nb-no							imported	nst	false	
+hundesport	NN	SIN|IND|NOM|MAS	hund+e+sport	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O rt	nb-no							imported	nst	false	
+hundesporten	NN	SIN|DEF|NOM|MAS	hund+e+sporten	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O . rt n`=	nb-no							imported	nst	false	
+hundesportene	NN	PLU|DEF|NOM|MAS	hund+e+sportene	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O . rt n`= . @	nb-no							imported	nst	false	
+hundesportenes	NN	PLU|DEF|GEN|MAS	hund+e+sportenes	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O . rt n`= . @ s	nb-no							imported	nst	false	
+hundesportens	NN	SIN|DEF|GEN|MAS	hund+e+sportens	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O . rt n`= s	nb-no							imported	nst	false	
+hundesporter	NN	PLU|IND|NOM|MAS	hund+e+sporter	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O . rt @ r	nb-no							imported	nst	false	
+hundesporters	NN	PLU|IND|GEN|MAS	hund+e+sporters	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O . rt @ rs	nb-no							imported	nst	false	
+hundesports	NN	SIN|IND|GEN|MAS	hund+e+sports	hundesport	s1a1-dag	nb-no	"" h } . n @ . % s p O rt rs	nb-no							imported	nst	false	
+hundestjerna	NN	SIN|DEF|NOM|FEM	hund+e+stjerna	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn A	nb-no							imported	nst	false	
+hundestjernas	NN	SIN|DEF|GEN|FEM	hund+e+stjernas	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn A s	nb-no							imported	nst	false	
+hundestjerne	NN	SIN|IND|NOM|MAS-FEM	hund+e+stjerne	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn @	nb-no							imported	nst	false	
+hundestjernen	NN	SIN|DEF|NOM|MAS	hund+e+stjernen	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn n`=	nb-no							imported	nst	false	
+hundestjernene	NN	PLU|DEF|NOM|MAS-FEM	hund+e+stjernene	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn n`= . @	nb-no							imported	nst	false	
+hundestjernenes	NN	PLU|DEF|GEN|MAS-FEM	hund+e+stjernenes	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn n`= . @ s	nb-no							imported	nst	false	
+hundestjernens	NN	SIN|DEF|GEN|MAS	hund+e+stjernens	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn n`= s	nb-no							imported	nst	false	
+hundestjerner	NN	PLU|IND|NOM|MAS-FEM	hund+e+stjerner	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn @ r	nb-no							imported	nst	false	
+hundestjerners	NN	PLU|IND|GEN|MAS-FEM	hund+e+stjerners	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn @ rs	nb-no							imported	nst	false	
+hundestjernes	NN	SIN|IND|GEN|MAS-FEM	hund+e+stjernes	hundestjerne	s6c-gate	nb-no	"" h } . n @ . % s t j {: . rn @ s	nb-no							imported	nst	false	
+hundetoalett	NN	|||NEU	hund+e+toalett			nb-no	"" h } . n @ . t O . A . % l e t	nb-no							imported	nst	false	
+hundetragedier	NN	|||MAS	hund+e+tragedier			nb-no	"" h } . n @ . t r A . % g e: . d i . @ r	nb-no							imported	nst	false	
+hundetunga	NN	SIN|DEF|NOM|FEM	hund+e+tunga	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . A	nb-no							imported	nst	false	
+hundetungas	NN	SIN|DEF|GEN|FEM	hund+e+tungas	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . A s	nb-no							imported	nst	false	
+hundetunge	NN	SIN|IND|NOM|MAS-FEM	hund+e+tunge	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @	nb-no							imported	nst	false	
+hundetungen	NN	SIN|DEF|NOM|MAS	hund+e+tungen	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @ n	nb-no							imported	nst	false	
+hundetungene	NN	PLU|DEF|NOM|MAS-FEM	hund+e+tungene	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @ . n @	nb-no							imported	nst	false	
+hundetungenes	NN	PLU|DEF|GEN|MAS-FEM	hund+e+tungenes	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @ . n @ s	nb-no							imported	nst	false	
+hundetungens	NN	SIN|DEF|GEN|MAS	hund+e+tungens	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @ n s	nb-no							imported	nst	false	
+hundetunger	NN	PLU|IND|NOM|MAS-FEM	hund+e+tunger	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @ r	nb-no							imported	nst	false	
+hundetungers	NN	PLU|IND|GEN|MAS-FEM	hund+e+tungers	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @ rs	nb-no							imported	nst	false	
+hundetunges	NN	SIN|IND|GEN|MAS-FEM	hund+e+tunges	hundetunge	s6c-gate	nb-no	"" h } . n @ . % t u N . @ s	nb-no							imported	nst	false	
+hundetype	NN	|||MAS	hund+e+type			nb-no	"" h } . n @ . % t y: . p @	nb-no							imported	nst	false	
+hundeutstillinger	NN	|||MAS-FEM	hund+e+utstillinger			nb-no	"" h } . n @ . }: t . % s t i . l i N . @ r	nb-no							imported	nst	false	
+hundevakt	NN	SIN|IND|NOM|MAS-FEM	hund+e+vakt	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k t	nb-no							imported	nst	false	
+hundevakta	NN	SIN|DEF|NOM|FEM	hund+e+vakta	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t A	nb-no							imported	nst	false	
+hundevaktas	NN	SIN|DEF|GEN|FEM	hund+e+vaktas	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t A s	nb-no							imported	nst	false	
+hundevakten	NN	SIN|DEF|NOM|MAS	hund+e+vakten	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t n=	nb-no							imported	nst	false	
+hundevaktene	NN	PLU|DEF|NOM|MAS-FEM	hund+e+vaktene	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t n= . @	nb-no							imported	nst	false	
+hundevaktenes	NN	PLU|DEF|GEN|MAS-FEM	hund+e+vaktenes	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t n= . @ s	nb-no							imported	nst	false	
+hundevaktens	NN	SIN|DEF|GEN|MAS	hund+e+vaktens	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t n= s	nb-no							imported	nst	false	
+hundevakter	NN	PLU|IND|NOM|MAS-FEM	hund+e+vakter	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t @ r	nb-no							imported	nst	false	
+hundevakters	NN	PLU|IND|GEN|MAS-FEM	hund+e+vakters	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k . t @ rs	nb-no							imported	nst	false	
+hundevakts	NN	SIN|IND|GEN|MAS-FEM	hund+e+vakts	hundevakt	s6a1-dør	nb-no	"" h } . n @ . % v A k t s	nb-no							imported	nst	false	
+hundevalp	NN	SIN|IND|NOM|MAS	hund+e+valp	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l p	nb-no							imported	nst	false	
+hundevalpen	NN	SIN|DEF|NOM|MAS	hund+e+valpen	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l . p @ n	nb-no							imported	nst	false	
+hundevalpene	NN	PLU|DEF|NOM|MAS	hund+e+valpene	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l . p @ . n @	nb-no							imported	nst	false	
+hundevalpenes	NN	PLU|DEF|GEN|MAS	hund+e+valpenes	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l . p @ . n @ s	nb-no							imported	nst	false	
+hundevalpens	NN	SIN|DEF|GEN|MAS	hund+e+valpens	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l . p @ n s	nb-no							imported	nst	false	
+hundevalper	NN	PLU|IND|NOM|MAS	hund+e+valper	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l . p @ r	nb-no							imported	nst	false	
+hundevalpers	NN	PLU|IND|GEN|MAS	hund+e+valpers	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l . p @ rs	nb-no							imported	nst	false	
+hundevalps	NN	SIN|IND|GEN|MAS	hund+e+valps	hundevalp	s1a1-dag	nb-no	"" h } . n @ . % v A l p s	nb-no							imported	nst	false	
+hundevogn	NN	|||MAS-FEM	hund+e+vogn			nb-no	"" h } . n @ . % v O N n	nb-no							imported	nst	false	
+hundevær	NN		hund+e+vær			nb-no	"" h } . n @ . % v {: r	nb-no							imported	nst	false	
+hundjag	VB	AKT|IMP	hund+jag	hundjage	v0a-lempe|v1a-lempe|v3a1-love	nb-no	"" h } n . % j A: g	nb-no							imported	nst	false	
+hundjaga	VB	AKT|PF|SIN-PLU|DEF|NOM	hund+jaga	hundjage	v0a-lempe	nb-no	"" h } n . % j A: . g A	nb-no							imported	nst	false	
+hundjaga	VB	AKT|PF|SIN|IND|NOM	hund+jaga	hundjage	v0a-lempe	nb-no	"" h } n . % j A: . g A	nb-no							imported	nst	false	
+hundjaga	VB	AKT|PRT	hund+jaga	hundjage	v0a-lempe	nb-no	"" h } n . % j A: . g A	nb-no							imported	nst	false	
+hundjagas	VB	AKT|PF|SIN-PLU|DEF|GEN	hund+jagas	hundjage	v0a-lempe	nb-no	"" h } n . % j A: . g A s	nb-no							imported	nst	false	
+hundjagas	VB	AKT|PF|SIN|IND|GEN	hund+jagas	hundjage	v0a-lempe	nb-no	"" h } n . % j A: . g A s	nb-no							imported	nst	false	
+hundjagd	VB	AKT|PF|SIN|IND|NOM	hund+jagd	hundjage	v3a1-love	nb-no	"" h } n . % j A: g d	nb-no							imported	nst	false	
+hundjagde	VB	AKT|PF-PRT|SIN-PLU|DEF|NOM	hund+jagde	hundjage	v3a1-love	nb-no	"" h } n . % j A: g . d @	nb-no							imported	nst	false	
+hundjagdes	VB	AKT|PF|SIN-PLU|DEF|GEN	hund+jagdes	hundjage	v3a1-love	nb-no	"" h } n . % j A: g . d @ s	nb-no							imported	nst	false	
+hundjagds	VB	AKT|PF|SIN|IND|GEN	hund+jagds	hundjage	v3a1-love	nb-no	"" h } n . % j A: g d s	nb-no							imported	nst	false	
+hundjage	VB	AKT|INF	hund+jage	hundjage	v0a-lempe|v1a-lempe|v3a1-love	nb-no	"" h } n . % j A: . g @	nb-no							imported	nst	false	
+hundjagende	VB	AKT|PS|SIN-PLU|IND-DEF|NOM	hund+jagende	hundjage	v0a-lempe|v1a-lempe|v3a1-love	nb-no	"" h } n . % j A: . g @ . n @	nb-no							imported	nst	false	
+hundjagendes	VB	AKT|PS|SIN-PLU|IND-DEF|GEN	hund+jagendes	hundjage	v0a-lempe|v1a-lempe|v3a1-love	nb-no	"" h } n . % j A: . g @ . n @ s	nb-no							imported	nst	false	
+hundjager	VB	AKT|PRS	hund+jager	hundjage	v0a-lempe|v1a-lempe|v3a1-love	nb-no	"" h } n . % j A: . g @ r	nb-no							imported	nst	false	
+hundjages	VB	PAS|INF	hund+jages	hundjage	v0a-lempe	nb-no	"" h } n . % j A: . g @ s	nb-no							imported	nst	false	
+hundjages	VB	PAS|INF	hund+jages	hundjage	v1a-lempe	nb-no	"" h } n . % j A: . g @ s	nb-no							imported	nst	false	
+hundjages	VB	PAS|INF	hund+jages	hundjage	v3a1-love	nb-no	"" h } n . % j A: . g @ s	nb-no							imported	nst	false	
+hundjages	VB	PAS|PRS	hund+jages	hundjage	v0a-lempe|v1a-lempe|v3a1-love	nb-no	"" h } n . % j A: . g @ s	nb-no							imported	nst	false	
+hundjaget	VB	AKT|PF-PRT|SIN|IND|NOM	hund+jaget	hundjage	v1a-lempe	nb-no	"" h } n . % j A: . g @ t	nb-no							imported	nst	false	
+hundjagete	VB	AKT|PF|SIN-PLU|DEF|NOM	hund+jagete	hundjage	v1a-lempe	nb-no	"" h } n . % j A: . g @ . t @	nb-no							imported	nst	false	
+hundjagetes	VB	AKT|PF|SIN-PLU|DEF|GEN	hund+jagetes	hundjage	v1a-lempe	nb-no	"" h } n . % j A: . g @ . t @ s	nb-no							imported	nst	false	
+hundjagets	VB	AKT|PF|SIN|IND|GEN	hund+jagets	hundjage	v1a-lempe	nb-no	"" h } n . % j A: . g @ t s	nb-no							imported	nst	false	
+hundjaging	NN	SIN|IND|NOM	hund+jaging	hundjage	v0a-lempe|v1a-lempe|v3a1-love	nb-no	"" h } n . % j A: . g i N	nb-no							imported	nst	false	
+hunds	NN	SIN|IND|GEN|MAS	hunds	hund	s1a1-dag	nb-no	" h } n s	nb-no							imported	nst	false	
+husgerådet	NN	SIN|DEF|NOM|NEU	hus+gerådet	husgeråd	s13a1-år	nb-no	"" h }: s . g @ . % r O: . d @	nb-no							imported	nst	false	
+husrådet	NN	SIN|DEF|NOM|NEU	hus+rådet	husråd	s11a1-blad|s13a1-år	nb-no	"" h }: s . % r O: . d @	nb-no							imported	nst	false	
+hvetebrødet	NN	SIN|DEF|NOM|NEU	hvete+brødet	hvetebrød	s13a1-år	nb-no	"" v e: . t @ . % b r 2: . @	nb-no							imported	nst	false	
+hyenehund	NN	SIN|IND|NOM|MAS	hyene+hund	hyenehund	s1a1-dag	nb-no	h y . "" e: . n @ . % h } n	nb-no							imported	nst	false	
+hytteområdet	NN	|||NEU	hytte+området			nb-no	"" h y . t @ . O m . % r O: . d @	nb-no							imported	nst	false	
+høgskolerådet	NN	|||NEU	høgskole+rådet			nb-no	"" h 2y . s k u: . l @ . % r O: . d @	nb-no	"" h 2: g . s k u: . l @ . % r O: . d @	nb-no					imported	nst	false	
+høgtrykksområdet	NN	SIN|DEF|NOM|NEU	høg+trykk+s+området	høgtrykksområde	s11b-eple	nb-no	"" h 2y . t r y k s . O m . % r O: . d @	nb-no							imported	nst	false	
+høyre-byrådet	NN	|||NEU	høyre+-+by+rådet			nb-no	" h 2y . r @ . b y: . % r O: . d @	nb-no							imported	nst	false	
+høyskoleområdet	NN	|||NEU	høyskole+området			nb-no	"" h 2y . s k u: . l @ . O m . % r O: . d @	nb-no							imported	nst	false	
+høytrykksområdet	NN	SIN|DEF|NOM|NEU	høy+trykk+s+området	høytrykksområde	s11b-eple	nb-no	"" h 2y . t r y k s . O m . % r O: . d @	nb-no							imported	nst	false	
+idrettsrådet	NN	|||NEU	idrett+s+rådet			nb-no	"" i: . d r @ t s . % r O: . d @	nb-no							imported	nst	false	
+industriområdet	NN	|||NEU	industri+området			nb-no	i n . d } . " s t r i: . O m . % r O: . d @	nb-no							imported	nst	false	
+influensområdet	NN	SIN|DEF|NOM|NEU	influens+området	influensområde	s11b-eple	nb-no	i n . f l } . " e n s . O m . % r O: . d @	nb-no							imported	nst	false	
+innsamlingsrådet	NN	|||NEU	innsamling+s+rådet			nb-no	" i n . s A m . l i N s . % r O: . d @	nb-no							imported	nst	false	
+innsatsområdet	NN	|||NEU	innsats+området			nb-no	"" i n . s A t s . O m . % r O: . d @	nb-no							imported	nst	false	
+innskjekkingsområdet	NN	|||NEU	innskjekking+s+området			nb-no	" i n . S @ . k i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+innstillingsrådet	NN	|||NEU	innstilling+s+rådet			nb-no	" i n . s t i . l i N s . % r O: . d @	nb-no							imported	nst	false	
+interesseområdet	NN	SIN|DEF|NOM|NEU	interesse+området	interesseområde	s11b-eple	nb-no	i n . t @ . " r e . s @ . O m . % r O: . d @	nb-no							imported	nst	false	
+isødet	NN	|||NEU	is+ødet			nb-no	"" i: . % s 2: . d @	nb-no							imported	nst	false	
+jakthund	NN	SIN|IND|NOM|MAS	jakt+hund	jakthund	s1a1-dag	nb-no	" j A k t . % h } n	nb-no							imported	nst	false	
+jernbaneområdet	NN	|||NEU	jern+bane+området			nb-no	"" j {: rn . b A: . n @ . O m . % r O: . d @	nb-no							imported	nst	false	
+johannesbrødet	NN	SIN|DEF|NOM|NEU	!johannes+brødet	johannesbrød	s13a1-år	nb-no	j u . " h A . n @ s . % b r 2: . @	nb-no							imported	nst	false	
+jordskjelvområdet	NN	|||NEU	jord+skjelv+området			nb-no	"" j u: r . S @ l v . O m . % r O: . d @	nb-no							imported	nst	false	
+kaffebrødet	NN	SIN|DEF|NOM|NEU	kaffe+brødet	kaffebrød	s13a1-år	nb-no	" k A . f @ . % b r 2: . @	nb-no							imported	nst	false	
+kaiområdet	NN	|||NEU	kai+området			nb-no	"" k Ai . O m . % r O: . d @	nb-no							imported	nst	false	
+kamphund	NN	|||MAS	kamp+hund			nb-no	" k A m p . % h } n	nb-no							imported	nst	false	
+kansellirådet	NN	SIN|DEF|NOM|NEU	kanselli+rådet	kanselliråd	s13a1-år	nb-no	k A n . s @ . " l i: . % r O: . d @	nb-no							imported	nst	false	
+kapusinerapa	NN	SIN|DEF|NOM|FEM	kapusiner+apa	kapusinerape	s6c-gate	nb-no	k A . p } . " s i: . n @ r . % A: . p A	nb-no							imported	nst	false	
+katastrofeområdet	NN	SIN|DEF|NOM|NEU	katastrofe+området	katastrofeområde	s11b-eple	nb-no	k A . t A . "" s t r u: . f @ . O m . % r O: . d @	nb-no							imported	nst	false	
+kirkerådet	NN	|||NEU	kirke+rådet			nb-no	"" C i r . k @ . % r O: . d @	nb-no							imported	nst	false	
+kjerneområdet	NN	SIN|DEF|NOM|NEU	kjerne+området	kjerneområde	s11b-eple	nb-no	"" C {: . rn @ . O m . % r O: . d @	nb-no							imported	nst	false	
+kjerneområdet	NN	|||NEU	kjerneområdet			nb-no	"" C {: . rn @ . O m . % r O: . d @	nb-no							imported	nst	false	
+kjerringrådet	NN	SIN|DEF|NOM|NEU	kjerring+rådet	kjerringråd	s11a1-blad|s13a1-år	nb-no	"" C { . r i N . % r O: . d @	nb-no							imported	nst	false	
+kjødet	NN	|||NEU	kjødet			nb-no	" C 2: . d @	nb-no							imported	nst	false	
+kjøpmannsrådet	NN	|||NEU	kjøpmann+s+rådet			nb-no	"" C 2: p . m A n s . % r O: . d @	nb-no							imported	nst	false	
+kjøretest	NN	|||MAS	kjøre+test			nb-no	"" C 2: . r @ . % t e s t	nb-no							imported	nst	false	
+klibrødet	NN	SIN|DEF|NOM|NEU	kli+brødet	klibrød	s13a1-år	nb-no	"" k l i: . % b r 2: . @	nb-no							imported	nst	false	
+klimaområdet	NN	|||NEU	klima+området			nb-no	" k l i: . m A . O m . % r O: . d @	nb-no							imported	nst	false	
+kneippbrødet	NN	SIN|DEF|NOM|NEU	kneipp+brødet	kneippbrød	s13a1-år	nb-no	" k n {i p . % b r 2: . @	nb-no							imported	nst	false	
+knekkebrødet	NN	SIN|DEF|NOM|NEU	knekkebrødet	knekkebrød	s13a1-år	nb-no	"" k n e . k @ . % b r 2: . @	nb-no							imported	nst	false	
+knekkebrødet	NN	|||NEU	knekke+brødet			nb-no	"" k n e . k @ . % b r 2: . @	nb-no							imported	nst	false	
+kollegierådet	NN	|||NEU	kollegierådet			nb-no	k O . " l e: . g i . @ . % r O: . d @	nb-no							imported	nst	false	
+konfliktområdet	NN	|||NEU	konflikt+området			nb-no	k O n . " f l i k t . O m . % r O: . d @	nb-no							imported	nst	false	
+konfliktrådet	NN	|||NEU	konflikt+rådet			nb-no	k O n . " f l i k t . % r O: . d @	nb-no							imported	nst	false	
+konkursrådet	NN	|||NEU	konkurs+rådet			nb-no	k O N . " k }: rs . % r O: . d @	nb-no							imported	nst	false	
+konsertområdet	NN	|||NEU	konsert+området			nb-no	k O n . " s { rt . O m . % r O: . d @	nb-no							imported	nst	false	
+krigsområdet	NN	|||NEU	krig+s+området			nb-no	"" k r i g s . O m . % r O: . d @	nb-no							imported	nst	false	
+krigsrådet	NN	SIN|DEF|NOM|NEU	krig+s+rådet	krigsråd	s13a1-år	nb-no	" k r i g s . % r O: . d @	nb-no							imported	nst	false	
+kringkastingsrådet	NN	|||NEU	kringkasting+s+rådet			nb-no	"" k r i N . k A . s t i N s . % r O: . d @	nb-no							imported	nst	false	
+kriseområdet	NN	|||NEU	krise+området			nb-no	"" k r i: . s @ . O m . % r O: . d @	nb-no							imported	nst	false	
+kulturområdet	NN	|||NEU	kulturområdet			nb-no	k } l . " t }: r . O m . % r O: . d @	nb-no							imported	nst	false	
+kulturrådet	NN	|||NEU	kultur+rådet			nb-no	k } l . " t }: r . % r O: . d @	nb-no							imported	nst	false	
+kveitebrødet	NN	SIN|DEF|NOM|NEU	kveite+brødet	kveitebrød	s13a1-år	nb-no	"" k v {i . t @ . % b r 2: . @	nb-no							imported	nst	false	
+kyrkjerådet	NN	|||NEU	kyrkje+rådet			nn-no	"" C y r . C @ . % r O: . d @	nn-no							imported	nst	false	
+kåtest	JJ	SIN|IND|NOM||SUV	kåtest	kåt	a1a6D-lat	nb-no	" k O: . t @ s t	nb-no							imported	nst	false	
+landbruksområdet	NN	|||NEU	land+bruk+s+området			nb-no	"" l A n . b r }: k s . O m . % r O: . d @	nb-no							imported	nst	false	
+landområdet	NN	SIN|DEF|NOM|NEU	land+området	landområde	s11b-eple	nb-no	"" l A n . O m . % r O: . d @	nb-no							imported	nst	false	
+landskapsvernområdet	NN	SIN|DEF|NOM|NEU	landskap+s+vern+området	landskapsvernområde	s11b-eple	nb-no	"" l A n . s k A: p s . v {: rn . O m . % r O: . d @	nb-no							imported	nst	false	
+landsrådet	NN	|||NEU	land+s+rådet			nb-no	" l A n s . % r O: . d @	nb-no							imported	nst	false	
+lavinehund	NN	SIN|IND|NOM|MAS	lavine+hund	lavinehund	s1a1-dag	nb-no	l A . "" v i: . n @ . % h } n	nb-no							imported	nst	false	
+lavtrykksområdet	NN	SIN|DEF|NOM|NEU	lav+trykk+s+området	lavtrykksområde	s11b-eple	nb-no	"" l A: v . t r y k s . O m . % r O: . d @	nb-no							imported	nst	false	
+legemiddelområdet	NN	|||NEU	lege+middel+området			nb-no	"" l e: . g @ . m i . d l= . O m . % r O: . d @	nb-no							imported	nst	false	
+legerådet	NN	SIN|DEF|NOM|NEU	lege+rådet	legeråd	s11a1-blad|s13a1-år	nb-no	"" l e: . g @ . % r O: . d @	nb-no							imported	nst	false	
+legerådet	NN	|||NEU	lege+rådet			nb-no	"" l e: . g @ . % r O: . d @	nb-no							imported	nst	false	
+leirområdet	NN	|||NEU	leir+området			nb-no	" l {i r . O m . % r O: . d @	nb-no							imported	nst	false	
+lekeområdet	NN	|||NEU	leke+området			nb-no	"" l e: . k @ . O m . % r O: . d @	nb-no							imported	nst	false	
+leteområdet	NN	|||NEU	lete+området			nb-no	"" l e: . t @ . O m . % r O: . d @	nb-no							imported	nst	false	
+levebrødet	NN	SIN|DEF|NOM|NEU	levebrødet	levebrød	s13a1-år	nb-no	"" l e: . v @ . % b r 2: . @	nb-no							imported	nst	false	
+likestillingsrådet	NN	|||NEU	likestilling+s+rådet			nb-no	"" l i: . k @ . s t i . l i N s . % r O: . d @	nb-no							imported	nst	false	
+lundehund	NN	SIN|IND|NOM|MAS	lunde+hund	lundehund	s1a1-dag	nb-no	"" l } n . d @ . % h } n	nb-no							imported	nst	false	
+lågtrykksområdet	NN	SIN|DEF|NOM|NEU	låg+trykk+s+området	lågtrykksområde	s11b-eple	nb-no	"" l O: g . t r y k s . O m . % r O: . d @	nb-no							imported	nst	false	
+lærerrådet	NN	SIN|DEF|NOM|NEU	lærer+rådet	lærerråd	s13a1-år	nb-no	"" l {: . r @ r . % r O: . d @	nb-no							imported	nst	false	
+lærerutdanningsrådet	NN	|||NEU	lærer+utdanning+s+rådet			nb-no	"" l {: . r @ r . }: t . d A . n i N s . % r O: . d @	nb-no							imported	nst	false	
+læringsområdet	NN	|||NEU	læring+s+området			nb-no	"" l {: . r i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+mandatområdet	NN	SIN|DEF|NOM|NEU	mandat+området	mandatområde	s11b-eple	nb-no	m A n . " d A: t . O m . % r O: . d @	nb-no							imported	nst	false	
+markarådet	NN	|||NEU	marka+rådet			nb-no	" m A r . k A . % r O: . d @	nb-no							imported	nst	false	
+markedsrådet	NN	|||NEU	marked+s+rådet			nb-no	"" m A r . k @ d s . % r O: . d @	nb-no							imported	nst	false	
+marsipanbrødet	NN	SIN|DEF|NOM|NEU	marsipan+brødet	marsipanbrød	s13a1-år	nb-no	m A . rs i . " p A: n . % b r 2: . @	nb-no							imported	nst	false	
+mellomtoneområdet	NN	|||NEU	mellom+tone+området			nb-no	"" m e . l O m . t u: . n @ . O m . % r O: . d @	nb-no							imported	nst	false	
+menighetsrådet	NN	SIN|DEF|NOM|NEU	menighet+s+rådet	menighetsråd	s13a1-år	nb-no	"" m e: . n i . h e: t s . % r O: . d @	nb-no							imported	nst	false	
+menneskeapa	NN	SIN|DEF|NOM|FEM	menneske+apa	menneskeape	s6c-gate	nb-no	"" m e . n @ . s k @ . % A: . p A	nb-no							imported	nst	false	
+messeområdet	NN	|||NEU	messe+området			nb-no	"" m e . s @ . O m . % r O: . d @	nb-no							imported	nst	false	
+militærrådet	NN	|||NEU	militær+rådet			nb-no	m i . l i . " t {: r . % r O: . d @	nb-no							imported	nst	false	
+miljøområdet	NN	|||NEU	miljø+området			nb-no	m i l . " j 2: . O m . % r O: . d @	nb-no							imported	nst	false	
+ministerrådet	NN	SIN|DEF|NOM|NEU	minister+rådet	ministerråd	s13a1-år	nb-no	m i . " n i . s t @ r . % r O: . d @	nb-no							imported	nst	false	
+ministerrådet	NN	|||NEU	minister+rådet			nb-no	m i . " n i s . t @ r . % r O: . d @	nb-no							imported	nst	false	
+mobilområdet	NN	|||NEU	mobil+området			nb-no	m u . " b i: l . O m . % r O: . d @	nb-no							imported	nst	false	
+modenhetstest	NN	|||MAS	modenhet+s+test			nb-no	"" m u: . d n= . h e: t s . % t e s t	nb-no							imported	nst	false	
+målområdet	NN	|||NEU	mål+området			nb-no	"" m O: l . O m . % r O: . d @	nb-no							imported	nst	false	
+mætest	JJ	SIN|IND|NOM||SUV	mætest	mæt	a1a6A-hvit	nb-no	" m {: . t @ s t	nb-no							imported	nst	false	
+narkotikahund	NN	SIN|IND|NOM|MAS	narkotika+hund	narkotikahund	s1a1-dag	nb-no	n A r . " k u: . t i . k A . % h } n	nb-no							imported	nst	false	
+nasjonalrådet	NN	|||NEU	nasjonal+rådet			nb-no	n A . S u . " n A: l . % r O: . d @	nb-no							imported	nst	false	
+naturområdet	NN	|||NEU	natur+området			nb-no	n A . " t }: r . O m . % r O: . d @	nb-no							imported	nst	false	
+nedbørområdet	NN	SIN|DEF|NOM|NEU	nedbør+området	nedbørområde	s11b-eple	nb-no	"" n e: . b 2: r . O m . % r O: . d @	nb-no							imported	nst	false	
+nedbørsområdet	NN	SIN|DEF|NOM|NEU	nedbør+s+området	nedbørsområde	s11b-eple	nb-no	"" n e: . b 2: rs . O m . % r O: . d @	nb-no							imported	nst	false	
+nedslagsområdet	NN	SIN|DEF|NOM|NEU	nedslag+s+området	nedslagsområde	s11b-eple	nb-no	"" n e: . S l A: g s . O m . % r O: . d @	nb-no							imported	nst	false	
+nedslagsområdet	NN	|||NEU	nedslag+s+området			nb-no	"" n e: d . S l A: g s . O m . % r O: . d @	nb-no							imported	nst	false	
+newfoundlandshund	NN	SIN|IND|NOM|MAS	newfoundland+s+hund	newfoundlandshund	s1a1-dag	nb-no	n j } . " f u n d . l @ n s . % h u n	nb-no							imported	nst	false	
+nordområdet	NN	|||NEU	nord+området			nb-no	"" n u: . r O m . % r O: . d @	nb-no							imported	nst	false	
+norgesnettrådet	NN	|||NEU	norge+s+nett+rådet			nb-no	"" n O r . g @ s . n @ t . % r O: . d @	nb-no							imported	nst	false	
+nådebrødet	NN	|||NEU	nådebrødet			nb-no	"" n O: . d @ . % b r 2: . @	nb-no							imported	nst	false	
+nådsensbrødet	NN	SIN|DEF|NOM|NEU	nådsen+s+brødet	nådsensbrød	s13a1-år	nb-no	"" n O: d . s n= s . % b r 2: . @	nb-no							imported	nst	false	
+næringslivsrådet	NN	|||NEU	næring+s+liv+s+rådet			nb-no	"" n {: . r i N s . l i: v s . % r O: . d @	nb-no							imported	nst	false	
+næringsmiddelområdet	NN	|||NEU	næring+s+middel+området			nb-no	"" n {: . r i N s . m i . d l= . O m . % r O: . d @	nb-no							imported	nst	false	
+næringsområdet	NN	|||NEU	næring+s+området			nb-no	"" n {: . r i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+næringsrådet	NN	|||NEU	næring+s+rådet			nb-no	"" n {: . r i N s . % r O: . d @	nb-no							imported	nst	false	
+nærområdet	NN	|||NEU	nær+området			nb-no	"" n {: r . O m . % r O: . d @	nb-no							imported	nst	false	
+nødet	VB	AKT|PF-PRT|SIN|IND|NOM	nødet	nøde	v1a-lempe	nb-no	"" n 2: . d @ t	nb-no							imported	nst	false	
+området	NN	SIN|DEF|NOM|NEU	området	område	s11b-eple	nb-no	"" O m . % r O: . d @	nb-no							imported	nst	false	
+omsetningsrådet	NN	|||NEU	omsetning+s+rådet			nb-no	" O m . s @ t . n i N s . % r O: . d @	nb-no							imported	nst	false	
+operasjonsområdet	NN	|||NEU	operasjon+s+området			nb-no	u . p @ . r A . " S u: n s . O m . % r O: . d @	nb-no							imported	nst	false	
+opplysningsrådet	NN	|||NEU	opplysning+s+rådet			nb-no	" O . p l y: . s n i N s . % r O: . d @	nb-no							imported	nst	false	
+opplæringsrådet	NN	|||NEU	opplæring+s+rådet			nb-no	" O . p l {: . r i N s . % r O: . d @	nb-no							imported	nst	false	
+oppmarsjområdet	NN	SIN|DEF|NOM|NEU	oppmarsj+området	oppmarsjområde	s11b-eple	nb-no	"" O p . m A rs . O m . % r O: . d @	nb-no							imported	nst	false	
+oppvekstområdet	NN	|||NEU	oppvekst+området			nb-no	"" O p . v @ k s t . O m . % r O: . d @	nb-no							imported	nst	false	
+ordforrådet	NN	SIN|DEF|NOM|NEU	ord+forrådet	ordforråd	s13a1-år	nb-no	"" u: r . f O . % r O: . d @	nb-no							imported	nst	false	
+parkområdet	NN	|||NEU	park+området			nb-no	" p A r k . O m . % r O: . d @	nb-no							imported	nst	false	
+pitabrødet	NN	SIN|DEF|NOM|NEU	pitabrødet	pitabrød	s13a1-år	nb-no	" p i: . t A . % b r 2: . @	nb-no							imported	nst	false	
+planområdet	NN	|||NEU	plan+området			nb-no	"" p l A: n . O m . % r O: . d @	nb-no							imported	nst	false	
+politihund	NN	SIN|IND|NOM|MAS	politi+hund	politihund	s1a1-dag	nb-no	p u . l i . " t i: . % h } n	nb-no							imported	nst	false	
+presidentrådet	NN	|||NEU	president+rådet			nb-no	p r @ . s i . " d e n t . % r O: . d @	nb-no							imported	nst	false	
+pressområdet	NN	SIN|DEF|NOM|NEU	press+området	pressområde	s11b-eple	nb-no	" p r e s . O m . % r O: . d @	nb-no							imported	nst	false	
+prisrådet	NN	|||NEU	pris+rådet			nb-no	" p r i: s . % r O: . d @	nb-no							imported	nst	false	
+problemområdet	NN	|||NEU	problem+området			nb-no	p r u . " b l e: m . O m . % r O: . d @	nb-no							imported	nst	false	
+professorrådet	NN	SIN|DEF|NOM|NEU	professor+rådet	professorråd	s13a1-år	nb-no	p r u . " f e . s u r . % r O: . d @	nb-no							imported	nst	false	
+programrådet	NN	|||NEU	program+rådet			nb-no	p r u . " g r A m . % r O: . d @	nb-no							imported	nst	false	
+prosjektområdet	NN	|||NEU	prosjekt+området			nb-no	p r u . " S e k t . O m . % r O: . d @	nb-no							imported	nst	false	
+præriehund	NN	SIN|IND|NOM|MAS	prærie+hund	præriehund	s1a1-dag	nb-no	" p r {: . r i . @ . % h } n	nb-no							imported	nst	false	
+rasområdet	NN	|||NEU	ras+området			nb-no	" r A: s . O m . % r O: . d @	nb-no							imported	nst	false	
+redaksjonsrådet	NN	|||NEU	redaksjon+s+rådet			nb-no	r @ . d A k . " S u: n s . % r O: . d @	nb-no							imported	nst	false	
+regionrådet	NN	|||NEU	region+rådet			nb-no	r @ . g i . " u: n . % r O: . d @	nb-no							imported	nst	false	
+reiselivsrådet	NN	|||NEU	reise+liv+s+rådet			nb-no	"" r {i . s @ . l i: v s . % r O: . d @	nb-no							imported	nst	false	
+rekreasjonsområdet	NN	SIN|DEF|NOM|NEU	rekreasjon+s+området	rekreasjonsområde	s11b-eple	nb-no	r @ . k r @ . A . " S u: n s . O m . % r O: . d @	nb-no							imported	nst	false	
+reliktområdet	NN	SIN|DEF|NOM|NEU	relikt+området	reliktområde	s11b-eple	nb-no	r @ . " l i k t . O m . % r O: . d @	nb-no							imported	nst	false	
+resepsjonsområdet	NN	|||NEU	resepsjon+s+området			nb-no	r @ . s @ p . " S u: n s . O m . % r O: . d @	nb-no							imported	nst	false	
+resultatområdet	NN	|||NEU	resultat+området			nb-no	r @ . s } l . " t A: t . O m . % r O: . d @	nb-no							imported	nst	false	
+revolusjonsrådet	NN	|||NEU	revolusjon+s+rådet			nb-no	r @ . v u . l } . " S u: n s . % r O: . d @	nb-no							imported	nst	false	
+riksrådet	NN	SIN|DEF|NOM|NEU	riksrådet	riksråd	s13a1-år	nb-no	" r i k s . % r O: . d @	nb-no							imported	nst	false	
+rugbrødet	NN	SIN|DEF|NOM|NEU	rug+brødet	rugbrød	s13a1-år	nb-no	"" r }: g . % b r 2: . @	nb-no							imported	nst	false	
+rådet	NN	SIN|DEF|NOM|NEU	rådet	råd	s11a1-blad|s13a1-år	nb-no	" r O: . d @	nb-no							imported	nst	false	
+rådet	NN	|||NEU	rådet			nb-no	" r O: . d @	nb-no							imported	nst	false	
+rådet	VB		rådet			nb-no	"" r O: . d @ t	nb-no							imported	nst	false	
+saksområdet	NN	|||NEU	sak+s+området			nb-no	" s A: k s . O m . % r O: . d @	nb-no							imported	nst	false	
+samarbeidsområdet	NN	|||NEU	samarbeid+s+området			nb-no	"" s A . m A r . b {i d s . O m . % r O: . d @	nb-no							imported	nst	false	
+samarbeidsrådet	NN	|||NEU	samarbeid+s+rådet			nb-no	"" s A . m A r . b {i d s . % r O: . d @	nb-no							imported	nst	false	
+samojedhund	NN	SIN|IND|NOM|MAS	samojed+hund	samojedhund	s1a1-dag	nb-no	s A . m u . " j e: d . % h } n	nb-no							imported	nst	false	
+samordningsrådet	NN	|||NEU	samordning+s+rådet			nb-no	"" s A . m O rd . rn i N s . % r O: . d @	nb-no							imported	nst	false	
+samrådet	NN	SIN|DEF|NOM|NEU	samrådet	samråd	s13a1-år	nb-no	"" s A m . % r O: . d @	nb-no							imported	nst	false	
+sanktbernhardshund	NN	SIN|IND|NOM|MAS	sanktbernhard+s+hund	sanktbernhardshund	s1a1-dag	nb-no	s A N t . " b {: . rn A rd rs . % h } n	nb-no							imported	nst	false	
+satsingsområdet	NN	|||NEU	satsing+s+området			nb-no	"" s A t . s i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+satsningsområdet	NN	|||NEU	satsning+s+området			nb-no	"" s A t . s n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+seksjonsrådet	NN	|||NEU	seksjon+s+rådet			nb-no	s @ k . " S u: n s . % r O: . d @	nb-no							imported	nst	false	
+selvstyrerådet	NN	|||NEU	selv+styre+rådet			nb-no	"" s e l . s t y: . r @ . % r O: . d @	nb-no							imported	nst	false	
+sentralrådet	NN	|||NEU	sentral+rådet			nb-no	s @ n . " t r A: l . % r O: . d @	nb-no							imported	nst	false	
+sentrumsområdet	NN	|||NEU	sentrum+s+området			nb-no	"" s e n . t r } m s . O m . % r O: . d @	nb-no							imported	nst	false	
+sikkerhetsrådet	NN	SIN|DEF|NOM|NEU	sikkerhet+s+rådet	sikkerhetsråd	s13a1-år	nb-no	" s i . k @ r . h e: t s . % r O: . d @	nb-no							imported	nst	false	
+sjøområdet	NN	|||NEU	sjø+området			nb-no	"" S 2: . O m . % r O: . d @	nb-no							imported	nst	false	
+skauområdet	NN	SIN|DEF|NOM|NEU	skau+området	skauområde	s11b-eple	nb-no	"" s k A} . O m . % r O: . d @	nb-no							imported	nst	false	
+skaurådet	NN	SIN|DEF|NOM|NEU	skau+rådet	skauråd	s13a1-år	nb-no	"" s k A} . % r O: . d @	nb-no							imported	nst	false	
+skipshund	NN	SIN|IND|NOM|MAS	skip+s+hund	skipshund	s1a1-dag	nb-no	" S i p s . % h } n	nb-no							imported	nst	false	
+skipsrådet	NN	SIN|DEF|NOM|NEU	skip+s+rådet	skipsråd	s13a1-år	nb-no	" S i p s . % r O: . d @	nb-no							imported	nst	false	
+skjødet	NN	SIN|DEF|NOM|NEU	skjødet	skjød	s13a1-år	nb-no	" S 2: . d @	nb-no							imported	nst	false	
+skogområdet	NN	SIN|DEF|NOM|NEU	skog+området	skogområde	s11b-eple	nb-no	"" s k u: g . O m . % r O: . d @	nb-no							imported	nst	false	
+skogrådet	NN	SIN|DEF|NOM|NEU	skog+rådet	skogråd	s13a1-år	nb-no	"" s k u: g . % r O: . d @	nb-no							imported	nst	false	
+skogsområdet	NN	SIN|DEF|NOM|NEU	skog+s+området	skogsområde	s11b-eple	nb-no	" s k u g s . O m . % r O: . d @	nb-no							imported	nst	false	
+skolebrødet	NN	SIN|DEF|NOM|NEU	skole+brødet	skolebrød	s13a1-år	nb-no	"" s k u: . l @ . % b r 2: . @	nb-no							imported	nst	false	
+skolebyrådet	NN	|||NEU	skole+by+rådet			nb-no	"" s k u: . l @ . b y: . % r O: . d @	nb-no							imported	nst	false	
+skoleområdet	NN	|||NEU	skole+området			nb-no	"" s k u: . l @ . O m . % r O: . d @	nb-no							imported	nst	false	
+skolerådet	NN	SIN|DEF|NOM|NEU	skole+rådet	skoleråd	s13a1-år	nb-no	"" s k u: . l @ . % r O: . d @	nb-no							imported	nst	false	
+skrivarbrødet	NN	SIN|DEF|NOM|NEU	skrivarbrødet	skrivarbrød	s13a1-år	nb-no	"" s k r i: . v A r . % b r 2: . @	nb-no							imported	nst	false	
+skuebrødet	NN	SIN|DEF|NOM|NEU	skue+brødet	skuebrød	s13a1-år	nb-no	"" s k }: . @ . % b r 2: . @	nb-no							imported	nst	false	
+smørbrødet	NN	SIN|DEF|NOM|NEU	smør+brødet	smørbrød	s13a1-år	nb-no	" s m 2 r . % b r 2: . @	nb-no							imported	nst	false	
+sporhund	NN	SIN|IND|NOM|MAS	spor+hund	sporhund	s1a1-dag	nb-no	"" s p u: r . % h } n	nb-no							imported	nst	false	
+sporområdet	NN	|||NEU	spor+området			nb-no	"" s p u: r . O m . % r O: . d @	nb-no							imported	nst	false	
+språkrådet	NN	|||NEU	språk+rådet			nb-no	"" s p r O: k . % r O: . d @	nb-no							imported	nst	false	
+språktest	NN	|||MAS	språk+test			nb-no	"" s p r O: k . % t e s t	nb-no							imported	nst	false	
+stasjonsområdet	NN	|||NEU	stasjon+s+området			nb-no	s t A . " S u: n s . O m . % r O: . d @	nb-no							imported	nst	false	
+statsrådet	NN	SIN|DEF|NOM|NEU	stat+s+rådet	statsråd	s13a1-år	nb-no	" s t A: t s . % r O: . d @	nb-no							imported	nst	false	
+stillehavsområdet	NN	|||NEU	stillehav+s+området			nb-no	"" s t i . l @ . h A: v s . O m . % r O: . d @	nb-no							imported	nst	false	
+straffelovrådet	NN	|||NEU	straffe+lov+rådet			nb-no	"" s t r A . f @ . l O: v . % r O: . d @	nb-no							imported	nst	false	
+strandområdet	NN	|||NEU	strand+området			nb-no	"" s t r A n . O m . % r O: . d @	nb-no							imported	nst	false	
+studentrådet	NN	|||NEU	student+rådet			nb-no	s t } . " d e n t . % r O: . d @	nb-no							imported	nst	false	
+sukkerbrødet	NN	SIN|DEF|NOM|NEU	sukker+brødet	sukkerbrød	s13a1-år	nb-no	"" s u . k @ r . % b r 2: . @	nb-no							imported	nst	false	
+supperådet	NN	SIN|DEF|NOM|NEU	suppe+rådet	supperåd	s13a1-år	nb-no	"" s } . p @ . % r O: . d @	nb-no							imported	nst	false	
+surbrødet	NN	SIN|DEF|NOM|NEU	surbrødet	surbrød	s13a1-år	nb-no	"" s }: r . % b r 2: . @	nb-no							imported	nst	false	
+svikrådet	NN	SIN|DEF|NOM|NEU	svikrådet	svikråd	s13a1-år	nb-no	"" s v i: . % k r O: . d @	nb-no							imported	nst	false	
+sykehusområdet	NN	|||NEU	syke+hus+området			nb-no	"" s y: . k @ . h }: s . O m . % r O: . d @	nb-no							imported	nst	false	
+søtest	JJ	SIN|IND|NOM||SUV	søtest	søt	a1a6A-hvit	nb-no	" s 2: . t @ s t	nb-no							imported	nst	false	
+tariffområdet	NN	|||NEU	tariff+området			nb-no	t A . " r i f . O m . % r O: . d @	nb-no							imported	nst	false	
+tartarsmørbrødet	NN	SIN|DEF|NOM|NEU	tartar+smørbrødet	tartarsmørbrød	s13a1-år	nb-no	t A . " rt A: r . s m 2 r . % b r 2: . @	nb-no							imported	nst	false	
+tatarsmørbrødet	NN	SIN|DEF|NOM|NEU	tatar+smørbrødet	tatarsmørbrød	s13a1-år	nb-no	t A . " t A: r . s m 2 r . % b r 2: . @	nb-no							imported	nst	false	
+tebrødet	NN	SIN|DEF|NOM|NEU	te+brødet	tebrød	s13a1-år	nb-no	" t e: . % b r 2: . @	nb-no							imported	nst	false	
+telekommunikasjonsrådet	NN	|||NEU	telekommunikasjon+s+rådet			nb-no	"" t e: . l @ . k u . m } . n i . k A . S u: n s . % r O: . d @	nb-no							imported	nst	false	
+teleområdet	NN	|||NEU	teleområdet			nb-no	"" t e: . l @ . O m . % r O: . d @	nb-no							imported	nst	false	
+teletorgrådet	NN	|||NEU	teletorg+rådet			nb-no	"" t e: l @ . t O r g . % r O: . d @	nb-no							imported	nst	false	
+teoritest	NN	|||MAS	teori+test			nb-no	t @ . u . " r i: . % t e s t	nb-no							imported	nst	false	
+terminalområdet	NN	|||NEU	terminal+området			nb-no	t @ r . m i . " n A: l . O m . % r O: . d @	nb-no							imported	nst	false	
+test	NN	SIN|IND|NOM|MAS	test	test	s1a1-dag	nb-no	" t e s t	nb-no							imported	nst	false	
+test	VB	AKT|IMP	test	teste	v0a-lempe|v1a-lempe	nb-no	" t e s t	nb-no							imported	nst	false	
+testen	NN	SIN|DEF|NOM|MAS	testen	test	s1a1-dag	nb-no	" t e . s t n=	nb-no							imported	nst	false	
+testene	NN	PLU|DEF|NOM|MAS	testene	test	s1a1-dag	nb-no	"" t e . s t n= . @	nb-no							imported	nst	false	
+testenes	NN	PLU|DEF|GEN|MAS	testenes	test	s1a1-dag	nb-no	"" t e . s t n= . @ s	nb-no							imported	nst	false	
+testens	NN	SIN|DEF|GEN|MAS	testens	test	s1a1-dag	nb-no	" t e . s t n= s	nb-no							imported	nst	false	
+tester	NN	PLU|IND|NOM|MAS	tester	test	s1a1-dag	nb-no	"" t e . s t @ r	nb-no							imported	nst	false	
+testers	NN	PLU|IND|GEN|MAS	testers	test	s1a1-dag	nb-no	"" t e . s t @ rs	nb-no							imported	nst	false	
+testfamiliene	NN	|||MAS	test+familiene			nb-no	" t e s t . f A . % m i: . l i . @ . n @	nb-no							imported	nst	false	
+testflyger	NN	SIN|IND|NOM|MAS	test+flyger	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ r	nb-no							imported	nst	false	
+testflygere	NN	PLU|IND|NOM|MAS	test+flygere	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ . r @	nb-no							imported	nst	false	
+testflygeren	NN	SIN|DEF|NOM|MAS	test+flygeren	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ . n`=	nb-no							imported	nst	false	
+testflygerens	NN	SIN|DEF|GEN|MAS	test+flygerens	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ r rn S	nb-no							imported	nst	false	
+testflygerer	NN	PLU|IND|NOM|MAS	test+flygerer	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ . r @ r	nb-no							imported	nst	false	
+testflygerers	NN	PLU|IND|GEN|MAS	test+flygerers	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ . r @ rs	nb-no							imported	nst	false	
+testflygeres	NN	PLU|IND|GEN|MAS	test+flygeres	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ . r @ s	nb-no							imported	nst	false	
+testflygerne	NN	PLU|DEF|NOM|MAS	test+flygerne	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ . rn @	nb-no							imported	nst	false	
+testflygernes	NN	PLU|DEF|GEN|MAS	test+flygernes	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ r . rn @ s	nb-no							imported	nst	false	
+testflygers	NN	SIN|IND|GEN|MAS	test+flygers	testflyger	s2a-baker	nb-no	" t e s t . % f l y: . g @ rs	nb-no							imported	nst	false	
+testfører	NN	SIN|IND|NOM|MAS	test+fører	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ r	nb-no							imported	nst	false	
+testførere	NN	PLU|IND|NOM|MAS	test+førere	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ . r @	nb-no							imported	nst	false	
+testføreren	NN	SIN|DEF|NOM|MAS	test+føreren	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ . n`=	nb-no							imported	nst	false	
+testførerens	NN	SIN|DEF|GEN|MAS	test+førerens	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ r rn S	nb-no							imported	nst	false	
+testførerer	NN	PLU|IND|NOM|MAS	test+førerer	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ . r @ r	nb-no							imported	nst	false	
+testførerers	NN	PLU|IND|GEN|MAS	test+førerers	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ . r @ rs	nb-no							imported	nst	false	
+testføreres	NN	PLU|IND|GEN|MAS	test+føreres	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ . r @ s	nb-no							imported	nst	false	
+testførerne	NN	PLU|DEF|NOM|MAS	test+førerne	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ . rn @	nb-no							imported	nst	false	
+testførernes	NN	PLU|DEF|GEN|MAS	test+førernes	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ r . rn @ s	nb-no							imported	nst	false	
+testførers	NN	SIN|IND|GEN|MAS	test+førers	testfører	s2a-baker	nb-no	" t e s t . % f 2: . r @ rs	nb-no							imported	nst	false	
+testgruppen	NN	|||MAS	test+gruppen			nb-no	" t e s t . % g r } . p @ n	nb-no							imported	nst	false	
+testkamp	NN	|||MAS	test+kamp			nb-no	" t e s t . % k A m p	nb-no							imported	nst	false	
+testkampen	NN		test+kampen			nb-no	" t e s t . % k A m . p @ n	nb-no							imported	nst	false	
+testkjøring	NN	|||MAS-FEM	test+kjøring			nb-no	" t e s t . % C 2: . r i N	nb-no							imported	nst	false	
+testkjøringen	NN	|||MAS	test+kjøringen			nb-no	" t e s t . % C 2: . r i N . @ n	nb-no							imported	nst	false	
+testkort	NN	|||NEU	test+kort			nb-no	" t e s t . % k O rt	nb-no							imported	nst	false	
+testkriterier	NN	|||NEU	test+kriterier			nb-no	" t e s t . k r i . % t e: . r i . @ r	nb-no							imported	nst	false	
+testløp	NN	SIN-PLU|IND|NOM|NEU	test+løp	testløp	s13a1-år	nb-no	" t e s t . % l 2: p	nb-no							imported	nst	false	
+testløp	NN	|||NEU	test+løp			nb-no	" t e s t . % l 2: p	nb-no							imported	nst	false	
+testløpa	NN	PLU|DEF|NOM|NEU	test+løpa	testløp	s13a1-år	nb-no	" t e s t . % l 2: . p A	nb-no							imported	nst	false	
+testløpas	NN	PLU|DEF|GEN|NEU	test+løpas	testløp	s13a1-år	nb-no	" t e s t . % l 2: . p A s	nb-no							imported	nst	false	
+testløpene	NN	PLU|DEF|NOM|NEU	test+løpene	testløp	s13a1-år	nb-no	" t e s t . % l 2: . p @ . n @	nb-no							imported	nst	false	
+testløpenes	NN	PLU|DEF|GEN|NEU	test+løpenes	testløp	s13a1-år	nb-no	" t e s t . % l 2: . p @ . n @ s	nb-no							imported	nst	false	
+testløpet	NN	SIN|DEF|NOM|NEU	test+løpet	testløp	s13a1-år	nb-no	" t e s t . % l 2: . p @	nb-no							imported	nst	false	
+testløpets	NN	SIN|DEF|GEN|NEU	test+løpets	testløp	s13a1-år	nb-no	" t e s t . % l 2: . p @ t s	nb-no							imported	nst	false	
+testløps	NN	SIN-PLU|IND|GEN|NEU	test+løps	testløp	s13a1-år	nb-no	" t e s t . % l 2: p s	nb-no							imported	nst	false	
+testmaskiner	NN	|||MAS-FEM	test+maskiner			nb-no	" t e s t . m A . % S i: . n @ r	nb-no							imported	nst	false	
+testmetoder	NN	|||MAS	test+metoder			nb-no	" t e s t . m @ . % t u: . d @ r	nb-no							imported	nst	false	
+testpanel	NN	|||NEU	test+panel			nb-no	" t e s t . p A . % n e: l	nb-no							imported	nst	false	
+testpanelet	NN	|||NEU	test+panelet			nb-no	" t e s t . p A . % n e: . l @	nb-no							imported	nst	false	
+testpassasjer	NN	|||MAS	test+passasjer			nb-no	" t e s t . p A . s A . % S e: r	nb-no							imported	nst	false	
+testperioden	NN	|||MAS	test+perioden			nb-no	" t e s t . p @ . r i . % u: . d n=	nb-no							imported	nst	false	
+testpersonene	NN	|||MAS	test+personene			nb-no	" t e s t . p @ . % rs u: . n n= . @	nb-no							imported	nst	false	
+testpersonenes	NN	|||MAS	test+personenes			nb-no	" t e s t . p @ . % rs u: . n n= . @ s	nb-no							imported	nst	false	
+testprogram	NN	|||NEU	test+program			nb-no	" t e s t . p r u . % g r A: m	nb-no							imported	nst	false	
+testprogrammet	NN	|||NEU	test+programmet			nb-no	" t e s t . p r u . % g r A . m @	nb-no							imported	nst	false	
+testrenn	NN	|||NEU	test+renn			nb-no	" t e s t . % r e n	nb-no							imported	nst	false	
+testresultatene	NN	|||NEU	test+resultatene			nb-no	" t e s t . r @ . s } l . % t A: . t n= . @	nb-no							imported	nst	false	
+testresultater	NN	|||NEU	test+resultater			nb-no	" t e s t . r @ . s } l . % t A: . t @ r	nb-no							imported	nst	false	
+testresultatet	NN	|||NEU	test+resultatet			nb-no	" t e s t . r @ . s } l . % t A: . t @	nb-no							imported	nst	false	
+tests	NN	SIN|IND|GEN|MAS	tests	test	s1a1-dag	nb-no	" t e s t s	nb-no							imported	nst	false	
+testsenter	NN	|||NEU	test+senter			nb-no	" t e s t . % s e n . t @ r	nb-no							imported	nst	false	
+teststasjonene	NN	|||MAS	test+stasjonene			nb-no	" t e s t . s t A . % S u: . n n= . @	nb-no							imported	nst	false	
+teststedene	NN	|||NEU	test+stedene			nb-no	" t e s t . % s t e: . d n= . @	nb-no							imported	nst	false	
+testsystem	NN	|||NEU	test+system			nb-no	" t e s t . s y . % s t e: m	nb-no							imported	nst	false	
+testutvalg	NN	|||NEU	test+utvalg			nb-no	" t e s t . }: . % t v A l g	nb-no							imported	nst	false	
+testvinner	NN	|||MAS	test+vinner			nb-no	" t e s t . % v i . n @ r	nb-no							imported	nst	false	
+tilrådet	VB		tilrådet			nb-no	" t i l . % r O: . d @ t	nb-no							imported	nst	false	
+tilsettingsrådet	NN	|||NEU	tilsetting+s+rådet			nb-no	" t i l . s @ . t i N s . % r O: . d @	nb-no							imported	nst	false	
+tilsynsrådet	NN	SIN|DEF|NOM|NEU	tilsyn+s+rådet	tilsynsråd	s13a1-år	nb-no	"" t i l . s y: n s . % r O: . d @	nb-no							imported	nst	false	
+tobakkskaderådet	NN	|||NEU	tobakk+skade+rådet			nb-no	" t u . n A k . s k A: . d @ . % r O: . d @	nb-no	t u . " b A k . s k A: . d @ . % r O: . d @	nb-no					imported	nst	false	
+tobakksskaderådet	NN	|||NEU	tobakk+s+skade+rådet			nb-no	" t u . b A k s . s k A: . d @ . % r O: . d @	nb-no	t u . " b A k s . s k A: . d @ . % r O: . d @	nb-no					imported	nst	false	
+tomteområdet	NN	|||NEU	tomte+området			nb-no	"" t u m . t @ . O m . % r O: . d @	nb-no							imported	nst	false	
+trafikksikkerhetsrådet	NN	|||NEU	trafikk+sikkerhet+s+rådet			nb-no	t r A . " f i k . s i . k @ r . h e: t s . % r O: . d @	nb-no							imported	nst	false	
+trepartibyrådet	NN	|||NEU	tre+parti+by+rådet			nb-no	" t r e: . p A . rt i: . b y: . % r O: . d @	nb-no							imported	nst	false	
+trykktest	NN	|||MAS	trykk+test			nb-no	" t r y k . % t e s t	nb-no							imported	nst	false	
+trådede	JJ	PLU|IND|NOM||POS	trådede	trådet	a4a-farget	nb-no	"" t r O: . @ . d @	nb-no							imported	nst	false	
+trådede	JJ	PLU|IND|NOM||POS	trådede	trådet	a4a-farget	nb-no	"" t r O: . @ . d @	nb-no							imported	nst	false	
+trådede	JJ	SIN-PLU|DEF|NOM||POS	trådede	trådet	a4a-farget	nb-no	"" t r O: . @ . d @	nb-no							imported	nst	false	
+trådede	JJ	SIN-PLU|DEF|NOM||POS	trådede	trådet	a4a-farget	nb-no	"" t r O: . @ . d @	nb-no							imported	nst	false	
+trådedes	JJ	PLU|IND|GEN||POS	trådedes	trådet	a4a-farget	nb-no	"" t r O: . @ . d @ s	nb-no							imported	nst	false	
+trådedes	JJ	PLU|IND|GEN||POS	trådedes	trådet	a4a-farget	nb-no	"" t r O: . @ . d @ s	nb-no							imported	nst	false	
+trådedes	JJ	SIN-PLU|DEF|GEN||POS	trådedes	trådet	a4a-farget	nb-no	"" t r O: . @ . d @ s	nb-no							imported	nst	false	
+trådedes	JJ	SIN-PLU|DEF|GEN||POS	trådedes	trådet	a4a-farget	nb-no	"" t r O: . @ . d @ s	nb-no							imported	nst	false	
+trådet	JJ	SIN|IND|NOM|MAS-FEM|POS	trådet	trådet	a6a-leddelt	nb-no	"" t r O: . @ t	nb-no							imported	nst	false	
+trådet	JJ	SIN|IND|NOM|NEU-MAS-FEM|POS	trådet	trådet	a4a-farget	nb-no	"" t r O: . @ t	nb-no							imported	nst	false	
+trådet	JJ	SIN|IND|NOM|NEU-MAS-FEM|POS	trådet	trådet	a4a-farget	nb-no	"" t r O: . @ t	nb-no							imported	nst	false	
+trådet	JJ	SIN|IND|NOM|NEU|POS	trådet	trådet	a6a-leddelt	nb-no	"" t r O: . @ t	nb-no							imported	nst	false	
+trådet	VB	AKT|PF-PRT|SIN|IND|NOM	trådet	tråde	v1a-lempe	nb-no	"" t r O: . @ t	nb-no							imported	nst	false	
+trådete	JJ	PLU|IND|NOM||POS	trådete	trådet	a4a-farget	nb-no	"" t r O: . @ . t @	nb-no							imported	nst	false	
+trådete	JJ	PLU|IND|NOM||POS	trådete	trådet	a6a-leddelt	nb-no	"" t r O: . @ . t @	nb-no							imported	nst	false	
+trådete	JJ	PLU|IND|NOM||POS	trådete	trådet	a4a-farget	nb-no	"" t r O: . @ . t @	nb-no							imported	nst	false	
+trådete	JJ	SIN-PLU|DEF|NOM||POS	trådete	trådet	a4a-farget	nb-no	"" t r O: . @ . t @	nb-no							imported	nst	false	
+trådete	JJ	SIN-PLU|DEF|NOM||POS	trådete	trådet	a4a-farget	nb-no	"" t r O: . @ . t @	nb-no							imported	nst	false	
+trådete	JJ	SIN-PLU|DEF|NOM||POS	trådete	trådet	a6a-leddelt	nb-no	"" t r O: . @ . t @	nb-no							imported	nst	false	
+trådetes	JJ	PLU|IND|GEN||POS	trådetes	trådet	a4a-farget	nb-no	"" t r O: . @ . t @ s	nb-no							imported	nst	false	
+trådetes	JJ	PLU|IND|GEN||POS	trådetes	trådet	a4a-farget	nb-no	"" t r O: . @ . t @ s	nb-no							imported	nst	false	
+trådetes	JJ	PLU|IND|GEN||POS	trådetes	trådet	a6a-leddelt	nb-no	"" t r O: . @ . t @ s	nb-no							imported	nst	false	
+trådetes	JJ	SIN-PLU|DEF|GEN||POS	trådetes	trådet	a4a-farget	nb-no	"" t r O: . @ . t @ s	nb-no							imported	nst	false	
+trådetes	JJ	SIN-PLU|DEF|GEN||POS	trådetes	trådet	a4a-farget	nb-no	"" t r O: . @ . t @ s	nb-no							imported	nst	false	
+trådetes	JJ	SIN-PLU|DEF|GEN||POS	trådetes	trådet	a6a-leddelt	nb-no	"" t r O: . @ . t @ s	nb-no							imported	nst	false	
+trådets	JJ	SIN|IND|GEN|MAS-FEM|POS	trådets	trådet	a4a-farget	nb-no	"" t r O: . @ t s	nb-no							imported	nst	false	
+trådets	JJ	SIN|IND|GEN|NEU-MAS-FEM|POS	trådets	trådet	a4a-farget	nb-no	"" t r O: . @ t s	nb-no							imported	nst	false	
+trådets	JJ	SIN|IND|GEN|NEU-MAS-FEM|POS	trådets	trådet	a6a-leddelt	nb-no	"" t r O: . @ t s	nb-no							imported	nst	false	
+trådets	JJ	SIN|IND|GEN|NEU|POS	trådets	trådet	a4a-farget	nb-no	"" t r O: . @ t s	nb-no							imported	nst	false	
+ulvehund	NN	SIN|IND|NOM|MAS	ulv+e+hund	ulvehund	s1a1-dag	nb-no	"" } l . v @ . % h } n	nb-no							imported	nst	false	
+ulykkesområdet	NN	|||NEU	ulykke+s+området			nb-no	"" }: . l y . k @ s . O m . % r O: . d @	nb-no							imported	nst	false	
+ungdomsrådet	NN	|||NEU	ungdom+s+rådet			nb-no	"" u N . d O m s . % r O: . d @	nb-no							imported	nst	false	
+unghund	NN	|||MAS	ung+hund			nb-no	"" u N . % h } n	nb-no							imported	nst	false	
+unionsrådet	NN	|||NEU	unionsrådet			nb-no	} . n i . " u: n s . % r O: . d @	nb-no							imported	nst	false	
+universitetsområdet	NN	|||NEU	universitet+s+området			nb-no	} . n i . v @ . rs i . " t e: t s . O m . % r O: . d @	nb-no							imported	nst	false	
+universitetsrådet	NN	|||NEU	universitet+s+rådet			nb-no	} . n i . v @ . rs i . " t e: t s . % r O: . d @	nb-no							imported	nst	false	
+utbyggingsområdet	NN	SIN|DEF|NOM|NEU	utbygging+s+området	utbyggingsområde	s11b-eple	nb-no	" }: t . b y . g i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+uteområdet	NN	|||NEU	ute+området			nb-no	"" }: . t @ . O m . % r O: . d @	nb-no							imported	nst	false	
+utgravningsområdet	NN	|||NEU	utgravning+s+området			nb-no	" }: t . g r A: v . n i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+utstillingsområdet	NN	|||NEU	utstilling+s+området			nb-no	" }: t . s t i . l i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+utviklingsområdet	NN	SIN|DEF|NOM|NEU	utvikling+s+området	utviklingsområde	s11b-eple	nb-no	" }: . t v i k . l i N s . O m . % r O: . d @	nb-no							imported	nst	false	
+vakthund	NN	SIN|IND|NOM|MAS	vakt+hund	vakthund	s1a1-dag	nb-no	" v A k t . % h } n	nb-no							imported	nst	false	
+vekstområdet	NN	SIN|DEF|NOM|NEU	vekst+området	vekstområde	s11b-eple	nb-no	" v e k s t . O m . % r O: . d @	nb-no							imported	nst	false	
+vennerådet	NN	SIN|DEF|NOM|NEU	venn+e+rådet	venneråd	s13a1-år	nb-no	"" v e . n @ . % r O: . d @	nb-no							imported	nst	false	
+verdensrådet	NN	|||NEU	verden+s+rådet			nb-no	" v { . rd n`= rs . % r O: . d @	nb-no	" v { r . d n= s . % r O: . d @	nb-no					imported	nst	false	
+verftsområdet	NN	|||NEU	verft+s+området			nb-no	" v { r f t s . O m . % r O: . d @	nb-no							imported	nst	false	
+vergerådet	NN	SIN|DEF|NOM|NEU	verge+rådet	vergeråd	s13a1-år	nb-no	"" v { r . g @ . % r O: . d @	nb-no							imported	nst	false	
+verjerådet	NN	SIN|DEF|NOM|NEU	verjerådet	verjeråd	s13a1-år	nb-no	"" v { r . j @ . % r O: . d @	nb-no							imported	nst	false	
+verksområdet	NN	|||NEU	verk+s+området			nb-no	" v { r k s . O m . % r O: . d @	nb-no							imported	nst	false	
+verneområdet	NN	|||NEU	verne+området			nb-no	"" v {: . rn @ . O m . % r O: . d @	nb-no							imported	nst	false	
+viltrådet	NN	SIN|DEF|NOM|NEU	vilt+rådet	viltråd	s13a1-år	nb-no	" v i l t . % r O: . d @	nb-no							imported	nst	false	
+vippetest	NN	|||MAS	vippe+test			nb-no	"" v i . p @ . % t e s t	nb-no							imported	nst	false	
+virkeområdet	NN	|||NEU	virkeområdet			nb-no	"" v i r . k @ . O m . % r O: . d @	nb-no							imported	nst	false	
+virksomhetsområdet	NN	|||NEU	virksomhet+s+området			nb-no	"" v i r k . s O m . h e: t s . O m . % r O: . d @	nb-no							imported	nst	false	
+vitabrødet	NN	SIN|DEF|NOM|NEU	vitabrødet	vitabrød	s13a1-år	nb-no	" v i: . t A . % b r 2: . @	nb-no							imported	nst	false	
+vorstehhund	NN	SIN|IND|NOM|MAS	!vorsteh+hund	vorstehhund	s1a1-dag	nb-no	" f O: . rs rt @ r . % h } n	de-de							imported	nst	false	
+våtest	JJ	SIN|IND|NOM||SUV	våtest	våt	a1a6A-hvit	nb-no	" v O: . t @ s t	nb-no							imported	nst	false	
+våtmarksområdet	NN	SIN|DEF|NOM|NEU	våt+mark+s+området	våtmarksområde	s11b-eple	nb-no	" v O: t . m A r k s . O m . % r O: . d @	nb-no							imported	nst	false	
+vørterbrødet	NN	SIN|DEF|NOM|NEU	vørter+brødet	vørterbrød	s13a1-år	nb-no	" v 2 . rt @ r . % b r 2: . @	nb-no							imported	nst	false	
+wienerbrødet	NN	SIN|DEF|NOM|NEU	wienerbrødet	wienerbrød	s13a1-år	nb-no	" v i: . n @ r . % b r 2: . @	nb-no							imported	nst	false	
+østersjø-området	NN	|||NEU	Østersjø+-+området			nb-no	"" 2 . s t @ . rs 2: . O m . % r O: . d @	nb-no							imported	nst	false	
+østersjørådet	NN	|||NEU	Østersjø+rådet			nb-no	"" 2 . s t @ . rs 2: . % r O: . d @	nb-no							imported	nst	false	
+ær	NN	SIN|IND|NOM|FEM	ær	ær	s25a1-bygd	nb-no	" {: r	nb-no							imported	nst	false	
+ær	NN	SIN|IND|NOM|MAS	ær	ær	s25a1-bygd	nb-no	" {: r	nb-no							imported	nst	false	
+ær	NN	|||FEM	ær			nb-no	" {: r	nb-no							imported	nst	false	
+ær	VB	AKT|IMP	ær	ære	v0a-lempe|v1a-lempe	nb-no	" {: r	nb-no							imported	nst	false	
+æra	NN	SIN|DEF|NOM|FEM	æra	ær	s25a1-bygd	nb-no	" {: . r A	nb-no							imported	nst	false	
+æras	NN	SIN|DEF|GEN|FEM	æras	ær	s25a1-bygd	nb-no	" {: . r A s	nb-no							imported	nst	false	
+æren	NN	SIN|DEF|NOM|MAS	æren	ær	s25a1-bygd	nb-no	" {: . n`=	nb-no							imported	nst	false	
+ærene	NN	PLU|DEF|NOM|FEM	ærene	ær	s25a1-bygd	nb-no	"" {: . n`= . @	nb-no							imported	nst	false	
+ærene	NN	PLU|DEF|NOM|MAS	ærene	ær	s25a1-bygd	nb-no	"" {: . n`= . @	nb-no							imported	nst	false	
+ærenes	NN	PLU|DEF|GEN|FEM	ærenes	ær	s25a1-bygd	nb-no	"" {: . n`= . @ s	nb-no							imported	nst	false	
+ærenes	NN	PLU|DEF|GEN|MAS	ærenes	ær	s25a1-bygd	nb-no	"" {: . n`= . @ s	nb-no							imported	nst	false	
+ærens	NN	SIN|DEF|GEN|MAS	ærens	ær	s25a1-bygd	nb-no	" {: . n`= s	nb-no							imported	nst	false	
+ærer	NN	PLU|IND|NOM|FEM	ærer	ær	s25a1-bygd	nb-no	"" {: . r @ r	nb-no							imported	nst	false	
+ærer	NN	PLU|IND|NOM|MAS	ærer	ær	s25a1-bygd	nb-no	"" {: . r @ r	nb-no							imported	nst	false	
+ærers	NN	PLU|IND|GEN|FEM	ærers	ær	s25a1-bygd	nb-no	"" {: . r @ rs	nb-no							imported	nst	false	
+ærers	NN	PLU|IND|GEN|MAS	ærers	ær	s25a1-bygd	nb-no	"" {: . r @ rs	nb-no							imported	nst	false	
+ærs	NN	SIN|IND|GEN|FEM	ærs	ær	s25a1-bygd	nb-no	" {: rs	nb-no							imported	nst	false	
+ærs	NN	SIN|IND|GEN|MAS	ærs	ær	s25a1-bygd	nb-no	" {: rs	nb-no							imported	nst	false	
+ødet	NN	|||NEU	ødet			nb-no	"" 2: . d @	nb-no							imported	nst	false	
+ølebrødet	NN	SIN|DEF|NOM|NEU	ølebrødet	ølebrød	s13a1-år	nb-no	"" 2 . l @ . % b r 2: . @	nb-no							imported	nst	false	
+ørkenområdet	NN	|||NEU	ørken+området			nb-no	" 2 r . k @ n . O m . % r O: . d @	nb-no							imported	nst	false	
+østersjøområdet	NN	|||NEU	!østersjø+området			nb-no	"" 2 . s t @ r . S 2: . O m . % r O: . d @	nb-no							imported	nst	false	
+østlandsområdet	NN	|||NEU	østland+s+området			nb-no	"" 2 s t . l A n s . O m . % r O: . d @	nb-no							imported	nst	false	
+øvelsesområdet	NN	|||NEU	øvelse+s+området			nb-no	"" 2: . v l= . s @ s . O m . % r O: . d @	nb-no							imported	nst	false	
+øvingsområdet	NN	|||NEU	øving+s+området			nb-no	"" 2: . v i N s . O m . % r O: . d @	nb-no							imported	nst	false	
