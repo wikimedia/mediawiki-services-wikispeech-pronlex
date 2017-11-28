@@ -78,8 +78,8 @@ mkdir -p $APPDIR/db_files || exit 1
 mkdir -p $APPDIR/symbol_sets || exit 1
 
 cp $APPDIR/lexdata.git/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
-echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
-cat $APPDIR/lexdata.git/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
+#echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
+#cat $APPDIR/lexdata.git/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
 cp $APPDIR/lexdata.git/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
 
