@@ -613,7 +613,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
-		return ids, fmt.Errorf("begin transaction faild : %v", err)
+		return ids, fmt.Errorf("begin transaction failed : %v", err)
 	}
 
 	stmt1, err := tx.Prepare(entrySTMT)
@@ -626,6 +626,12 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 	}
 
 	for _, e := range es {
+		//log.Printf("dbapi: insert entry: %#v", e)
+
+		if len(e.Transcriptions) == 0 {
+			tx.Rollback()
+			return ids, fmt.Errorf("cannot insert entry without transcriptions: %#v", e)
+		}
 		// convert 'Preferred' into DB integer value
 		var pref int64
 		if e.Preferred {
