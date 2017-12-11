@@ -42,7 +42,8 @@ A few JSON examples:
          current: true
       },
       entryValidations: [ ],
-      preferred: false
+      preferred: false,
+      tag: ""
    }
 
 
@@ -82,7 +83,8 @@ A few JSON examples:
          current: true
       },
       entryValidations: [ ],
-      preferred: false
+      preferred: false,
+      tag: ""
    }
 
 */
