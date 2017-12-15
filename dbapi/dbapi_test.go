@@ -381,6 +381,14 @@ func Test_insertEntries(t *testing.T) {
 
 	newE, updated, err := updateEntry(db, ees0)
 
+	oldEntryStatus := ees0.EntryStatus
+	newEntryStatus := newE.EntryStatus
+
+	// Assert that the statuses have different time stamps
+	if oldEntryStatus.Timestamp == newEntryStatus.Timestamp {
+		t.Errorf("Expected different EntryStatus.Timestamp, got same: %#v\n", oldEntryStatus)
+	}
+
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}

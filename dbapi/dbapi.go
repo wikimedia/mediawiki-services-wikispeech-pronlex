@@ -1457,7 +1457,6 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 	return false, err
 }
 
-// TODO add DB trigger to set current = false for old statuses at update/insert
 var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = ?"
 
 //var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
@@ -1465,11 +1464,14 @@ var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = 
 // TODO always insert new status, or only when name and source have changed. Or...?
 func updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if trm(e.EntryStatus.Name) != "" {
-		_, err := tx.Exec(statusSetCurrentFalse, dbE.ID)
-		if err != nil {
-			tx.Rollback()
-			return false, fmt.Errorf("failed EntryStatus.Current update : %v", err)
-		}
+
+		// There is now a db trigger that sets older entry status current flag to false
+
+		// _, err := tx.Exec(statusSetCurrentFalse, dbE.ID)
+		// if err != nil {
+		// 	tx.Rollback()
+		// 	return false, fmt.Errorf("failed EntryStatus.Current update : %v", err)
+		// }
 		_, err = tx.Exec(insertStatus, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
 		if err != nil {
 			tx.Rollback()
