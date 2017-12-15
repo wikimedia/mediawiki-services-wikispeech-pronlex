@@ -258,6 +258,9 @@ func Test_insertEntries(t *testing.T) {
 	if errx != nil {
 		t.Errorf(fs, "nil", errx)
 	}
+
+	//time.Sleep(2000 * time.Millisecond)
+
 	// Check that there are things in db:
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
@@ -379,6 +382,8 @@ func Test_insertEntries(t *testing.T) {
 	// new validation
 	ees0.EntryValidations = []lex.EntryValidation{{Level: "severe", RuleName: "barf", Message: "it hurts"}}
 
+	//time.Sleep(2000 * time.Millisecond)
+
 	newE, updated, err := updateEntry(db, ees0)
 
 	oldEntryStatus := ees0.EntryStatus
@@ -451,6 +456,7 @@ func Test_insertEntries(t *testing.T) {
 	eApa.WordParts = "fin+krog"
 	eApa.Language = "gummiapa"
 	eApa.EntryValidations = []lex.EntryValidation{}
+	//time.Sleep(2000 * time.Millisecond)
 	newE2, updated, err := updateEntry(db, eApa)
 	if err != nil {
 		t.Errorf(fs, "nil", err)
@@ -507,6 +513,8 @@ func Test_insertEntries(t *testing.T) {
 		Preferred:      true,
 		Transcriptions: []lex.Transcription{t1, t2},
 		EntryStatus:    lex.EntryStatus{Name: "old2", Source: "tst"}}
+
+	//time.Sleep(2000 * time.Millisecond)
 
 	_, errxb := insertEntries(db, l, []lex.Entry{e1b})
 	if errxb != nil {
