@@ -1,6 +1,7 @@
    
    
      $ go run importLex.go 
+     
      USAGE:
       importLex <FLAGS> <DB FILE> <LEXICON NAME> <LOCALE> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
      
