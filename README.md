@@ -64,7 +64,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    Example:
    `install$ bash import.sh ~/git_repos/lexdata ~/wikispeech` 
 
-   Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
+   Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
 If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github. The import takes some time to finish.
 
 
