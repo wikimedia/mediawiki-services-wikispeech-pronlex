@@ -51,7 +51,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 3. Setup the pronlex server
 
    `pronlex$ cd install`   
-   `install$ bash setup.sh <APPDIR>`
+   `install$ bash setup.sh <APPDIR>`   
+   Example:
+   `install$ bash setup.sh ~/wikispeech`
 
    Sets up the pronlex server and a set of test data in the folder specified by `<APPDIR>`.
 
@@ -59,6 +61,8 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 4. Import lexicon data (optional)
 
    `install$ bash import.sh <LEXDATA-GIT> <APPDIR>`   
+   Example:
+   `install$ bash import.sh ~/git_repos/lexdata ~/wikispeech` 
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
 If the `<LEXDATA-GIT>` folder doesn't exist, it will be downloaded from github. The import takes some time to finish.
