@@ -65,7 +65,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    `install$ bash import.sh ~/git_repos/lexdata ~/wikispeech` 
 
    Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
-If the `<LEXDATA-GIT>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github. Please note that the import takes some time to finish.
+If the `<LEXDATA-GIT>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
+
+   The import takes some time to finish.
 
 
 ### III. Start the lexicon server
