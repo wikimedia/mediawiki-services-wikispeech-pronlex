@@ -69,7 +69,7 @@ If the `<LEXDATA-GIT>` folder exists on disk, lexicon resources will be read fro
 
    The import takes some time to finish.
    
-   If you want to import other lexicon files, or just a subset of the files above, you can use either the lexserver web API (http://localhost:8787/admin/lex_import_page if you have a running lexicon server on localhost); or import from the command line using this import script: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
+   If you want to import other lexicon files, or just a subset of the files above, you can use either the lexserver web API (http://localhost:8787/admin/lex_import_page if you have a running lexicon server on localhost); or import from the command line using this import script: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex. You can create your own lexicon files, or you can use existing data in the [lexdata repository](https://github.com/stts-se/lexdata).
 
 
 ### III. Start the lexicon server
