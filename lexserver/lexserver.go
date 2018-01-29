@@ -165,12 +165,12 @@ func initFolders() error {
 
 	err := os.MkdirAll(filepath.Join(os.TempDir(), "lexserver"), os.ModeDir)
 	if err != nil {
-		return fmt.Errorf("couldn't initialize temp dir : %s", "/tmp/lexserver", err)
+		return fmt.Errorf("couldn't initialize temp dir %s : %v", "/tmp/lexserver", err)
 	}
 
 	tmpDir, err := ioutil.TempDir("", "lexserver-")
 	if err != nil {
-		return fmt.Errorf("couldn't initialize temp dir : %s", "/tmp/lexserver/tmp-", err)
+		return fmt.Errorf("couldn't initialize temp dir %s : %v", "/tmp/lexserver", err)
 	}
 
 	uploadFileArea := filepath.Join(tmpDir, "upload_area")

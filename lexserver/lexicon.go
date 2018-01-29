@@ -384,7 +384,7 @@ var deleteEntry = func(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(entryID, 10, 64)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, fmt.Sprintf("failed to parse entry id %d : %v", entryID, err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("failed to parse entry id %s : %v", entryID, err), http.StatusInternalServerError)
 		return
 	}
 
