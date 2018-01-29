@@ -82,8 +82,8 @@ CREATE INDEX idid on Entry (id, lexiconId);
 
 -- Entry tag is a string used to distinguish between homographs.
 -- Unique for an entry of a specific word forms, but not for different
--- word forms. NOTE: This can be futher normalized into a separate Tag
--- table, for resuable tags.
+-- word forms. NOTE: This can be further normalized into a separate Tag
+-- table, for reusable tags.
 CREATE TABLE EntryTag (
     -- id integer not null primary key autoincrement,
     entryId integer not null,
