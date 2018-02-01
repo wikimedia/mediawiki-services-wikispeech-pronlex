@@ -20,6 +20,8 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
+ignored = ["golang.org/x/*", "github.com/stts-se/rbg2p", "github.com/dlclark/regexp2/syntax/workdir"]
+
 
 [[constraint]]
   name = "github.com/dlclark/regexp2"
@@ -48,3 +50,4 @@
 [[constraint]]
   branch = "master"
   name = "golang.org/x/net"
+
