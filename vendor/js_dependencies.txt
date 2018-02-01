@@ -1,0 +1,20 @@
+lexserver/static/admin/lex_import_page.html:    https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js
+lexserver/static/admin/lex_import_page.html:    https://code.jquery.com/jquery-2.2.1.min.js
+lexserver/static/admin/lex_import_page.html:    http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js
+lexserver/static/admin/lex_import_page.html:    /static/admin/lex_import_page.js
+lexserver/static/lexicon/validation_page.html:    https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js
+lexserver/static/lexicon/validation_page.html:    https://code.jquery.com/jquery-2.2.1.min.js
+lexserver/static/lexicon/validation_page.html:    http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js
+lexserver/static/lexicon/validation_page.html:    /static/lexicon/validation_page.js
+lexserver/static/search_demo.html:/static/externals/knockout-3.4.1.js
+lexserver/static/search_demo.html:/static/search_demo.js
+lexserver/static/symbolset/upload_page.html:    https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js
+lexserver/static/symbolset/upload_page.html:    https://code.jquery.com/jquery-2.2.1.min.js
+lexserver/static/symbolset/upload_page.html:    http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js
+lexserver/static/symbolset/upload_page.html:    /static/symbolset/upload_page.js
+lexserver/static/websock_test.html:    https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js
+lexserver/static/websock_test.html:    https://code.jquery.com/jquery-2.2.1.min.js
+lexserver/static/websock_test.html:    http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js
+lexserver/static/websock_test.html:    static/websock_test.js
+web/lexsearch/index.html:/lexsearch/externals/knockout-3.4.1.js
+web/lexsearch/index.html:/lexsearch/built/search_demo.js
