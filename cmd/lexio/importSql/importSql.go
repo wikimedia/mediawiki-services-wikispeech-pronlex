@@ -16,16 +16,14 @@ import (
 )
 
 // SQL DUMP:
-/*
-sqlite3 <dbFile> .dump | gzip -c > <sqlDumpFile>
-**/
+// sqlite3 <dbFile> .dump | gzip -c > <sqlDumpFile>
 
 // SQL LOAD:
 // gunzip -c <dumpFile> | sqlite3 <dbFile>
 
 // TODO:
-// * BUG(hanna) Tests: simple sanity checks after import (count entries etc...)
-// * BUG(hanna) For later: Compare sql dump's schema version to the current schema.go (dbapi/schema.go). Refuse import if they don't match. Requires db change.
+// * Tests: simple sanity checks after import (count entries etc...)
+// * For later: Compare sql dump's schema version to the current schema.go (dbapi/schema.go). Refuse import if they don't match. Requires db change (move schema version from PRAGMA tag to separate table).
 
 const sqlitePath = "sqlite3"
 
