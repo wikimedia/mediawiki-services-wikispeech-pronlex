@@ -2,10 +2,10 @@ package dbapi
 
 // Schema is a string containing the SQL definition of the lexicon database
 
-const PragmaUserVersion = "2"
+const SchemaVersion = "2"
 const Schema = `
 -- Set version of Schema
-PRAGMA user_version = ` + PragmaUserVersion + `;
+PRAGMA user_version = ` + SchemaVersion + `;
 
 -- Each lexical entry belongs to a lexicon.
 -- The Lexicon table defines a lexicon through a unique name, along with the name a of symbol set and a locale
