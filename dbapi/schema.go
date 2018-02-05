@@ -2,8 +2,8 @@ package dbapi
 
 // Schema is a string containing the SQL definition of the lexicon database
 
-var PragmaUserVersion = "2"
-var Schema = `
+const PragmaUserVersion = "2"
+const Schema = `
 -- Set version of Schema
 PRAGMA user_version = ` + PragmaUserVersion + `;
 
