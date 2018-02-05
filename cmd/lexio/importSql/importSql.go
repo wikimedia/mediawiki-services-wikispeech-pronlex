@@ -73,7 +73,7 @@ func runPostTests(dbFile string, sqlDumpFile string) {
 	sqlDump(dbFile, testDump)
 	defer os.Remove(testDump)
 	if deepCompare(sqlDumpFile, testDump) {
-		fmt.Printf("Imported db %s seems to match the input sql dump file %s\n", dbFile, sqlDumpFile)
+		log.Printf("Imported db %s seems to match the input sql dump file %s\n", dbFile, sqlDumpFile)
 	} else {
 		log.Fatalf("Imported db %s does not match the input sql dump file %s", dbFile, sqlDumpFile)
 	}
@@ -92,7 +92,7 @@ func validateSchemaVersion(fName string) error {
 			if len(matches) >= 2 {
 				schemaVersion := matches[1]
 				if schemaVersion == dbapi.SchemaVersion {
-					fmt.Printf("Valid schema version: %s\n", schemaVersion)
+					log.Printf("Valid schema version: %s\n", schemaVersion)
 					return nil
 				} else {
 					log.Fatalf("Invalid schema in file %s: found %s, expected %s", fName, schemaVersion, dbapi.SchemaVersion)
@@ -106,28 +106,25 @@ func validateSchemaVersion(fName string) error {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("No schema version in file: %s\n", fName)
+	log.Printf("No schema version in file: %s\n", fName)
 	return nil
 }
 
 func getFileReader(fName string) io.Reader {
-	var fileStream io.Reader
-
 	if strings.HasSuffix(fName, ".sql") {
 		// cat <sqlDumpFile> | sqlite3 <dbFile>
 		fs, err := os.Open(fName)
 		if err != nil {
 			log.Fatalf("Couldn't open sql dump file %s for reading : %v\n", fName, err)
 		}
-		fileStream = io.Reader(fs)
+		return io.Reader(fs)
 
 	} else if strings.HasSuffix(fName, ".sql.gz") {
 		// zcat <sqlDumpFile> | gunzip -c | sqlite3 <dbFile>
 
 		fh, err := os.Open(fName)
 		if err != nil {
-			var msg = fmt.Sprintf("Couldn't open file : %v", err)
-			fmt.Println(msg)
+			log.Fatalf("Couldn't open file : %v", err)
 		}
 
 		if strings.HasSuffix(fName, ".gz") {
@@ -135,13 +132,12 @@ func getFileReader(fName string) io.Reader {
 			if err != nil {
 				log.Fatalf("Couldn't to open gz reader : %v", err)
 			}
-			fileStream = io.Reader(gz)
+			return io.Reader(gz)
 		}
 
-	} else {
-		log.Fatalf("Unknown file type: %s. Expected .sql or .sql.gz", fName)
 	}
-	return fileStream
+	log.Fatalf("Unknown file type: %s. Expected .sql or .sql.gz", fName)
+	return nil
 }
 
 func main() {
@@ -154,8 +150,8 @@ func main() {
 	var sqlDumpFile = os.Args[1]
 	var dbFile = os.Args[2]
 
-	fmt.Printf("Input file: %s\n", sqlDumpFile)
-	fmt.Printf("Output db: %s\n", dbFile)
+	log.Printf("Input file: %s\n", sqlDumpFile)
+	log.Printf("Output db: %s\n", dbFile)
 
 	_, err := os.Stat(sqlDumpFile)
 	if err != nil {
@@ -182,7 +178,7 @@ func main() {
 		log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, dbFile, err)
 	}
 	if len(sqliteOut.String()) > 0 {
-		fmt.Println(sqliteOut.String())
+		log.Println(sqliteOut.String())
 	}
 
 	log.Printf("Imported %s into db %s\n", sqlDumpFile, dbFile)
