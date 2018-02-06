@@ -24,32 +24,7 @@ import (
 // SQL LOAD:
 // gunzip -c <dumpFile> | sqlite3 <dbFile>
 
-// TODO: Compare sql dump's schema version to the current schema.go (dbapi/schema.go). Refuse import if they don't match. Requires db change (move schema version from PRAGMA tag to separate table). | SELECT name from SchemaVersion;
-
 const sqlitePath = "sqlite3"
-
-func deepCompare(file1, file2 string) bool {
-	f1 := getFileReader(file1)
-	f2 := getFileReader(file2)
-
-	scan1 := bufio.NewScanner(f1)
-	scan2 := bufio.NewScanner(f2)
-
-	var n = 0
-	for scan1.Scan() {
-		scan2.Scan()
-		n++
-		var b1, b2 = scan1.Bytes(), scan2.Bytes()
-		if !bytes.Equal(b1, b2) {
-			log.Printf("deepCompare found mismatching content on line %d:", n)
-			log.Printf("  - input sql dump: %s", string(b1))
-			log.Printf("  - re-exported sql dump: %s", string(b2))
-			return false
-		}
-	}
-
-	return true
-}
 
 func sqlDump(dbFile string, outFile string) error {
 	sqliteCmd := exec.Command(sqlitePath, dbFile, ".dump")
@@ -82,33 +57,16 @@ func validateSchemaVersion(db *sql.DB) error {
 
 func runPostTests(dbFile string, sqlDumpFile string) {
 
-	// (1) generate new sql dump and compare to input sql
-	var dir = filepath.Dir(sqlDumpFile)
-	var fName = filepath.Base(sqlDumpFile)
-	var testDumpFile = filepath.Join(dir, "_tmp_importSql_"+fName)
-	var ext = filepath.Ext(testDumpFile)
-	if ext == ".gz" {
-		testDumpFile = testDumpFile[0 : len(testDumpFile)-len(ext)]
-	}
-	sqlDump(dbFile, testDumpFile)
-	defer os.Remove(testDumpFile)
-	if deepCompare(sqlDumpFile, testDumpFile) {
-		log.Printf("Imported db %s seems to match the input sql dump file %s\n", dbFile, sqlDumpFile)
-	} else {
-		log.Printf("Imported db %s does not match the input sql dump file %s\n", dbFile, sqlDumpFile)
-		log.Fatalf("For more details, try running $ diff %s %s", sqlDumpFile, testDumpFile)
-	}
-
 	db, dbm := defineDB(dbFile)
 	lexes, err := dbm.ListLexicons()
 
-	// (2) check schema version
+	// (1) check schema version
 	err = validateSchemaVersion(db)
 	if err != nil {
 		log.Fatalf("Couldn't read validate schema version in file %s : %v\n", sqlDumpFile, err)
 	}
 
-	// (3) output statistics
+	// (2) output statistics
 	lexes, err = dbm.ListLexicons()
 	if err != nil {
 		log.Fatalf("Couldn't list lexicons : %v", err)
