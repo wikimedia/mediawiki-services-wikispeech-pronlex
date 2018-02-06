@@ -84,24 +84,16 @@ func runPostTests(dbFile string, sqlDumpFile string) {
 }
 
 func getFileReader(fName string) io.Reader {
+	fs, err := os.Open(fName)
+	if err != nil {
+		log.Fatalf("Couldn't open file %s for reading : %v\n", fName, err)
+	}
+
 	if strings.HasSuffix(fName, ".sql") {
-		// cat <sqlDumpFile> | sqlite3 <dbFile>
-		fs, err := os.Open(fName)
-		if err != nil {
-			log.Fatalf("Couldn't open sql dump file %s for reading : %v\n", fName, err)
-		}
 		return io.Reader(fs)
-
 	} else if strings.HasSuffix(fName, ".sql.gz") {
-		// zcat <sqlDumpFile> | gunzip -c | sqlite3 <dbFile>
-
-		fh, err := os.Open(fName)
-		if err != nil {
-			log.Fatalf("Couldn't open file : %v", err)
-		}
-
 		if strings.HasSuffix(fName, ".gz") {
-			gz, err := gzip.NewReader(fh)
+			gz, err := gzip.NewReader(fs)
 			if err != nil {
 				log.Fatalf("Couldn't to open gz reader : %v", err)
 			}
