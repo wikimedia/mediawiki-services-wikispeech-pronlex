@@ -73,7 +73,7 @@ FLAGS:
    -help     bool  print help message
 
 SAMPLE INVOCATION:
-  importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8 sv-se_ws-sampa [SYMBOLSET FOLDER]`
+  importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa [SYMBOLSET FOLDER]`
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage)
@@ -161,14 +161,14 @@ SAMPLE INVOCATION:
 
 	lexExists, err := dbm.LexiconExists(lexRef)
 	if err != nil {
-		log.Fatalf("Couldn't super delete lexicon %s: %s", lexRef, err)
+		log.Fatalf("Couldn't super delete lexicon %s: %v", lexRef, err)
 	}
 	if lexExists {
 		if *replace {
 			log.Printf("Running SuperDelete on lexicon %s. This may take some time. Please do not abort during deletion.\n", lexRef)
 			err := dbm.SuperDeleteLexicon(lexRef)
 			if err != nil {
-				log.Fatalf("Couldn't super delete lexicon %s : %s", lexRef, err)
+				log.Fatalf("Couldn't super delete lexicon %s : %v", lexRef, err)
 				return
 			}
 			log.Printf("Deleted lexicon %s\n", lexRef)
