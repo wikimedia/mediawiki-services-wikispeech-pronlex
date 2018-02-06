@@ -4,14 +4,17 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
+	"database/sql"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -21,30 +24,31 @@ import (
 // SQL LOAD:
 // gunzip -c <dumpFile> | sqlite3 <dbFile>
 
-// TODO:
-// * Tests: simple sanity checks after import (count entries etc...)
-// * For later: Compare sql dump's schema version to the current schema.go (dbapi/schema.go). Refuse import if they don't match. Requires db change (move schema version from PRAGMA tag to separate table).
+// TODO: Compare sql dump's schema version to the current schema.go (dbapi/schema.go). Refuse import if they don't match. Requires db change (move schema version from PRAGMA tag to separate table).
 
 const sqlitePath = "sqlite3"
-
-// change this regexp in order to check for other definitions of schema version
-var schemaVersionRe = regexp.MustCompile("^\\s*PRAGMA user_version = ([0-9]+);\\s*$")
 
 func deepCompare(file1, file2 string) bool {
 	f1 := getFileReader(file1)
 	f2 := getFileReader(file2)
 
-	sscan := bufio.NewScanner(f1)
-	dscan := bufio.NewScanner(f2)
+	scan1 := bufio.NewScanner(f1)
+	scan2 := bufio.NewScanner(f2)
 
-	for sscan.Scan() {
-		dscan.Scan()
-		if !bytes.Equal(sscan.Bytes(), dscan.Bytes()) {
-			return true
+	var n = 0
+	for scan1.Scan() {
+		scan2.Scan()
+		n++
+		var b1, b2 = scan1.Bytes(), scan2.Bytes()
+		if !bytes.Equal(b1, b2) {
+			log.Printf("deepCompare found mismatching content on line %d:", n)
+			log.Printf("  - input sql dump: %s", string(b1))
+			log.Printf("  - re-exported sql dump: %s", string(b2))
+			return false
 		}
 	}
 
-	return false
+	return true
 }
 
 func sqlDump(dbFile string, outFile string) error {
@@ -60,54 +64,46 @@ func sqlDump(dbFile string, outFile string) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Exported %s into db %s\n", dbFile, outFile)
+	log.Printf("Exported %s from db %s\n", dbFile, outFile)
 	return nil
 }
 
 func runPostTests(dbFile string, sqlDumpFile string) {
-	var testDump = "_test_" + sqlDumpFile
-	var ext = filepath.Ext(testDump)
+
+	// (1) generate new sql dump and compare to input sql
+	var dir = filepath.Dir(sqlDumpFile)
+	var fName = filepath.Base(sqlDumpFile)
+	var testDumpFile = filepath.Join(dir, "_tmp_importSql_"+fName)
+	var ext = filepath.Ext(testDumpFile)
 	if ext == ".gz" {
-		testDump = testDump[0 : len(testDump)-len(ext)]
+		testDumpFile = testDumpFile[0 : len(testDumpFile)-len(ext)]
 	}
-	sqlDump(dbFile, testDump)
-	defer os.Remove(testDump)
-	if deepCompare(sqlDumpFile, testDump) {
+	sqlDump(dbFile, testDumpFile)
+	defer os.Remove(testDumpFile)
+	if deepCompare(sqlDumpFile, testDumpFile) {
 		log.Printf("Imported db %s seems to match the input sql dump file %s\n", dbFile, sqlDumpFile)
 	} else {
-		log.Fatalf("Imported db %s does not match the input sql dump file %s", dbFile, sqlDumpFile)
+		log.Printf("Imported db %s does not match the input sql dump file %s\n", dbFile, sqlDumpFile)
+		log.Fatalf("For more details, try running $ diff %s %s", sqlDumpFile, testDumpFile)
 	}
-}
 
-func validateSchemaVersion(fName string) error {
-	file := getFileReader(fName)
-
-	scanner := bufio.NewScanner(file)
-	lineNo := 0
-	for scanner.Scan() {
-		lineNo++
-		l := scanner.Text()
-		if schemaVersionRe.MatchString(l) {
-			matches := schemaVersionRe.FindStringSubmatch(l)
-			if len(matches) >= 2 {
-				schemaVersion := matches[1]
-				if schemaVersion == dbapi.SchemaVersion {
-					log.Printf("Valid schema version: %s\n", schemaVersion)
-					return nil
-				} else {
-					log.Fatalf("Invalid schema in file %s: found %s, expected %s", fName, schemaVersion, dbapi.SchemaVersion)
-				}
-			} else {
-				log.Fatalf("Error parsing schema version on line %d in file %s", lineNo, fName)
-			}
+	// (2) output statistics
+	dbm := defineDBM(dbFile)
+	lexes, err := dbm.ListLexicons()
+	if err != nil {
+		log.Fatalf("Couldn't list lexicons : %v", err)
+	}
+	for _, lex := range lexes {
+		stats, err := dbm.LexiconStats(lex.LexRef)
+		if err != nil {
+			log.Fatalf("Failed to retrieve statistics : %v", err)
+		}
+		err = printStats(stats, true)
+		if err != nil {
+			log.Fatalf("Failed to print statistics : %v", err)
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("No schema version in file: %s\n", fName)
-	return nil
 }
 
 func getFileReader(fName string) io.Reader {
@@ -140,10 +136,76 @@ func getFileReader(fName string) io.Reader {
 	return nil
 }
 
+func printStats(stats dbapi.LexStats, validate bool) error {
+	var fstr = "%-16s %6d\n"
+	println("\nLEXICON STATISTICS")
+	fmt.Printf(fstr, "entries", stats.Entries)
+	for _, s2f := range stats.StatusFrequencies {
+		fs := strings.Split(s2f, "\t")
+		if len(fs) != 2 {
+			return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
+		}
+		var freq, err = strconv.ParseInt(fs[1], 10, 64)
+		if err != nil {
+			return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
+		}
+		var status = "status:" + fs[0]
+		fmt.Printf(fstr, status, freq)
+	}
+	if validate {
+		fmt.Printf(fstr, "invalid entries", stats.ValStats.InvalidEntries)
+		fmt.Printf(fstr, "validation msgs", stats.ValStats.TotalValidations)
+	}
+	return nil
+}
+
+func defineDBM(dbFile string) *dbapi.DBManager {
+	var db *sql.DB
+	var dbm = dbapi.NewDBManager()
+	var err error
+
+	dbapi.Sqlite3WithRegex()
+	db, err = sql.Open("sqlite3_with_regexp", dbFile)
+	if err != nil {
+		log.Fatalf("Failed to open dbfile %v", err)
+	}
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatalf("Failed to exec PRAGMA call %v", err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	if err != nil {
+		log.Fatalf("Failed to exec PRAGMA call %v", err)
+	}
+	_, err = db.Exec("PRAGMA journal_mode=WAL")
+	if err != nil {
+		log.Fatalf("Failed to exec PRAGMA call %v", err)
+	}
+
+	dbName := filepath.Base(dbFile)
+	var extension = filepath.Ext(dbName)
+	dbName = dbName[0 : len(dbName)-len(extension)]
+	dbRef := lex.DBRef(dbName)
+	err = dbm.AddDB(dbRef, db)
+	if err != nil {
+		log.Fatalf("Failed to add db: %v", err)
+	}
+	return dbm
+}
+
 func main() {
 
 	if len(os.Args) != 3 {
-		fmt.Fprintf(os.Stderr, "USAGE:\nimportSql <SQL DUMP FILE (.sql or .sql.gz)> <NEW DB FILE>\n")
+		fmt.Fprintf(os.Stderr, `USAGE:
+      importSql <SQL DUMP FILE> <NEW DB FILE>
+
+      <SQL DUMP FILE> - sql dump of a lexicon database (.sql or .sql.gz)
+      <NEW DB FILE>   - new (non-existing) db file to import into (<DBNAME>.db)
+     
+     SAMPLE INVOCATION:
+       importSql [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.sql.gz sv_se_nst_lex.db
+
+`)
 		os.Exit(1)
 	}
 
@@ -159,13 +221,13 @@ func main() {
 	}
 
 	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-		log.Fatalf("Db file already exists: %s\n", dbFile)
+		log.Fatalf("Cannot import sql dump into pre-existing database. Db file already exists: %s\n", dbFile)
 	}
 
-	err = validateSchemaVersion(sqlDumpFile)
-	if err != nil {
-		log.Fatalf("Couldn't read validate schema version in file %s : %v\n", sqlDumpFile, err)
-	}
+	// err = validateSchemaVersion(sqlDumpFile)
+	// if err != nil {
+	// 	log.Fatalf("Couldn't read validate schema version in file %s : %v\n", sqlDumpFile, err)
+	// }
 
 	sqliteCmd := exec.Command(sqlitePath, dbFile)
 	stdin := sqlDumpFile
@@ -174,11 +236,11 @@ func main() {
 	sqliteCmd.Stdout = &sqliteOut
 	sqliteCmd.Stderr = os.Stderr
 	err = sqliteCmd.Run()
-	if err != nil {
-		log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, dbFile, err)
-	}
 	if len(sqliteOut.String()) > 0 {
 		log.Println(sqliteOut.String())
+	}
+	if err != nil {
+		log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, dbFile, err)
 	}
 
 	log.Printf("Imported %s into db %s\n", sqlDumpFile, dbFile)
