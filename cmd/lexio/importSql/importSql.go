@@ -24,7 +24,7 @@ import (
 // SQL LOAD:
 // gunzip -c <dumpFile> | sqlite3 <dbFile>
 
-// TODO: Compare sql dump's schema version to the current schema.go (dbapi/schema.go). Refuse import if they don't match. Requires db change (move schema version from PRAGMA tag to separate table).
+// TODO: Compare sql dump's schema version to the current schema.go (dbapi/schema.go). Refuse import if they don't match. Requires db change (move schema version from PRAGMA tag to separate table). | SELECT name from SchemaVersion;
 
 const sqlitePath = "sqlite3"
 
@@ -68,6 +68,18 @@ func sqlDump(dbFile string, outFile string) error {
 	return nil
 }
 
+func validateSchemaVersion(db *sql.DB) error {
+	ver, err := dbapi.GetSchemaVersion(db)
+	if err != nil {
+		log.Fatalf("Couldn't retrive schema version : %v", err)
+	}
+	if ver != dbapi.SchemaVersion {
+		log.Fatalf("Mismatching schema versions -- in input file: %s, in dbapi.Schema: %s ", ver, dbapi.SchemaVersion)
+	}
+	log.Printf("Schema version matching dbapi.Schema: %s\n", dbapi.SchemaVersion)
+	return nil
+}
+
 func runPostTests(dbFile string, sqlDumpFile string) {
 
 	// (1) generate new sql dump and compare to input sql
@@ -87,9 +99,17 @@ func runPostTests(dbFile string, sqlDumpFile string) {
 		log.Fatalf("For more details, try running $ diff %s %s", sqlDumpFile, testDumpFile)
 	}
 
-	// (2) output statistics
-	dbm := defineDBM(dbFile)
+	db, dbm := defineDB(dbFile)
 	lexes, err := dbm.ListLexicons()
+
+	// (2) check schema version
+	err = validateSchemaVersion(db)
+	if err != nil {
+		log.Fatalf("Couldn't read validate schema version in file %s : %v\n", sqlDumpFile, err)
+	}
+
+	// (3) output statistics
+	lexes, err = dbm.ListLexicons()
 	if err != nil {
 		log.Fatalf("Couldn't list lexicons : %v", err)
 	}
@@ -159,7 +179,7 @@ func printStats(stats dbapi.LexStats, validate bool) error {
 	return nil
 }
 
-func defineDBM(dbFile string) *dbapi.DBManager {
+func defineDB(dbFile string) (*sql.DB, *dbapi.DBManager) {
 	var db *sql.DB
 	var dbm = dbapi.NewDBManager()
 	var err error
@@ -190,7 +210,7 @@ func defineDBM(dbFile string) *dbapi.DBManager {
 	if err != nil {
 		log.Fatalf("Failed to add db: %v", err)
 	}
-	return dbm
+	return db, dbm
 }
 
 func main() {
@@ -223,11 +243,6 @@ func main() {
 	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
 		log.Fatalf("Cannot import sql dump into pre-existing database. Db file already exists: %s\n", dbFile)
 	}
-
-	// err = validateSchemaVersion(sqlDumpFile)
-	// if err != nil {
-	// 	log.Fatalf("Couldn't read validate schema version in file %s : %v\n", sqlDumpFile, err)
-	// }
 
 	sqliteCmd := exec.Command(sqlitePath, dbFile)
 	stdin := sqlDumpFile
