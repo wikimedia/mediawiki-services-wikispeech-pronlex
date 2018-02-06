@@ -95,6 +95,7 @@ func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	return res, nil
 }
 
+// GetSchemaVersion retrieves the schema version from the database (as defined in schema.go on first load)
 func GetSchemaVersion(db *sql.DB) (string, error) {
 	tx, err := db.Begin()
 	if err != nil {
