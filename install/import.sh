@@ -7,8 +7,9 @@ export PATH=$PATH:$GOPATH/bin
 if [ $# -ne 2 ]; then
     echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR>
 
-Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
-If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github.
+Imports lexicon data for Swedish, Norwegian, US English and a small test set for Arabic from the lexdata repository.
+Imports from sql dump files (file extension .sql.gz).
+If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github: https://github.com/stts-se/lexdata .
 " >&2
     exit 1
 fi
@@ -70,8 +71,9 @@ CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
 
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
-if  go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$SVLEX ; then
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$SVLEX sv-se.nst sv_SE $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets
+#if  go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$SVLEX ; then
+if go run $CMDDIR/importSql/importSql.go $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz $APPDIR/db_files/$SVLEX; then
+    echo -n ""
 else
     echo "$SVLEX FAILED" >&2
     exit 1
@@ -79,8 +81,9 @@ fi
 
 echo "" >&2
 echo "IMPORT: $NOBLEX" >&2
-if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$NOBLEX ; then
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb-no.nst nb_NO $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APPDIR/symbol_sets
+#if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$NOBLEX ; then
+if go run $CMDDIR/importSql/importSql.go $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.sql.gz $APPDIR/db_files/$NOBLEX; then
+    echo -n ""
 else
     echo "$NOBLEX FAILED" >&2
     exit 1
@@ -88,8 +91,9 @@ fi
 
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
-if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$AMELEX ; then 
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$AMELEX en-us.cmu en_US $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets
+#if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$AMELEX ; then 
+if go run $CMDDIR/importSql/importSql.go $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8.sql.gz $APPDIR/db_files/$AMELEX; then
+    echo -n ""
 else
     echo "$AMELEX FAILED" >&2
     exit 1
@@ -97,8 +101,9 @@ fi
 
 echo "" >&2
 echo "IMPORT: $ARLEX" >&2
-if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$ARLEX ; then
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$ARLEX ar-test ar_AR $LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets
+#if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$ARLEX ; then
+if go run $CMDDIR/importSql/importSql.go $LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8.sql.gz $APPDIR/db_files/$ARLEX; then
+    echo -n ""
 else
     echo "$ARLEX FAILED" >&2
     exit 1
