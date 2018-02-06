@@ -64,10 +64,17 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    Example:
    `install$ bash import.sh ~/git_repos/lexdata ~/wikispeech` 
 
-   Imports lexicon data for Swedish, Norwegian, US English and a small set of test data for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
+   Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
 If the `<LEXDATA-GIT>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
 
-   If you want to import other lexicon data, or just a subset of the files above, you can use either the lexserver web API (http://localhost:8787/admin/lex_import_page if you have a running lexicon server on localhost); or import from the command line using this import script: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex. You can create your own lexicon files, or you can use existing data in the [lexdata repository](https://github.com/stts-se/lexdata). The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
+   If you want to import other lexicon data, or just a subset of the data above, you can use one of the following methods:
+   
+   * Import lexicon files using the lexserver web API (http://localhost:8787/admin/lex_import_page if you have a running lexicon server on localhost)
+   * Import lexicon files from the command line using this import script: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
+   * Import database sql dumps files from the command line using this import script: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
+
+
+You can create your own lexicon files, or you can use existing data in the [lexdata repository](https://github.com/stts-se/lexdata). The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
 
 
 ### III. Start the lexicon server
