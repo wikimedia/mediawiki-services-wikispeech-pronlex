@@ -9,11 +9,13 @@ WORKDIR "/wikispeech"
 RUN go get github.com/stts-se/pronlex/lexserver 
 RUN go install github.com/stts-se/pronlex/lexserver 
 
-RUN go get github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
-RUN go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
+#RUN go get github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
+#RUN go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
+#RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
+#RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
 
-RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
-RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
+RUN go get github.com/stts-se/pronlex/cmd/lexio/importSql
+RUN go install github.com/stts-se/pronlex/cmd/lexio/importSql
 
 ENV APPDIR /wikispeech/appdir
 
