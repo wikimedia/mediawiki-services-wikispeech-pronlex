@@ -29,7 +29,7 @@ To set up and run the lexicon server, you will use the [docker_run.sh](https://r
 
     `$ bash docker_run.sh -a <APPDIR> -t sttsse/pronlex:<TAGNAME> import_all`
 
-        Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
+        Imports lexicon data for Swedish, Norwegian, US English, and a small set of test data for Arabic.
 
 
 3. Run lex server
