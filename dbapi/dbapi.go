@@ -95,6 +95,30 @@ func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	return res, nil
 }
 
+func GetSchemaVersion(db *sql.DB) (string, error) {
+	tx, err := db.Begin()
+	if err != nil {
+		return "", fmt.Errorf("dbapi.GetSchemaVersion : %v", err)
+	}
+	defer tx.Commit()
+	return getSchemaVersionTx(tx)
+}
+
+func getSchemaVersionTx(tx *sql.Tx) (string, error) {
+	var res string
+
+	q := "SELECT name FROM SchemaVersion"
+	row := tx.QueryRow(q).Scan(&res)
+	if row == sql.ErrNoRows {
+		tx.Rollback()
+		var msg = "dbapi.getSchemaVersionTx : couldn't retrive schema version"
+		log.Println(msg)
+		return res, fmt.Errorf(msg)
+	}
+
+	return res, nil
+}
+
 // ListEntryTableColumnNames is a meta-function that returns the names of the columns of the 'entry' lexicon database table.
 // It can be used for checking that the entry table has the expected columns.
 func listEntryTableColumnNames(db *sql.DB) ([]string, error) {
