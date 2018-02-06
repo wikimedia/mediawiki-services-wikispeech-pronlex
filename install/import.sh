@@ -7,7 +7,7 @@ export PATH=$PATH:$GOPATH/bin
 if [ $# -ne 2 ]; then
     echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR>
 
-Imports lexicon data for Swedish, Norwegian, US English and a small test set for Arabic from the lexdata repository.
+Imports lexicon data for Swedish, Norwegian, US English, and a small set of test data for Arabic from the lexdata repository.
 Imports from sql dump files (file extension .sql.gz).
 If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github: https://github.com/stts-se/lexdata .
 " >&2
