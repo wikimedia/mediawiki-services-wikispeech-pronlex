@@ -25,7 +25,7 @@ For info on recommended installation procedure(s), see the <a href="http://stts-
 To set up and run the lexicon server, you will use the [docker_run.sh](https://raw.githubusercontent.com/stts-se/pronlex/master/docker/docker_run.sh) script. It is a convenience script for calling `docker run` with a few switches. Requires a working `bash` installation  (preferably on a Linux system).
 
 
-1. Import lexicon files (optional)
+1. Import pre-compiled lexicon data (optional)
 
     `$ bash docker_run.sh -a <APPDIR> -t sttsse/pronlex:<TAGNAME> import_all`
 
