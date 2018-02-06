@@ -4,8 +4,9 @@ package dbapi
 
 const SchemaVersion = "2"
 const Schema = `
--- Set version of Schema
-PRAGMA user_version = ` + SchemaVersion + `;
+-- To keep track of the version of this schema
+CREATE TABLE SchemaVersion (name text not null);
+INSERT INTO SchemaVersion VALUES (` + SchemaVersion + `);
 
 -- Each lexical entry belongs to a lexicon.
 -- The Lexicon table defines a lexicon through a unique name, along with the name a of symbol set and a locale
