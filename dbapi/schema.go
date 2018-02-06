@@ -2,7 +2,7 @@ package dbapi
 
 // Schema is a string containing the SQL definition of the lexicon database
 
-const SchemaVersion = "2"
+const SchemaVersion = "3"
 const Schema = `
 -- To keep track of the version of this schema
 CREATE TABLE SchemaVersion (name text not null);
