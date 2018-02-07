@@ -1,5 +1,5 @@
 outdir=`dirname $0 | xargs realpath`
-gitroot=`echo $outdir/../.. | xargs realpath`
+gitroot=`echo $outdir/.. | xargs realpath`
 
 outfile=dependencies.txt
 cmd=`basename $0`
