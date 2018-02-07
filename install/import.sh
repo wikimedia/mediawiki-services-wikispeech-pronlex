@@ -71,7 +71,6 @@ CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
 
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
-#if  go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$SVLEX ; then
 if go run $CMDDIR/importSql/importSql.go $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz $APPDIR/db_files/$SVLEX; then
     echo -n ""
 else
@@ -81,7 +80,6 @@ fi
 
 echo "" >&2
 echo "IMPORT: $NOBLEX" >&2
-#if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$NOBLEX ; then
 if go run $CMDDIR/importSql/importSql.go $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.sql.gz $APPDIR/db_files/$NOBLEX; then
     echo -n ""
 else
@@ -91,7 +89,6 @@ fi
 
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
-#if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$AMELEX ; then 
 if go run $CMDDIR/importSql/importSql.go $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8.sql.gz $APPDIR/db_files/$AMELEX; then
     echo -n ""
 else
@@ -101,7 +98,6 @@ fi
 
 echo "" >&2
 echo "IMPORT: $ARLEX" >&2
-#if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$ARLEX ; then
 if go run $CMDDIR/importSql/importSql.go $LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8.sql.gz $APPDIR/db_files/$ARLEX; then
     echo -n ""
 else
