@@ -29,7 +29,7 @@ func sqlDump(dbFile string, outFile string) error {
 	sqliteCmd := exec.Command(sqlitePath, dbFile, ".dump")
 	out, err := os.Create(outFile)
 	if err != nil {
-		log.Fatal("couldn't create output file %s : %v", outFile, err)
+		log.Fatalf("couldn't create output file %s : %v", outFile, err)
 	}
 	defer out.Close()
 	sqliteCmd.Stdout = out

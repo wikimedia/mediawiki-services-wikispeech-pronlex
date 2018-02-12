@@ -432,6 +432,7 @@ func (dbm *DBManager) UpdateEntry(e lex.Entry) (lex.Entry, bool, error) {
 	return updateEntry(db, e)
 }
 
+// DeleteEntry deletes an entry from the database
 func (dbm *DBManager) DeleteEntry(entryID int64, lexRef lex.LexRef) (int64, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
