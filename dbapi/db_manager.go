@@ -54,17 +54,17 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		db.Close()
-		return fmt.Errorf("sql error : %v", err)
+		return fmt.Errorf("sql error, failed to open db : %v", err)
 	}
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 		db.Close()
-		return fmt.Errorf("sql error : %v", err)
+		return fmt.Errorf("sql error, failed to set foreign keys : %v", err)
 	}
 	_, err = db.Exec(Schema)
 	if err != nil {
 		db.Close()
-		return fmt.Errorf("sql error : %v", err)
+		return fmt.Errorf("sql error, failed to load schema: %v", err)
 	}
 
 	dbm.dbs[dbRef] = db
