@@ -197,7 +197,7 @@ func setupDemoDB() error {
 
 	_, err = dbmx.InsertEntries(lexRef, demoEntries())
 	if err != nil {
-		return fmt.Errorf("Failed to insert entries to db: %v", err)
+		return fmt.Errorf("failed to insert entries to db: %v", err)
 	}
 
 	log.Println("demo_setup: test database completed")
