@@ -740,7 +740,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 		}
 	}
 
-	tx.Commit()
+	//tx.Commit()
 	// <- transaction
 
 	return ids, err
