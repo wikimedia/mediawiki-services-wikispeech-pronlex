@@ -12,14 +12,10 @@ PORT="8787"
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
-if [ $# -eq 1 ]; then
-    APPDIR=$1
-    shift 1
-else
-    while getopts ":hp:a:" opt; do
-	case $opt in
-	    h)
-		echo "
+while getopts ":hp:a:" opt; do
+    case $opt in
+	h)
+	    echo "
 [$CMD] SERVER STARTUP SCRIPT
    1. STARTS A TEST SERVER AND RUNS A SET OF TESTS
    2. SHUTS DOWN TEST SERVER
@@ -32,29 +28,20 @@ Options:
 
 EXAMPLE INVOCATION: $CMD -a lexserver_files
 " >&2
-		echo "USAGE: bash $CMD <OPTIONS>
-		
-Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic.
-
-Options:
-  -h help
-  -a appdir (default: this script's folder)
-" >&2
-		exit 1
-		;;
-	    a)
-		APPDIR=$OPTARG
-		;;
-	    p)
-		PORT=$OPTARG
-		;;
-	    \?)
-		echo "Invalid option: -$OPTARG" >&2
-		exit 1
-		;;
-	esac
-    done
-fi
+	    exit 1
+	    ;;
+	a)
+	    APPDIR=$OPTARG
+	    ;;
+	p)
+	    PORT=$OPTARG
+	    ;;
+	\?)
+	    echo "Invalid option: -$OPTARG" >&2
+	    exit 1
+	    ;;
+    esac
+done
 
 if [ -z "$APPDIR" ] ; then
     echo "[$CMD] APPDIR must be specified using -a!" >&2
