@@ -9,6 +9,7 @@
 
 CMD=`basename $0`
 PORT="8787"
+GOBIN="go"
 
 while getopts ":hp:a:g:" opt; do
     case $opt in
@@ -32,10 +33,10 @@ EXAMPLE INVOCATION: $CMD -a lexserver_files
 	a)
 	    APPDIR=$OPTARG
 	    ;;
-	g)
+	t)
 	    GOPATH=$OPTARG
 	    ;;
-	p)
+	g)
 	    PORT=$OPTARG
 	    ;;
 	\?)
@@ -58,7 +59,7 @@ if [ -z "$GOPATH" ] ; then
     fi
 fi
 
-export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin/go
+export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin
 
 shift $(expr $OPTIND - 1 )
 
