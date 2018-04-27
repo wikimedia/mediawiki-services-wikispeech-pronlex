@@ -33,6 +33,9 @@ EXAMPLE INVOCATION: $CMD -a lexserver_files
 	a)
 	    APPDIR=$OPTARG
 	    ;;
+	g)
+	    GOPATH=$OPTARG
+	    ;;
 	p)
 	    PORT=$OPTARG
 	    ;;
