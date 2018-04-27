@@ -633,14 +633,14 @@ Default ports:
 
 	err = setupDemoDB()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "COULDN'T INITIALISE DEMO DB : %v\n", err)
+		log.Printf("COULDN'T INITIALISE DEMO DB : %v\n", err)
 		os.Exit(1)
 	}
 
 	log.Printf("lexserver: creating %s server on port %s", tag, port)
 	s, err := createServer(port)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "COULDN'T CREATE SERVER : %v\n", err)
+		log.Printf("COULDN'T CREATE SERVER : %v\n", err)
 		os.Exit(1)
 	}
 
@@ -663,6 +663,7 @@ Default ports:
 
 		<-stop
 
+		// This happens after Ctrl-C
 		fmt.Fprintf(os.Stderr, "\n")
 		log.Println("lexserver: shutting down...")
 
@@ -719,6 +720,9 @@ func createServer(port string) (*http.Server, error) {
 			return s, fmt.Errorf("lexserver: cannot find db file. %v", err)
 		}
 		var db *sql.DB
+
+		// TODO! see also db_manager.DefineSqliteDB - it should do the same thing!
+
 		db, err = sql.Open("sqlite3_with_regexp", dbPath)
 		if err != nil {
 			return s, fmt.Errorf("Failed to open dbfile %v", err)

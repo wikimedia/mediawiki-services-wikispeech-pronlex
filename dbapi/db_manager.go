@@ -3,6 +3,7 @@ package dbapi
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 	"sync"
@@ -51,20 +52,45 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 		return fmt.Errorf("DBManager.AddDB: db already exists: '%s'", name)
 	}
 
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
 	if err != nil {
 		db.Close()
-		return fmt.Errorf("sql error, failed to open db : %v", err)
+		//return fmt.Errorf("sql error : %v", err)
+		msg := fmt.Sprintf("failed to open db : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 		db.Close()
-		return fmt.Errorf("sql error, failed to set foreign keys : %v", err)
+		//return fmt.Errorf("sql error : %v", err)
+		msg := fmt.Sprintf("failed to set foreign keys : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
 	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	if err != nil {
+		db.Close()
+		msg := fmt.Sprintf("failed to set case sensitive like : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
+	}
+	_, err = db.Exec("PRAGMA journal_mode=WAL")
+	if err != nil {
+		db.Close()
+		msg := fmt.Sprintf("failed to set journal_mode=WAL : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
+	}
+	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
 	_, err = db.Exec(Schema)
 	if err != nil {
 		db.Close()
-		return fmt.Errorf("sql error, failed to load schema: %v", err)
+		//return fmt.Errorf("sql error : %v", err)
+		msg := fmt.Sprintf("failed to load schema: %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
 	}
 
 	dbm.dbs[dbRef] = db

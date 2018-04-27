@@ -23,7 +23,7 @@ func runInitTests(s *http.Server, port string) error {
 
 	log.Println("init_tests: waiting for server to start ...")
 
-	time.Sleep(time.Second) // TODO: This is not beautiful...
+	time.Sleep(time.Second * 2) // TODO: This is not beautiful...
 
 	log.Printf("init_tests: server up and running using port " + port)
 	log.Println("init_tests: running tests")

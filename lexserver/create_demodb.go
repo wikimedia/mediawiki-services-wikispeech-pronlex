@@ -164,20 +164,29 @@ func demoEntries() []lex.Entry {
 }
 
 func setupDemoDB() error {
+	var err error
+
 	log.Println("demo_setup: creating demo database ...")
 
 	dbName := "lexserver_testdb"
 	lexRef := lex.NewLexRef(dbName, "sv")
 	dbPath := filepath.Join(dbFileArea, dbName+".db")
 
-	var dbmx = dbapi.NewDBManager()
-	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-		log.Printf("demo_setup: deleting demo db: %v", dbPath)
-		err := os.Remove(dbPath)
-		if err != nil {
-			return fmt.Errorf("failed to remove %s : %v", dbPath, err)
+	dbRelatedPaths, err := filepath.Glob(dbPath + "*")
+	if err != nil {
+		return fmt.Errorf("failed to retrieve list of db files for '%s' : %v", dbPath, err)
+	}
+	for _, file := range dbRelatedPaths {
+		if _, err = os.Stat(file); !os.IsNotExist(err) {
+			log.Printf("demo_setup: deleting db file: %v", file)
+			err := os.Remove(file)
+			if err != nil {
+				return fmt.Errorf("failed to remove %s : %v", file, err)
+			}
 		}
 	}
+
+	var dbmx = dbapi.NewDBManager()
 	if dbmx.ContainsDB(lexRef.DBRef) {
 		err := dbmx.RemoveDB(lexRef.DBRef)
 		if err != nil {
@@ -185,19 +194,19 @@ func setupDemoDB() error {
 		}
 	}
 
-	err := dbmx.DefineSqliteDB(lexRef.DBRef, dbPath)
+	err = dbmx.DefineSqliteDB(lexRef.DBRef, dbPath)
 	if err != nil {
-		return fmt.Errorf("failed to define db: %v", err)
+		return fmt.Errorf("failed to define db %s | %v : %v", dbPath, lexRef, err)
 	}
 
 	err = dbmx.DefineLexicon(lexRef, "sv-se_ws-sampa", "sv")
 	if err != nil {
-		return fmt.Errorf("failed to create lexicon: %v", err)
+		return fmt.Errorf("failed to create lexicon %v: %v", lexRef, err)
 	}
 
 	_, err = dbmx.InsertEntries(lexRef, demoEntries())
 	if err != nil {
-		return fmt.Errorf("failed to insert entries to db: %v", err)
+		return fmt.Errorf("failed to insert entries to db %v: %v", lexRef, err)
 	}
 
 	log.Println("demo_setup: test database completed")
