@@ -9,9 +9,10 @@
 
 CMD=`basename $0`
 PORT="8787"
-GOBIN="go"
+export GOPATH=`go env GOPATH`
+export PATH=$PATH:$GOPATH/bin
 
-while getopts ":hp:a:g:" opt; do
+while getopts ":hp:a:" opt; do
     case $opt in
 	h)
 	    echo "
@@ -24,7 +25,6 @@ Options:
   -h help
   -a appdir (required)
   -p port   (default: $PORT)
-  -g gopath (default: $GOPATH)
 
 EXAMPLE INVOCATION: $CMD -a lexserver_files
 " >&2
@@ -33,10 +33,7 @@ EXAMPLE INVOCATION: $CMD -a lexserver_files
 	a)
 	    APPDIR=$OPTARG
 	    ;;
-	t)
-	    GOPATH=$OPTARG
-	    ;;
-	g)
+	p)
 	    PORT=$OPTARG
 	    ;;
 	\?)
@@ -52,14 +49,9 @@ if [ -z "$APPDIR" ] ; then
 fi
 
 if [ -z "$GOPATH" ] ; then
-    export GOPATH=`go env GOPATH`
-    if [ -z "$GOPATH" ] ; then
-	echo "[$CMD] The GOPATH environment variable is required!" >&2
-	exit 1
-    fi
+    echo "[$CMD] The GOPATH environment variable is required!" >&2
+    exit 1
 fi
-
-export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin
 
 shift $(expr $OPTIND - 1 )
 
@@ -69,6 +61,7 @@ if [ $# -ne 0 ]; then
 fi
 
 APPDIRABS=`readlink -f $APPDIR`
+
 
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
 switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
