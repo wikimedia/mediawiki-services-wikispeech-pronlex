@@ -10,9 +10,8 @@
 CMD=`basename $0`
 PORT="8787"
 export GOPATH=`go env GOPATH`
-export PATH=$PATH:$GOPATH/bin
 
-while getopts ":hp:a:" opt; do
+while getopts ":hp:a:g:" opt; do
     case $opt in
 	h)
 	    echo "
@@ -25,6 +24,7 @@ Options:
   -h help
   -a appdir (required)
   -p port   (default: $PORT)
+  -g gopath (default: $GOPATH)
 
 EXAMPLE INVOCATION: $CMD -a lexserver_files
 " >&2
@@ -52,6 +52,8 @@ if [ -z "$GOPATH" ] ; then
     echo "[$CMD] The GOPATH environment variable is required!" >&2
     exit 1
 fi
+
+export PATH=$PATH:$GOPATH/bin
 
 shift $(expr $OPTIND - 1 )
 
