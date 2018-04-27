@@ -9,7 +9,6 @@
 
 CMD=`basename $0`
 PORT="8787"
-export GOPATH=`go env GOPATH`
 
 while getopts ":hp:a:g:" opt; do
     case $opt in
@@ -52,8 +51,11 @@ if [ -z "$APPDIR" ] ; then
 fi
 
 if [ -z "$GOPATH" ] ; then
-    echo "[$CMD] The GOPATH environment variable is required!" >&2
-    exit 1
+    export GOPATH=`go env GOPATH`
+    if [ -z "$GOPATH" ] ; then
+	echo "[$CMD] The GOPATH environment variable is required!" >&2
+	exit 1
+    fi
 fi
 
 export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin/go
