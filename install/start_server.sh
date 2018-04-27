@@ -67,7 +67,7 @@ fi
 
 APPDIRABS=`readlink -f $APPDIR`
 
-
+GOCMD="$GOPATH/bin/go"
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
 switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
-cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
+cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && $GOCMD run *.go $switches -test && go run *.go $switches $PORT
