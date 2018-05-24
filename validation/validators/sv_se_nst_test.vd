@@ -1,0 +1,13 @@
+MustHaveTrans
+NoEmptyTrans
+RequiredTransRe	primary_stress	Fatal	Primary stress required	"
+IllegalTransRe	stress_first	Fatal	Stress can only be used in syllable initial position	[^.!+ ] +(\"\"|\"|%)
+RequiredTransRe	syllabic	Format	Each syllable needs a syllabic phoneme	^(\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*( (.|-) (\"\"|\"|%)? *(nonsyllabic +)*syllabic( +nonsyllabic)*)*$
+IllegalTransRe	MaxOneSyllabic	Fatal	A syllable cannot contain more than one syllabic phoneme	syllabic[^.+%\"-]*( +syllabic)
+IllegalTransRe	repeated_phonemes	Fatal	Repeated phonemes cannot be used within the same morpheme	symbol( +[.~])? +\\1( |$)
+
+IllegalOrthRe	bw:VocalisedOrth	Warning	The bw orthography must be vocalised (it contains >3 consonant chars)	[AbtvjHxd*rzs$SDTZEgfqklmnhwyp'><&}|{`Y~]{4}
+IllegalOrthRe	bw:OrthLengthPlacement	Fatal	Length symbol (~) is only allowed after (most) consonants"	[^btvjHxd*rzs$SDTZEgfqklmnhwyp>}|{`Y]~
+
+ACCEPT	primary_stress	hEst	\" h E s t
+REJECT	MustHaveTrans	hEst	

@@ -38,6 +38,12 @@ func (r testMustHaveTrans) Level() string {
 	return ""
 }
 
+func (r testMustHaveTrans) AddAccept(entry lex.Entry) {
+}
+
+func (r testMustHaveTrans) AddReject(entry lex.Entry) {
+}
+
 type testNoEmptyTrans struct {
 }
 
@@ -60,10 +66,15 @@ func (r testNoEmptyTrans) ShouldReject() []lex.Entry {
 	return make([]lex.Entry, 0)
 }
 func (r testNoEmptyTrans) Name() string {
-	return ""
+	return "NoEmptyTrans"
 }
 func (r testNoEmptyTrans) Level() string {
-	return ""
+	return "Format"
+}
+func (r testNoEmptyTrans) AddAccept(entry lex.Entry) {
+}
+
+func (r testNoEmptyTrans) AddReject(entry lex.Entry) {
 }
 
 type testDecomp2Orth struct {
@@ -93,9 +104,15 @@ func (r testDecomp2Orth) Level() string {
 	return ""
 }
 
+func (r testDecomp2Orth) AddAccept(entry lex.Entry) {
+}
+
+func (r testDecomp2Orth) AddReject(entry lex.Entry) {
+}
+
 func Test1(t *testing.T) {
 	var vali = validation.Validator{
-		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
+		Rules: []validation.Rule{testNoEmptyTrans{}, testMustHaveTrans{}}}
 
 	var e = lex.Entry{
 		Strn:         "anka",
@@ -119,7 +136,7 @@ func Test1(t *testing.T) {
 
 func Test2(t *testing.T) {
 	var vali = validation.Validator{
-		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}}}
+		Rules: []validation.Rule{testNoEmptyTrans{}, testMustHaveTrans{}}}
 
 	var e = lex.Entry{
 		Strn:           "anka",
@@ -151,7 +168,7 @@ func Test2(t *testing.T) {
 
 func Test3(t *testing.T) {
 	var vali = validation.Validator{
-		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
+		Rules: []validation.Rule{testNoEmptyTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = lex.Entry{
 		Strn:         "ankstjärt",
@@ -187,7 +204,7 @@ func Test3(t *testing.T) {
 
 func Test4(t *testing.T) {
 	var vali = validation.Validator{
-		Rules: []validation.Rule{testMustHaveTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
+		Rules: []validation.Rule{testNoEmptyTrans{}, testNoEmptyTrans{}, testDecomp2Orth{}}}
 
 	var e = lex.Entry{
 		Strn:         "ankstjärtsbad",

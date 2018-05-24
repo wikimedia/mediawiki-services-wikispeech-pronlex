@@ -43,6 +43,16 @@ type RequiredTransRe struct {
 	Reject   []lex.Entry
 }
 
+// AddAccept adds accept examples
+func (r RequiredTransRe) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r RequiredTransRe) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
+}
+
 func (r RequiredTransRe) Validate(e lex.Entry) (Result, error) {
 	var messages = make([]string, 0)
 	for _, t := range e.Transcriptions {

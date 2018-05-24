@@ -31,7 +31,7 @@ func loadValidators(symsetDirName string) error {
 		return err
 	}
 	vMut.Lock()
-	err = vMut.service.Load(symbolSets)
+	err = vMut.service.Load(symbolSets, symsetDirName)
 	vMut.Unlock()
 	return err
 }

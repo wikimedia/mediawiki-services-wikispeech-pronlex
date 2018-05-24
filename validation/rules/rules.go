@@ -13,6 +13,8 @@ import (
 // SymbolSetRule is a general rule for verifying that each phoneme is a legal symbol
 type SymbolSetRule struct {
 	SymbolSet symbolset.SymbolSet
+	Accept    []lex.Entry
+	Reject    []lex.Entry
 }
 
 // Validate a lex.Entry
@@ -36,12 +38,12 @@ func (r SymbolSetRule) Validate(e lex.Entry) (validation.Result, error) {
 
 // ShouldAccept returns a slice of entries that the rule should accept
 func (r SymbolSetRule) ShouldAccept() []lex.Entry {
-	return make([]lex.Entry, 0)
+	return r.Accept
 }
 
 // ShouldReject returns a slice of entries that the rule should reject
 func (r SymbolSetRule) ShouldReject() []lex.Entry {
-	return make([]lex.Entry, 0)
+	return r.Reject
 }
 
 // Name is the name of this rule
@@ -52,6 +54,16 @@ func (r SymbolSetRule) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r SymbolSetRule) Level() string {
 	return "Fatal"
+}
+
+// AddAccept adds accept examples
+func (r SymbolSetRule) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r SymbolSetRule) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
 }
 
 /*
@@ -102,6 +114,16 @@ func (r IllegalOrthRe) Level() string {
 	return r.LevelStr
 }
 
+// AddAccept adds accept examples
+func (r IllegalOrthRe) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r IllegalOrthRe) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
+}
+
 // Validate a lex.Entry
 func (r IllegalOrthRe) Validate(e lex.Entry) (validation.Result, error) {
 	var messages = make([]string, 0)
@@ -144,6 +166,16 @@ func (r RequiredOrthRe) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r RequiredOrthRe) Level() string {
 	return r.LevelStr
+}
+
+// AddAccept adds accept examples
+func (r RequiredOrthRe) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r RequiredOrthRe) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
 }
 
 // Validate a lex.Entry
@@ -206,6 +238,16 @@ func (r IllegalTransRe) Level() string {
 	return r.LevelStr
 }
 
+// AddAccept adds accept examples
+func (r IllegalTransRe) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r IllegalTransRe) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
+}
+
 // RequiredTransRe is a general rule type used to defined basic transcription requirements using regexps
 type RequiredTransRe struct {
 	NameStr  string
@@ -252,8 +294,20 @@ func (r RequiredTransRe) Level() string {
 	return r.LevelStr
 }
 
+// AddAccept adds accept examples
+func (r RequiredTransRe) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r RequiredTransRe) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
+}
+
 // MustHaveTrans is a general rule to make sure each entry has at least one transcription
 type MustHaveTrans struct {
+	Accept []lex.Entry
+	Reject []lex.Entry
 }
 
 // Validate a lex.Entry
@@ -267,12 +321,12 @@ func (r MustHaveTrans) Validate(e lex.Entry) (validation.Result, error) {
 
 // ShouldAccept returns a slice of entries that the rule should accept
 func (r MustHaveTrans) ShouldAccept() []lex.Entry {
-	return make([]lex.Entry, 0)
+	return r.Accept
 }
 
 // ShouldReject returns a slice of entries that the rule should reject
 func (r MustHaveTrans) ShouldReject() []lex.Entry {
-	return make([]lex.Entry, 0)
+	return r.Reject
 }
 
 // Name is the name of this rule
@@ -285,13 +339,28 @@ func (r MustHaveTrans) Level() string {
 	return "Format"
 }
 
+// AddAccept adds accept examples
+func (r MustHaveTrans) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r MustHaveTrans) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
+}
+
 // NoEmptyTrans is a general rule to make sure no transcriptions are be empty
 type NoEmptyTrans struct {
+	Accept []lex.Entry
+	Reject []lex.Entry
 }
 
 // Validate a lex.Entry
 func (r NoEmptyTrans) Validate(e lex.Entry) (validation.Result, error) {
 	var messages = make([]string, 0)
+	if len(e.Transcriptions) == 0 {
+		messages = append(messages, "Empty transcriptions are not allowed")
+	}
 	for _, t := range e.Transcriptions {
 		if len(strings.TrimSpace(t.Strn)) == 0 {
 			messages = append(messages, "Empty transcriptions are not allowed")
@@ -302,12 +371,12 @@ func (r NoEmptyTrans) Validate(e lex.Entry) (validation.Result, error) {
 
 // ShouldAccept returns a slice of entries that the rule should accept
 func (r NoEmptyTrans) ShouldAccept() []lex.Entry {
-	return make([]lex.Entry, 0)
+	return r.Accept
 }
 
 // ShouldReject returns a slice of entries that the rule should reject
 func (r NoEmptyTrans) ShouldReject() []lex.Entry {
-	return make([]lex.Entry, 0)
+	return r.Reject
 }
 
 // Name is the name of this rule
@@ -318,6 +387,16 @@ func (r NoEmptyTrans) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r NoEmptyTrans) Level() string {
 	return "Format"
+}
+
+// AddAccept adds accept examples
+func (r NoEmptyTrans) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r NoEmptyTrans) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
 }
 
 // Decomp2Orth is a general rule type to validate the word parts vs. the orthography. A filter is used to control the filtering, typically how to treat triple consonants at boundaries.
@@ -366,4 +445,55 @@ func (r Decomp2Orth) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r Decomp2Orth) Level() string {
 	return "Fatal"
+}
+
+// AddAccept adds accept examples
+func (r Decomp2Orth) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r Decomp2Orth) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
+}
+
+type EmptyRule struct {
+	NameStr string
+	Accept  []lex.Entry
+	Reject  []lex.Entry
+}
+
+// Validate a lex.Entry
+func (r EmptyRule) Validate(e lex.Entry) (validation.Result, error) {
+	return validation.Result{}, nil
+}
+
+// ShouldAccept returns a slice of entries that the rule should accept
+func (r EmptyRule) ShouldAccept() []lex.Entry {
+	return []lex.Entry{}
+}
+
+// ShouldReject returns a slice of entries that the rule should reject
+func (r EmptyRule) ShouldReject() []lex.Entry {
+	return []lex.Entry{}
+}
+
+// Name is the name of this rule
+func (r EmptyRule) Name() string {
+	return r.NameStr
+}
+
+// Level is the rule level (typically format, fatal, warning, info)
+func (r EmptyRule) Level() string {
+	return "No level"
+}
+
+// AddAccept adds accept examples
+func (r EmptyRule) AddAccept(entry lex.Entry) {
+	r.Accept = append(r.Accept, entry)
+}
+
+// AddReject adds accept examples
+func (r EmptyRule) AddReject(entry lex.Entry) {
+	r.Reject = append(r.Reject, entry)
 }

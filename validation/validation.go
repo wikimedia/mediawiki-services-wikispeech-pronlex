@@ -36,12 +36,56 @@ type Rule interface {
 	ShouldReject() []lex.Entry
 	Name() string
 	Level() string
+	AddAccept(lex.Entry)
+	AddReject(lex.Entry)
+}
+
+func ToString(r Rule) string {
+	fs := []string{
+		r.Name(),
+		r.Level(),
+	}
+	return strings.Join(fs, "\t")
 }
 
 // Validator is a struct containing a slice of rules
 type Validator struct {
 	Name  string
 	Rules []Rule
+}
+
+func (v Validator) NumberOfTests() int {
+	a, r := v.AllTests()
+	return len(a) + len(r)
+}
+
+func (v Validator) AllTests() ([]lex.Entry, []lex.Entry) {
+	accept := []lex.Entry{}
+	reject := []lex.Entry{}
+	for _, r := range v.Rules {
+		for _, e := range r.ShouldAccept() {
+			accept = append(accept, e)
+		}
+	}
+	for _, r := range v.Rules {
+		for _, e := range r.ShouldReject() {
+			reject = append(reject, e)
+		}
+	}
+	return accept, reject
+}
+
+func (v Validator) String() string {
+	name := "<noname>"
+	if v.Name != "" {
+		name = v.Name
+	}
+	fs := []string{"Validator: " + name}
+	fs = append(fs, fmt.Sprintf("# rules: %d", len(v.Rules)))
+	for _, r := range v.Rules {
+		fs = append(fs, fmt.Sprintf("Rule: %s", ToString(r)))
+	}
+	return strings.Join(fs, "\n")
 }
 
 // IsDefined is used to check if the validator is initialized (by checking that the validator has a non-empty name).

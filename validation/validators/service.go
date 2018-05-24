@@ -3,6 +3,8 @@ package validators
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
@@ -39,56 +41,80 @@ func (vs ValidatorService) testValidator(v validation.Validator) error {
 		for _, e := range tr.AllErrors() {
 			log.Printf("%v", e)
 		}
-		return fmt.Errorf("%s, see log file for details.", msg)
+		return fmt.Errorf("%s, see log for details.", msg)
 	}
 	return nil
 }
 
 // Load is used to load validators for the input symbol sets
-func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error {
+func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet, symsetDirName string) error {
 	if ss, ok := symbolsets["sv-se_ws-sampa"]; ok {
 		v, err := newSvSeNstValidator(ss)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize symbol set : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
 		err = vs.testValidator(v)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize validator : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
+		log.Printf("Loaded validator from code: %s", v.Name)
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["sv-se_ws-sampa-DEMO"]; ok { // FOR DEMO DB
 		v, err := newSvSeNstValidator(ss)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize symbol set : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
 		err = vs.testValidator(v)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize validator : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
+		log.Printf("Loaded validator from code: %s", v.Name)
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["nb-no_ws-sampa"]; ok {
 		v, err := newNbNoNstValidator(ss)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize symbol set : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
 		err = vs.testValidator(v)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize validator : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
+		log.Printf("Loaded validator from code: %s", v.Name)
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["en-us_ws-sampa"]; ok {
 		v, err := newEnUsCmuValidator(ss)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize symbol set : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
 		err = vs.testValidator(v)
 		if err != nil {
-			return fmt.Errorf("couldn't initialize validator : %v", err)
+			return fmt.Errorf("couldn't initialize validator from code : %v", err)
 		}
+		log.Printf("Loaded validator from code: %s", v.Name)
 		vs.Validators[ss.Name] = &v
+	}
+	for _, ss := range symbolsets {
+		fName := filepath.Join(symsetDirName, ss.Name) + ".vd" // validator suffix
+		if _, err := os.Stat(fName); !os.IsNotExist(err) {
+			v, err := LoadValidatorFromFile(ss, fName)
+			if err != nil {
+				return fmt.Errorf("couldn't initialize validator from file %s : %v", fName, err)
+			}
+			if v0, ok := vs.Validators[ss.Name]; ok {
+				for _, r := range v0.Rules { // merge two validators!
+					v.Rules = append(v.Rules, r)
+				}
+			}
+			err = vs.testValidator(v)
+			if err != nil {
+				return fmt.Errorf("couldn't initialize validator from file %s : %v", fName, err)
+			}
+			vs.Validators[ss.Name] = &v
+			log.Printf("Loaded validator from file: %s", v.Name)
+		}
 	}
 	return nil
 }

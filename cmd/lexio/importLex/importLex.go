@@ -25,7 +25,7 @@ func loadValidators(symsetDirName string) error {
 	if err != nil {
 		return err
 	}
-	err = vServ.Load(symbolSets)
+	err = vServ.Load(symbolSets, symsetDirName)
 	return err
 }
 
