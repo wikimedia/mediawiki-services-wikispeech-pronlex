@@ -2,6 +2,7 @@ package validation
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/stts-se/pronlex/lex"
@@ -71,6 +72,11 @@ type TestResult struct {
 	Level    string
 	Messages []string
 	Input    lex.Entry
+}
+
+func (tr TestResult) String() string {
+	msg := fmt.Sprintf("[%s|%s] %s", tr.RuleName, tr.Level, strings.Join(tr.Messages, "; "))
+	return fmt.Sprintf("%s\nInput: %v", msg, tr.Input)
 }
 
 type acceptExample struct {

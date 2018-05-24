@@ -65,6 +65,101 @@ func ProcessTransRe(SymbolSet symbolset.SymbolSet, Regexp string) (*regexp2.Rege
 	return regexp2.Compile(Regexp, regexp2.None)
 }
 
+/*
+ProcessRe converts an input regexp string to a compiled regexp2 regular expression
+*/
+func ProcessRe(Regexp string) (*regexp2.Regexp, error) {
+	return regexp2.Compile(Regexp, regexp2.None)
+}
+
+// IllegalOrthRe is a general rule type to check for illegal orthographies by regexp
+type IllegalOrthRe struct {
+	NameStr  string
+	LevelStr string
+	Message  string
+	Re       *regexp2.Regexp
+	Accept   []lex.Entry
+	Reject   []lex.Entry
+}
+
+// ShouldAccept returns a slice of entries that the rule should accept
+func (r IllegalOrthRe) ShouldAccept() []lex.Entry {
+	return r.Accept
+}
+
+// ShouldReject returns a slice of entries that the rule should reject
+func (r IllegalOrthRe) ShouldReject() []lex.Entry {
+	return r.Reject
+}
+
+// Name is the name of this rule
+func (r IllegalOrthRe) Name() string {
+	return r.NameStr
+}
+
+// Level is the rule level (typically format, fatal, warning, info)
+func (r IllegalOrthRe) Level() string {
+	return r.LevelStr
+}
+
+// Validate a lex.Entry
+func (r IllegalOrthRe) Validate(e lex.Entry) (validation.Result, error) {
+	var messages = make([]string, 0)
+	if m, err := r.Re.MatchString(strings.TrimSpace(e.Strn)); m {
+		if err != nil {
+			return validation.Result{RuleName: r.Name(), Level: r.Level()}, err
+		}
+		messages = append(
+			messages,
+			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Strn))
+	}
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
+}
+
+// RequiredOrthRe is a general rule type used to defined basic orthography requirements using regexps
+type RequiredOrthRe struct {
+	NameStr  string
+	LevelStr string
+	Message  string
+	Re       *regexp2.Regexp
+	Accept   []lex.Entry
+	Reject   []lex.Entry
+}
+
+// ShouldAccept returns a slice of entries that the rule should accept
+func (r RequiredOrthRe) ShouldAccept() []lex.Entry {
+	return r.Accept
+}
+
+// ShouldReject returns a slice of entries that the rule should reject
+func (r RequiredOrthRe) ShouldReject() []lex.Entry {
+	return r.Reject
+}
+
+// Name is the name of this rule
+func (r RequiredOrthRe) Name() string {
+	return r.NameStr
+}
+
+// Level is the rule level (typically format, fatal, warning, info)
+func (r RequiredOrthRe) Level() string {
+	return r.LevelStr
+}
+
+// Validate a lex.Entry
+func (r RequiredOrthRe) Validate(e lex.Entry) (validation.Result, error) {
+	var messages = make([]string, 0)
+	if m, err := r.Re.MatchString(strings.TrimSpace(e.Strn)); !m {
+		if err != nil {
+			return validation.Result{RuleName: r.Name(), Level: r.Level()}, err
+		}
+		messages = append(
+			messages,
+			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Strn))
+	}
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
+}
+
 // IllegalTransRe is a general rule type to check for illegal transcriptions by regexp
 type IllegalTransRe struct {
 	NameStr  string

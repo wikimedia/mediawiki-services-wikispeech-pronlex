@@ -2,6 +2,7 @@ package validators
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
@@ -27,12 +28,32 @@ func (vs ValidatorService) HasValidator(symbolSetName string) bool {
 	return ok
 }
 
+func (vs ValidatorService) testValidator(v validation.Validator) error {
+	tr, err := v.RunTests()
+	if err != nil {
+		return err
+	}
+	if tr.Size() > 0 {
+		msg := fmt.Sprintf("init tests failed for validator %s", v.Name)
+		log.Printf(msg)
+		for _, e := range tr.AllErrors() {
+			log.Printf("%v", e)
+		}
+		return fmt.Errorf("%s, see log file for details.", msg)
+	}
+	return nil
+}
+
 // Load is used to load validators for the input symbol sets
 func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error {
 	if ss, ok := symbolsets["sv-se_ws-sampa"]; ok {
 		v, err := newSvSeNstValidator(ss)
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
+		}
+		err = vs.testValidator(v)
+		if err != nil {
+			return fmt.Errorf("couldn't initialize validator : %v", err)
 		}
 		vs.Validators[ss.Name] = &v
 	}
@@ -41,6 +62,10 @@ func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
 		}
+		err = vs.testValidator(v)
+		if err != nil {
+			return fmt.Errorf("couldn't initialize validator : %v", err)
+		}
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["nb-no_ws-sampa"]; ok {
@@ -48,12 +73,20 @@ func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet) error
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
 		}
+		err = vs.testValidator(v)
+		if err != nil {
+			return fmt.Errorf("couldn't initialize validator : %v", err)
+		}
 		vs.Validators[ss.Name] = &v
 	}
 	if ss, ok := symbolsets["en-us_ws-sampa"]; ok {
 		v, err := newEnUsCmuValidator(ss)
 		if err != nil {
 			return fmt.Errorf("couldn't initialize symbol set : %v", err)
+		}
+		err = vs.testValidator(v)
+		if err != nil {
+			return fmt.Errorf("couldn't initialize validator : %v", err)
 		}
 		vs.Validators[ss.Name] = &v
 	}
