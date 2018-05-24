@@ -38,8 +38,9 @@ func main() {
 		os.Exit(1)
 	}
 	if tr.Size() > 0 {
-		msg := fmt.Sprintf("init tests failed for validator %s", v.Name)
-		fmt.Printf(msg)
+		errs := tr.AllErrors()
+		msg := fmt.Sprintf("%d tests failed for validator %s", len(errs), v.Name)
+		fmt.Fprintf(os.Stderr, msg)
 		for _, e := range tr.AllErrors() {
 			fmt.Fprintf(os.Stderr, "%v\n", e)
 		}
