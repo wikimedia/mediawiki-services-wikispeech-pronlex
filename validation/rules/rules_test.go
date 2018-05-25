@@ -38,12 +38,6 @@ func (r testMustHaveTrans) Level() string {
 	return ""
 }
 
-func (r testMustHaveTrans) AddAccept(entry lex.Entry) {
-}
-
-func (r testMustHaveTrans) AddReject(entry lex.Entry) {
-}
-
 type testNoEmptyTrans struct {
 }
 
@@ -71,11 +65,6 @@ func (r testNoEmptyTrans) Name() string {
 func (r testNoEmptyTrans) Level() string {
 	return "Format"
 }
-func (r testNoEmptyTrans) AddAccept(entry lex.Entry) {
-}
-
-func (r testNoEmptyTrans) AddReject(entry lex.Entry) {
-}
 
 type testDecomp2Orth struct {
 }
@@ -102,12 +91,6 @@ func (r testDecomp2Orth) Name() string {
 }
 func (r testDecomp2Orth) Level() string {
 	return ""
-}
-
-func (r testDecomp2Orth) AddAccept(entry lex.Entry) {
-}
-
-func (r testDecomp2Orth) AddReject(entry lex.Entry) {
 }
 
 func Test1(t *testing.T) {

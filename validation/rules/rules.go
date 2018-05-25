@@ -56,16 +56,6 @@ func (r SymbolSetRule) Level() string {
 	return "Fatal"
 }
 
-// AddAccept adds accept examples
-func (r SymbolSetRule) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r SymbolSetRule) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
-}
-
 /*
 ProcessTransRe converts pre-defined entities to the appropriate symbols. Strings replaced are: syllabic, nonsyllabic, phoneme, symbol.
 */
@@ -114,16 +104,6 @@ func (r IllegalOrthRe) Level() string {
 	return r.LevelStr
 }
 
-// AddAccept adds accept examples
-func (r IllegalOrthRe) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r IllegalOrthRe) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
-}
-
 // Validate a lex.Entry
 func (r IllegalOrthRe) Validate(e lex.Entry) (validation.Result, error) {
 	var messages = make([]string, 0)
@@ -166,16 +146,6 @@ func (r RequiredOrthRe) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r RequiredOrthRe) Level() string {
 	return r.LevelStr
-}
-
-// AddAccept adds accept examples
-func (r RequiredOrthRe) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r RequiredOrthRe) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
 }
 
 // Validate a lex.Entry
@@ -238,16 +208,6 @@ func (r IllegalTransRe) Level() string {
 	return r.LevelStr
 }
 
-// AddAccept adds accept examples
-func (r IllegalTransRe) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r IllegalTransRe) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
-}
-
 // RequiredTransRe is a general rule type used to defined basic transcription requirements using regexps
 type RequiredTransRe struct {
 	NameStr  string
@@ -294,16 +254,6 @@ func (r RequiredTransRe) Level() string {
 	return r.LevelStr
 }
 
-// AddAccept adds accept examples
-func (r RequiredTransRe) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r RequiredTransRe) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
-}
-
 // MustHaveTrans is a general rule to make sure each entry has at least one transcription
 type MustHaveTrans struct {
 	Accept []lex.Entry
@@ -337,16 +287,6 @@ func (r MustHaveTrans) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r MustHaveTrans) Level() string {
 	return "Format"
-}
-
-// AddAccept adds accept examples
-func (r MustHaveTrans) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r MustHaveTrans) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
 }
 
 // NoEmptyTrans is a general rule to make sure no transcriptions are be empty
@@ -387,16 +327,6 @@ func (r NoEmptyTrans) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r NoEmptyTrans) Level() string {
 	return "Format"
-}
-
-// AddAccept adds accept examples
-func (r NoEmptyTrans) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r NoEmptyTrans) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
 }
 
 // Decomp2Orth is a general rule type to validate the word parts vs. the orthography. A filter is used to control the filtering, typically how to treat triple consonants at boundaries.
@@ -447,16 +377,6 @@ func (r Decomp2Orth) Level() string {
 	return "Fatal"
 }
 
-// AddAccept adds accept examples
-func (r Decomp2Orth) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r Decomp2Orth) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
-}
-
 type EmptyRule struct {
 	NameStr string
 	Accept  []lex.Entry
@@ -486,14 +406,4 @@ func (r EmptyRule) Name() string {
 // Level is the rule level (typically format, fatal, warning, info)
 func (r EmptyRule) Level() string {
 	return "No level"
-}
-
-// AddAccept adds accept examples
-func (r EmptyRule) AddAccept(entry lex.Entry) {
-	r.Accept = append(r.Accept, entry)
-}
-
-// AddReject adds accept examples
-func (r EmptyRule) AddReject(entry lex.Entry) {
-	r.Reject = append(r.Reject, entry)
 }

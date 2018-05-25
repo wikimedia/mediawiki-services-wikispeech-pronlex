@@ -36,8 +36,6 @@ type Rule interface {
 	ShouldReject() []lex.Entry
 	Name() string
 	Level() string
-	AddAccept(lex.Entry)
-	AddReject(lex.Entry)
 }
 
 func ToString(r Rule) string {

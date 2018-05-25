@@ -200,23 +200,12 @@ func LoadValidatorFromFile(ss symbolset.SymbolSet, fName string) (validation.Val
 		if !ok {
 			return nilRes, fmt.Errorf("no rule named %s is defined (found in accept example)", rName)
 		}
-		// for _, e := range entries {
-		// 	r.AddAccept(e)
-		// 	fmt.Println(e)
-		// 	fmt.Println(r)
-		// 	fmt.Println(len(r.ShouldAccept()))
-		// 	rules[i] = r
-		// }
 	}
 	for rName, _ := range reject {
 		_, _, ok := find(rules, rName)
 		if !ok {
 			return nilRes, fmt.Errorf("no rule named %s is defined (found in reject example)", rName)
 		}
-		// for _, e := range entries {
-		// 	r.AddReject(e)
-		// 	rules[i] = r
-		// }
 	}
 	v := validation.Validator{Name: ss.Name, Rules: rules}
 
