@@ -210,9 +210,7 @@ func (v Validator) validateEntryOLD(e lex.Entry) (lex.Entry, bool) {
 }
 
 // ValidateEntry is used to validate single entries. Any validation
-// errors are added to the entry's EntryValidations field. The
-// function returns true if the entry is valid (i.e., no validation
-// issues are found), otherwise false.
+// errors are added to the entry's EntryValidations field.
 func (v Validator) ValidateEntry(e *lex.Entry) {
 	e.EntryValidations = make([]lex.EntryValidation, 0)
 	for _, rule := range v.Rules {
