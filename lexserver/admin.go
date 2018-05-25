@@ -208,6 +208,58 @@ var adminLexImport = urlHandler{
 	},
 }
 
+var adminDefineLex = urlHandler{
+	name:     "define_lex",
+	url:      "/define_lex/{lexicon_name}/{locale}/{symbolset_name}",
+	help:     "Define (create) a new (empty) lexicon inside a database.",
+	examples: []string{},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+
+		defer protect(w) // use this call in handlers to catch 'panic' and stack traces and returning a general error to the calling client
+
+		symbolsetName := delQuote(getParam("symbolset_name", r))
+		if symbolsetName == "" {
+			http.Error(w, "no value for parameter 'symbolset_name'", http.StatusBadRequest)
+			return
+		}
+
+		locale := delQuote(getParam("locale", r))
+		if locale == "" {
+			http.Error(w, "no value for parameter 'locale'", http.StatusBadRequest)
+			return
+		}
+
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+			return
+		}
+		exists, err := dbm.LexiconExists(lexRef)
+		if err != nil {
+			msg := fmt.Sprintf("Couldn't lookup lexicon reference: %s", lexRef.String())
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		if exists {
+			msg := fmt.Sprintf("Nothing will be added. Lexicon already exists: %s", lexRef.String())
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
+		err = dbm.DefineLexicon(lexRef, symbolsetName, locale)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		log.Println("Created lexicon: ", lexRef.String())
+		fmt.Fprint(w, "Created lexicon "+lexRef.String())
+	},
+}
+
 var adminDeleteLex = urlHandler{
 	name:     "deletelexicon",
 	url:      "/deletelexicon/{lexicon_name}",

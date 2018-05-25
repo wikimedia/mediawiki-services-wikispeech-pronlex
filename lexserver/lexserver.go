@@ -821,6 +821,7 @@ func createServer(port string) (*http.Server, error) {
 	admin.addHandler(adminLexImport)
 	admin.addHandler(adminListDBs)
 	admin.addHandler(adminCreateDB)
+	admin.addHandler(adminDefineLex)
 	admin.addHandler(adminMoveNewEntries)
 	admin.addHandler(adminDeleteLex)
 	admin.addHandler(adminSuperDeleteLex)
