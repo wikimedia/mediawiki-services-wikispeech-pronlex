@@ -53,8 +53,11 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	}
 
 	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	//defer db.Close()
 	if err != nil {
-		db.Close()
+		if db != nil {
+			db.Close()
+		}
 		//return fmt.Errorf("sql error : %v", err)
 		msg := fmt.Sprintf("failed to open db : %v", err)
 		log.Println(msg)
@@ -62,7 +65,10 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	}
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
-		db.Close()
+		if db != nil {
+			db.Close()
+		}
+		//db.Close()
 		//return fmt.Errorf("sql error : %v", err)
 		msg := fmt.Sprintf("failed to set foreign keys : %v", err)
 		log.Println(msg)
@@ -70,14 +76,20 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	}
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	if err != nil {
-		db.Close()
+		if db != nil {
+			db.Close()
+		}
+		//db.Close()
 		msg := fmt.Sprintf("failed to set case sensitive like : %v", err)
 		log.Println(msg)
 		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA journal_mode=WAL")
 	if err != nil {
-		db.Close()
+		if db != nil {
+			db.Close()
+		}
+		//db.Close()
 		msg := fmt.Sprintf("failed to set journal_mode=WAL : %v", err)
 		log.Println(msg)
 		return fmt.Errorf(msg)
