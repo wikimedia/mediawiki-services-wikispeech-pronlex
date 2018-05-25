@@ -72,13 +72,11 @@ Flags:
 
 	exists, err := dbm.LexiconExists(lexRef)
 	if err != nil {
-		//panic(err)
 		msg := fmt.Sprintf("[createEmptyLexicon] couldn't lookup lexicon reference %s : %v", lexRef.String(), err)
 		fmt.Fprintln(os.Stderr, msg)
 		os.Exit(1)
 	}
 	if exists {
-		//panic(err)
 		msg := fmt.Sprintf("[createEmptyLexicon] couldn't create lexicon that already exists: %s", lexRef.String())
 		fmt.Fprintln(os.Stderr, msg)
 		os.Exit(1)
@@ -86,7 +84,6 @@ Flags:
 
 	err = dbm.DefineLexicon(lexRef, ssName, locale)
 	if err != nil {
-		//panic(err)
 		msg := fmt.Sprintf("[createEmptyLexicon] couldn't create lexicon : %v", err)
 		fmt.Fprintln(os.Stderr, msg)
 		os.Exit(1)
