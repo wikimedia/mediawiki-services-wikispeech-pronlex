@@ -187,6 +187,7 @@ func setupDemoDB() error {
 	}
 
 	var dbmx = dbapi.NewDBManager()
+	defer dbmx.CloseDB(lexRef.DBRef)
 	if dbmx.ContainsDB(lexRef.DBRef) {
 		err := dbmx.RemoveDB(lexRef.DBRef)
 		if err != nil {
