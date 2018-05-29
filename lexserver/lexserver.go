@@ -579,8 +579,8 @@ func main() {
 	var help = flag.Bool("help", false, "print usage/help and exit")
 
 	usage := `Usage:
-     $ lexserver <PORT>
-     $ lexserver
+     $ lexserver [flags] <PORT>
+     $ lexserver [flags]
       - use default port
 
 Flags:
@@ -646,6 +646,7 @@ Default ports:
 
 	if *test {
 		err = runInitTests(s, port)
+		defer shutdown(s)
 		if err != nil {
 			log.Printf("lexserver: %v", err)
 			os.Exit(1)
@@ -665,27 +666,31 @@ Default ports:
 
 		// This happens after Ctrl-C
 		fmt.Fprintf(os.Stderr, "\n")
-		log.Println("lexserver: shutting down...")
-
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		defer s.Shutdown(ctx)
-
-		// shut down databases nicely
-		dbNames, err := dbm.ListDBNames()
-		if err != nil {
-			log.Printf("couldn't close databases properly, will exit anyway : %v", err)
-		}
-		for _, dbName := range dbNames {
-			err = dbm.CloseDB(dbName)
-			if err != nil {
-				log.Printf("couldn't close database %s properly, will exit anyway : %v", string(dbName), err)
-			}
-			log.Printf("lexserver: closed database %s", string(dbName))
-		}
+		shutdown(s)
 	}
 	log.Println("lexserver: BYE!")
 	log.Println("")
+}
+
+func shutdown(s *http.Server) {
+	log.Println("lexserver: shutting down...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	defer s.Shutdown(ctx)
+
+	// shut down databases nicely
+	dbNames, err := dbm.ListDBNames()
+	if err != nil {
+		log.Printf("couldn't close databases properly, will exit anyway : %v", err)
+	}
+	for _, dbName := range dbNames {
+		err = dbm.CloseDB(dbName)
+		if err != nil {
+			log.Printf("couldn't close database %s properly, will exit anyway : %v", string(dbName), err)
+		}
+		log.Printf("lexserver: closed database %s", string(dbName))
+	}
 }
 
 func createServer(port string) (*http.Server, error) {
