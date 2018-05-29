@@ -27,7 +27,7 @@ func createEmptyLexicon(dbPath string, lexRefX lex.LexRefWithInfo, locale string
 			if err != nil {
 				return fmt.Errorf("couldn't create db %s : %v", dbPath, err)
 			}
-			fmt.Fprintf(os.Stderr, "created db %s\n", dbPath)
+			fmt.Fprintf(os.Stderr, "[createEmptyLexicon] created db %s\n", dbPath)
 		} else {
 			return fmt.Errorf("db does not exist %s : %v", dbPath, err)
 		}
@@ -36,6 +36,7 @@ func createEmptyLexicon(dbPath string, lexRefX lex.LexRefWithInfo, locale string
 		if err != nil {
 			return fmt.Errorf("couldn't open db %s : %v", dbPath, err)
 		}
+		fmt.Fprintf(os.Stderr, "[createEmptyLexicon] opened db %s\n", dbPath)
 	}
 
 	if !dbm.ContainsDB(lexRef.DBRef) {
@@ -54,6 +55,9 @@ func createEmptyLexicon(dbPath string, lexRefX lex.LexRefWithInfo, locale string
 	if err != nil {
 		return fmt.Errorf("couldn't create lexicon : %v", err)
 	}
+	fmt.Fprintf(os.Stderr, "[createEmptyLexicon] created lexicon %s in %s\n", lexRefX.LexRef.LexName, dbPath)
+	fmt.Fprintf(os.Stderr, "[createEmptyLexicon]  > symbolset: %s\n", lexRefX.SymbolSetName)
+	fmt.Fprintf(os.Stderr, "[createEmptyLexicon]  > locale:    %s\n", locale)
 
 	return nil
 }
@@ -104,7 +108,4 @@ Flags:
 		os.Exit(1)
 	}
 
-	fmt.Fprintf(os.Stderr, "[createEmptyLexicon] created lexicon %s in %s\n", lexName, dbPath)
-	fmt.Fprintf(os.Stderr, "[createEmptyLexicon]  > symbolset: %s\n", ssName)
-	fmt.Fprintf(os.Stderr, "[createEmptyLexicon]  > locale:    %s\n", locale)
 }
