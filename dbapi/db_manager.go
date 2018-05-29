@@ -32,6 +32,10 @@ func (dbm *DBManager) CloseDB(dbRef lex.DBRef) error {
 		return fmt.Errorf("DBManager.CloseDB: no such db '%s'", dbRef)
 	}
 	err := db.Close()
+	if err != nil {
+		return fmt.Errorf("DBManager.CloseDB: couldn't close '%s'", dbRef)
+	}
+	log.Printf("DBManager.CloseDB: closed db '%s'", dbRef)
 	return err
 }
 
