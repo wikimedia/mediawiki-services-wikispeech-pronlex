@@ -39,17 +39,17 @@ func (dbm *DBManager) CloseDB(dbRef lex.DBRef) error {
 func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	name := string(dbRef)
 	if "" == name {
-		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not be empty")
+		return fmt.Errorf("DBManager.DefineSqliteDB: illegal argument: name must not be empty")
 	}
 	if strings.Contains(name, ":") {
-		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not contain ':'")
+		return fmt.Errorf("DBManager.DefineSqliteDB: illegal argument: name must not contain ':'")
 	}
 
 	dbm.Lock()
 	defer dbm.Unlock()
 
 	if _, ok := dbm.dbs[dbRef]; ok {
-		return fmt.Errorf("DBManager.AddDB: db already exists: '%s'", name)
+		return fmt.Errorf("DBManager.DefineSqliteDB: db is already loaded: '%s'", name)
 	}
 
 	db, err := sql.Open("sqlite3_with_regexp", dbPath)
@@ -59,7 +59,7 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 			db.Close()
 		}
 		//return fmt.Errorf("sql error : %v", err)
-		msg := fmt.Sprintf("failed to open db : %v", err)
+		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to open db : %v", err)
 		log.Println(msg)
 		return fmt.Errorf(msg)
 	}
@@ -70,7 +70,7 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 		}
 		//db.Close()
 		//return fmt.Errorf("sql error : %v", err)
-		msg := fmt.Sprintf("failed to set foreign keys : %v", err)
+		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to set foreign keys : %v", err)
 		log.Println(msg)
 		return fmt.Errorf(msg)
 	}
@@ -80,7 +80,7 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 			db.Close()
 		}
 		//db.Close()
-		msg := fmt.Sprintf("failed to set case sensitive like : %v", err)
+		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to set case sensitive like : %v", err)
 		log.Println(msg)
 		return fmt.Errorf(msg)
 	}
@@ -90,7 +90,7 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 			db.Close()
 		}
 		//db.Close()
-		msg := fmt.Sprintf("failed to set journal_mode=WAL : %v", err)
+		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to set journal_mode=WAL : %v", err)
 		log.Println(msg)
 		return fmt.Errorf(msg)
 	}
@@ -110,7 +110,73 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	return nil
 }
 
-// AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk. To create AND add the database, use DefineSqliteDB instead.
+// OpenDB is used to open an existing sqlite3 database and add it to the DB manager cache.
+func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
+	name := string(dbRef)
+	if "" == name {
+		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not be empty")
+	}
+	if strings.Contains(name, ":") {
+		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not contain ':'")
+	}
+
+	dbm.Lock()
+	defer dbm.Unlock()
+
+	if _, ok := dbm.dbs[dbRef]; ok {
+		return fmt.Errorf("DBManager.OpenDB: db is already loaded: '%s'", name)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	//defer db.Close()
+	if err != nil {
+		if db != nil {
+			db.Close()
+		}
+		//return fmt.Errorf("sql error : %v", err)
+		msg := fmt.Sprintf("DBManager.OpenDB: failed to open db : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
+	}
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		if db != nil {
+			db.Close()
+		}
+		//db.Close()
+		//return fmt.Errorf("sql error : %v", err)
+		msg := fmt.Sprintf("DBManager.OpenDB: failed to set foreign keys : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	if err != nil {
+		if db != nil {
+			db.Close()
+		}
+		//db.Close()
+		msg := fmt.Sprintf("DBManager.OpenDB: failed to set case sensitive like : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
+	}
+	_, err = db.Exec("PRAGMA journal_mode=WAL")
+	if err != nil {
+		if db != nil {
+			db.Close()
+		}
+		//db.Close()
+		msg := fmt.Sprintf("DBManager.OpenDB: failed to set journal_mode=WAL : %v", err)
+		log.Println(msg)
+		return fmt.Errorf(msg)
+	}
+	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
+	dbm.dbs[dbRef] = db
+
+	return nil
+}
+
+// AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk. To create AND add the database, use DefineSqliteDB instead. To open and add an existing db, use OpenDB
 func (dbm *DBManager) AddDB(dbRef lex.DBRef, db *sql.DB) error {
 	name := string(dbRef)
 	if "" == name {
