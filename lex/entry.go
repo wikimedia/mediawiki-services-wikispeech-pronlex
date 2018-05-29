@@ -47,11 +47,17 @@ func ParseLexRef(fullLexName string) (LexRef, error) {
 	return NewLexRef(db, lex), nil
 }
 
-// NewLexRef creates a lexicon reference from input strings
+// NewLexRef creates a lexicon reference from input (downcased) strings
 func NewLexRef(lexDB string, lexName string) LexRef {
 	return LexRef{DBRef: DBRef(strings.ToLower(strings.TrimSpace(lexDB))),
 		LexName: LexName(strings.ToLower(strings.TrimSpace(lexName))),
 	}
+}
+
+// NewLexRefWithInfo creates a lexicon reference with symbol set, from (downcased) input strings
+func NewLexRefWithInfo(lexDB string, lexName string, symbolSetName string) LexRefWithInfo {
+	lexRef := NewLexRef(lexDB, lexName)
+	return LexRefWithInfo{LexRef: lexRef, SymbolSetName: strings.ToLower(strings.TrimSpace(symbolSetName))}
 }
 
 func (lr LexRef) String() string {
