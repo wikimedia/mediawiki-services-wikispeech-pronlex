@@ -318,6 +318,73 @@ var lexiconLookup = urlHandler{
 	},
 }
 
+var lexiconEntriesExit = urlHandler{
+	name:     "entries_exist",
+	url:      "/entries_exist",
+	help:     "Lookup orthographies in the db and see if they exist as entries.",
+	examples: []string{"/entries_exist?lexicons=lexserver_testdb:sv&words=hund,h%C3%A4st,hunnd"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+
+		var err error
+
+		u, err := url.Parse(r.URL.String())
+		if err != nil {
+			log.Printf("entriesExistHandler failed to get params: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		params := u.Query()
+		for k, v := range params {
+			// if _, ok := knownParams[k]; !ok {
+			// 	log.Printf("entriesExist: unknown URL parameter: '%s': '%s'", k, v)
+			// 	http.Error(w, fmt.Sprintf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v), http.StatusBadRequest)
+			// 	return // NB: only informs about the first unknown param...
+			// }
+			if !(k == "lexicons" || k == "words") {
+				log.Printf("entriesExist: unknown URL parameter: '%s': '%s'. Valid parameters :  %s and %s", k, v, "lexicons", "words")
+				http.Error(w, fmt.Sprintf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v), http.StatusBadRequest)
+				return // NB: only informs about the first unknown param...
+			}
+		}
+
+		q, err := queryFromParams(r)
+
+		if err != nil {
+			log.Printf("failed to process query params: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+			return
+		}
+
+		var res = make(map[string]bool)
+		writer := lex.EntrySliceWriter{}
+		err = dbm.LookUp(q, &writer)
+		if err != nil {
+			log.Printf("lexserver: Failed to get entries: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		for _, e := range writer.Entries {
+			orth := e.Strn
+			res[orth] = true
+		}
+		for _, orth := range q.Query.Words {
+			if _, ok := res[orth]; !ok {
+				res[orth] = false
+			}
+		}
+
+		jsn, err := marshal(res, r)
+		if err != nil {
+			log.Printf("lexserver: Failed to marshal json: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(jsn))
+	},
+}
+
 var lexiconAddEntryURL = `/addentry?lexicon_name=lexserver_testdb:sv&entry={
     "strn": "flesk",
     "language": "sv-se",
