@@ -405,6 +405,10 @@ var lexiconAddEntryURL = `/addentry?lexicon_name=lexserver_testdb:sv&entry={
 }
 `
 
+type IDs struct {
+	IDs []int64 `json:"ids"`
+}
+
 var lexiconAddEntry = urlHandler{
 	name:     "addentry",
 	url:      "/addentry",
@@ -434,7 +438,16 @@ var lexiconAddEntry = urlHandler{
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprint(w, ids)
+		jsids := IDs{ids}
+		res, err := json.Marshal(jsids)
+		if err != nil {
+			msg := fmt.Sprintf("lexserver: Failed to marshal ids : %v", err)
+			log.Printf(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(res))
 	},
 }
 

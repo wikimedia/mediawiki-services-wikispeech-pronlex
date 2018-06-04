@@ -1392,6 +1392,7 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 }
 
 func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+	//log.Printf("dbapi debug updateEntryTag called")
 	if e.ID != dbE.ID {
 		tx.Rollback()
 		return false, fmt.Errorf("updateEntryTag: new and old entries have different ids")
@@ -1399,6 +1400,10 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 
 	newTag := strings.TrimSpace(strings.ToLower(e.Tag))
 	oldTag := strings.TrimSpace(strings.ToLower(dbE.Tag))
+
+	// log.Println("dbapi oldTag", oldTag)
+	// log.Println("dbapi newTag", newTag)
+
 	// Nothing to do
 	if newTag == oldTag {
 		return false, nil
