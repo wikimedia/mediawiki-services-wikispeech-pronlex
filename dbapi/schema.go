@@ -112,6 +112,15 @@ CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON entryTag
    END;
 
 
+CREATE TABLE EntryComment (
+    id integer not null primary key autoincrement,
+    entryId integer not null,
+    label text not null,
+    comment text, -- not null,
+    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
+);
+
+
 -- Validiation results of entries
 CREATE TABLE EntryValidation (
     id integer not null primary key autoincrement,
