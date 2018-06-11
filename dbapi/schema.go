@@ -85,7 +85,7 @@ CREATE INDEX idid on Entry (id, lexiconId);
 -- CREATE UNIQUE INDEX tagindex ON Tag (strn);
 
 -- Entry tag is a string used to distinguish between homographs.
--- Unique for an entry of a specific word forms, but not for different
+-- Unique for an entry of a specific word form, but not for different
 -- word forms. NOTE: This can be further normalized into a separate Tag
 -- table, for reusable tags.
 CREATE TABLE EntryTag (

@@ -231,6 +231,17 @@ func TestEntryTag2(t *testing.T) {
 		t.Errorf("failed to insert entries : %v", err)
 	}
 
+	// Test Query.TagLike
+
+	q00 := Query{TagLike: "entrytag_2"}
+	entries00, err00 := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q00)
+	if err00 != nil {
+		t.Errorf("Got error: %v", err00)
+	}
+	if w, g := 1, len(entries00); w != g {
+		t.Errorf("Expected '%d' got '%d'", w, g)
+	}
+
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	//var entries map[string][]lex.Entry

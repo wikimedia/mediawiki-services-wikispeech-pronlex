@@ -54,6 +54,8 @@ type Query struct {
 	ParadigmLike   string `json:"paradigmLike"`
 	ParadigmRegexp string `json:"paradigmRegexp"`
 
+	TagLike string `json:"tagLike"`
+
 	// A list of entry statuses to match
 	EntryStatus []string `json:"entryStatus"`
 
