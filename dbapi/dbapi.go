@@ -738,6 +738,13 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 			tx.Rollback()
 			return ids, fmt.Errorf("inserting EntryValidations failed : %v", err)
 		}
+
+		err = insertEntryComments(tx, e.ID, e.Comments)
+		if err != nil {
+			tx.Rollback()
+			return ids, fmt.Errorf("inserting EntryComments failed : %v", err)
+		}
+
 	}
 
 	//tx.Commit()
@@ -984,6 +991,9 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 	var entryValidationID sql.NullInt64
 	var entryValidationLevel, entryValidationName, entryValidationMessage, entryValidationTimestamp sql.NullString
 
+	var entryCommentID sql.NullInt64
+	var entryCommentLabel, entryCommentSource, entryCommentComment sql.NullString
+
 	// transcription ids read so far, in order not to add same trans twice
 	transIDs := make(map[int64]int)
 	// entry validation ids read so far, in order not to add same validation twice
@@ -1029,6 +1039,11 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 			&entryValidationName,
 			&entryValidationMessage,
 			&entryValidationTimestamp,
+
+			&entryCommentID,
+			&entryCommentLabel,
+			&entryCommentSource,
+			&entryCommentComment,
 		)
 		// new entry starts here.
 		//
@@ -1130,6 +1145,22 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 				valiIDs[entryValidationID.Int64]++
 			}
 		}
+
+		// Zero or more lex.EntryComments
+		if entryCommentID.Valid && entryCommentLabel.Valid && entryCommentSource.Valid && entryCommentComment.Valid {
+			if _, ok := valiIDs[entryCommentID.Int64]; !ok {
+				currCmt := lex.EntryComment{
+					ID:      entryCommentID.Int64,
+					Label:   entryCommentLabel.String,
+					Source:  entryCommentSource.String,
+					Comment: entryCommentComment.String,
+				}
+				currE.Comments = append(currE.Comments, currCmt)
+				valiIDs[entryCommentID.Int64]++
+			}
+
+		}
+
 		lastE = entryID
 	}
 
@@ -1289,7 +1320,12 @@ func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 		return updated8, err
 	}
 
-	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7 || updated8, err
+	updated9, err := updateEntryComments(tx, e, dbEntries[0])
+	if err != nil {
+		return updated9, err
+	}
+
+	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7 || updated8 || updated9, err
 }
 
 func getTIDs(ts []lex.Transcription) []int64 {
@@ -1445,6 +1481,29 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+
+	if len(e.Comments) == 0 && len(dbE.Comments) == 0 {
+		return false, nil
+	}
+
+	// Update comments if different numbers of comments
+	if len(e.Comments) != len(dbE.Comments) {
+		err := insertEntryComments(tx, dbE.ID, e.Comments)
+		return true, err
+	}
+
+	// List of comments equally long. Only update if different comments
+	for i, cmt := range e.Comments {
+		if cmt != dbE.Comments[i] {
+			err := insertEntryComments(tx, dbE.ID, e.Comments)
+			return true, err
+		}
+	}
+
+	return false, nil
 }
 
 // TODO move to function
@@ -1624,6 +1683,31 @@ func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error)
 	}
 
 	return true, nil
+}
+
+var delEntryCommentsSQL = "DELETE FROM entrycomment WHERE entryID = ?"
+var insEntryCommentSQL = "INSERT INTO entrycomment (entryid, label, source, comment) values (?, ?, ?, ?)"
+
+func insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) error {
+
+	// Delete all old comments, before adding the new
+	// TODO Handle old comments that are to be kept in a smoother way.
+	_, err := tx.Exec(delEntryCommentsSQL, eID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed deleting EntryComments : %v", err)
+	}
+
+	for _, cmt := range eComments {
+		_, err := tx.Exec(insEntryCommentSQL, eID, cmt.Label, cmt.Source, cmt.Comment)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed inserting EntryComment : %v", err)
+		}
+
+	}
+
+	return nil
 }
 
 func unique(ns []int64) []int64 {

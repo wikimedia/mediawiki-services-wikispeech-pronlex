@@ -115,10 +115,15 @@ CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON entryTag
 CREATE TABLE EntryComment (
     id integer not null primary key autoincrement,
     entryId integer not null,
+    source text,
     label text not null,
     comment text, -- not null,
+    -- Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
     FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
 );
+
+CREATE INDEX cmtlabelndx ON EntryComment(label); 
+CREATE INDEX cmtsrcndx ON EntryComment(source); 
 
 
 -- Validiation results of entries

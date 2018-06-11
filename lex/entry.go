@@ -75,6 +75,14 @@ type EntryStatus struct {
 	Current   bool   `json:"current"`
 }
 
+type EntryComment struct {
+	ID      int64  `json:"id"`
+	EntryID int64  `json:"entryId"`
+	Source  string `json:"source"`
+	Label   string `json:"label"`
+	Comment string `json:"comment"`
+}
+
 // EntryValidation associates a validation result to an Entry
 type EntryValidation struct {
 	ID int64 `json:"id"`
@@ -170,8 +178,9 @@ type Entry struct {
 
 	// Preferred flag: 1=true, 0=false; schema triggers only one preferred per orthographic word
 	//Preferred        int64             `json:"preferred"`
-	Preferred bool   `json:"preferred"`
-	Tag       string `json:"tag"`
+	Preferred bool           `json:"preferred"`
+	Tag       string         `json:"tag"`
+	Comments  []EntryComment `json:"comments"`
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.
