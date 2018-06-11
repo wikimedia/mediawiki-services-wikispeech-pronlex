@@ -266,11 +266,12 @@ LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid
 LEFT JOIN entrytag ON entrytag.entryid = entry.id
 LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1
 LEFT JOIN entryvalidation ON entryvalidation.entryid = entry.id 
+LEFT JOIN entryComment ON entryComment.entryid = entry.id 
 WHERE entry.id = transcription.entryid AND entry.lexiconid = lexicon.id` // entry.lexiconid = lexicon.id needed when no single input lexicon ID is given
 // AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
 
 // Queries db for all entries with transcriptions and optional lemma forms.
-var baseSQLSelect = "SELECT lexicon.name, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, entry.preferred, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrytag.tag, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp " + baseSQLFrom
+var baseSQLSelect = "SELECT lexicon.name, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, entry.preferred, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrytag.tag, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp, entryComment.id, entryComment.label, entryComment.source, entryComment.comment " + baseSQLFrom
 
 var baseSQLCount = `SELECT count(distinct entry.id) ` + baseSQLFrom
 

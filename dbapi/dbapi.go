@@ -741,6 +741,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 
 		err = insertEntryComments(tx, e.ID, e.Comments)
 		if err != nil {
+
 			tx.Rollback()
 			return ids, fmt.Errorf("inserting EntryComments failed : %v", err)
 		}

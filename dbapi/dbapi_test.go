@@ -252,7 +252,8 @@ func Test_insertEntries(t *testing.T) {
 		Language:       "XYZZ",
 		Preferred:      true,
 		Transcriptions: []lex.Transcription{t1, t2},
-		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"},
+	}
 
 	_, errx := insertEntries(db, l, []lex.Entry{e1})
 	if errx != nil {
@@ -266,6 +267,12 @@ func Test_insertEntries(t *testing.T) {
 
 	var entries map[string][]lex.Entry
 	entries, err = lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+
+	for k, v := range entries {
+		log.Printf("WTF %#v\n", k)
+		log.Printf("         --- %#v\n", v)
+	}
+
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
