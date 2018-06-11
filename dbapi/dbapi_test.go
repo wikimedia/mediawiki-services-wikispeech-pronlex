@@ -268,11 +268,6 @@ func Test_insertEntries(t *testing.T) {
 	var entries map[string][]lex.Entry
 	entries, err = lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 
-	for k, v := range entries {
-		log.Printf("WTF %#v\n", k)
-		log.Printf("         --- %#v\n", v)
-	}
-
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -463,6 +458,11 @@ func Test_insertEntries(t *testing.T) {
 	eApa.WordParts = "fin+krog"
 	eApa.Language = "gummiapa"
 	eApa.EntryValidations = []lex.EntryValidation{}
+
+	c1 := lex.EntryComment{Label: "label1", Source: "secret", Comment: "strålande"}
+	cmts := []lex.EntryComment{c1}
+	eApa.Comments = cmts
+
 	//time.Sleep(2000 * time.Millisecond)
 	newE2, updated, err := updateEntry(db, eApa)
 	if err != nil {
@@ -489,6 +489,10 @@ func Test_insertEntries(t *testing.T) {
 		t.Errorf(fs, "gummiapa", eApax.Language)
 	}
 	if got, want := len(eApax.EntryValidations), 0; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
+	if got, want := len(eApax.Comments), 1; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
