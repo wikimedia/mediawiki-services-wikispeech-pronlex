@@ -324,7 +324,7 @@ func Test_ValidationUpdate1(t *testing.T) {
 	db, lexName := vInsertEntries(t, "test3")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
-	err := lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{}, &ew)
+	err := lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
 
 	for _, e := range ew.Entries {
@@ -361,7 +361,7 @@ func Test_ValidationUpdate2(t *testing.T) {
 	db, lexName := vInsertEntries(t, "test4")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
-	err := lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{}, &ew)
+	err := lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
 
 	var es []lex.Entry
@@ -400,7 +400,7 @@ func Test_ValidationUpdate3(t *testing.T) {
 	db, lexName := vInsertEntries(t, "test5")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
-	err := lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{}, &ew)
+	err := lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
 
 	es, _ := v.ValidateEntries(ew.Entries)

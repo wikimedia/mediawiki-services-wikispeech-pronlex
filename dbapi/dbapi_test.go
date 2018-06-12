@@ -140,7 +140,7 @@ func Test_SuperDeleteLexicon(t *testing.T) {
 	}
 
 	// Check that there are things in db:
-	q := Query{Page: 0, PageLength: 25}
+	q := Query{WordLike: "%", Page: 0, PageLength: 25}
 
 	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 	if err != nil {
@@ -505,6 +505,53 @@ func Test_insertEntries(t *testing.T) {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
+	// Throw in tests of entry comment search for
+	// lex.EntryComment{Label: "label1", Source: "secret", Comment: "strålande"}
+	rezzx, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLabelLike: "745648w8"})
+	if err != nil {
+		t.Errorf("Got error %v", err)
+	}
+	if w, g := 0, len(rezzx); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+	rezzx, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLabelLike: "_abel1"})
+	if err != nil {
+		t.Errorf("Got error %v", err)
+	}
+	if w, g := 1, len(rezzx); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+
+	rezzx, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentSourceLike: "745648w8"})
+	if err != nil {
+		t.Errorf("Got error %v", err)
+	}
+	if w, g := 0, len(rezzx); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+	rezzx, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentSourceLike: "secr_t"})
+	if err != nil {
+		t.Errorf("Got error %v", err)
+	}
+	if w, g := 1, len(rezzx); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+
+	rezzx, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLike: "745648w8"})
+	if err != nil {
+		t.Errorf("Got error %v", err)
+	}
+	if w, g := 0, len(rezzx); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+	rezzx, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLike: "%å%"})
+	if err != nil {
+		t.Errorf("Got error %v", err)
+	}
+	if w, g := 1, len(rezzx); w != g {
+		t.Errorf("wanted %d got %d", w, g)
+	}
+
 	// rezz, err := db.Query("select entry.strn from entry where strn regexp '^a'")
 	// if err != nil {
 	// 	log.Fatalf("Agh: %v", err)
@@ -784,7 +831,7 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 		t.Errorf(fs, "vadare", o)
 	}
 
-	q = Query{}
+	q = Query{WordLike: "%"}
 	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)

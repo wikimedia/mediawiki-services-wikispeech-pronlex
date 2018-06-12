@@ -247,6 +247,28 @@ func entryTag(q Query) (string, []interface{}) {
 	return res, resv
 }
 
+func comments(q Query) (string, []interface{}) {
+	var res string
+	var resv []interface{}
+
+	if q.CommentLabelLike != "" {
+		res += " entry.id = entryComment.entryid AND entrycomment.label like ? "
+		resv = append(resv, q.CommentLabelLike)
+	}
+
+	if q.CommentSourceLike != "" {
+		res += " entry.id = entryComment.entryid AND entrycomment.source like ? "
+		resv = append(resv, q.CommentSourceLike)
+	}
+
+	if q.CommentLike != "" {
+		res += " entry.id = entryComment.entryid AND entrycomment.comment like ? "
+		resv = append(resv, q.CommentLike)
+	}
+
+	return res, resv
+}
+
 func filter(ss []string, f func(string) bool) []string {
 	var res []string
 	for i, s := range ss {
@@ -321,6 +343,9 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	tl, tlv := entryTag(q)
 	args = append(args, tlv...)
 
+	cl, clv := comments(q)
+	args = append(args, clv...)
+
 	// HasEntryValidation doesn't take any argument
 	ev := ""
 	if q.HasEntryValidation {
@@ -328,7 +353,7 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	}
 
 	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, tl, ev}), " AND "))
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, tl, cl, ev}), " AND "))
 	if "" != qRes {
 		sql += " AND " + qRes
 	}

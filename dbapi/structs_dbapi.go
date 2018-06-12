@@ -56,6 +56,10 @@ type Query struct {
 
 	TagLike string `json:"tagLike"`
 
+	CommentLabelLike  string `json:"commentLabelLike"`
+	CommentSourceLike string `json:"commenSourceLike"`
+	CommentLike       string `json:"commentLike"`
+
 	// A list of entry statuses to match
 	EntryStatus []string `json:"entryStatus"`
 
@@ -112,6 +116,19 @@ func (q Query) Empty() bool {
 		return false
 	case strings.TrimSpace(q.ParadigmRegexp) != "":
 		return false
+	case strings.TrimSpace(q.TagLike) != "":
+		return false
+	case strings.TrimSpace(q.CommentLabelLike) != "":
+		return false
+	case strings.TrimSpace(q.CommentSourceLike) != "":
+		return false
+	case strings.TrimSpace(q.CommentLike) != "":
+		return false
+	case len(q.EntryStatus) > 0:
+		return false
+	case q.HasEntryValidation:
+		return false
+
 	}
 
 	//log.Printf("dbapi.EmptyQuery: query struct appears to lack any search constraint: %v", q)

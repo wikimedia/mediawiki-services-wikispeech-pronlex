@@ -918,6 +918,11 @@ func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
 func lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
+
+	if q.Empty() {
+		return nil
+	}
+
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -952,6 +957,10 @@ func validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
 // EntryWriter.
 // TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
 func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
+
+	//if q.Empty() {
+	//	return nil
+	//}
 
 	//log.Printf("QUWRY %v\n\n", q)
 
@@ -1498,7 +1507,8 @@ func updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 
 	// List of comments equally long. Only update if different comments
 	for i, cmt := range e.Comments {
-		if cmt != dbE.Comments[i] {
+		dbCmt := dbE.Comments[i]
+		if cmt.Label == dbCmt.Label && cmt.Source == dbCmt.Source && cmt.Comment == dbCmt.Comment {
 			err := insertEntryComments(tx, dbE.ID, e.Comments)
 			return true, err
 		}
