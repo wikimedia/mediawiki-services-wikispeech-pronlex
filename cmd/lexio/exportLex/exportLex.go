@@ -59,7 +59,7 @@ func main() {
 		log.Fatalf("no such lexicon name '%s'", lexName)
 		return
 	}
-	q := dbapi.DBMQuery{LexRefs: []lex.LexRef{lexRef}}
+	q := dbapi.DBMQuery{LexRefs: []lex.LexRef{lexRef}, Query: dbapi.Query{WordLike: "%"}}
 	f, err := os.Create(os.Args[3])
 	if err != nil {
 		log.Fatalf("aouch : %v", err)
