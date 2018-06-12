@@ -1156,6 +1156,9 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 			}
 		}
 
+		if currE.Comments == nil {
+			currE.Comments = []lex.EntryComment{}
+		}
 		// Zero or more lex.EntryComments
 		if entryCommentID.Valid && entryCommentLabel.Valid && entryCommentSource.Valid && entryCommentComment.Valid {
 			if _, ok := valiIDs[entryCommentID.Int64]; !ok {
