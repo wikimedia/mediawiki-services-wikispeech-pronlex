@@ -334,6 +334,9 @@ var knownParams = map[string]int{
 	"paradigmregexp":      1,
 	"hasEntryValidation":  1,
 	"taglike":             1,
+	"commentlabellike":    1,
+	"commentsourcelike":   1,
+	"commentlike":         1,
 	"page":                1,
 	"pagelength":          1,
 	"pp":                  1,
@@ -388,6 +391,9 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	}
 
 	tagLike := strings.TrimSpace(getParam("taglike", r))
+	commentLabelLike := strings.TrimSpace(getParam("commentlabellike", r))
+	commentSourceLike := strings.TrimSpace(getParam("commentsourcelike", r))
+	commentLike := strings.TrimSpace(getParam("commentlike", r))
 
 	// TODO report error if getParam("page", r) != ""?
 	// Silently sets deafault if no value, or faulty value
@@ -434,6 +440,9 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		ParadigmRegexp:      paradigmRegexp,
 		EntryStatus:         entryStatus,
 		TagLike:             tagLike,
+		CommentLabelLike:    commentLabelLike,
+		CommentSourceLike:   commentSourceLike,
+		CommentLike:         commentLike,
 		Page:                page,
 		PageLength:          pageLength,
 		HasEntryValidation:  hasEntryValidation,
