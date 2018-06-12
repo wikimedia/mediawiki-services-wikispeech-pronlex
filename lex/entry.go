@@ -180,7 +180,7 @@ type Entry struct {
 	//Preferred        int64             `json:"preferred"`
 	Preferred bool           `json:"preferred"`
 	Tag       string         `json:"tag"`
-	Comments  []EntryComment `json:"comments"`
+	Comments  []EntryComment `json:"comments,omitempty"`
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.
