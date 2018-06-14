@@ -168,15 +168,18 @@ type Symbol struct {
 	IPA         string `json:"ipa"`
 }
 
+type StatusFreq struct {
+	Status string `json:"status"`
+	Freq   int64  `json:"freq"`
+}
+
 // LexStats holds the result of a call to the dbapi.LexiconStats function.
 type LexStats struct {
 	Lexicon string `json:"lexicon"`
 	// The number of entries in the lexicon corresponding to database id LexiconID
 	Entries int64 `json:"entries"`
 
-	// Status frequencies, as strings: StatusName<TAB>Frequency
-	// TODO better structure for status/freq (string/int)
-	StatusFrequencies []string `json:"statusFrequencies"`
+	StatusFrequencies []StatusFreq `json:"statusFrequencies"`
 
 	ValStats ValStats
 }

@@ -34,15 +34,16 @@ func printStats(stats dbapi.LexStats, validate bool) error {
 	println("\nLEXICON STATISTICS")
 	fmt.Printf(fstr, "entries", stats.Entries)
 	for _, s2f := range stats.StatusFrequencies {
-		fs := strings.Split(s2f, "\t")
-		if len(fs) != 2 {
-			return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
-		}
-		var freq, err = strconv.ParseInt(fs[1], 10, 64)
-		if err != nil {
-			return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
-		}
-		var status = "status:" + fs[0]
+		//fs := strings.Split(s2f, "\t")
+		//if len(fs) != 2 {
+		//	return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
+		//}
+		//var freq, err = strconv.ParseInt(fs[1], 10, 64)
+		//if err != nil {
+		//	return fmt.Errorf("couldn't parse status-freq from string: %s", s2f)
+		//}
+		var status = "status:" + s2f.Status
+		var freq = s2f.Freq
 		fmt.Printf(fstr, status, freq)
 	}
 	if validate {

@@ -1876,13 +1876,13 @@ func lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var status string
-		var freq string
+		var freq int64
 		err = rows.Scan(&status, &freq)
 		if err != nil {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
 
-		res.StatusFrequencies = append(res.StatusFrequencies, status+"\t"+freq)
+		res.StatusFrequencies = append(res.StatusFrequencies, StatusFreq{Status: status, Freq: freq}) //status+"\t"+freq)
 	}
 	err = rows.Err()
 	if err != nil {
