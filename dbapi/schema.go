@@ -1,7 +1,7 @@
 package dbapi
 
 // SchemaVersion defines the version of the schema structure. It is used for validating databases against the current version number. It will be updated manually when the structure of the schema/database is changed.
-const SchemaVersion = "3"
+const SchemaVersion = "4"
 
 // Schema is a string containing the SQL definition of the lexicon database
 const Schema = `
