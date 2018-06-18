@@ -4,8 +4,8 @@ CMD=`basename $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 
-if [ $# -ne 2 ]; then
-    echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR>
+if [ $# -ne 3 ]; then
+    echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR> <RELEASE-TAG>
 
 Imports lexicon data for Swedish, Norwegian, US English, and a small set of test data for Arabic from the lexdata repository.
 Imports from sql dump files (file extension .sql.gz).
@@ -16,6 +16,7 @@ fi
 
 LEXDATA=$1
 APPDIR=`readlink -f $2`
+RELEASETAG=$3
 
 ### LEXDATA SETUP
 
@@ -26,9 +27,9 @@ if [ ! -d $APPDIR/symbol_sets ] ; then
 fi
 
 if [ -d $LEXDATA ]; then
-    cd $LEXDATA && git pull && cd - || exit 1
+    cd $LEXDATA && git pull && git checkout $RELEASETAG && cd - || exit 1
 else
-    git clone https://github.com/stts-se/lexdata.git $LEXDATA || exit 1
+    git clone https://github.com/stts-se/lexdata.git --branch $RELEASETAG --single-branch $LEXDATA || exit 1
 fi
 
 mkdir -p $APPDIR/db_files || exit 1

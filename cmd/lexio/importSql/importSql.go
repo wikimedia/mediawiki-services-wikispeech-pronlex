@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	//"strconv"
 	"strings"
 )
@@ -42,15 +43,25 @@ func sqlDump(dbFile string, outFile string) error {
 	return nil
 }
 
+var dotAndAfter = regexp.MustCompile("[.].*$")
+
 func validateSchemaVersion(db *sql.DB) error {
-	ver, err := dbapi.GetSchemaVersion(db)
+	dbVer, err := dbapi.GetSchemaVersion(db)
+	apiVer := dbapi.SchemaVersion
 	if err != nil {
 		log.Fatalf("Couldn't retrive schema version : %v", err)
 	}
-	if ver != dbapi.SchemaVersion {
-		log.Fatalf("Mismatching schema versions -- in input file: %s, in dbapi.Schema: %s ", ver, dbapi.SchemaVersion)
+	if dbVer != apiVer {
+		dbVerX := dotAndAfter.ReplaceAllString(dbVer, "")
+		apiVerX := dotAndAfter.ReplaceAllString(apiVer, "")
+		if dbVerX != apiVerX {
+			log.Fatalf("Mismatching schema versions. Input file: %s, dbapi.Schema: %s ", dbVer, apiVer)
+		} else {
+			log.Printf("Compatible schema versions. Input file: %s, dbapi.Schema: %s ", dbVer, apiVer)
+		}
+	} else {
+		log.Printf("Schema version matching dbapi.SchemaVersion: %s\n", apiVer)
 	}
-	log.Printf("Schema version matching dbapi.Schema: %s\n", dbapi.SchemaVersion)
 	return nil
 }
 
