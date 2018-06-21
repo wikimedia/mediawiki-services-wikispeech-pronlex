@@ -1,46 +1,66 @@
-# Download sttsse/wikispeech_base from hub.docker.com | source repository: https://github.com/stts-se/wikispeech_mockup: docker/wikispeech_base
-FROM sttsse/wikispeech_base
+FROM golang
+
+############# INITIAL SETUP/INSTALLATION #############
+# setup apt
+RUN apt-get update -y && apt-get upgrade -y && apt-get install apt-utils -y
+
+# debugging tools
+# RUN apt-get install -y libnet-ifconfig-wrapper-perl/stable curl wget emacs
+
+# RELEASE variable (to be set by build args)
+ARG RELEASE="undefined"
 
 LABEL "se.stts.vendor"="STTS - Speech technology services - http://stts.se"
+LABEL "se.stts.release"=$RELEASE
 
-RUN mkdir -p /wikispeech/bin
-WORKDIR "/wikispeech"
 
-RUN go get github.com/stts-se/pronlex/lexserver 
-RUN go install github.com/stts-se/pronlex/lexserver 
-
-RUN go get github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
-RUN go install github.com/stts-se/pronlex/cmd/lexio/createEmptyDB
-
-RUN go get github.com/stts-se/pronlex/cmd/lexio/importLex
-RUN go install github.com/stts-se/pronlex/cmd/lexio/importLex
-
-RUN go get github.com/stts-se/pronlex/cmd/lexio/importSql
-RUN go install github.com/stts-se/pronlex/cmd/lexio/importSql
-
-ENV APPDIR /wikispeech/appdir
-
+############# COMPONENT SPECIFIC DEPENDENCIES #############
+RUN apt-get install -y sqlite3 gcc build-essential
 RUN export GOPATH=$(go env GOPATH)
 RUN export PATH=$PATH:$(go env GOPATH)/bin
 
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/setup /wikispeech/bin/setup
-RUN ln -s /go/src/github.com/stts-se/pronlex/docker/import_all /wikispeech/bin/import_all
-RUN chmod +x /wikispeech/bin/*
+
+
+############# PRONLEX #############
+ENV BASEDIR /wikispeech/pronlex
+RUN mkdir -p $BASEDIR/bin
+ENV PRONLEXPATH=$GOPATH/src/github.com/stts-se/pronlex
+
+# local copy of https://github.com/stts-se/pronlex.git
+COPY . $PRONLEXPATH
+
+WORKDIR $PRONLEXPATH
+#RUN go get ./...
+RUN cd $PRONLEXPATH/lexserver && go get && go install
+RUN cd $PRONLEXPATH/cmd/lexio/createEmptyDB && go get && go install
+RUN cd $PRONLEXPATH/cmd/lexio/importLex && go get && go install
+RUN cd $PRONLEXPATH/cmd/lexio/importSql && go get && go install
+
+WORKDIR $BASEDIR
+
+RUN ln -s $PRONLEXPATH/docker/setup $BASEDIR/bin/setup
+RUN ln -s $PRONLEXPATH/docker/import_all $BASEDIR/bin/import_all
+RUN chmod +x $BASEDIR/bin/*
+
+ENV APPDIR $BASEDIR/appdir
+
+
+############# POST INSTALL #############
+WORKDIR $BASEDIR
 
 # BUILD INFO
-ENV BUILD_INFO_FILE /wikispeech/.pronlex_build_info.txt
+ENV BUILD_INFO_FILE $BASEDIR/build_info.txt
 RUN echo "Application name: pronlex" >> $BUILD_INFO_FILE
 RUN echo -n "Build timestamp: " >> $BUILD_INFO_FILE
 RUN date --utc "+%Y-%m-%d %H:%M:%S %Z" >> $BUILD_INFO_FILE
 RUN echo "Built by: docker" >> $BUILD_INFO_FILE
-RUN echo -n "Git release: " >> $BUILD_INFO_FILE
-RUN cd /go/src/github.com/stts-se/pronlex/ && git describe --tags >> $BUILD_INFO_FILE
+RUN echo "Release: $RELEASE" >> $BUILD_INFO_FILE
+RUN cat $BUILD_INFO_FILE
 
-# RUNTIME SETTINGS
 
+############# RUNTIME SETTINGS #############
+WORKDIR $BASEDIR
 EXPOSE 8787
 
-# RUN echo "Mount external host dir to $APPDIR"
-
-CMD (/wikispeech/bin/setup $APPDIR && lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static $GOPATH/src/github.com/stts-se/pronlex/lexserver/static 8787)
+CMD ($BASEDIR/bin/setup $APPDIR && lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static  $PRONLEXPATH/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static  $PRONLEXPATH/lexserver/static 8787)
 

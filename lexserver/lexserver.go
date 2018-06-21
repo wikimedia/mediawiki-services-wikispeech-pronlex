@@ -250,7 +250,7 @@ var startedTimestamp = time.Now().UTC().Format("2006-01-02 15:04:05 MST")
 
 func getVersionInfo() []string {
 	res := []string{}
-	var buildInfoFile = "/wikispeech/.pronlex_build_info.txt"
+	var buildInfoFile = "/wikispeech/pronlex/build_info.txt"
 	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
 		log.Printf(msg)
@@ -260,9 +260,9 @@ func getVersionInfo() []string {
 		out, err := exec.Command("git", "describe", "--tags").Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
-			res = append(res, "Git release: unknown")
+			res = append(res, "Release: unknown")
 		} else {
-			res = append(res, strings.TrimSpace(fmt.Sprintf("Git release: %s", out)))
+			res = append(res, strings.TrimSpace(fmt.Sprintf("Release: %s", out)))
 		}
 	} else {
 		fh, err := os.Open(buildInfoFile)
