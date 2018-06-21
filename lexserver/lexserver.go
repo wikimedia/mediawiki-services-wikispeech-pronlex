@@ -257,12 +257,19 @@ func getVersionInfo() []string {
 		res = append(res, "Application name: pronlex")
 		res = append(res, "Build timestamp: n/a")
 		res = append(res, "Built by: user")
-		out, err := exec.Command("git", "describe", "--tags").Output()
+		tag, err := exec.Command("git", "describe", "--tags").Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
 			res = append(res, "Release: unknown")
 		} else {
-			res = append(res, strings.TrimSpace(fmt.Sprintf("Release: %s", out)))
+			branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
+			if err != nil {
+				log.Printf("lexserver: couldn't retrieve git release info: %v", err)
+				res = append(res, "Release: unknown")
+			}
+			res = append(res, strings.TrimSpace(fmt.Sprintf("Release: %s on branch %s",
+				strings.TrimSpace(string(tag)),
+				strings.TrimSpace(string(branch)))))
 		}
 	} else {
 		fh, err := os.Open(buildInfoFile)
