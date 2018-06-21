@@ -3,6 +3,11 @@ language: go
 go:
   - 1.9.x
 
+notifications:
+  slack:
+    on_success: change
+    on_failure: change
+
 script:
  - go test -v ./... && bash install/setup.sh /tmp/appdir && bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
