@@ -18,7 +18,8 @@ LABEL "se.stts.release"=$RELEASE
 RUN apt-get install -y sqlite3 gcc build-essential
 RUN export GOPATH=$(go env GOPATH)
 RUN export PATH=$PATH:$(go env GOPATH)/bin
-
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
 
 
 ############# PRONLEX #############
