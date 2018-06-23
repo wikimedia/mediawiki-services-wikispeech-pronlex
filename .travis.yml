@@ -18,6 +18,6 @@ script:
  - sleep 300
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  - docker build . -t pronlex 
- - git clone https://github.com/stts-se/lexdata.git#$RELEASE || git clone https://github.com/stts-se/lexdata.git
+ # - git clone https://github.com/stts-se/lexdata.git#$RELEASE || git clone https://github.com/stts-se/lexdata.git
  - bash install/import.sh lexdata /tmp/appdir $RELEASE || bash install/import.sh lexdata /tmp/appdir master 
 
