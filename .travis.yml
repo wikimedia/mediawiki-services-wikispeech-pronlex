@@ -8,12 +8,16 @@ notifications:
     on_success: change
     on_failure: change
 
+env:
+ - RELEASE=docker_update
+
 script:
  - go test -v ./... && bash install/setup.sh /tmp/appdir && bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
  - echo "pronlex server running on pid $pid"
  - sleep 300
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
- - docker build . -t pronlex
-
+ - docker build . -t pronlex 
+ - git clone https://github.com/stts-se/lexdata.git#$RELEASE || git clone https://github.com/stts-se/lexdata.git
+ - bash install/import.sh lexdata /tmp/appdir $RELEASE || bash install/import.sh lexdata /tmp/appdir master 
 
