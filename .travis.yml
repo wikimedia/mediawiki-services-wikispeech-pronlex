@@ -9,7 +9,7 @@ notifications:
     on_failure: change
 
 env:
- - RELEASE=docker_update SLEEP=150
+ - RELEASE=docker_update SLEEP=60
 
 script:
  - go test -v ./...
