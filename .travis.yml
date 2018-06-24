@@ -16,14 +16,15 @@ script:
  - go test -v ./... 
  - bash install/setup.sh /tmp/appdir
  
- - export GOPATH=`go env GOPATH`
- - export PATH=$PATH:$GOPATH/bin
- - CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
- - switches="-ss_files /tmp/appdir/symbol_sets/ -db_files /tmp/appdir/db_files/ -static $CMDDIR/static"
- - cd $CMDDIR && go run *.go $switches -test
- #- bash install/start_server.sh -a /tmp/appdir &
+ #- export GOPATH=`go env GOPATH`
+ #- export PATH=$PATH:$GOPATH/bin
+ #- CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
+ #- switches="-ss_files /tmp/appdir/symbol_sets/ -db_files /tmp/appdir/db_files/ -static $CMDDIR/static"
+ #- cd $CMDDIR && go run *.go $switches -test
+ #- cd -
  
- - cd -
+ ##- bash install/start_server.sh -a /tmp/appdir &
+ 
  - bash install/import.sh lexdata /tmp/appdir $RELEASE || bash install/import.sh lexdata /tmp/appdir master
  - bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
