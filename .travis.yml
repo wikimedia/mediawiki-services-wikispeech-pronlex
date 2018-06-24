@@ -18,6 +18,7 @@ script:
  - bash install/setup.sh /tmp/appdir
  - bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
+ - ps -Af | egrep lexserver
  - echo "pronlex server running on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
