@@ -23,6 +23,7 @@ script:
  - cd $CMDDIR && go run *.go $switches -test
  #- bash install/start_server.sh -a /tmp/appdir &
  
+ - cd -
  - bash install/import.sh lexdata /tmp/appdir $RELEASE || bash install/import.sh lexdata /tmp/appdir master
  - bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
