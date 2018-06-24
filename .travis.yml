@@ -18,8 +18,7 @@ script:
  - bash install/setup.sh /tmp/appdir
 
  - | 
-   echo "DO_IMPORT : '${DO_IMPORT} '" 
-   if [ -z $DO_IMPORT ]; then
+   if [ -v $DO_IMPORT ]; then
      bash install/import.sh lexdata /tmp/appdir $RELEASE || bash install/import.sh lexdata /tmp/appdir master
    fi
    
