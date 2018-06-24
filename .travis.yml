@@ -10,7 +10,7 @@ notifications:
 
 env:
  - RELEASE=docker_update SLEEP=60
- - DO_IMPORT=1
+ - RELEASE=docker_update SLEEP=60 DO_IMPORT=1
 
 script:
  - set -e
@@ -21,6 +21,7 @@ script:
    if [ -z "$DO_IMPORT" ]; then
      bash install/import.sh lexdata /tmp/appdir $RELEASE || bash install/import.sh lexdata /tmp/appdir master
    fi
+   
  - bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
  - echo "pronlex server running on pid $pid. wait for $SLEEP seconds before shutting down"
