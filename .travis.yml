@@ -4,7 +4,7 @@ go:
   - 1.9.x
 
 notifications:
-  slack:
+  email:
     on_success: change
     on_failure: change
 
