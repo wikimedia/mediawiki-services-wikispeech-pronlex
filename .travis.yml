@@ -12,6 +12,7 @@ env:
  - RELEASE=docker_update SLEEP=60
 
 script:
+ - set -e
  - go test -v ./...
  
  - bash install/setup.sh /tmp/appdir
