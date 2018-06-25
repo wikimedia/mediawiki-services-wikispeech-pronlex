@@ -12,10 +12,6 @@ env:
  - RELEASE=master SLEEP=60
  - RELEASE=master SLEEP=60 DO_IMPORT=1
 
-before_script:
- - set -e
- - sudo apt install coreutils # realpath is required
-
 script:
  - set -e
  - go test -v ./... 
