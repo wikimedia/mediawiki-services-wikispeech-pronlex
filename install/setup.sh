@@ -16,7 +16,10 @@ fi
 
 APPDIRREL=$1
 
+APPDIR=`readlink -f $APPDIRREL`
+if [ "<>" == "<$APPDIR>" ]; then
 APPDIR=`realpath $APPDIRREL`
+fi
 LEXDB=wikispeech_testdb.db
 
 DEMOFILES=$GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files
