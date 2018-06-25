@@ -94,6 +94,14 @@ To specify port, run:
 For a complete set of options, run:  
 `$ bash start_server.sh -h`
 
+---
+
+## For developers
+
+If you are developing for Wikispeech, and need to make changes to this repository, make sure you run a test build using `build_and_test.sh` before you make a pull request. Don't run more than one instance of this script at once.
+
+
+
 
 
 

@@ -15,7 +15,8 @@ Setup files will be added to the destination folder APPDIR.
 fi
 
 APPDIRREL=$1
-APPDIR=`readlink -f $APPDIRREL`
+
+APPDIR=`realpath $APPDIRREL`
 LEXDB=wikispeech_testdb.db
 
 DEMOFILES=$GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files
