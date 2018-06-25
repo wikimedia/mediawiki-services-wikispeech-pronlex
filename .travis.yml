@@ -12,6 +12,10 @@ env:
  - RELEASE=master SLEEP=60
  - RELEASE=master SLEEP=60 DO_IMPORT=1
 
+before_script:
+ - set -e
+ - sudo apt install coreutils # realpath is required
+
 script:
  - set -e
  - go test -v ./... 
@@ -24,7 +28,7 @@ script:
    
  - bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
- - echo "pronlex server running on pid $pid. wait for $SLEEP seconds before shutting down"
+ - echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  

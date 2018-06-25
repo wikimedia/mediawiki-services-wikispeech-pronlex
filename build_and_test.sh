@@ -17,12 +17,12 @@ mkdir -p .build/appdir
 bash install/setup.sh .build/appdir
 
 for proc in `ps --sort pid -Af|egrep pronlex| egrep -v  "grep .E"|sed 's/  */\t/g'|cut -f2`; do
-    kill $proc
+    kill $proc || "Couldn't kill $pid"
 done
 
 bash install/start_server.sh -a .build/appdir &
 export pid=$!
-echo "pronlex server running on pid $pid. wait for $SLEEP seconds before shutting down"
+echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shutting down"
 sleep $SLEEP
 sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
