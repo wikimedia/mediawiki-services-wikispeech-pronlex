@@ -14,11 +14,11 @@ go test -v ./...
 
 mkdir -p .build/appdir
 
-bash install/setup.sh .build/appdir
-
 for proc in `ps --sort pid -Af|egrep pronlex| egrep -v  "grep .E"|sed 's/  */\t/g'|cut -f2`; do
     kill $proc || "Couldn't kill $pid"
 done
+
+bash install/setup.sh .build/appdir
 
 bash install/start_server.sh -a .build/appdir &
 export pid=$!
