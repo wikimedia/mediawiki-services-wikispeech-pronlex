@@ -9,8 +9,8 @@ notifications:
     on_failure: change
 
 env:
- - RELEASE=docker_update SLEEP=60
- - RELEASE=docker_update SLEEP=60 DO_IMPORT=1
+ - RELEASE=master SLEEP=60
+ - RELEASE=master SLEEP=60 DO_IMPORT=1
 
 script:
  - set -e
