@@ -1,3 +1,4 @@
+# build script for Wikispeech
 # mimic travis build tests, always run before pushing!
 
 set -e
@@ -26,4 +27,4 @@ echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shuttin
 sleep $SLEEP
 sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
-docker build . --no-cache -t sttsse/pronlex:travis
+docker build . --no-cache -t sttsse/pronlex:buildtest
