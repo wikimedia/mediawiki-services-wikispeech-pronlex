@@ -2,6 +2,10 @@
 
 ## INTERNAL SCRIPT FOR USE INSIDE OF DOCKER CONTAINER
 
+set -e
+
+echo -n "whoami " && whoami
+
 CMD=`basename $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
@@ -42,13 +46,13 @@ function initial_setup {
 
     echo "[$CMD] Setting up basic files in docker folder $DOCKERDIR... " >&2
 
-    mkdir -p $DOCKERDIR || exit 1
-    mkdir -p $DOCKERDIR/symbol_sets || exit 1
-    mkdir -p $DOCKERDIR/db_files || exit 1
+    mkdir -p $DOCKERDIR
+    mkdir -p $DOCKERDIR/symbol_sets
+    mkdir -p $DOCKERDIR/db_files
 
-    cp $DEMOFILES/*.sym $DOCKERDIR/symbol_sets/ || exit 1
-    cp $DEMOFILES/*.cnv $DOCKERDIR/symbol_sets/ || exit 1
-    cp $DEMOFILES/mappers.txt $DOCKERDIR/symbol_sets/ || exit 1
+    cp $DEMOFILES/*.sym $DOCKERDIR/symbol_sets/
+    cp $DEMOFILES/*.cnv $DOCKERDIR/symbol_sets/
+    cp $DEMOFILES/mappers.txt $DOCKERDIR/symbol_sets/
 }
 
 
