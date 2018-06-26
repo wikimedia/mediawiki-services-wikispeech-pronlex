@@ -64,8 +64,8 @@ RUN cat $BUILD_INFO_FILE
 
 ############# RUNTIME SETTINGS #############
 WORKDIR $BASEDIR
-#RUN chown -R wikispeech.wikispeech /wikispeech
-#USER wikispeech
+RUN chown -R wikispeech.wikispeech /wikispeech
+USER wikispeech
 EXPOSE 8787
 
 CMD ($BASEDIR/bin/setup $APPDIR && lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static  $PRONLEXPATH/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static  $PRONLEXPATH/lexserver/static 8787)
