@@ -1,5 +1,7 @@
 #!/bin/bash 
 
+set -e
+
 CMD=`basename $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
@@ -29,7 +31,10 @@ fi
 if [ -d $LEXDATA ]; then
     cd $LEXDATA && git pull && git checkout $RELEASETAG && cd - || exit 1
 else
-    git clone https://github.com/stts-se/lexdata.git --branch $RELEASETAG --single-branch $LEXDATA || exit 1
+    git clone https://github.com/stts-se/lexdata.git $LEXDATA
+    cd $LEXDATA
+    git checkout $RELEASETAG
+    cd -
 fi
 
 mkdir -p $APPDIR/db_files || exit 1
