@@ -64,7 +64,7 @@ RUN cat $BUILD_INFO_FILE
 
 ############# RUNTIME SETTINGS #############
 WORKDIR $BASEDIR
-#RUN chown -R wikispeech.wikispeech /wikispeech
+RUN chown -R wikispeech.wikispeech /wikispeech
 USER wikispeech
 EXPOSE 8787
 
