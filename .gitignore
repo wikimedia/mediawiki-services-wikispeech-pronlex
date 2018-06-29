@@ -8,3 +8,4 @@ Gopkg.lock
 pronlex.log
 
 .build
+vendor/github.com/dlclark/regexp2/syntax/workdir/
