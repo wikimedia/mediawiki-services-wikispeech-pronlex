@@ -318,7 +318,7 @@ var lexiconLookup = urlHandler{
 	},
 }
 
-var lexiconEntriesExit = urlHandler{
+var lexiconEntriesExist = urlHandler{
 	name:     "entries_exist",
 	url:      "/entries_exist",
 	help:     "Lookup orthographies in the db and see if they exist as entries.",
@@ -354,7 +354,6 @@ var lexiconEntriesExit = urlHandler{
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 			return
 		}
-
 		var res = make(map[string]bool)
 		writer := lex.EntrySliceWriter{}
 		err = dbm.LookUp(q, &writer)
@@ -372,7 +371,6 @@ var lexiconEntriesExit = urlHandler{
 				res[orth] = false
 			}
 		}
-
 		jsn, err := marshal(res, r)
 		if err != nil {
 			log.Printf("lexserver: Failed to marshal json: %v", err)

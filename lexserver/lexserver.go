@@ -805,7 +805,7 @@ func createServer(port string) (*http.Server, error) {
 	lexicon := newSubRouter(rout, "/lexicon", "Lexicon management/admin, including full validation")
 	lexicon.addHandler(lexiconList)
 	lexicon.addHandler(lexiconLookup) // has its own index page in static/
-	lexicon.addHandler(lexiconEntriesExit)
+	lexicon.addHandler(lexiconEntriesExist)
 	lexicon.addHandler(lexiconInfo)
 	lexicon.addHandler(lexiconStats)
 	lexicon.addHandler(lexiconListCurrentEntryStatuses)
