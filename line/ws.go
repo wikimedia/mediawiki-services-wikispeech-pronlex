@@ -2,6 +2,7 @@ package line
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -21,6 +22,27 @@ func (ws WS) Format() Format {
 // Parse is used for parsing input lines (calls underlying Format.Parse)
 func (ws WS) Parse(line string) (map[Field]string, error) {
 	return ws.format.Parse(line)
+}
+
+// [other: comment text] (nisse) §§§ [assign_to: nisse] (bengt)",
+const commentDelim = " §§§ "
+
+var commentRe = regexp.MustCompile("^\\[([^)]+): ([^\\]]+)\\] \\(([a-zåäö0-9_-]+)\\)$")
+
+func (ws WS) parseComments(cmts string) ([]lex.EntryComment, error) {
+	var res []lex.EntryComment
+	if strings.TrimSpace(cmts) == "" {
+		return res, nil
+	}
+	for _, cmt := range strings.Split(cmts, commentDelim) {
+		m := commentRe.FindStringSubmatch(cmt)
+		label := m[1]
+		text := m[2]
+		source := m[3]
+		c := lex.EntryComment{Label: label, Comment: text, Source: source}
+		res = append(res, c)
+	}
+	return res, nil
 }
 
 // ParseToEntry is used for parsing input lines (calls underlying Format.Parse)
@@ -147,7 +169,7 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 // NewWS is used to create a new instance of the WS parser
 func NewWS() (WS, error) {
 	tests := []FormatTest{
-		{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	false	big_city",
+		{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	false	big_city	[other: comment text] (nisse) §§§ [assign_to: nisse] (bengt)",
 			map[Field]string{
 				Orth:         "storstaden",
 				Pos:          "NN",
@@ -168,10 +190,11 @@ func NewWS() (WS, error) {
 				StatusSource: "nst",
 				Preferred:    "false",
 				Tag:          "big_city",
+				Comments:     "[other: comment text] (nisse) §§§ [assign_to: nisse] (bengt)",
 			},
-			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	false	big_city",
+			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	false	big_city	[other: comment text] (nisse) §§§ [assign_to: nisse] (bengt)",
 		},
-		{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	true	",
+		{"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	true		",
 			map[Field]string{
 				Orth:         "storstaden",
 				Pos:          "NN",
@@ -192,8 +215,9 @@ func NewWS() (WS, error) {
 				StatusSource: "nst",
 				Preferred:    "true",
 				Tag:          "",
+				Comments:     "",
 			},
-			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	true	",
+			"storstaden	NN	SIN|DEF|NOM|UTR	stor+staden	storstad|95522	s111n, a->ä, stad	SWE	\"\"stu:$%s`t`A:$den	SWE							imported	nst	true		",
 		},
 	}
 	f, err := NewFormat(
@@ -219,8 +243,9 @@ func NewWS() (WS, error) {
 			StatusSource: 16,
 			Preferred:    17,
 			Tag:          18,
+			Comments:     19,
 		},
-		19,
+		20,
 		tests,
 	)
 	if err != nil {

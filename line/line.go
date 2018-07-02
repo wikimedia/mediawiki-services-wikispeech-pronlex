@@ -84,6 +84,9 @@ const (
 
 	// Tag is an optional disambiguation tag
 	Tag
+
+	// Comments is an optional field
+	Comments
 )
 
 // FormatTest defines a test to run upon initialization of Format (using NewFormat)
