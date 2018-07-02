@@ -135,9 +135,10 @@ func (q Query) Empty() bool {
 	return true
 }
 
-// NewQuery returns a Query instance where PageLength: 25
+// NewQuery returns a Query instance where PageLength: 0
 func NewQuery() Query {
-	return Query{PageLength: 25}
+	//return Query{PageLength: 25}
+	return Query{PageLength: 0}
 }
 
 // LexiconIDs returns a list of db IDs of the Lexicons of the Query

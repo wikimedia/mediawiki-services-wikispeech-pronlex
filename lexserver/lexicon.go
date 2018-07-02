@@ -340,7 +340,7 @@ var lexiconEntriesExist = urlHandler{
 			// 	http.Error(w, fmt.Sprintf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v), http.StatusBadRequest)
 			// 	return // NB: only informs about the first unknown param...
 			// }
-			if !(k == "lexicons" || k == "words") {
+			if !(k == "lexicons" || k == "words" || k == "pagelength") {
 				log.Printf("entriesExist: unknown URL parameter: '%s': '%s'. Valid parameters :  %s and %s", k, v, "lexicons", "words")
 				http.Error(w, fmt.Sprintf("lexiconLookup: unknown URL parameter: '%s': '%s'", k, v), http.StatusBadRequest)
 				return // NB: only informs about the first unknown param...

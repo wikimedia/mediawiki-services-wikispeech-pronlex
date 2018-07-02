@@ -414,7 +414,8 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	// Silently sets deafault if no value, or faulty value
 	pageLength, err := strconv.ParseInt(getParam("pagelength", r), 10, 64)
 	if err != nil {
-		pageLength = 25
+		//pageLength = 25
+		pageLength = 0
 	}
 
 	lexRefs := []lex.LexRef{}
