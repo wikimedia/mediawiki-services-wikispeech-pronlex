@@ -33,10 +33,13 @@ Any lexicon files you want to import into the lexicon database must be in this f
      Preferred      Takes values 1/0, and is used to defined which reading for a specific
                     orthography should be the standard one (in case of homographs)
      Tag            A tag (string) that can be used to disambiguate between homographs if needed (default: empty)
+     Comments       Comments in the following format, separated by §§§
+                      [label: comment text] (source) 
 
 Sample line:
 
-  finalspelet	NN	SIN|DEF|NOM|NEU	final+spelet	finalspel	s7n-övriga ex träd	sv-se	f I . "" n A: l . % s p e: . l e t	sv-se							imported	nst	false	dummytag
+  finalspelet	NN	SIN|DEF|NOM|NEU	final+spelet	finalspel	s7n-övriga ex träd	sv-se	f I . "" n A: l . % s p e: . l e t	sv-se							imported	nst	false	dummytag	[assign_to: john] (jane) §§§
+  [nolabel: typo] (hanna)
 
 */
 package line
