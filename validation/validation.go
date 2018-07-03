@@ -141,7 +141,7 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 			var messages []string
 			for _, msg := range res.Messages {
 				messages = append(messages,
-					fmt.Sprintf("Accept example was reject for rule %s (%s). Message: %s", res.RuleName, res.Level, msg))
+					fmt.Sprintf("Accept example was rejected for rule %s (%s). Message: %s", res.RuleName, res.Level, msg))
 			}
 			if len(messages) > 0 {
 				result.AcceptErrors = append(result.AcceptErrors,
