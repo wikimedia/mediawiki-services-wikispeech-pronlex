@@ -2,7 +2,7 @@ FROM golang
 
 ############# INITIAL SETUP/INSTALLATION #############
 # non-root user
-RUN useradd -m -u 8877 wikispeech
+#RUN useradd -m -u 8877 wikispeech
 
 # setup apt
 RUN apt-get update -y && apt-get upgrade -y && apt-get install apt-utils -y
@@ -63,8 +63,8 @@ RUN cat $BUILD_INFO_FILE
 
 ############# RUNTIME SETTINGS #############
 WORKDIR $BASEDIR
-RUN chown -R wikispeech.wikispeech /wikispeech
-USER wikispeech
+#RUN chown -R wikispeech.wikispeech /wikispeech
+#USER wikispeech
 EXPOSE 8787
 
 CMD ($BASEDIR/bin/setup $APPDIR && lexserver -test -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static  $PRONLEXPATH/lexserver/static && lexserver -ss_files $APPDIR/symbol_sets -db_files $APPDIR/db_files -static  $PRONLEXPATH/lexserver/static 8787)
