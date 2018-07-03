@@ -460,7 +460,8 @@ func Test_insertEntries(t *testing.T) {
 	eApa.EntryValidations = []lex.EntryValidation{}
 
 	c1 := lex.EntryComment{Label: "label1", Source: "secret", Comment: "strålande"}
-	cmts := []lex.EntryComment{c1}
+	c2 := lex.EntryComment{Label: "label2", Source: "hämligt", Comment: "super super hemligt |)("}
+	cmts := []lex.EntryComment{c1, c2}
 	eApa.Comments = cmts
 
 	//time.Sleep(2000 * time.Millisecond)
@@ -492,7 +493,7 @@ func Test_insertEntries(t *testing.T) {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 
-	if got, want := len(eApax.Comments), 1; got != want {
+	if got, want := len(eApax.Comments), 2; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 

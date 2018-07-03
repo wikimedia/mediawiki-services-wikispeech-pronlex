@@ -27,7 +27,22 @@ func (ws WS) Parse(line string) (map[Field]string, error) {
 // [other: comment text] (nisse) §§§ [assign_to: nisse] (bengt)",
 const commentDelim = " §§§ "
 
+// EntryComment.String() : return fmt.Sprintf("[%s: %s] (%s)", c.Label, c.Comment, c.Source)
 var commentRe = regexp.MustCompile("^\\[([^)]+): ([^\\]]+)\\] \\(([a-zåäö0-9_-]+)\\)$")
+
+func (ws WS) joinComments(comments []lex.EntryComment) (string, error) {
+	var res = []string{}
+	if len(comments) == 0 {
+		return "", nil
+	}
+	for _, c := range comments {
+		if strings.Contains(c.Comment, commentDelim) {
+			return "", fmt.Errorf("A comment must not contain comment delimiter %s: %s", commentDelim, c.String())
+		}
+		res = append(res, c.String())
+	}
+	return strings.Join(res, commentDelim), nil
+}
 
 func (ws WS) parseComments(cmts string) ([]lex.EntryComment, error) {
 	var res []lex.EntryComment
@@ -67,11 +82,19 @@ func (ws WS) ParseToEntry(line string) (lex.Entry, error) {
 	res.EntryStatus.Name = fs[StatusName]
 	res.EntryStatus.Source = fs[StatusSource]
 	res.Preferred, err = strconv.ParseBool(fs[Preferred])
-	res.Tag = fs[Tag]
 	if err != nil {
 		err := fmt.Errorf("couldn't convert string to boolean preferred field: %v", err)
 		return res, fmt.Errorf("parse to entry failed : %v", err)
 	}
+
+	res.Tag = fs[Tag]
+
+	cmts, err := ws.parseComments(fs[Comments])
+	if err != nil {
+		err := fmt.Errorf("couldn't parse comments: %v", err)
+		return res, fmt.Errorf("parse to entry failed : %v", err)
+	}
+	res.Comments = cmts
 
 	err = ws.sanityChecks(res)
 	if err != nil {
@@ -116,7 +139,7 @@ func (ws WS) Entry2String(e lex.Entry) (string, error) {
 
 func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 
-	// Fields ID and LexiconID are database internal  and not processed here
+	// Fields ID and LexiconID are database internal and not processed here
 
 	var fs = make(map[Field]string)
 	fs[Orth] = e.Strn
@@ -124,6 +147,12 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 	fs[WordParts] = e.WordParts
 	fs[Preferred] = strconv.FormatBool(e.Preferred)
 	fs[Tag] = e.Tag
+
+	comments, err := ws.joinComments(e.Comments)
+	if err != nil {
+		return map[Field]string{}, fmt.Errorf("couldn't make comment string : %v", err)
+	}
+	fs[Comments] = comments
 
 	fs[Pos] = e.PartOfSpeech
 	fs[Morph] = e.Morphology

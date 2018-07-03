@@ -83,6 +83,10 @@ type EntryComment struct {
 	Comment string `json:"comment"`
 }
 
+func (c EntryComment) String() string {
+	return fmt.Sprintf("[%s: %s] (%s)", c.Label, c.Comment, c.Source)
+}
+
 // EntryValidation associates a validation result to an Entry
 type EntryValidation struct {
 	ID int64 `json:"id"`

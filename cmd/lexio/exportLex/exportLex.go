@@ -14,12 +14,9 @@ import (
 
 func main() {
 
-	// TODO read lexicon name from command line
-	// + db look up
-
 	if len(os.Args) != 4 && len(os.Args) != 2 {
-		log.Println("exportLex <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>")
-		log.Println(" if only <DB_FILE> is specified, a list of available lexicons will be printed")
+		fmt.Println("exportLex <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>")
+		fmt.Println(" if only <DB_FILE> is specified, a list of available lexicons will be printed")
 		return
 	}
 

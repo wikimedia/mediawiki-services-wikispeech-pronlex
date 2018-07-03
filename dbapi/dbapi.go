@@ -1006,6 +1006,8 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 
 	// transcription ids read so far, in order not to add same trans twice
 	transIDs := make(map[int64]int)
+	// comment ids
+	commentIDs := make(map[int64]int)
 	// entry validation ids read so far, in order not to add same validation twice
 	valiIDs := make(map[int64]int)
 
@@ -1078,6 +1080,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 				Preferred:    pref,
 				Tag:          entryTag.String,
 			}
+
 			// max one lemma per entry
 			if lemmaStrn.Valid && trm(lemmaStrn.String) != "" {
 				l := lex.Lemma{Strn: lemmaStrn.String}
@@ -1114,7 +1117,6 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 			}
 		}
 		// Things that may appear in several rows of a single lex.Entry below:
-
 		// transcriptions ordered by id so they will be added
 		// in correct order
 		// Only add transcriptions that are !ok, i.e. not added already
@@ -1161,7 +1163,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 		}
 		// Zero or more lex.EntryComments
 		if entryCommentID.Valid && entryCommentLabel.Valid && entryCommentSource.Valid && entryCommentComment.Valid {
-			if _, ok := valiIDs[entryCommentID.Int64]; !ok {
+			if _, ok := commentIDs[entryCommentID.Int64]; !ok {
 				currCmt := lex.EntryComment{
 					ID:      entryCommentID.Int64,
 					Label:   entryCommentLabel.String,
@@ -1169,7 +1171,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 					Comment: entryCommentComment.String,
 				}
 				currE.Comments = append(currE.Comments, currCmt)
-				valiIDs[entryCommentID.Int64]++
+				commentIDs[entryCommentID.Int64]++
 			}
 
 		}

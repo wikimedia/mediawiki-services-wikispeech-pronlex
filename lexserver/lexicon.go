@@ -300,6 +300,7 @@ var lexiconLookup = urlHandler{
 		}
 
 		res, err := dbm.LookUpIntoSlice(q)
+
 		if err != nil {
 			log.Printf("lexserver: Failed to get entries: %v", err)
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
