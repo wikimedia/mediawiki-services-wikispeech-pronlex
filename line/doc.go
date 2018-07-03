@@ -33,7 +33,8 @@ Any lexicon files you want to import into the lexicon database must be in this f
      Preferred      Takes values 1/0, and is used to defined which reading for a specific
                     orthography should be the standard one (in case of homographs)
      Tag            A tag (string) that can be used to disambiguate between homographs if needed (default: empty)
-     Comments       Comments containing a label (category), a comment (text), and a source (user or other source). It is defined using the format below. Each comment is separated by §§§ (three paragraph symbols)
+     Comments       On or more comments containing a label (category), a comment (text), and a source (user or other source).
+                    Comments are defined in the following format (separated by §§§):
                       [label: comment text] (source) §§§ [anotherlabel: another comment] (anothersource_or_user)
 
 Sample line:
