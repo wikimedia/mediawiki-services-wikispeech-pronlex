@@ -14,7 +14,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
-	loc "github.com/stts-se/pronlex/validation/locale"
+	//loc "github.com/stts-se/pronlex/validation/locale"
 	"github.com/stts-se/pronlex/validation/validators"
 )
 
@@ -110,9 +110,9 @@ SAMPLE INVOCATION:
 	inFile := args[3]
 	symbolSetFile := args[4]
 
-	if _, err := loc.LookUp(locale); err != nil {
-		log.Fatalf("Invalid locale: %v", locale)
-	}
+	// if _, err := loc.LookUp(locale); err != nil {
+	// 	log.Fatalf("Invalid locale: %v", locale)
+	// }
 
 	symbolSetDir, ssFileName := filepath.Split(symbolSetFile)
 	ext := filepath.Ext(ssFileName)
