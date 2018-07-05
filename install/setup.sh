@@ -105,7 +105,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB enu en_US $DEMOFILES/cmudict-0.7b-ws.utf8.for_testing $APPDIR/symbol_sets/en-us_ws-samp.sym ; then
+if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB enu en_US $DEMOFILES/cmudict-0.7b-ws.utf8.for_testing $APPDIR/symbol_sets/en-us_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:enu FAILED" >&2
