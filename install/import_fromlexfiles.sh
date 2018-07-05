@@ -73,7 +73,7 @@ CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
 if  go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$SVLEX &&
-	go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$SVLEX sv-se.nst sv_SE $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa $APPDIR/symbol_sets; then
+	go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$SVLEX sv-se.nst sv_SE $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.gz $APPDIR/symbol_sets/sv-se_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$SVLEX FAILED" >&2
@@ -83,7 +83,7 @@ fi
 echo "" >&2
 echo "IMPORT: $NOBLEX" >&2
 if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$NOBLEX &&
-	go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb-no.nst nb_NO $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.gz nb-no_ws-sampa $APPDIR/symbol_sets; then
+	go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$NOBLEX nb-no.nst nb_NO $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8.gz $APPDIR/symbol_sets/nb-no_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$NOBLEX FAILED" >&2
@@ -93,7 +93,7 @@ fi
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
 if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$AMELEX &&
-    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$AMELEX en-us.cmu en_US $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8 en-us_ws-sampa $APPDIR/symbol_sets; then
+    go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$AMELEX en-us.cmu en_US $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8 $APPDIR/symbol_sets/en-us_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$AMELEX FAILED" >&2
@@ -103,7 +103,7 @@ fi
 echo "" >&2
 echo "IMPORT: $ARLEX" >&2
 if go run $CMDDIR/createEmptyDB/createEmptyDB.go $APPDIR/db_files/$ARLEX &&
-	go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$ARLEX ar-test ar_AR $LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8 ar_ws-sampa $APPDIR/symbol_sets; then
+	go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$ARLEX ar-test ar_AR $LEXDATA/ar/TEST/ar_TEST.pron-ws.utf8 $APPDIR/symbol_sets/ar_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$ARLEX FAILED" >&2
