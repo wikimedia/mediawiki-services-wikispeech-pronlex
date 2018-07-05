@@ -87,7 +87,7 @@ echo "IMPORT: $LEXDB:sv" >&2
 
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
 
-if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB sv sv_SE $DEMOFILES/swe030224NST.pron-ws.utf8.for_testing sv-se_ws-sampa $APPDIR/symbol_sets ; then
+if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB sv sv_SE $DEMOFILES/swe030224NST.pron-ws.utf8.for_testing $APPDIR/symbol_sets/sv-se_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:sv FAILED" >&2
@@ -96,7 +96,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:nb" >&2
-if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB nb nb_NO $DEMOFILES/nor030224NST.pron-ws.utf8.for_testing nb-no_ws-sampa $APPDIR/symbol_sets ; then
+if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB nb nb_NO $DEMOFILES/nor030224NST.pron-ws.utf8.for_testing $APPDIR/symbol_sets/nb-no_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:nb FAILED" >&2
@@ -105,7 +105,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB enu en_US $DEMOFILES/cmudict-0.7b-ws.utf8.for_testing en-us_ws-sampa $APPDIR/symbol_sets ; then
+if go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB enu en_US $DEMOFILES/cmudict-0.7b-ws.utf8.for_testing $APPDIR/symbol_sets/en-us_ws-samp.sym ; then
     echo -n ""
 else
     echo "$LEXDB:enu FAILED" >&2
@@ -114,7 +114,7 @@ else
 
 echo "" >&2
 echo "IMPORT: $LEXDB:ar" >&2
-if  go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB ar ar_AR $DEMOFILES/ar_TEST.pron-ws.utf8.for_testing ar_ws-sampa $APPDIR/symbol_sets ; then
+if  go run $CMDDIR/importLex/importLex.go $APPDIR/db_files/$LEXDB ar ar_AR $DEMOFILES/ar_TEST.pron-ws.utf8.for_testing $APPDIR/symbol_sets/ar_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:ar FAILED" >&2

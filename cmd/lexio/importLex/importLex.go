@@ -65,7 +65,7 @@ func main() {
 	var createDb = f.Bool("createdb", false, "create db if it doesn't exist")
 
 	usage := `USAGE:
- importLex <FLAGS> <DB FILE> <LEXICON NAME> <LOCALE> <LEXICON FILE> <SYMBOLSET FILE>
+ importLex [FLAGS] <DB FILE> <LEXICON NAME> <LOCALE> <LEXICON FILE> <SYMBOLSET FILE>
 
 FLAGS:
    -validate bool  validate each entry, and save the validation in the database (default: false)
@@ -76,7 +76,7 @@ FLAGS:
    -help     bool  print help message
 
 SAMPLE INVOCATION:
-  importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz [SYMBOLSET FOLDER]/sv-se_ws-sampa.txt`
+  importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym`
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage)
