@@ -64,7 +64,7 @@ func createEmptyLexicon(dbPath string, lexRefX lex.LexRefWithInfo, locale string
 
 func main() {
 
-	var createDbIfNotExists1 = flag.Bool("create_db", false, "create db if it doesn't exist")
+	var createDbIfNotExists1 = flag.Bool("createdb", false, "create db if it doesn't exist")
 	var createDbIfNotExists2 = flag.Bool("c", false, "create db if it doesn't exist")
 	var help = flag.Bool("help", false, "print help and exit")
 
@@ -72,7 +72,7 @@ func main() {
      $ createEmptyLexicon [flags] <DB PATH> <LEX NAME> <SYMBOL SET NAME> <LOCALE>
 
 Flags:
-     -create_db   bool    create db if it doesn't exist (alias -c)
+     -createdb   bool    create db if it doesn't exist (alias -c)
      -help        bool    print help and exit
 `
 
