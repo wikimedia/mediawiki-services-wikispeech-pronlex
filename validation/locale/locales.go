@@ -1,0 +1,86 @@
+package locale
+
+import (
+	"golang.org/x/text/language"
+)
+
+var SupportedLocales = []language.Tag{
+	language.Afrikaans,            // *Dictionary = &af        // af
+	language.Amharic,              // *Dictionary = &am        // am
+	language.Arabic,               // *Dictionary = &ar        // ar
+	language.ModernStandardArabic, // *Dictionary = Arabic     // ar-001
+	language.Azerbaijani,          // *Dictionary = &az        // az
+	language.Bulgarian,            // *Dictionary = &bg        // bg
+	language.Bengali,              // *Dictionary = &bn        // bn
+	language.Catalan,              // *Dictionary = &ca        // ca
+	language.Czech,                // *Dictionary = &cs        // cs
+	language.Danish,               // *Dictionary = &da        // da
+	language.German,               // *Dictionary = &de        // de
+	language.Greek,                // *Dictionary = &el        // el
+	language.English,              // *Dictionary = &en        // en
+	language.AmericanEnglish,      // *Dictionary = English    // en-US
+	language.BritishEnglish,       // *Dictionary = English    // en-GB
+	language.Spanish,              // *Dictionary = &es        // es
+	language.EuropeanSpanish,      // *Dictionary = Spanish    // es-ES
+	language.LatinAmericanSpanish, // *Dictionary = Spanish    // es-419
+	language.Estonian,             // *Dictionary = &et        // et
+	language.Persian,              // *Dictionary = &fa        // fa
+	language.Finnish,              // *Dictionary = &fi        // fi
+	language.Filipino,             // *Dictionary = &fil       // fil
+	language.French,               // *Dictionary = &fr        // fr
+	language.Gujarati,             // *Dictionary = &gu        // gu
+	language.Hebrew,               // *Dictionary = &he        // he
+	language.Hindi,                // *Dictionary = &hi        // hi
+	language.Croatian,             // *Dictionary = &hr        // hr
+	language.Hungarian,            // *Dictionary = &hu        // hu
+	language.Armenian,             // *Dictionary = &hy        // hy
+	language.Indonesian,           // *Dictionary = &id        // id
+	language.Icelandic,            // *Dictionary = &is        // is
+	language.Italian,              // *Dictionary = &it        // it
+	language.Japanese,             // *Dictionary = &ja        // ja
+	language.Georgian,             // *Dictionary = &ka        // ka
+	language.Kazakh,               // *Dictionary = &kk        // kk
+	language.Khmer,                // *Dictionary = &km        // km
+	language.Kannada,              // *Dictionary = &kn        // kn
+	language.Korean,               // *Dictionary = &ko        // ko
+	language.Kirghiz,              // *Dictionary = &ky        // ky
+	language.Lao,                  // *Dictionary = &lo        // lo
+	language.Lithuanian,           // *Dictionary = &lt        // lt
+	language.Latvian,              // *Dictionary = &lv        // lv
+	language.Macedonian,           // *Dictionary = &mk        // mk
+	language.Malayalam,            // *Dictionary = &ml        // ml
+	language.Mongolian,            // *Dictionary = &mn        // mn
+	language.Marathi,              // *Dictionary = &mr        // mr
+	language.Malay,                // *Dictionary = &ms        // ms
+	language.Burmese,              // *Dictionary = &my        // my
+	language.Nepali,               // *Dictionary = &ne        // ne
+	language.Dutch,                // *Dictionary = &nl        // nl
+	language.Norwegian,            // *Dictionary = &no        // no
+	language.Punjabi,              // *Dictionary = &pa        // pa
+	language.Polish,               // *Dictionary = &pl        // pl
+	language.Portuguese,           // *Dictionary = &pt        // pt
+	language.BrazilianPortuguese,  // *Dictionary = Portuguese // pt-BR
+	language.EuropeanPortuguese,   // *Dictionary = &ptPT      // pt-PT
+	language.Romanian,             // *Dictionary = &ro        // ro
+	language.Russian,              // *Dictionary = &ru        // ru
+	language.Sinhala,              // *Dictionary = &si        // si
+	language.Slovak,               // *Dictionary = &sk        // sk
+	language.Slovenian,            // *Dictionary = &sl        // sl
+	language.Albanian,             // *Dictionary = &sq        // sq
+	language.Serbian,              // *Dictionary = &sr        // sr
+	language.SerbianLatin,         // *Dictionary = &srLatn    // sr
+	language.Swedish,              // *Dictionary = &sv        // sv
+	language.Swahili,              // *Dictionary = &sw        // sw
+	language.Tamil,                // *Dictionary = &ta        // ta
+	language.Telugu,               // *Dictionary = &te        // te
+	language.Thai,                 // *Dictionary = &th        // th
+	language.Turkish,              // *Dictionary = &tr        // tr
+	language.Ukrainian,            // *Dictionary = &uk        // uk
+	language.Urdu,                 // *Dictionary = &ur        // ur
+	language.Uzbek,                // *Dictionary = &uz        // uz
+	language.Vietnamese,           // *Dictionary = &vi        // vi
+	language.Chinese,              // *Dictionary = &zh        // zh
+	language.SimplifiedChinese,    // *Dictionary = Chinese    // zh-Hans
+	language.TraditionalChinese,   // *Dictionary = &zhHant    // zh-Hant
+	language.Zulu,                 // *Dictionary = &zu        // zu
+}

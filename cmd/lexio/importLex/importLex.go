@@ -1,21 +1,21 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
+	loc "github.com/stts-se/pronlex/validation/locale"
 	"github.com/stts-se/pronlex/validation/validators"
-
-	"fmt"
 )
 
 var vServ = validators.ValidatorService{Validators: make(map[string]*validation.Validator)}
@@ -62,19 +62,21 @@ func main() {
 	var replace = f.Bool("replace", false, "if the lexicon already exists, delete it before importing the new input data (default: false)")
 	var quiet = f.Bool("quiet", false, "mute information logging (default: false)")
 	var help = f.Bool("help", false, "print help message")
+	var createDb = f.Bool("createdb", false, "create db if it doesn't exist")
 
 	usage := `USAGE:
- importLex <FLAGS> <DB FILE> <LEXICON NAME> <LOCALE> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
+ importLex <FLAGS> <DB FILE> <LEXICON NAME> <LOCALE> <LEXICON FILE> <SYMBOLSET FILE>
 
 FLAGS:
    -validate bool  validate each entry, and save the validation in the database (default: false)
    -force    bool  force loading of lexicon even if the symbolset is undefined (default: false)
    -replace  bool  if the lexicon already exists, delete it before importing the new input data (default: false)
+   -createdb bool  create db if it doesn't exist (default: false)
    -quiet    bool  mute information logging (default: false)
    -help     bool  print help message
 
 SAMPLE INVOCATION:
-  importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa [SYMBOLSET FOLDER]`
+  importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz [SYMBOLSET FOLDER]/sv-se_ws-sampa.txt`
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage)
@@ -96,69 +98,83 @@ SAMPLE INVOCATION:
 		os.Exit(1)
 	}
 
-	if len(args) != 6 {
+	if len(args) != 5 {
 		fmt.Println(usage)
 		os.Exit(1)
 	}
 
+	dbapi.Sqlite3WithRegex()
 	dbFile := args[0]
 	lexName := args[1]
 	locale := args[2]
 	inFile := args[3]
-	symbolSetName := args[4]
+	symbolSetFile := args[4]
+
+	if _, err := loc.LookUp(locale); err != nil {
+		log.Fatalf("Invalid locale: %v", locale)
+	}
+
+	symbolSetDir, ssFileName := filepath.Split(symbolSetFile)
+	ext := filepath.Ext(ssFileName)
+	symbolSetName := ssFileName[0 : len(ssFileName)-len(ext)]
 
 	validator := &validation.Validator{}
-	symsetDirName := args[5]
 	if *validate {
 
-		err := loadValidators(symsetDirName)
+		err := loadValidators(symbolSetDir)
 		if err != nil {
-			msg := fmt.Sprintf("failed to load validators : %v", err)
+			msg := fmt.Sprintf("Failed to load validators : %v", err)
 			log.Fatal(msg)
 			return
 		}
 		vdat, err := vServ.ValidatorForName(symbolSetName)
 		validator = vdat
 		if err != nil {
-			msg := fmt.Sprintf("failed to get validator for symbol set %v : %v", symbolSetName, err)
+			msg := fmt.Sprintf("Failed to get validator for symbol set %v : %v", symbolSetName, err)
 			log.Fatal(msg)
 			return
 		}
 		log.Println("Validator created for " + validator.Name)
 	} else if !*force { // do not validate but still check symbolset
-		_, err := symbolset.LoadSymbolSet(filepath.Join(symsetDirName, symbolSetName+symbolset.SymbolSetSuffix))
+		_, err := symbolset.LoadSymbolSet(filepath.Join(symbolSetDir, symbolSetName+symbolset.SymbolSetSuffix))
 		if err != nil {
-			msg := fmt.Sprintf("failed to load symbol set %v : %v", symbolSetName, err)
+			msg := fmt.Sprintf("Failed to load symbol set %v : %v", symbolSetName, err)
 			log.Fatal(msg)
 			return
 		}
 	}
 
-	_, err = os.Stat(dbFile)
-	if err != nil {
-		log.Fatalf("Cannot find db file: %v", err)
-	}
-
-	_, err = os.Stat(inFile)
-	if err != nil {
-		log.Fatalf("Cannot find lexicon file: %v", err)
-	}
-
-	db, err := sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer db.Close()
-
 	dbm := dbapi.NewDBManager()
 	lexRef := lex.NewLexRef(dbFile, lexName)
 	dbRef := lexRef.DBRef
-	dbm.AddDB(dbRef, db)
+
+	defer dbm.CloseDB(dbRef)
+
+	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
+		if *createDb {
+			err := dbm.DefineSqliteDB(dbRef, dbFile)
+			if err != nil {
+				log.Fatalf("couldn't create db %s : %v", dbFile, err)
+				return
+			}
+			log.Printf("Created db %s\n", dbFile)
+		} else {
+			log.Fatalf("DB does not exist %s : %v", dbFile, err)
+			return
+		}
+	} else {
+		err := dbm.OpenDB(dbRef, dbFile)
+		if err != nil {
+			log.Fatalf("Couldn't open db %s : %v", dbFile, err)
+			return
+		}
+		log.Printf("Opened db %s\n", dbFile)
+	}
+
+	if !dbm.ContainsDB(dbRef) {
+		log.Fatalf("DB should be registered in dbm, but wasn't : %s", dbRef)
+		return
+	}
 
 	lexExists, err := dbm.LexiconExists(lexRef)
 	if err != nil {
@@ -196,19 +212,19 @@ SAMPLE INVOCATION:
 	}
 	// TODO handle errors? Does it make sent to return array of error...?
 	stderrLogger.Write(fmt.Sprintf("importing lexicon file %s ...", inFile))
-	err = dbapi.ImportLexiconFile(db, lexRef.LexName, logger, inFile, validator)
+	err = dbm.ImportLexiconFile(lexRef, logger, inFile, validator)
 
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	stderrLogger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")
-	_, err = db.Exec("ANALYZE")
-	if err != nil {
-		stderrLogger.Write(fmt.Sprintf("failed to run ANALYZE command : %v", err))
-		return
-	}
+	// stderrLogger.Write("running the Sqlite3 ANALYZE command. It may take a little while...")
+	// _, err = db.Exec("ANALYZE")
+	// if err != nil {
+	// 	stderrLogger.Write(fmt.Sprintf("failed to run ANALYZE command : %v", err))
+	// 	return
+	// }
 
 	fmt.Fprintf(os.Stderr, "\n")
 	stderrLogger.Write("finished importing lexicon file")
@@ -216,7 +232,7 @@ SAMPLE INVOCATION:
 	stderrLogger.Write("lexName=" + lexName)
 	stderrLogger.Write("lexFile=" + inFile)
 	stderrLogger.Write("symbolSet=" + symbolSetName)
-	stderrLogger.Write("symbolSetFolder=" + symsetDirName)
+	stderrLogger.Write("symbolSetFolder=" + symbolSetDir)
 	stderrLogger.Write("validate=" + strconv.FormatBool(*validate))
 	fmt.Fprintf(os.Stderr, "\n")
 
