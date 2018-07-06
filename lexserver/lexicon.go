@@ -169,6 +169,62 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 	},
 }
 
+var lexiconListCommentLabels = urlHandler{
+	name:     "list_comment_labels",
+	url:      "/list_comment_labels/{lexicon_name}",
+	help:     "List comment labels.",
+	examples: []string{"/list_current_entry_statuses/lexserver_testdb:sv"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+			return
+		}
+
+		statuses, err := dbm.ListCommentLabels(lexRef)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listCommentLabels: %v", err), http.StatusInternalServerError)
+			return
+		}
+		j, err := json.Marshal(statuses)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listCommentLabels : %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, string(j))
+	},
+}
+
+var lexiconListCurrentEntryUsers = urlHandler{
+	name:     "list_current_entry_users",
+	url:      "/list_current_entry_users/{lexicon_name}",
+	help:     "List current entry users.",
+	examples: []string{"/list_current_entry_users/lexserver_testdb:sv"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+			return
+		}
+
+		users, err := dbm.ListCurrentEntryUsers(lexRef)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
+			return
+		}
+		j, err := json.Marshal(users)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, string(j))
+	},
+}
+
 // TODO cut-n-paste from above
 var lexiconListAllEntryStatuses = urlHandler{
 	name:     "list_all_entry_statuses",

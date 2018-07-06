@@ -63,6 +63,9 @@ type Query struct {
 	// A list of entry statuses to match
 	EntryStatus []string `json:"entryStatus"`
 
+	// A list of users to match
+	Users []string `json:"user"`
+
 	// Select entries with one or more EntryValidations
 	HasEntryValidation bool `json:"hasEntryValidation"`
 
@@ -125,6 +128,8 @@ func (q Query) Empty() bool {
 	case strings.TrimSpace(q.CommentLike) != "":
 		return false
 	case len(q.EntryStatus) > 0:
+		return false
+	case len(q.Users) > 0:
 		return false
 	case q.HasEntryValidation:
 		return false

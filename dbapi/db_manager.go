@@ -481,6 +481,7 @@ func (dbm *DBManager) ListLexicons() ([]lex.LexRefWithInfo, error) {
 		}
 	}
 
+	sort.Slice(res, func(i, j int) bool { return res[i].LexRef.String() < res[j].LexRef.String() })
 	return res, nil
 }
 
@@ -583,6 +584,28 @@ func (dbm *DBManager) Locale(lexRef lex.LexRef) (string, error) {
 		return "", fmt.Errorf("DBManager.ImportLexiconFile: no such db '%s'", lexRef.DBRef)
 	}
 	return locale(db, string(lexRef.LexName))
+}
+
+// ListCommentLabels returns a list of all comment labels
+func (dbm *DBManager) ListCommentLabels(lexRef lex.LexRef) ([]string, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return []string{}, fmt.Errorf("DBManager.ListCommentLabels: no such db '%s'", lexRef.DBRef)
+	}
+	return listCommentLabels(db, string(lexRef.LexName))
+}
+
+// ListCurrentEntryUsers returns a list of all names EntryUsers marked 'current' (i.e., the most recent status).
+func (dbm *DBManager) ListCurrentEntryUsers(lexRef lex.LexRef) ([]string, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return []string{}, fmt.Errorf("DBManager.ListCurrentEntryUsers: no such db '%s'", lexRef.DBRef)
+	}
+	return listCurrentEntryUsers(db, string(lexRef.LexName))
 }
 
 // ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).

@@ -234,6 +234,24 @@ func entryStatuses(q Query) (string, []interface{}) {
 	return res, resv
 }
 
+func users(q Query) (string, []interface{}) {
+	var res string
+	var resv []interface{}
+
+	if len(q.Users) == 0 {
+		return res, resv
+	}
+
+	// Lexicon selection should already have been taken care of
+	//res += "entry.lexiconid = lexicon.id AND lexicon.id in " + nQs(len(q.Lexicons))
+	res += "entry.id = entryStatus.entryID AND entryStatus.current = 1 AND entryStatus.source in " + nQs(len(q.Users))
+	for _, es := range q.Users {
+		resv = append(resv, es)
+	}
+
+	return res, resv
+}
+
 func entryTag(q Query) (string, []interface{}) {
 
 	var res string
@@ -335,9 +353,14 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	// Query.TranscriptionLike, Query.TranscriptionRegexp
 	t, tv := transcriptions(q) // V2 simply returns 'transkription.strn like ?' + param value
 	args = append(args, tv...)
+
 	// Query.EntryStatus
 	es, esv := entryStatuses(q)
 	args = append(args, esv...)
+
+	// Query.Users
+	us, usv := users(q)
+	args = append(args, usv...)
 
 	// Query.TagLike
 	tl, tlv := entryTag(q)
@@ -353,7 +376,7 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	}
 
 	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, tl, cl, ev}), " AND "))
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, us, tl, cl, ev}), " AND "))
 	if "" != qRes {
 		sql += " AND " + qRes
 	}

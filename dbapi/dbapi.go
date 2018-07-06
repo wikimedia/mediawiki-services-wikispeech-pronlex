@@ -15,6 +15,7 @@ import (
 	"log"
 	"reflect"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -162,6 +163,7 @@ func listLexicons(db *sql.DB) ([]lexicon, error) {
 		res = append(res, l)
 	}
 	err = rows.Err()
+	sort.Slice(res, func(i, j int) bool { return res[i].name < res[j].name })
 	return res, err
 }
 
@@ -1796,6 +1798,11 @@ func locale(db *sql.DB, lexiconName string) (string, error) {
 // 	return entries, nil
 // }
 
+// ListCurrentEntryUsers returns a list of all names EntryUsers marked 'current' (i.e., the most recent status).
+func listCurrentEntryUsers(db *sql.DB, lexiconName string) ([]string, error) {
+	return listEntryUsers(db, lexiconName, true)
+}
+
 // ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).
 func listCurrentEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
 	return listEntryStatuses(db, lexiconName, true)
@@ -1836,6 +1843,68 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 	}
 
 	err = rows.Err()
+	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
+	return res, err
+}
+
+func listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error) {
+	var res []string
+
+	tx, err := db.Begin()
+	if err != nil {
+		return res, fmt.Errorf("dbapi.ListCurrentEntryUsers : %v", err)
+	}
+	defer tx.Commit()
+
+	// TODO This query seems a bit slow?
+	q := "SELECT DISTINCT entryStatus.source FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
+	qOnlyCurrent := " AND entryStatus.current = 1"
+	if onlyCurrent {
+		q += qOnlyCurrent
+	}
+
+	rows, err := tx.Query(q, lexiconName)
+	if err != nil {
+		tx.Rollback() // ?
+		return res, fmt.Errorf("ListCurrentEntryUsers : %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var userName string
+		rows.Scan(&userName)
+		res = append(res, userName)
+	}
+
+	err = rows.Err()
+	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
+	return res, err
+}
+
+func listCommentLabels(db *sql.DB, lexiconName string) ([]string, error) {
+	var res []string
+
+	tx, err := db.Begin()
+	if err != nil {
+		return res, fmt.Errorf("dbapi.ListCommentLabels : %v", err)
+	}
+	defer tx.Commit()
+
+	q := "SELECT DISTINCT entryComment.label FROM lexicon, entry, entryComment WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID"
+
+	rows, err := tx.Query(q, lexiconName)
+	if err != nil {
+		tx.Rollback() // ?
+		return res, fmt.Errorf("ListCommentLabels : %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var label string
+		rows.Scan(&label)
+		res = append(res, label)
+	}
+
+	err = rows.Err()
+	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
 	return res, err
 }
 

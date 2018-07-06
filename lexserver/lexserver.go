@@ -326,6 +326,8 @@ var knownParams = map[string]int{
 	"lemmas":              1,
 	"wordlike":            1,
 	"wordregexp":          1,
+	"entrystatus":         1,
+	"users":               1,
 	"wordparts":           1,
 	"wordpartslike":       1,
 	"wordpartsregexp":     1,
@@ -391,6 +393,10 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	if "" != getParam("entrystatus", r) {
 		entryStatus = splitRE.Split(getParam("entrystatus", r), -1)
 	}
+	var users []string
+	if "" != getParam("users", r) {
+		users = splitRE.Split(getParam("users", r), -1)
+	}
 	// If true, returns only entries with at least one EntryValidation issue
 	hasEntryValidation := false
 	if strings.ToLower(getParam("hasEntryValidation", r)) == "true" {
@@ -454,6 +460,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		Page:                page,
 		PageLength:          pageLength,
 		HasEntryValidation:  hasEntryValidation,
+		Users:               users,
 	}
 	dq := dbapi.DBMQuery{
 		Query:   q,
@@ -809,6 +816,8 @@ func createServer(port string) (*http.Server, error) {
 	lexicon.addHandler(lexiconEntriesExist)
 	lexicon.addHandler(lexiconInfo)
 	lexicon.addHandler(lexiconStats)
+	lexicon.addHandler(lexiconListCommentLabels)
+	lexicon.addHandler(lexiconListCurrentEntryUsers)
 	lexicon.addHandler(lexiconListCurrentEntryStatuses)
 	lexicon.addHandler(lexiconListAllEntryStatuses)
 	lexicon.addHandler(lexiconValidationPage)
