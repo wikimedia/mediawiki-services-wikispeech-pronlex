@@ -384,6 +384,10 @@ func Test_insertEntries(t *testing.T) {
 	// new validation
 	ees0.EntryValidations = []lex.EntryValidation{{Level: "severe", RuleName: "barf", Message: "it hurts"}}
 
+	ees0.PartOfSpeech = "PM"
+	ees0.Morphology = "F"
+	ees0.Tag = "accent II"
+
 	//time.Sleep(2000 * time.Millisecond)
 
 	newE, updated, err := updateEntry(db, ees0)
@@ -442,6 +446,17 @@ func Test_insertEntries(t *testing.T) {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 	if got, want := eApa.EntryValidations[0].Message, "it hurts"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
+	if got, want := eApa.PartOfSpeech, "PM"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+
+	if got, want := eApa.Morphology, "F"; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+	if got, want := eApa.Tag, "accent ii"; got != want {
 		t.Errorf("Got: %v Wanted: %v", got, want)
 	}
 

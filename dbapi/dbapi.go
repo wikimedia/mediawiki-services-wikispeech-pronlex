@@ -1341,8 +1341,17 @@ func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 	if err != nil {
 		return updated9, err
 	}
+	updated10, err := updatePartOfSpeech(tx, e, dbEntries[0])
+	if err != nil {
+		return updated10, err
+	}
 
-	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7 || updated8 || updated9, err
+	updated11, err := updateMorphology(tx, e, dbEntries[0])
+	if err != nil {
+		return updated11, err
+	}
+
+	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7 || updated8 || updated9 || updated10 || updated11, err
 }
 
 func getTIDs(ts []lex.Transcription) []int64 {
@@ -1380,6 +1389,38 @@ func updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if err != nil {
 		tx.Rollback()
 		return false, fmt.Errorf("failed language update : %v", err)
+	}
+	return true, nil
+}
+
+func updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+	if e.ID != dbE.ID {
+		tx.Rollback()
+		return false, fmt.Errorf("new and old entries have different ids")
+	}
+	if e.PartOfSpeech == dbE.PartOfSpeech {
+		return false, nil
+	}
+	_, err := tx.Exec("update entry set partofspeech = ? where entry.id = ?", e.PartOfSpeech, e.ID)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("failed partofspeech update : %v", err)
+	}
+	return true, nil
+}
+
+func updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+	if e.ID != dbE.ID {
+		tx.Rollback()
+		return false, fmt.Errorf("new and old entries have different ids")
+	}
+	if e.Morphology == dbE.Morphology {
+		return false, nil
+	}
+	_, err := tx.Exec("update entry set morphology = ? where entry.id = ?", e.Morphology, e.ID)
+	if err != nil {
+		tx.Rollback()
+		return false, fmt.Errorf("failed morphology update : %v", err)
 	}
 	return true, nil
 }
