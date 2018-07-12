@@ -3,9 +3,11 @@ package main
 import (
 	"bufio"
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
@@ -14,13 +16,24 @@ import (
 
 func main() {
 
-	if len(os.Args) != 4 && len(os.Args) != 2 {
-		fmt.Println("exportLex <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>")
-		fmt.Println(" if only <DB_FILE> is specified, a list of available lexicons will be printed")
+	var usage = "USAGE: exportLex [-header] <DB_FILE> <LEXICON_NAME> <OUTPUT_FILE_NAME>\n" +
+		" if only <DB_FILE> is specified, a list of available lexicons will be printed\n" +
+		" optional flag: header (print header in output file)\n"
+
+	var header = flag.Bool("header", false, "print header")
+	flag.Usage = func() {
+		fmt.Println(strings.TrimSpace(usage))
+	}
+	flag.Parse()
+
+	var args = flag.Args()
+
+	if len(args) != 3 && len(args) != 1 {
+		fmt.Fprintf(os.Stderr, usage)
 		return
 	}
 
-	dbFile := os.Args[1]
+	dbFile := args[0]
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatalf("darn : %v", err)
@@ -36,16 +49,16 @@ func main() {
 		log.Fatalf("darn : %v", err)
 	}
 	for _, ref := range lexRefs {
-		if len(os.Args) == 2 {
+		if len(args) == 1 {
 			fmt.Println(ref.LexRef.LexName)
 		}
 		lexNames[ref.LexRef.LexName] = true
 	}
-	if len(os.Args) == 2 {
+	if len(args) == 1 {
 		return
 	}
 
-	lexName := os.Args[2]
+	lexName := args[1]
 	lexRef := lex.NewLexRef(dbFile, lexName)
 
 	if "" == lexName {
@@ -57,8 +70,7 @@ func main() {
 		return
 	}
 	q := dbapi.DBMQuery{LexRefs: []lex.LexRef{lexRef}, Query: dbapi.Query{WordLike: "%"}}
-	//q := dbapi.DBMQuery{LexRefs: []lex.LexRef{lexRef}}
-	f, err := os.Create(os.Args[3])
+	f, err := os.Create(args[2])
 	if err != nil {
 		log.Fatalf("aouch : %v", err)
 	}
@@ -70,6 +82,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if *header {
+		bf.Write([]byte(fmt.Sprintf("%s\n", wsFmt.Header())))
+	}
+
 	writer := line.FileWriter{Parser: wsFmt, Writer: bf}
 	dbm.LookUp(q, writer)
 }

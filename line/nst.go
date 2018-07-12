@@ -104,6 +104,10 @@ func (nst NST) Entry2String(e lex.Entry) (string, error) {
 	return s, nil
 }
 
+func (nst NST) Header() string {
+	return nst.format.Header()
+}
+
 func (nst NST) fields(e lex.Entry) (map[Field]string, error) {
 
 	// Fields ID and LexiconID are database internal  and not processed here

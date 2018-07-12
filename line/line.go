@@ -163,6 +163,14 @@ func (f Format) Parse(line string) (map[Field]string, error) {
 	return res, nil
 }
 
+func (f Format) Header() string {
+	var res = make([]string, f.NFields)
+	for field, i := range f.Fields {
+		res[i] = field.String()
+	}
+	return strings.Join(res, f.FieldSep)
+}
+
 // String is used to generate an output line from a set of fields
 func (f Format) String(fields map[Field]string) (string, error) {
 	var res = make([]string, f.NFields)

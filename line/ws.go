@@ -195,6 +195,10 @@ func (ws WS) fields(e lex.Entry) (map[Field]string, error) {
 	return fs, nil
 }
 
+func (ws WS) Header() string {
+	return ws.format.Header()
+}
+
 // NewWS is used to create a new instance of the WS parser
 func NewWS() (WS, error) {
 	tests := []FormatTest{
