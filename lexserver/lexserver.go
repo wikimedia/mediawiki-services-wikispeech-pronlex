@@ -831,6 +831,7 @@ func createServer(port string) (*http.Server, error) {
 	lexicon.addHandler(lexiconValidationPage)
 	lexicon.addHandler(lexiconValidation)
 	lexicon.addHandler(lexiconUpdateEntry)
+	lexicon.addHandler(lexiconUpdateValidation)
 	lexicon.addHandler(lexiconAddEntry)
 	lexicon.addHandler(lexiconDeleteEntry)
 
@@ -869,6 +870,7 @@ func createServer(port string) (*http.Server, error) {
 	admin.addHandler(adminMoveNewEntries)
 	admin.addHandler(adminDeleteLex)
 	admin.addHandler(adminSuperDeleteLex)
+	admin.addHandler(adminListIDs)
 
 	// Sqlite3 ANALYZE command in some instances make search quicker,
 	// but it takes a while to perform. TODO: Re-add this call?

@@ -343,6 +343,23 @@ type lookUpRes struct {
 	err     error
 }
 
+// ListIDs is a wrapper around lookUpIds, returning a slice of ID's
+func (dbm *DBManager) ListIDs(lexRef lex.LexRef) ([]int64, error) {
+	dbm.RLock()
+	defer dbm.RUnlock()
+
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return []int64{}, fmt.Errorf("DBManager.ListIDs failed: no db of name '%s'", lexRef.DBRef)
+	}
+
+	ids, err := lookUpIds(db, []lex.LexName{lexRef.LexName}, Query{})
+	if err != nil {
+		return []int64{}, fmt.Errorf("DBManager.ListIDs failed for lexicon : '%s'", lexRef)
+	}
+	return ids, nil
+}
+
 // LookUpIntoSlice is a wrapper around LookUp, returning a slice of Entries
 func (dbm *DBManager) LookUpIntoSlice(q DBMQuery) ([]lex.Entry, error) {
 	var res = []lex.Entry{}
@@ -525,6 +542,18 @@ func (dbm *DBManager) InsertEntries(lexRef lex.LexRef, entries []lex.Entry) ([]i
 		return res, fmt.Errorf("DBManager.InsertEntries failed: %v", err)
 	}
 	return res, err
+}
+
+// UpdateValidation
+func (dbm *DBManager) UpdateValidation(e lex.Entry) error {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[e.LexRef.DBRef]
+	if !ok {
+		return fmt.Errorf("DBManager.UpdateValidation: no such db '%s'", e.LexRef.DBRef)
+	}
+
+	return updateValidation(db, []lex.Entry{e})
 }
 
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db

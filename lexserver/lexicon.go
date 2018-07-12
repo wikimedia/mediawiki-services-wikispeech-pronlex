@@ -102,6 +102,34 @@ var lexiconUpdateEntry = urlHandler{
 	},
 }
 
+var lexiconUpdateValidation = urlHandler{
+	name:     "updatevalidation",
+	url:      "/updatevalidation",
+	help:     "Updates the validation for an entry in the database. Input is an entry variable in JSON format. For examples, see <a href=\"https://godoc.org/github.com/stts-se/pronlex/lex\">package documentation</a>.",
+	examples: []string{},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		entryJSON := getParam("entry", r)
+		//body, err := ioutil.ReadAll(r.Body)
+		var e lex.Entry
+		err := json.Unmarshal([]byte(entryJSON), &e)
+		if err != nil {
+			log.Printf("lexserver: Failed to unmarshal json: %v", err)
+			http.Error(w, fmt.Sprintf("failed to process incoming Entry json : %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		err2 := dbm.UpdateValidation(e)
+		if err2 != nil {
+			log.Printf("lexserver: Failed to update entry : %v", err2)
+			http.Error(w, fmt.Sprintf("failed to update Entry : %v", err2), http.StatusInternalServerError)
+			return
+		}
+
+		//w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		//fmt.Fprint(w, "Validation updated")
+	},
+}
+
 // LexWithEntryCount is a struct for collecting lexicon info for json result
 type LexWithEntryCount struct {
 	Name          string `json:"name"`

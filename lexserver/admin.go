@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -26,6 +27,40 @@ func deleteUploadedFile(serverPath string) {
 		msg := fmt.Sprint("the uploaded temp file has been deleted from server")
 		log.Println(msg)
 	}
+}
+
+var adminListIDs = urlHandler{
+	name:     "list_ids",
+	url:      "/list_ids/{lexicon_name}",
+	help:     "List all IDs for the entries in one lexicon.",
+	examples: []string{"/list_ids/lexserver_testdb:sv"},
+	handler: func(w http.ResponseWriter, r *http.Request) {
+		lexRef, err := getLexRefParam(r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+			return
+		}
+
+		ids, err := dbm.ListIDs(lexRef)
+
+		if err != nil {
+			log.Printf("lexserver: Failed to get ids: %v", err)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		jsids := IDs{ids}
+		res, err := json.Marshal(jsids)
+		if err != nil {
+			msg := fmt.Sprintf("lexserver: Failed to marshal ids : %v", err)
+			log.Printf(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		fmt.Fprint(w, string(res))
+
+	},
 }
 
 var adminLexImportPage = urlHandler{
