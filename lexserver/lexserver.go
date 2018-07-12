@@ -343,6 +343,8 @@ var knownParams = map[string]int{
 	"paradigmregexp":      1,
 	"hasEntryValidation":  1,
 	"taglike":             1,
+	"languagelike":        1,
+	"morphologylike":      1,
 	"commentlabellike":    1,
 	"commentsourcelike":   1,
 	"commentlike":         1,
@@ -383,6 +385,8 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	transcriptionRegexp := strings.TrimSpace(getParam("transcriptionregexp", r))
 	partOfSpeechLike := strings.TrimSpace(getParam("partofspeechlike", r))
 	partOfSpeechRegexp := strings.TrimSpace(getParam("partofspeechregexp", r))
+	languageLike := strings.TrimSpace(getParam("languagelike", r))
+	morphologyLike := strings.TrimSpace(getParam("morphologylike", r))
 	lemmaLike := strings.TrimSpace(getParam("lemmalike", r))
 	lemmaRegexp := strings.TrimSpace(getParam("lemmaregexp", r))
 	readingLike := strings.TrimSpace(getParam("readinglike", r))
@@ -404,6 +408,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	}
 
 	tagLike := strings.TrimSpace(getParam("taglike", r))
+
 	commentLabelLike := strings.TrimSpace(getParam("commentlabellike", r))
 	commentSourceLike := strings.TrimSpace(getParam("commentsourcelike", r))
 	commentLike := strings.TrimSpace(getParam("commentlike", r))
@@ -445,9 +450,11 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		TranscriptionRegexp: transcriptionRegexp,
 		PartOfSpeechLike:    partOfSpeechLike,
 		PartOfSpeechRegexp:  partOfSpeechRegexp,
+		MorphologyLike:      morphologyLike,
 		Lemmas:              lemmas,
 		LemmaLike:           lemmaLike,
 		LemmaRegexp:         lemmaRegexp,
+		LanguageLike:        languageLike,
 		ReadingLike:         readingLike,
 		ReadingRegexp:       readingRegexp,
 		ParadigmLike:        paradigmLike,
@@ -462,6 +469,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		HasEntryValidation:  hasEntryValidation,
 		Users:               users,
 	}
+
 	dq := dbapi.DBMQuery{
 		Query:   q,
 		LexRefs: lexRefs,

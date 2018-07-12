@@ -99,7 +99,7 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 
 	//fmt.Printf("sql_gen QUERY : %#v\n", q)
 
-	if len(q.Words) == 0 && len(q.WordParts) == 0 && trm(q.WordLike) == "" && trm(q.WordPartsLike) == "" && trm(q.WordPartsRegexp) == "" && trm(q.WordRegexp) == "" && trm(q.PartOfSpeechLike) == "" && trm(q.PartOfSpeechRegexp) == "" && len(q.EntryIDs) == 0 {
+	if len(q.Words) == 0 && len(q.WordParts) == 0 && trm(q.WordLike) == "" && trm(q.WordPartsLike) == "" && trm(q.WordPartsRegexp) == "" && trm(q.WordRegexp) == "" && trm(q.PartOfSpeechLike) == "" && trm(q.PartOfSpeechRegexp) == "" && trm(q.LanguageLike) == "" && trm(q.MorphologyLike) == "" && len(q.EntryIDs) == 0 {
 		return "", resv
 	} //else {
 	if len(q.Words) > 0 {
@@ -131,6 +131,14 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 		resv = append(resv, q.WordRegexp)
 	}
 
+	if trm(q.LanguageLike) != "" {
+		reses = append(reses, "entry.language like ?")
+		resv = append(resv, q.LanguageLike)
+	}
+	if trm(q.MorphologyLike) != "" {
+		reses = append(reses, "entry.morphology like ?")
+		resv = append(resv, q.MorphologyLike)
+	}
 	if trm(q.PartOfSpeechLike) != "" {
 		reses = append(reses, "entry.partofspeech like ?")
 		resv = append(resv, q.PartOfSpeechLike)

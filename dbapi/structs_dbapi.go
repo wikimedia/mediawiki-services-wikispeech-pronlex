@@ -42,6 +42,9 @@ type Query struct {
 	// a 'like' db search expression matching part of speech strings
 	PartOfSpeechLike   string `json:"partOfSpeechLike"`
 	PartOfSpeechRegexp string `json:"partOfSpeechRegexp"`
+
+	MorphologyLike string `json:"morphologyLike"`
+
 	// list of lemma forms to get corresponding entries for
 	Lemmas []string `json:"lemmas"`
 	// an SQL 'like' expression to match lemma forms
@@ -54,7 +57,8 @@ type Query struct {
 	ParadigmLike   string `json:"paradigmLike"`
 	ParadigmRegexp string `json:"paradigmRegexp"`
 
-	TagLike string `json:"tagLike"`
+	TagLike      string `json:"tagLike"`
+	LanguageLike string `json:"languageLike"`
 
 	CommentLabelLike  string `json:"commentLabelLike"`
 	CommentSourceLike string `json:"commenSourceLike"`
@@ -104,6 +108,10 @@ func (q Query) Empty() bool {
 	case strings.TrimSpace(q.PartOfSpeechLike) != "":
 		return false
 	case strings.TrimSpace(q.PartOfSpeechRegexp) != "":
+		return false
+	case strings.TrimSpace(q.LanguageLike) != "":
+		return false
+	case strings.TrimSpace(q.MorphologyLike) != "":
 		return false
 	case len(q.Lemmas) > 0:
 		return false

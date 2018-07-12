@@ -920,6 +920,7 @@ func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
 func lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
+	//log.Printf("dbapi lookUp QUWRY %#v\n\n", q)
 
 	if q.Empty() {
 		return nil
@@ -964,7 +965,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 	//	return nil
 	//}
 
-	//log.Printf("QUWRY %v\n\n", q)
+	//log.Printf("dbapi lookUpTx QUWRY %#v\n\n", q)
 
 	sqlStmt := selectEntriesSQL(lexNames, q)
 
