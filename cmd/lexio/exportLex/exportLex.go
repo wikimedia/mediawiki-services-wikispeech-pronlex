@@ -83,7 +83,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if *header {
-		bf.Write([]byte(fmt.Sprintf("%s\n", wsFmt.Header())))
+		bf.Write([]byte(fmt.Sprintf("#%s\n", wsFmt.Header())))
 	}
 
 	writer := line.FileWriter{Parser: wsFmt, Writer: bf}

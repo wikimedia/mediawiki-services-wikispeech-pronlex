@@ -109,6 +109,11 @@ var lexiconUpdateValidation = urlHandler{
 	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		entryJSON := getParam("entry", r)
+		if entryJSON == "" {
+			log.Printf("lexiconUpdateValidation got empty input entry")
+			http.Error(w, "failed to process incoming Entry json : empty input entry", http.StatusInternalServerError)
+			return
+		}
 		//body, err := ioutil.ReadAll(r.Body)
 		var e lex.Entry
 		err := json.Unmarshal([]byte(entryJSON), &e)
