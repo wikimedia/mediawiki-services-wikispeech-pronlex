@@ -86,13 +86,20 @@ func parseEntry(testType string, rName string, fs []string) (string, lex.Entry, 
 	orth := fs[2]
 
 	e := lex.Entry{Strn: orth}
-	for _, ts := range fs[3:] {
+	for _, ts := range strings.Split(fs[3], "#") {
 		ts = strings.TrimSpace(ts)
 		if len(ts) > 0 {
 			t := lex.Transcription{Strn: ts}
 			e.Transcriptions = append(e.Transcriptions, t)
 		}
 	}
+	if len(fs) > 4 {
+		e.Language = fs[4]
+	}
+	if len(fs) > 5 {
+		e.PartOfSpeech = fs[5]
+	}
+
 	return rName, e, nil
 
 }
