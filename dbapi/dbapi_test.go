@@ -474,6 +474,7 @@ func Test_insertEntries(t *testing.T) {
 	eApa.Language = "gummiapa"
 	eApa.EntryValidations = []lex.EntryValidation{}
 
+	//
 	c1 := lex.EntryComment{Label: "label1", Source: "secret", Comment: "strålande"}
 	c2 := lex.EntryComment{Label: "label2", Source: "hämligt", Comment: "super super hemligt |)("}
 	cmts := []lex.EntryComment{c1, c2}
@@ -989,5 +990,96 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	if len(resX) != 0 {
 		t.Errorf(fs, "0", len(res))
 	}
+}
 
+func Test_UpdateComments(t *testing.T) {
+	dbPath := "./testlex_updateentry.db"
+
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		err := os.Remove(dbPath)
+		ff("failed to remove "+dbPath+" : %v", err)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	defer db.Close()
+
+	_, err = execSchema(db) // Creates new lexicon database
+
+	ff("Failed to create lexicon db: %v", err)
+
+	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
+
+	l, err = defineLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	// TEST UPDATE COMMENTS
+	e1 := lex.Entry{Strn: "apa",
+		PartOfSpeech: "NN",
+		Morphology:   "NEU UTR",
+		WordParts:    "apa",
+		Language:     "XYZZ",
+		Preferred:    true,
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{Strn: "A: p a", Language: "Svetsko"},
+			lex.Transcription{Strn: "a pp a", Language: "svinspråket"},
+		},
+		Comments: []lex.EntryComment{
+			lex.EntryComment{Label: "label1", Source: "anon", Comment: "strålande 1"},
+		},
+		EntryStatus: lex.EntryStatus{Name: "old1", Source: "tst"}}
+
+	_, err = insertEntries(db, l, []lex.Entry{e1})
+	if err != nil {
+		t.Errorf(fs, "nil", err)
+	}
+
+	que := Query{WordLike: "apa"}
+	var addeds lex.EntrySliceWriter
+	err = lookUp(db, []lex.LexName{lex.LexName(l.name)}, que, &addeds)
+	if err != nil {
+		t.Errorf("Wanted nil, got %v", err)
+	}
+	if got, want := len(addeds.Entries), 1; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+	added := addeds.Entries[0]
+
+	added.Comments = []lex.EntryComment{
+		lex.EntryComment{Label: "label2", Source: "anon", Comment: "strålande 2"},
+	}
+	newE, updated, err := updateEntry(db, added)
+
+	if err != nil {
+		t.Errorf(fs, "nil", err)
+	}
+	if !updated {
+		t.Errorf(fs, true, updated)
+	}
+	if want, got := true, newE.Strn == e1.Strn; !got {
+		t.Errorf(fs, got, want)
+	}
+
+	if len(newE.Comments) != 1 || len(newE.Comments) != len(added.Comments) {
+		t.Errorf(fs, newE.Comments, added.Comments)
+	} else {
+		for i, newC := range newE.Comments {
+			c := added.Comments[i]
+			if c.Comment != newC.Comment || c.Label != newC.Label || c.Source != newC.Source {
+				t.Errorf(fs, newC, c)
+			}
+		}
+	}
 }

@@ -1281,7 +1281,6 @@ func updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 		tx.Rollback()
 		return res, updated, fmt.Errorf("failed getting updated entry : %v", err)
 	}
-
 	return res, updated, err
 }
 
@@ -1554,14 +1553,20 @@ func updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return true, err
 	}
 
-	// List of comments equally long. Only update if different comments
-	for i, cmt := range e.Comments {
-		dbCmt := dbE.Comments[i]
-		if cmt.Label == dbCmt.Label && cmt.Source == dbCmt.Source && cmt.Comment == dbCmt.Comment {
-			err := insertEntryComments(tx, dbE.ID, e.Comments)
-			return true, err
-		}
+	// New code:
+	if !reflect.DeepEqual(e.Comments, dbE.Comments) {
+		err := insertEntryComments(tx, dbE.ID, e.Comments)
+		return true, err
 	}
+
+	// Removed code:
+	// for i, cmt := range e.Comments {
+	// 	dbCmt := dbE.Comments[i]
+	// 	if cmt.Label == dbCmt.Label && cmt.Source == dbCmt.Source && cmt.Comment == dbCmt.Comment {
+	// 		err := insertEntryComments(tx, dbE.ID, e.Comments)
+	// 		return true, err
+	// 	}
+	// }
 
 	return false, nil
 }
