@@ -26,6 +26,7 @@ func (ws WS) Parse(line string) (map[Field]string, error) {
 
 // [other: comment text] (nisse) §§§ [assign_to: nisse] (bengt)",
 const commentDelim = " §§§ "
+const newline = "<br>"
 
 // EntryComment.String() : return fmt.Sprintf("[%s: %s] (%s)", c.Label, c.Comment, c.Source)
 var commentRe = regexp.MustCompile("^\\[([^)]+): ([^\\]]+)\\] \\(([a-zåäö0-9_-]+)\\)$")
@@ -39,7 +40,7 @@ func (ws WS) joinComments(comments []lex.EntryComment) (string, error) {
 		if strings.Contains(c.Comment, commentDelim) {
 			return "", fmt.Errorf("A comment must not contain comment delimiter %s: %s", commentDelim, c.String())
 		}
-		res = append(res, c.String())
+		res = append(res, strings.Replace(c.String(), "\n", newline, -1))
 	}
 	return strings.Join(res, commentDelim), nil
 }
@@ -52,7 +53,7 @@ func (ws WS) parseComments(cmts string) ([]lex.EntryComment, error) {
 	for _, cmt := range strings.Split(cmts, commentDelim) {
 		m := commentRe.FindStringSubmatch(cmt)
 		label := m[1]
-		text := m[2]
+		text := strings.Replace(m[2], newline, "\n", -1)
 		source := m[3]
 		c := lex.EntryComment{Label: label, Comment: text, Source: source}
 		res = append(res, c)
