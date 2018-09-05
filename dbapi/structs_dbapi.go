@@ -71,7 +71,8 @@ type Query struct {
 	Users []string `json:"user"`
 
 	// Select entries with one or more EntryValidations
-	HasEntryValidation bool `json:"hasEntryValidation"`
+	HasEntryValidation bool   `json:"hasEntryValidation"`
+	ValidationRuleLike string `json:"validationRuleLike"`
 
 	// // Search for Entries with EntryValidations with the listed
 	// // validation rule names (such as 'Decomp2Orth', etc)
@@ -134,6 +135,8 @@ func (q Query) Empty() bool {
 	case strings.TrimSpace(q.CommentSourceLike) != "":
 		return false
 	case strings.TrimSpace(q.CommentLike) != "":
+		return false
+	case strings.TrimSpace(q.ValidationRuleLike) != "":
 		return false
 	case len(q.EntryStatus) > 0:
 		return false

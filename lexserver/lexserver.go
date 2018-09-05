@@ -341,7 +341,8 @@ var knownParams = map[string]int{
 	"readingregexp":       1,
 	"paradigmlike":        1,
 	"paradigmregexp":      1,
-	"hasEntryValidation":  1,
+	"hasentryvalidation":  1,
+	"validationrulelike":  1,
 	"taglike":             1,
 	"languagelike":        1,
 	"morphologylike":      1,
@@ -403,9 +404,10 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	}
 	// If true, returns only entries with at least one EntryValidation issue
 	hasEntryValidation := false
-	if strings.ToLower(getParam("hasEntryValidation", r)) == "true" {
+	if strings.ToLower(getParam("hasentryvalidation", r)) == "true" {
 		hasEntryValidation = true
 	}
+	validationRuleLike := strings.TrimSpace(getParam("validationrulelike", r))
 
 	tagLike := strings.TrimSpace(getParam("taglike", r))
 
@@ -467,6 +469,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		Page:                page,
 		PageLength:          pageLength,
 		HasEntryValidation:  hasEntryValidation,
+		ValidationRuleLike:  validationRuleLike,
 		Users:               users,
 	}
 

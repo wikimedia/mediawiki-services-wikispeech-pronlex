@@ -295,6 +295,18 @@ func comments(q Query) (string, []interface{}) {
 	return res, resv
 }
 
+func validations(q Query) (string, []interface{}) {
+	var res string
+	var resv []interface{}
+
+	if q.ValidationRuleLike != "" {
+		res += " entry.id = entryValidation.entryid AND lower(entryValidation.name) like lower(?) "
+		resv = append(resv, q.ValidationRuleLike)
+	}
+
+	return res, resv
+}
+
 func filter(ss []string, f func(string) bool) []string {
 	var res []string
 	for i, s := range ss {
@@ -377,6 +389,9 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	cl, clv := comments(q)
 	args = append(args, clv...)
 
+	vl, vlv := validations(q)
+	args = append(args, vlv...)
+
 	// HasEntryValidation doesn't take any argument
 	ev := ""
 	if q.HasEntryValidation {
@@ -384,7 +399,7 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	}
 
 	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, us, tl, cl, ev}), " AND "))
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, us, tl, cl, vl, ev}), " AND "))
 	if "" != qRes {
 		sql += " AND " + qRes
 	}

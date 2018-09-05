@@ -3,6 +3,7 @@ package dbapi
 import (
 	"database/sql"
 	"flag"
+	"reflect"
 	//"fmt"
 	"time"
 
@@ -990,10 +991,11 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	if len(resX) != 0 {
 		t.Errorf(fs, "0", len(res))
 	}
+
 }
 
 func Test_UpdateComments(t *testing.T) {
-	dbPath := "./testlex_updateentry.db"
+	dbPath := "./testlex_updatecomments.db"
 
 	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
 		err := os.Remove(dbPath)
@@ -1081,5 +1083,111 @@ func Test_UpdateComments(t *testing.T) {
 				t.Errorf(fs, newC, c)
 			}
 		}
+	}
+}
+
+func Test_ValidationRuleLike(t *testing.T) {
+	dbPath := "./testlex_validationrulelike.db"
+
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		err := os.Remove(dbPath)
+		ff("failed to remove "+dbPath+" : %v", err)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	defer db.Close()
+
+	_, err = execSchema(db) // Creates new lexicon database
+
+	ff("Failed to create lexicon db: %v", err)
+
+	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
+
+	l, err = defineLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	e1 := lex.Entry{Strn: "apa1",
+		PartOfSpeech: "NN",
+		Morphology:   "NEU UTR",
+		WordParts:    "apa",
+		Language:     "XYZZ",
+		Preferred:    true,
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{Strn: "A: p a", Language: "Svetsko"},
+			lex.Transcription{Strn: "a pp a", Language: "svinspråket"},
+		},
+		Comments: []lex.EntryComment{
+			lex.EntryComment{Label: "label1", Source: "anon", Comment: "strålande 1"},
+		},
+		EntryStatus: lex.EntryStatus{Name: "old1", Source: "tst"},
+		EntryValidations: []lex.EntryValidation{
+			lex.EntryValidation{RuleName: "rule1", Level: "fatal", Message: "nizze"},
+		},
+	}
+
+	e2 := lex.Entry{Strn: "apa2",
+		PartOfSpeech: "NN",
+		Morphology:   "NEU UTR",
+		WordParts:    "apa",
+		Language:     "XYZZ",
+		Preferred:    true,
+		Transcriptions: []lex.Transcription{
+			lex.Transcription{Strn: "A: p a", Language: "Svetsko"},
+			lex.Transcription{Strn: "a pp a", Language: "svinspråket"},
+		},
+		Comments: []lex.EntryComment{
+			lex.EntryComment{Label: "label1", Source: "anon", Comment: "strålande 1"},
+		},
+		EntryStatus: lex.EntryStatus{Name: "old1", Source: "tst"},
+		EntryValidations: []lex.EntryValidation{
+			lex.EntryValidation{RuleName: "rule2", Level: "fatal", Message: "nizze"},
+		},
+	}
+
+	_, err = insertEntries(db, l, []lex.Entry{e1, e2})
+	if err != nil {
+		t.Errorf(fs, "nil", err)
+	}
+
+	que1 := Query{ValidationRuleLike: "rule%"}
+	var searchRes1 lex.EntrySliceWriter
+	err = lookUp(db, []lex.LexName{lex.LexName(l.name)}, que1, &searchRes1)
+	if err != nil {
+		t.Errorf("Wanted nil, got %v", err)
+	}
+	if got, want := len(searchRes1.Entries), 2; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+	if !reflect.DeepEqual(searchRes1.Entries[0].Strn, e1.Strn) {
+		t.Errorf("Got: %v Wanted: %v", searchRes1, e1)
+	}
+	if !reflect.DeepEqual(searchRes1.Entries[1].Strn, e2.Strn) {
+		t.Errorf("Got: %v Wanted: %v", searchRes1, e2)
+	}
+
+	que2 := Query{ValidationRuleLike: "rule1"}
+	var searchRes2 lex.EntrySliceWriter
+	err = lookUp(db, []lex.LexName{lex.LexName(l.name)}, que2, &searchRes2)
+	if err != nil {
+		t.Errorf("Wanted nil, got %v", err)
+	}
+	if got, want := len(searchRes2.Entries), 1; got != want {
+		t.Errorf("Got: %v Wanted: %v", got, want)
+	}
+	if !reflect.DeepEqual(searchRes2.Entries[0].Strn, e1.Strn) {
+		t.Errorf("Got: %v Wanted: %v", searchRes2, e1)
 	}
 }
