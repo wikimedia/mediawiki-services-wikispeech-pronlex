@@ -163,6 +163,10 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 
 	for _, accept := range allAccept {
 		for _, rule := range v.Rules {
+			if strings.ToLower(rule.Level()) == "info" {
+				continue
+			}
+
 			// TODO: no need to test the rule's own accept examples, that is already taken care of above
 			res, err := rule.Validate(accept.Entry)
 			if err != nil {
