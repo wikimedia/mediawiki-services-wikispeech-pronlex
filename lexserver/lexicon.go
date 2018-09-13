@@ -177,7 +177,7 @@ var lexiconList = urlHandler{
 var lexiconListCurrentEntryStatuses = urlHandler{
 	name:     "list_current_entry_statuses",
 	url:      "/list_current_entry_statuses/{lexicon_name}",
-	help:     "List current entry statuses.",
+	help:     "List current entry statuses. Optional param freq set to true will include frequencies for each status.",
 	examples: []string{"/list_current_entry_statuses/lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
@@ -186,19 +186,34 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
+		freq := getParam("freq", r)
+		if freq == "true" {
+			statuses, err := dbm.ListCurrentEntryStatusesWithFreq(lexRef)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+				return
+			}
+			j, err := json.Marshal(statuses)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+				return
+			}
 
-		statuses, err := dbm.ListCurrentEntryStatuses(lexRef)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
-			return
-		}
-		j, err := json.Marshal(statuses)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
-			return
-		}
+			fmt.Fprintf(w, string(j))
+		} else {
+			statuses, err := dbm.ListCurrentEntryStatuses(lexRef)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+				return
+			}
+			j, err := json.Marshal(statuses)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryStatuses : %v", err), http.StatusInternalServerError)
+				return
+			}
 
-		fmt.Fprintf(w, string(j))
+			fmt.Fprintf(w, string(j))
+		}
 	},
 }
 

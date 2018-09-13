@@ -659,6 +659,17 @@ func (dbm *DBManager) ListCurrentEntryStatuses(lexRef lex.LexRef) ([]string, err
 	return listCurrentEntryStatuses(db, string(lexRef.LexName))
 }
 
+// ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status), and the frequency for each status.
+func (dbm *DBManager) ListCurrentEntryStatusesWithFreq(lexRef lex.LexRef) (map[string]int, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return make(map[string]int), fmt.Errorf("DBManager.ListCurrentEntryStatusesWithFreq: no such db '%s'", lexRef.DBRef)
+	}
+	return listCurrentEntryStatusesWithFreq(db, string(lexRef.LexName))
+}
+
 // ListAllEntryStatuses returns a list of all names EntryStatuses, also those that are not 'current'  (i.e., the most recent status).
 // In other words, this list potentially includes statuses not in use, but that have been used before.
 func (dbm *DBManager) ListAllEntryStatuses(lexRef lex.LexRef) ([]string, error) {

@@ -1859,6 +1859,10 @@ func listCurrentEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) 
 	return listEntryStatuses(db, lexiconName, true)
 }
 
+func listCurrentEntryStatusesWithFreq(db *sql.DB, lexiconName string) (map[string]int, error) {
+	return listEntryStatusesWithFreq(db, lexiconName, true)
+}
+
 // ListAllEntryStatuses returns a list of all names EntryStatuses, also those that are not 'current'  (i.e., the most recent status).
 // In other words, this list potentially includes statuses not in use, but that have been used.
 func listAllEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
@@ -1898,6 +1902,40 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 	return res, err
 }
 
+func listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error) {
+	var res = make(map[string]int)
+
+	tx, err := db.Begin()
+	if err != nil {
+		return res, fmt.Errorf("dbapi.ListCurrentEntryStatusesWithFreq: %v", err)
+	}
+	defer tx.Commit()
+
+	// TODO This query seems a bit slow?
+	q := "SELECT DISTINCT entryStatus.name, COUNT(entryStatus.name) FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
+	qOnlyCurrent := " AND entryStatus.current = 1"
+	if onlyCurrent {
+		q += qOnlyCurrent
+	}
+	q += " GROUP BY entryStatus.name"
+
+	rows, err := tx.Query(q, lexiconName)
+	if err != nil {
+		tx.Rollback() // ?
+		return res, fmt.Errorf("ListCurrentEntryStatusesWithFreq : %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var statusName string
+		var freq int
+		rows.Scan(&statusName, &freq)
+		res[statusName] = freq
+	}
+
+	err = rows.Err()
+	return res, err
+}
+
 func listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error) {
 	var res = make(map[string]int)
 
@@ -1918,7 +1956,7 @@ func listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (m
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
 		tx.Rollback() // ?
-		return res, fmt.Errorf("ListCurrentEntryUsers : %v", err)
+		return res, fmt.Errorf("ListCurrentEntryUsersWithFreq : %v", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -1929,7 +1967,6 @@ func listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (m
 		res[userName] = freq
 	}
 	err = rows.Err()
-	//sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
 	return res, err
 }
 
