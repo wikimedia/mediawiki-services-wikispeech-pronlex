@@ -233,8 +233,8 @@ var lexiconListCommentLabels = urlHandler{
 var lexiconListCurrentEntryUsers = urlHandler{
 	name:     "list_current_entry_users",
 	url:      "/list_current_entry_users/{lexicon_name}",
-	help:     "List current entry users.",
-	examples: []string{"/list_current_entry_users/lexserver_testdb:sv"},
+	help:     "List current entry users. Optional param freq set to true will include frequencies for each user.",
+	examples: []string{"/list_current_entry_users/lexserver_testdb:sv?freq=true"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -242,19 +242,34 @@ var lexiconListCurrentEntryUsers = urlHandler{
 			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
 			return
 		}
+		freq := getParam("freq", r)
+		if freq == "true" {
+			users, err := dbm.ListCurrentEntryUsersWithFreq(lexRef)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
+				return
+			}
+			j, err := json.Marshal(users)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
+				return
+			}
+			fmt.Fprintf(w, string(j))
 
-		users, err := dbm.ListCurrentEntryUsers(lexRef)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
-			return
-		}
-		j, err := json.Marshal(users)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
-			return
+		} else {
+			users, err := dbm.ListCurrentEntryUsers(lexRef)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
+				return
+			}
+			j, err := json.Marshal(users)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
+				return
+			}
+			fmt.Fprintf(w, string(j))
 		}
 
-		fmt.Fprintf(w, string(j))
 	},
 }
 

@@ -637,6 +637,17 @@ func (dbm *DBManager) ListCurrentEntryUsers(lexRef lex.LexRef) ([]string, error)
 	return listCurrentEntryUsers(db, string(lexRef.LexName))
 }
 
+// ListCurrentEntryUsersWithFreq returns a map of all names EntryUsers marked 'current' (i.e., the most recent status), and the frequency for each user
+func (dbm *DBManager) ListCurrentEntryUsersWithFreq(lexRef lex.LexRef) (map[string]int, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return make(map[string]int), fmt.Errorf("DBManager.ListCurrentEntryUsersWithFreq: no such db '%s'", lexRef.DBRef)
+	}
+	return listCurrentEntryUsersWithFreq(db, string(lexRef.LexName))
+}
+
 // ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).
 func (dbm *DBManager) ListCurrentEntryStatuses(lexRef lex.LexRef) ([]string, error) {
 	dbm.Lock()
