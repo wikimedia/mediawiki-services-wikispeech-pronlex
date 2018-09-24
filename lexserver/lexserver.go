@@ -343,6 +343,7 @@ var knownParams = map[string]int{
 	"paradigmregexp":      1,
 	"hasentryvalidation":  1,
 	"validationrulelike":  1,
+	"validationlevellike": 1,
 	"taglike":             1,
 	"languagelike":        1,
 	"morphologylike":      1,
@@ -408,6 +409,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		hasEntryValidation = true
 	}
 	validationRuleLike := strings.TrimSpace(getParam("validationrulelike", r))
+	validationLevelLike := strings.TrimSpace(getParam("validationlevellike", r))
 
 	tagLike := strings.TrimSpace(getParam("taglike", r))
 
@@ -470,6 +472,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		PageLength:          pageLength,
 		HasEntryValidation:  hasEntryValidation,
 		ValidationRuleLike:  validationRuleLike,
+		ValidationLevelLike: validationLevelLike,
 		Users:               users,
 	}
 

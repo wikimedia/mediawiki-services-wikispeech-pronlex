@@ -303,6 +303,10 @@ func validations(q Query) (string, []interface{}) {
 		res += " entry.id = entryValidation.entryid AND lower(entryValidation.name) like lower(?) "
 		resv = append(resv, q.ValidationRuleLike)
 	}
+	if q.ValidationLevelLike != "" {
+		res += " entry.id = entryValidation.entryid AND lower(entryValidation.level) like lower(?) "
+		resv = append(resv, q.ValidationLevelLike)
+	}
 
 	return res, resv
 }
