@@ -76,7 +76,7 @@ switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -stat
 
 echo "[$CMD] Go binaries: $gobinaries" >&2
 if [ $gobinaries -eq 1 ]; then
-    cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
-else
     lexserver $switches -test && lexserver $switches $PORT
+else
+    cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
 fi
