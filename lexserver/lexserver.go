@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"database/sql"
+	//"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -766,40 +766,43 @@ func createServer(port string) (*http.Server, error) {
 		if err != nil {
 			return s, fmt.Errorf("lexserver: cannot find db file. %v", err)
 		}
-		var db *sql.DB
-
-		// TODO! see also db_manager.DefineSqliteDB - it should do the same thing!
-
-		db, err = sql.Open("sqlite3_with_regexp", dbPath)
-		if err != nil {
-			return s, fmt.Errorf("Failed to open dbfile %v", err)
-		}
-		_, err = db.Exec("PRAGMA foreign_keys = ON")
-		if err != nil {
-			return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		}
-		_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-		if err != nil {
-			return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		}
-		_, err = db.Exec("PRAGMA journal_mode=WAL")
-		if err != nil {
-			return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		}
-		//_, err = db.Exec("PRAGMA busy_timeout=500") // doesn't seem to do the trick
-		//		if err != nil {
-		//return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		//}
-		db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
-
 		dbName := filepath.Base(dbPath)
 		var extension = filepath.Ext(dbName)
 		dbName = dbName[0 : len(dbName)-len(extension)]
 		dbRef := lex.DBRef(dbName)
-		err = dbm.AddDB(dbRef, db)
+		err := dbm.OpenDB(dbRef, dbPath)
+
 		if err != nil {
-			return s, fmt.Errorf("Failed to add db: %v", err)
+			return s, fmt.Errorf("lexserver: failed to open db : %v", err)
 		}
+
+		// db, err = sql.Open("sqlite3_with_regexp", dbPath)
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to open dbfile %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA foreign_keys = ON")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA journal_mode=WAL")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
+		// db, ok := dbm.dbs[dbRef]
+		// if !ok {
+		// 	return s, fmt.Errorf("No such db '%s'", dbRef)
+		// }
+
+		// err = dbm.AddDB(dbRef, db)
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to add db: %v", err)
+		// }
 
 	}
 

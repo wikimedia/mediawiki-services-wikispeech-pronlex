@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -41,75 +42,32 @@ func (dbm *DBManager) CloseDB(dbRef lex.DBRef) error {
 
 // DefineSqliteDB is used to define a new sqlite3 database and add it to the DB manager cache.
 func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
-	name := string(dbRef)
-	if "" == name {
-		return fmt.Errorf("DBManager.DefineSqliteDB: illegal argument: name must not be empty")
-	}
-	if strings.Contains(name, ":") {
-		return fmt.Errorf("DBManager.DefineSqliteDB: illegal argument: name must not contain ':'")
+	// kolla att db-filen inte existerar
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		return fmt.Errorf("DBManager.DefineSqliteDB: db file already exists : %v", err)
 	}
 
-	dbm.Lock()
-	defer dbm.Unlock()
+	err := dbm.OpenDB(dbRef, dbPath)
 
-	if _, ok := dbm.dbs[dbRef]; ok {
-		return fmt.Errorf("DBManager.DefineSqliteDB: db is already loaded: '%s'", name)
-	}
-
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
-	//defer db.Close()
 	if err != nil {
-		if db != nil {
-			db.Close()
-		}
-		//return fmt.Errorf("sql error : %v", err)
 		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to open db : %v", err)
-		log.Println(msg)
+		//log.Println(msg)
 		return fmt.Errorf(msg)
 	}
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		if db != nil {
-			db.Close()
-		}
-		//db.Close()
-		//return fmt.Errorf("sql error : %v", err)
-		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to set foreign keys : %v", err)
-		log.Println(msg)
-		return fmt.Errorf(msg)
+
+	db, ok := dbm.dbs[dbRef]
+	if !ok {
+		return fmt.Errorf("DBManager.DefineSqliteDB: no such db '%s'", dbRef)
 	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	if err != nil {
-		if db != nil {
-			db.Close()
-		}
-		//db.Close()
-		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to set case sensitive like : %v", err)
-		log.Println(msg)
-		return fmt.Errorf(msg)
-	}
-	_, err = db.Exec("PRAGMA journal_mode=WAL")
-	if err != nil {
-		if db != nil {
-			db.Close()
-		}
-		//db.Close()
-		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to set journal_mode=WAL : %v", err)
-		log.Println(msg)
-		return fmt.Errorf(msg)
-	}
-	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
 
 	_, err = db.Exec(Schema)
 	if err != nil {
 		db.Close()
 		//return fmt.Errorf("sql error : %v", err)
 		msg := fmt.Sprintf("failed to load schema: %v", err)
-		log.Println(msg)
+		//log.Println(msg)
 		return fmt.Errorf(msg)
 	}
-
-	dbm.dbs[dbRef] = db
 
 	return nil
 }
@@ -137,9 +95,8 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 		if db != nil {
 			db.Close()
 		}
-		//return fmt.Errorf("sql error : %v", err)
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to open db : %v", err)
-		log.Println(msg)
+		//log.Println(msg)
 		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
@@ -147,10 +104,8 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 		if db != nil {
 			db.Close()
 		}
-		//db.Close()
-		//return fmt.Errorf("sql error : %v", err)
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to set foreign keys : %v", err)
-		log.Println(msg)
+		//log.Println(msg)
 		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
@@ -158,9 +113,8 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 		if db != nil {
 			db.Close()
 		}
-		//db.Close()
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to set case sensitive like : %v", err)
-		log.Println(msg)
+		//log.Println(msg)
 		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA journal_mode=WAL")
@@ -168,11 +122,15 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 		if db != nil {
 			db.Close()
 		}
-		//db.Close()
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to set journal_mode=WAL : %v", err)
-		log.Println(msg)
+		//log.Println(msg)
 		return fmt.Errorf(msg)
 	}
+	//_, err = db.Exec("PRAGMA busy_timeout=500") // doesn't seem to do the trick
+	//		if err != nil {
+	//return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+	//}
+
 	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
 
 	dbm.dbs[dbRef] = db

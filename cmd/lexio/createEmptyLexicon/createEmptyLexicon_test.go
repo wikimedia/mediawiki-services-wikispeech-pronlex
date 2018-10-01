@@ -15,7 +15,7 @@ var fsExpTrans = "Expected: '%v' got: %v'"
 func TestProperCloseDontRemoveLockFiles(t *testing.T) {
 
 	// 1. SETUP
-	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-")
+	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-A")
 	defer os.RemoveAll(tmpDir)
 	if err != nil {
 		t.Errorf("didn't expect error here, found : %v", err)
@@ -27,7 +27,7 @@ func TestProperCloseDontRemoveLockFiles(t *testing.T) {
 	ssName := "ss_test1"
 	locale := "en_US"
 	lexRefX := lex.NewLexRefWithInfo(dbPath, lexName, ssName)
-	closeAfter := false
+	closeAfter := true
 	createDB := true // if not exists
 
 	// 2. CREATE A NEW LEXICON IN A NEW DB
@@ -40,6 +40,7 @@ func TestProperCloseDontRemoveLockFiles(t *testing.T) {
 	// 3. DO NOT REMOVE shm/wal FILES
 
 	// 4. OPEN THE SAME DB
+	createDB = false
 	lexRefX = lex.NewLexRefWithInfo(dbPath, lexName+"-2", ssName)
 	err = createEmptyLexicon(dbPath, lexRefX, locale, createDB, closeAfter)
 	if err != nil {
@@ -51,8 +52,8 @@ func TestProperCloseDontRemoveLockFiles(t *testing.T) {
 func TestProperCloseRemoveLockFiles(t *testing.T) {
 
 	// 1. SETUP
-	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-")
-	defer os.RemoveAll(tmpDir)
+	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-B")
+	//defer os.RemoveAll(tmpDir)
 	if err != nil {
 		t.Errorf("didn't expect error here, found : %v", err)
 		return
@@ -88,6 +89,7 @@ func TestProperCloseRemoveLockFiles(t *testing.T) {
 	}
 
 	// 4. OPEN THE SAME DB
+	createDB = false
 	lexRefX = lex.NewLexRefWithInfo(dbPath, lexName+"-2", ssName)
 	err = createEmptyLexicon(dbPath, lexRefX, locale, createDB, closeAfter)
 	if err == nil {
