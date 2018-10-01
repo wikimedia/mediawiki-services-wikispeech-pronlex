@@ -11,8 +11,9 @@ CMD=`basename $0`
 PORT="8787"
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
+gobinaries=0
 
-while getopts ":hp:a:" opt; do
+while getopts ":hp:a:b" opt; do
     case $opt in
 	h)
 	    echo "
@@ -25,6 +26,7 @@ Options:
   -h help
   -a appdir (required)
   -p port   (default: $PORT)
+  -b go binaries (default: false)
 
 EXAMPLE INVOCATION: $CMD -a lexserver_files
 " >&2
@@ -35,6 +37,9 @@ EXAMPLE INVOCATION: $CMD -a lexserver_files
 	    ;;
 	p)
 	    PORT=$OPTARG
+	    ;;
+	b)
+	    gobinaries=1
 	    ;;
 	\?)
 	    echo "Invalid option: -$OPTARG" >&2
@@ -64,5 +69,14 @@ APPDIRABS=`readlink -f $APPDIR`
 
 
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
+
+
 switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
-cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
+#cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
+
+echo "[$CMD] Go binaries: $gobinaries" >&2
+if [ $gobinaries -eq 1 ]; then
+    cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
+else
+    lexserver $switches -test && lexserver $switches $PORT
+fi
