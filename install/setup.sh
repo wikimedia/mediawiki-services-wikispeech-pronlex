@@ -6,18 +6,27 @@ export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 gobinaries=0
 
+function print_help {
+    echo "USAGE: bash $CMD [options] <APPDIR>
+
+OPTIONS: -b use go binaries (optional, as opposed to 'go run' with source code)
+
+Setup files will be added to the destination folder APPDIR.
+" >&2
+}
+
+if [ $# -gt 0 ] && [ $1 == "-h" ]; then
+    print_help
+    exit 1
+fi
+
 if [ $# -eq 2 ] && [ $1 == "-b" ]; then
     gobinaries=1
     shift
 fi
 
 if [ $# -ne 1 ]; then
-    echo "USAGE: bash $CMD [options] <APPDIR>
-
-OPTIONS: -b go binaries (optional)
-
-Setup files will be added to the destination folder APPDIR.
-" >&2
+    print_help
     exit 1
 fi
 
@@ -33,7 +42,7 @@ DEMOFILES=$GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files
 CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
 
 
-if [ -z "$GOPATH" ] ; then
+if [ -z "$GOPATH" ] && [ $gobinaries -eq 0 ] ; then
     echo "[$CMD] The GOPATH environment variable is required!" >&2
     exit 1
 fi

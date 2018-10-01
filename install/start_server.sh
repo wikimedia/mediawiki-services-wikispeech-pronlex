@@ -13,9 +13,7 @@ export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 gobinaries=0
 
-while getopts ":hp:a:b" opt; do
-    case $opt in
-	h)
+function print_help {
 	    echo "
 [$CMD] SERVER STARTUP SCRIPT
    1. STARTS A TEST SERVER AND RUNS A SET OF TESTS
@@ -26,10 +24,16 @@ Options:
   -h help
   -a appdir (required)
   -p port   (default: $PORT)
-  -b go binaries (default: false)
+  -b use go binaries (optional, as opposed to 'go run' with source code)
 
 EXAMPLE INVOCATION: $CMD -a lexserver_files
 " >&2
+}
+
+while getopts ":hp:a:b" opt; do
+    case $opt in
+	h)
+	    print_help
 	    exit 1
 	    ;;
 	a)
@@ -50,10 +54,11 @@ done
 
 if [ -z "$APPDIR" ] ; then
     echo "[$CMD] APPDIR must be specified using -a!" >&2
+    print_help
     exit 1
 fi
 
-if [ -z "$GOPATH" ] ; then
+if [ -z "$GOPATH" ] && [ $gobinaries -eq 0 ] ; then
     echo "[$CMD] The GOPATH environment variable is required!" >&2
     exit 1
 fi
