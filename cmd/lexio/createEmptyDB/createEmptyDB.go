@@ -25,10 +25,11 @@ func main() {
 	}
 
 	db, err := sql.Open("sqlite3", fOut)
-	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
+
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 		log.Fatal(err)
