@@ -99,6 +99,8 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 		//log.Println(msg)
 		return fmt.Errorf(msg)
 	}
+	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 		if db != nil {
@@ -130,8 +132,6 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 	//		if err != nil {
 	//return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
 	//}
-
-	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
 
 	dbm.dbs[dbRef] = db
 
