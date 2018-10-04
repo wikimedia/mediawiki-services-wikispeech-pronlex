@@ -13,7 +13,7 @@ export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 gobinaries=0
 
-function print_help {
+print_help(){
 	    echo "
 [$CMD] SERVER STARTUP SCRIPT
    1. STARTS A TEST SERVER AND RUNS A SET OF TESTS

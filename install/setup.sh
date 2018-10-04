@@ -6,7 +6,7 @@ export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
 gobinaries=0
 
-function print_help {
+print_help() {
     echo "USAGE: bash $CMD [options] <APPDIR>
 
 OPTIONS: -b use go binaries (optional, as opposed to 'go run' with source code)
@@ -47,7 +47,7 @@ if [ -z "$GOPATH" ] && [ $gobinaries -eq 0 ] ; then
     exit 1
 fi
 
-function initial_setup {
+initial_setup() {
     echo "[$CMD] Go binaries: $gobinaries" >&2
 
     if [ -f $APPDIR/db_files/$LEXDB ] ; then
