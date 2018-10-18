@@ -19,6 +19,10 @@ APPDIR=$1
 LOCALDIR=$2
 RELEASETAG=$3
 
+if [ $RELEASETAG == "latest" ]; then
+    RELEASETAG="master"
+fi
+
 echo "[$CMD] APPDIR=$APPDIR" >&2
 echo "[$CMD] LOCALDIR=$LOCALDIR" >&2
 echo "[$CMD] RELEASETAG=$RELEASETAG" >&2
