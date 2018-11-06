@@ -274,41 +274,41 @@ func entryTag(q Query) (string, []interface{}) {
 }
 
 func comments(q Query) (string, []interface{}) {
-	var res string
+	var res []string
 	var resv []interface{}
 
 	if q.CommentLabelLike != "" {
-		res += " entry.id = entryComment.entryid AND entrycomment.label like ? "
+		res = append(res, " entry.id = entryComment.entryid AND entrycomment.label like ? ")
 		resv = append(resv, q.CommentLabelLike)
 	}
 
 	if q.CommentSourceLike != "" {
-		res += " entry.id = entryComment.entryid AND entrycomment.source like ? "
+		res = append(res, " entry.id = entryComment.entryid AND entrycomment.source like ? ")
 		resv = append(resv, q.CommentSourceLike)
 	}
 
 	if q.CommentLike != "" {
-		res += " entry.id = entryComment.entryid AND entrycomment.comment like ? "
+		res = append(res, " entry.id = entryComment.entryid AND entrycomment.comment like ? ")
 		resv = append(resv, q.CommentLike)
 	}
 
-	return res, resv
+	return strings.Join(res, " AND "), resv
 }
 
 func validations(q Query) (string, []interface{}) {
-	var res string
+	var res []string
 	var resv []interface{}
 
 	if q.ValidationRuleLike != "" {
-		res += " entry.id = entryValidation.entryid AND lower(entryValidation.name) like lower(?) "
+		res = append(res, " entry.id = entryValidation.entryid AND lower(entryValidation.name) like lower(?) ")
 		resv = append(resv, q.ValidationRuleLike)
 	}
 	if q.ValidationLevelLike != "" {
-		res += " entry.id = entryValidation.entryid AND lower(entryValidation.level) like lower(?) "
+		res = append(res, " entry.id = entryValidation.entryid AND lower(entryValidation.level) like lower(?) ")
 		resv = append(resv, q.ValidationLevelLike)
 	}
 
-	return res, resv
+	return strings.Join(res, " AND "), resv
 }
 
 func filter(ss []string, f func(string) bool) []string {
