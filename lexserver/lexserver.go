@@ -72,7 +72,7 @@ type urlHandler struct {
 
 // TODO: Neat URL encoding...
 func urlEnc(url string) string {
-	return strings.Replace(strings.Replace(strings.Replace(url, " ", "%20", -1), "\n", "", -1), `"`, "%22", -1)
+	return strings.Replace(strings.Replace(strings.Replace(strings.Replace(url, " ", "%20", -1), "\n", "", -1), `"`, "%22", -1), "\t", "", -1)
 }
 
 func (h urlHandler) helpHTML(root string) string {
