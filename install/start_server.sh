@@ -11,6 +11,7 @@ CMD=`basename $0`
 PORT="8787"
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
+PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname` # $GOPATH/src/github.com/stts-se/pronlex
 gobinaries=0
 
 print_help(){
@@ -73,15 +74,14 @@ fi
 APPDIRABS=`readlink -f $APPDIR`
 
 
-CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/lexserver"
+CMDDIR="$PRONLEXPATH/lexserver"
 
 
 switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
-#cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
 
 echo "[$CMD] Go binaries: $gobinaries" >&2
 if [ $gobinaries -eq 1 ]; then
     lexserver $switches -test && lexserver $switches $PORT
 else
-    cd $GOPATH/src/github.com/stts-se/pronlex/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
+    cd $PRONLEXPATH/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
 fi

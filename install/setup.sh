@@ -38,8 +38,9 @@ APPDIR=`realpath $APPDIRREL`
 fi
 LEXDB=wikispeech_testdb.db
 
-DEMOFILES=$GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files
-CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
+PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname` # $GOPATH/src/github.com/stts-se/pronlex
+DEMOFILES=$PRONLEXPATH/lexserver/demo_files
+CMDDIR="$PRONLEXPATH/cmd/lexio"
 
 
 if [ -z "$GOPATH" ] && [ $gobinaries -eq 0 ] ; then
@@ -77,8 +78,8 @@ initial_setup() {
     cp $DEMOFILES/*.cnv $APPDIR/symbol_sets/ || exit 1
     cp $DEMOFILES/mappers.txt $APPDIR/symbol_sets/ || exit 1
 
-    cp $GOPATH/src/github.com/stts-se/pronlex/install/import.sh $APPDIR || exit 1
-    cp $GOPATH/src/github.com/stts-se/pronlex/install/start_server.sh $APPDIR || exit 1
+    cp $PRONLEXPATH/install/import.sh $APPDIR || exit 1
+    cp $PRONLEXPATH/install/start_server.sh $APPDIR || exit 1
 }
 
 function run_go_command {

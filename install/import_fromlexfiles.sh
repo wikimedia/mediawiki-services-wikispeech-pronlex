@@ -3,13 +3,16 @@
 CMD=`basename $0`
 export GOPATH=`go env GOPATH`
 export PATH=$PATH:$GOPATH/bin
+PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname` # $GOPATH/src/github.com/stts-se/pronlex
 
 if [ $# -ne 3 ]; then
-    echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR> <RELEASETAG>
+    echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR> <LEXDATA-RELEASE-TAG>
 
 Imports lexicon data for Swedish, Norwegian, US English and a small test file for Arabic from the lexdata repository.
 Imports from plain text lexicon files.
-If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github: https://github.com/stts-se/lexdata .
+If the <LEXDATA-GIT> folder doesn't exist, it will be downloaded from github: https://github.com/stts-se/lexdata
+
+If you don't know what release tag you should use, you should probably use master.
 " >&2
     exit 1
 fi
@@ -68,7 +71,7 @@ cp $LEXDATA/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
 
 
 
-CMDDIR="$GOPATH/src/github.com/stts-se/pronlex/cmd/lexio"
+CMDDIR="$PRONLEXPATH/cmd/lexio"
 
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
