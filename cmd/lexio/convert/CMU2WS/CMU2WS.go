@@ -64,11 +64,12 @@ func main() {
 	}
 	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
 
-	syller, phnSet, err := rbg2p.LoadSyllFile(syllRuleFile)
+	syller, err := rbg2p.LoadSyllFile(syllRuleFile)
 	if err != nil {
 		log.Printf("couldn't load rule file %s : %s", syllRuleFile, err)
 		os.Exit(1)
 	}
+	phnSet := syller.PhonemeSet
 
 	cmuFile, err := os.Open(cmuFileName)
 	defer cmuFile.Close()
