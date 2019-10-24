@@ -55,10 +55,7 @@ Download an SQL lexicon dump file. In the following example, we use a Swedish le
    `lexlookup$ lexlookup swe_lex.db åsna`
 
 
-(Compiling using `go build` instead of using `go run` as above, makes it a bit faster.)
-
-
-### III: Server setup and default databaes
+### III: Server setup
 
 1. Setup the pronlex server
 
