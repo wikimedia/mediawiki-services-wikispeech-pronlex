@@ -44,14 +44,17 @@ Download an SQL lexicon dump file. In the following example, we use a Swedish le
 
 1) Download the file `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
 
+2) Pre-compile binaries (for faster execution times)
+
+    `pronlex$ go build ./...`
+
 2) Create a database file (this takes a while):
 
-    `pronlex$ go run cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
+    `pronlex$ importSql swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
        
 3) Test looking up a word:
        
-   `pronlex$ go build cmd/lexloookup` (pre-compile for faster execution time)
-   `pronlex$ ./lexlookup swe_lex.db åsna`
+   `pronlex$ lexlookup swe_lex.db åsna`
 
 
 ### III: Server setup
@@ -104,9 +107,6 @@ For a complete set of options, run:
 
 ---
 
-## CLI
-
-There is a command line tool for quick lexicon look up, [lexlookup](https://github.com/stts-se/lexlookup). 
 
 ## For developers
 
