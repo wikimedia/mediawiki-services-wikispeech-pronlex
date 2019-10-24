@@ -5,29 +5,12 @@ pronlex is a pronunciation lexicon database with a server behind a simple HTTP A
 [![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex) [![Build Status](https://travis-ci.org/stts-se/pronlex.svg?branch=master)](https://travis-ci.org/stts-se/pronlex)
 
 
-## Create a lexicon database file and look up a word
-
-Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon:
-
-1) Download the file `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
-2) Create a database file (this takes a while):
-
-    `pronlex$ go run cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
-       
-3) Test looking up a word:
-       
-   `pronlex$ go run cmd/lexlookup/main.go swe_lex.db åsna`
-
-
-(Compiling using `go build` instead of using `go run` as above, makes it a bit faster.)
-
-
 
 ## Lexicon server / Installation instructions
 
 Utility scripts below (setup, import, start_server) require a working `bash` installation (preferably on a Linux system).
 
-### I. Preparation steps
+### I. Installation
 
 1. Prerequisites
 
@@ -45,21 +28,39 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
      On Linux systems with `apt`, run `sudo apt install sqlite3`
 
 
-
-### II. Installation
-
-1. Clone the source code
+4. Clone the source code
 
    `$ git clone https://github.com/stts-se/pronlex.git`
-
-
-2. Download dependencies
-   
    `$ cd pronlex`   
+
+5. Download dependencies
+ 
    `pronlex$ go get -u ./...`
 
+6. Build binaries (optional)
+   
+   `pronlex$ go build ./...`
 
-3. Setup the pronlex server
+
+### II. Quick start: Create a lexicon database file and look up a word
+
+Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon:
+
+1) Download the file `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
+
+2) Create a database file (this takes a while):
+
+    `pronlex$ cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
+       
+3) Test looking up a word:
+       
+   `pronlex$ cmd/lexlookup/main.go swe_lex.db åsna`
+
+
+(Compiling using `go build` instead of using `go run` as above, makes it a bit faster.)
+
+
+### III: Setup the pronlex server
 
    `pronlex$ cd install`   
    `install$ bash setup.sh <APPDIR>`   
