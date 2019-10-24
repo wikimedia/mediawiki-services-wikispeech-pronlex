@@ -3,9 +3,7 @@
 set -e
 
 CMD=`basename $0`
-export GOPATH=`go env GOPATH`
-export PATH=$PATH:$GOPATH/bin
-PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname` # $GOPATH/src/github.com/stts-se/pronlex
+PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
 
 if [ $# -ne 3 ]; then
     echo "USAGE: bash $CMD <LEXDATA-GIT> <APPDIR> <LEXDATA-RELEASE-TAG>

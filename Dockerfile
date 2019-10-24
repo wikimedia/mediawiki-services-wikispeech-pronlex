@@ -19,8 +19,6 @@ LABEL "se.stts.release"=$RELEASE
 
 ############# COMPONENT SPECIFIC DEPENDENCIES #############
 RUN apt-get install -y sqlite3 gcc build-essential
-RUN export GOPATH=$(go env GOPATH)
-RUN export PATH=$PATH:$(go env GOPATH)/bin
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
@@ -28,7 +26,7 @@ ENV LC_ALL C.UTF-8
 ############# PRONLEX #############
 ENV BASEDIR /wikispeech/pronlex
 RUN mkdir -p $BASEDIR/bin
-ENV PRONLEXPATH=$GOPATH/src/github.com/stts-se/pronlex
+ENV PRONLEXPATH=$BASEDIR/git
 
 # local copy of https://github.com/stts-se/pronlex.git
 COPY . $PRONLEXPATH

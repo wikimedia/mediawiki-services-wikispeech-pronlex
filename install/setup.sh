@@ -2,8 +2,6 @@
 
 CMD=`basename $0`
 SCRIPTDIR=`dirname $0`
-export GOPATH=`go env GOPATH`
-export PATH=$PATH:$GOPATH/bin
 gobinaries=0
 
 print_help() {
@@ -38,15 +36,9 @@ APPDIR=`realpath $APPDIRREL`
 fi
 LEXDB=wikispeech_testdb.db
 
-PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname` # $GOPATH/src/github.com/stts-se/pronlex
+PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
 DEMOFILES=$PRONLEXPATH/lexserver/demo_files
 CMDDIR="$PRONLEXPATH/cmd/lexio"
-
-
-if [ -z "$GOPATH" ] && [ $gobinaries -eq 0 ] ; then
-    echo "[$CMD] The GOPATH environment variable is required!" >&2
-    exit 1
-fi
 
 initial_setup() {
     echo "[$CMD] Go binaries: $gobinaries" >&2
@@ -60,11 +52,6 @@ initial_setup() {
 	exit 0
     fi
 
-
-    if [ -z "$GOPATH" ] ; then
-	echo "[$CMD] The GOPATH environment variable is required!" >&2
-	exit 1
-    fi
 
     ### LEXDATA PREPS
 

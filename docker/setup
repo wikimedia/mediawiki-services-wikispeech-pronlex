@@ -7,8 +7,6 @@ set -e
 echo -n "whoami " && whoami
 
 CMD=`basename $0`
-export GOPATH=`go env GOPATH`
-export PATH=$PATH:$GOPATH/bin
 
 if [ $# -ne 1 ]; then
 	echo "
@@ -20,7 +18,8 @@ Setup files will be added to the destination folder <APPDIR> and imports a small
 fi
 
 DOCKERDIR=$1
-DEMOFILES=$GOPATH/src/github.com/stts-se/pronlex/lexserver/demo_files
+PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
+DEMOFILES=$PRONLEXPATH/lexserver/demo_files
 
 LEXDB=wikispeech_testdb.db
 
@@ -36,11 +35,6 @@ function initial_setup {
 	exit 0
     fi
 
-
-    if [ -z "$GOPATH" ] ; then
-	echo "[$CMD] The GOPATH environment variable is required!" >&2
-	exit 1
-    fi
 
     ### LEXDATA PREPS
 

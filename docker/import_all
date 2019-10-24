@@ -4,8 +4,6 @@
 
 CMD=`basename $0`
 scriptdir=`dirname $0`
-export GOPATH=`go env GOPATH`
-export PATH=$PATH:$GOPATH/bin
 
 if [ $# -ne 3 ]; then
 	echo "

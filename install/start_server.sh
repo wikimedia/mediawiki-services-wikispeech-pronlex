@@ -9,9 +9,7 @@
 
 CMD=`basename $0`
 PORT="8787"
-#export GOPATH=`go env GOPATH`
-#export PATH=$PATH:$GOPATH/bin
-PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname` # $GOPATH/src/github.com/stts-se/pronlex
+PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
 gobinaries=0
 
 print_help(){
@@ -58,11 +56,6 @@ if [ -z "$APPDIR" ] ; then
     print_help
     exit 1
 fi
-
-# if [ -z "$GOPATH" ] && [ $gobinaries -eq 0 ] ; then
-#     echo "[$CMD] The GOPATH environment variable is required!" >&2
-#     exit 1
-# fi
 
 shift $(expr $OPTIND - 1 )
 
