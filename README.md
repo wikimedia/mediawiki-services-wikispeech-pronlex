@@ -50,9 +50,8 @@ Download an SQL lexicon dump file. In the following example, we use a Swedish le
        
 3) Test looking up a word:
        
-   `pronlex$ cd cmd/lexlookup/`
-   `lexlookup$ go build`
-   `lexlookup$ lexlookup swe_lex.db åsna`
+   `pronlex$ go build cmd/lexloookup` (pre-compile for faster execution time)
+   `pronlex$ ./lexlookup swe_lex.db åsna`
 
 
 ### III: Server setup
