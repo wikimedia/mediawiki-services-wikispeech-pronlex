@@ -1,5 +1,7 @@
 FROM golang
 
+RUN go version
+
 ############# INITIAL SETUP/INSTALLATION #############
 # non-root user
 #RUN useradd -m -u 8877 wikispeech
