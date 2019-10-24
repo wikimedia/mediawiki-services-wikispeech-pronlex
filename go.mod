@@ -5,7 +5,6 @@ go 1.13
 require (
 	github.com/dlclark/regexp2 v1.2.0
 	github.com/go-errors/errors v1.0.2-0.20180813162953-d98b870cc4e0
-	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/stts-se/rbg2p v0.0.0-20191023140523-3380156c83e7
