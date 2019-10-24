@@ -12,11 +12,11 @@ Download an SQL lexicon dump file. In the following example, we use a Swedish le
 1) Download the file `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
 2) Create a database file (this takes a while):
 
-       pronlex$ go run cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db
+    `pronlex$ go run cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
        
 3) Test looking up a word:
        
-       pronlex$ go run cmd/lexlookup/main.go swe_lex.db åsna
+   `pronlex$ go run cmd/lexlookup/main.go swe_lex.db åsna`
 
 
 (Compiling using `go build` instead of using `go run` as above, makes it a bit faster.)
