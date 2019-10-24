@@ -4,6 +4,26 @@ pronlex is a pronunciation lexicon database with a server behind a simple HTTP A
 [![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://godoc.org/github.com/stts-se/pronlex)
 [![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex) [![Build Status](https://travis-ci.org/stts-se/pronlex.svg?branch=master)](https://travis-ci.org/stts-se/pronlex)
 
+
+## Create a lexicon database file and look up a word
+
+Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon:
+
+       Download the file `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
+
+       Create a database file (this takes a while):
+
+       `pronlex$ go run cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
+       
+
+       Test looking up a word:
+       
+       `pronlex$ go run cmd/lexlookup/main.go swe_lex.db åsna`
+
+       (Compiling using `go build` instead of using `go run` as above, makes it a bit faster to start.)
+
+
+
 ## Lexicon server / Installation instructions
 
 Utility scripts below (setup, import, start_server) require a working `bash` installation (preferably on a Linux system).
