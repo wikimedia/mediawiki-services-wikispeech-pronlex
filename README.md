@@ -40,9 +40,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 ### II. Quick start: Create a lexicon database file and look up a word
 
-Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon:
-
-1) Download the file `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
+1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
 
 2) Pre-compile binaries (for faster execution times)
 
