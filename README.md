@@ -32,14 +32,10 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
    `$ git clone https://github.com/stts-se/pronlex.git`
    `$ cd pronlex`   
-
-5. Download dependencies
- 
-   `pronlex$ go get -u ./...`
-
-6. Build binaries (optional)
    
-   `pronlex$ go build ./...`
+5. Test (optional)
+
+   `pronlex$ go test ./...`
 
 
 ### II. Quick start: Create a lexicon database file and look up a word
@@ -50,17 +46,21 @@ Download an SQL lexicon dump file. In the following example, we use a Swedish le
 
 2) Create a database file (this takes a while):
 
-    `pronlex$ cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
+    `pronlex$ go run cmd/lexio/importSql/importSql.go swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
        
 3) Test looking up a word:
        
-   `pronlex$ cmd/lexlookup/main.go swe_lex.db åsna`
+   `pronlex$ cd cmd/lexlookup/
+   `lexlookup$ go build`
+   `lexlookup$ lexlookup swe_lex.db åsna`
 
 
 (Compiling using `go build` instead of using `go run` as above, makes it a bit faster.)
 
 
-### III: Setup the pronlex server
+### III: Server setup and default databaes
+
+1. Setup the pronlex server
 
    `pronlex$ cd install`   
    `install$ bash setup.sh <APPDIR>`   
@@ -70,7 +70,7 @@ Download an SQL lexicon dump file. In the following example, we use a Swedish le
    Sets up the pronlex server and a set of test data in the folder specified by `<APPDIR>`.
 
 
-4. Import lexicon data (optional)
+2. Import lexicon data (optional)
 
    `install$ bash import.sh <LEXDATA-GIT> <APPDIR>`   
    Example:
@@ -89,7 +89,7 @@ If the `<LEXDATA-GIT>` folder exists on disk, lexicon resources will be read fro
 You can create your own lexicon files, or you can use existing data in the [lexdata repository](https://github.com/stts-se/lexdata). The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
 
 
-### III. Start the lexicon server
+### IV. Start the lexicon server
 
 The server is started using this script
 
