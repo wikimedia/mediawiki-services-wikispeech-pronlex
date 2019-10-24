@@ -15,7 +15,6 @@ env:
 script:
  - set -e
  - cat go.mod
- - go get -u ./...
  - go test -v ./... 
  - bash install/setup.sh /tmp/appdir
 
