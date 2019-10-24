@@ -13,6 +13,47 @@ type TestResult struct {
 	FailedTests []string
 }
 
+// Strings returns all messages as strings
+func (tr TestResult) Strings() []string {
+	res := []string{}
+	for _, e := range tr.AllErrors() {
+		res = append(res, fmt.Sprintf("%s", e))
+	}
+	return res
+}
+
+// Failed returns true if the test result has any errors or failed tests
+func (tr TestResult) Failed() bool {
+	return (len(tr.Errors) > 0 || len(tr.FailedTests) > 0)
+}
+
+// AllMessages returns one single slice with all errors and test results (if any). Each message is prefixed by its type (ERROR/FAILED TESTS).
+func (tr TestResult) AllErrors() []string {
+	res := []string{}
+	for _, s := range tr.Errors {
+		res = append(res, fmt.Sprintf("ERROR: %s", s))
+	}
+	for _, s := range tr.FailedTests {
+		res = append(res, fmt.Sprintf("FAILED TEST: %s", s))
+	}
+	return res
+}
+
+// AllMessages returns one single slice with all errors, warnings and test results (if any). Each message is prefixed by its type (ERROR/WARNING/FAILED TESTS).
+func (tr TestResult) AllMessages() []string {
+	res := []string{}
+	for _, s := range tr.Errors {
+		res = append(res, fmt.Sprintf("ERROR: %s", s))
+	}
+	for _, s := range tr.Warnings {
+		res = append(res, fmt.Sprintf("WARNING: %s", s))
+	}
+	for _, s := range tr.FailedTests {
+		res = append(res, fmt.Sprintf("FAILED TEST: %s", s))
+	}
+	return res
+}
+
 func isSyllDefLine(s string) bool {
 	return strings.HasPrefix(s, "SYLLDEF ")
 }
@@ -26,7 +67,7 @@ func trimComment(s string) string {
 }
 
 func isComment(s string) bool {
-	return strings.HasPrefix(s, "//")
+	return strings.HasPrefix(s, "//") || strings.HasPrefix(s, "#")
 }
 
 func isBlankLine(s string) bool {
@@ -71,3 +112,13 @@ func parsePhonemeSet(line string, phnDelim string) (PhonemeSet, error) {
 }
 
 var commaSplit = regexp.MustCompile(" *, *")
+
+// Contains checks whether a slice of strings contains a specific string
+func Contains(slice []string, value string) bool {
+	for _, s := range slice {
+		if s == value {
+			return true
+		}
+	}
+	return false
+}

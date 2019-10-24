@@ -26,6 +26,7 @@ Available variables (* means required):
       - used for input input (orthographic) symbols
      PHONEME_DELIMITER  (default: " ")
       - used to concatenate phonemes into a transcriptions
+     DOWNCASE_INPUT     (default: true)
 
 Examples:
      CHARACTER_SET "abcdefghijklmnopqrstuvwxyzåäö"
@@ -36,7 +37,7 @@ Examples:
 
 VARIABLES
 
-Regexp variables prefixed by VAR, that can be used in the rule context as exemplified below.
+Regexp variables prefixed by VAR, that can be used in the rule context and filters as exemplified below. The variable names must not contain underscore (_).
      VAR <NAME> <VALUE>
 
 Examples:
@@ -101,8 +102,9 @@ Examples:
 
 FILTERS
 
-Regexp replacement filters for transcriptions. The filters are applied after the g2p rules. Pre-defined variables (see above) cannot be used in the filters for now.
+Regexp replacement filters for transcriptions. The filters are applied after the g2p rules.  Pre-defined variables (above) can be use in the input regexp surrounded by curly brackets.
      FILTER "<FROM RE>" -> "<TO RE>"
+     FILTER "<FROM RE WITH {VARIABLENAME}>" -> "<TO RE>"
 
 Example:
      FILTER "^" -> "\" " // place stress first in transcription
@@ -110,7 +112,7 @@ Example:
 
 COMMENTS
 
-Comments are prefixed by //
+Comments are prefixed by // or #
 
 
 TESTS
@@ -130,7 +132,7 @@ Examples:
 
 SEPARATE SYLLABIFICATION RULE FILE
 
-A .g2p file for syllabification contains a subset of the items used for a proper g2p.
+A .syll file for syllabification contains a subset of the items used for a proper g2p.
 
 Example (for the CMU lexicon):
 
@@ -154,6 +156,34 @@ For more examples (used for unit tests), see the test_data folder: https://githu
 
 
 To test a single g2p file from the command line, use cmd/g2p.
+
+To import and use the rbg2p rule package in another go program:
+
+    import (
+           "github.com/stts-se/rbg2p"
+    )
+
+    func main() {
+            // TODO: initialize g2pFile and orth
+            var g2pFile = "", orth = ""
+
+            // Load rule file
+            ruleSet, err := rbg2p.LoadFile(g2pFile)
+            // TODO: check for error in err
+
+            // Test rule set
+            testRes := ruleSet.Test()
+            // TODO: check for errors in testRes
+            // testRes is an instance of rbg2p.TestResult
+            // - you can do a quick check using testRes.Failed() to find out if there were any errors
+            // - you can retrieve all errors using testRes.AllErrors()
+            // - you can retrieve all errors and warnings using testRes.AllMessages()
+
+            // Transcribe an input word
+            transes, err := ruleSet.Apply(orth)
+    }
+
+
 
 */
 package rbg2p

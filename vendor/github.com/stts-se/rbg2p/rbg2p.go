@@ -3,6 +3,7 @@ package rbg2p
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/dlclark/regexp2"
@@ -79,10 +80,17 @@ func (r Rule) String() string {
 	return fmt.Sprintf("%s -> %s / %s _ %s", r.Input, r.Output, r.LeftContext, r.RightContext)
 }
 
-// equals checks for equality (including underlying underlying slices and regexps); used for unit tests
+// equals: checks for equality (including underlying slices and regexps); used for unit tests
 func (r Rule) equals(r2 Rule) bool {
 	return r.Input == r2.Input &&
 		reflect.DeepEqual(r.Output, r2.Output) &&
+		r.LeftContext.equals(r2.LeftContext) &&
+		r.RightContext.equals(r2.RightContext)
+}
+
+// equalsExceptOutput: checks for equality except for output (including underlying slices and regexps); used for unit tests
+func (r Rule) equalsExceptOutput(r2 Rule) bool {
+	return r.Input == r2.Input &&
 		r.LeftContext.equals(r2.LeftContext) &&
 		r.RightContext.equals(r2.RightContext)
 }
@@ -105,11 +113,13 @@ type RuleSet struct {
 	PhonemeDelimiter  string
 	SyllableDelimiter string
 	DefaultPhoneme    string
+	DowncaseInput     bool
 	Vars              map[string]string
 	Rules             []Rule
 	Tests             []Test
 	Filters           []Filter
 	Syllabifier       Syllabifier
+	Content           string
 }
 
 func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualChars map[string]bool, validation *TestResult) {
@@ -119,8 +129,28 @@ func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualCh
 			errors = append(errors, char)
 		}
 	}
+	sort.Strings(errors)
 	if len(errors) > 0 {
 		validation.Errors = append(validation.Errors, fmt.Sprintf("no default rule for character(s): %s", strings.Join(errors, ",")))
+	}
+}
+
+func (rs RuleSet) checkForUndefinedChars(coveredChars map[string]bool, individualChars map[string]bool, validation *TestResult) {
+	var definedChars = make(map[string]bool)
+	var errors = []string{}
+	for _, char := range rs.CharacterSet {
+		definedChars[char] = true
+	}
+	for char := range individualChars {
+		for _, ch := range strings.Split(char, "") {
+			if _, ok := definedChars[ch]; !ok {
+				errors = append(errors, ch)
+			}
+		}
+	}
+	sort.Strings(errors)
+	if len(errors) > 0 {
+		validation.Errors = append(validation.Errors, fmt.Sprintf("undefined character(s) used in rule set: %s", strings.Join(errors, ",")))
 	}
 }
 
@@ -143,6 +173,7 @@ func (rs RuleSet) Test() TestResult {
 		}
 	}
 	rs.checkForUnusedChars(coveredChars, individualChars, &result)
+	rs.checkForUndefinedChars(coveredChars, individualChars, &result)
 
 	if rs.hasPhonemeSet() {
 		validation, err := compareToPhonemeSet(rs)
@@ -160,7 +191,10 @@ func (rs RuleSet) Test() TestResult {
 	for _, test := range rs.Tests {
 		input := test.Input
 		expect := test.Output
-		res0, err := rs.Apply(strings.ToLower(input))
+		if rs.DowncaseInput {
+			input = strings.ToLower(input)
+		}
+		res0, err := rs.Apply(input)
 		res := []string{}
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
@@ -168,8 +202,9 @@ func (rs RuleSet) Test() TestResult {
 		for _, trans := range res0 {
 			res = append(res, trans)
 		}
+		//delim := rs.PhonemeDelimiter
 		if !reflect.DeepEqual(expect, res) {
-			result.FailedTests = append(result.FailedTests, fmt.Sprintf("for '%s', expected %#v, got %#v", input, expect, res))
+			result.FailedTests = append(result.FailedTests, fmt.Sprintf("for '%s', expected /%s/, got /%s/", input, strings.Join(expect, "/ + /"), strings.Join(res, "/ + /")))
 		}
 	}
 	return result
@@ -194,11 +229,11 @@ func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []trans) []trans {
 	if len(tail) == 0 {
 		return res
 	}
-	return rs.expandLoop(tail[0], tail[1:len(tail)], res)
+	return rs.expandLoop(tail[0], tail[1:], res)
 }
 
 func (rs RuleSet) expand(phonemes []g2p) []trans {
-	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []trans{trans{}})
+	return rs.expandLoop(phonemes[0], phonemes[1:], []trans{{}})
 }
 
 func (rs RuleSet) applyFilters(trans string) (string, error) {
@@ -209,6 +244,8 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 		if err != nil {
 			return res, fmt.Errorf("couldn't execute regexp : %s", err)
 		}
+		//HB
+		//fmt.Printf("FILTER: %s\nRES: %s\n", f, res)
 	}
 	return res, nil
 }
@@ -216,11 +253,14 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
 func (rs RuleSet) Apply(s string) ([]string, error) {
 	var i = 0
+	if rs.DowncaseInput {
+		s = strings.ToLower(s)
+	}
 	var s0 = []rune(s)
 	res := []g2p{}
 	var couldntMap = []string{}
 	for i < len(s0) {
-		ss := string(s0[i:len(s0)])
+		ss := string(s0[i:])
 		thisChar := string(s0[i : i+1])
 		left := string(s0[0:i])
 		var matchFound = false
@@ -229,10 +269,9 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 			if err != nil {
 				return []string{}, fmt.Errorf("couldn't execute regexp /%s/ : %s", rule.LeftContext.Regexp, err)
 			}
-			if strings.HasPrefix(ss, rule.Input) &&
-				leftMatch {
+			if strings.HasPrefix(ss, rule.Input) && leftMatch {
 				ruleInputLen := len([]rune(rule.Input))
-				right := string(s0[i+ruleInputLen : len(s0)])
+				right := string(s0[i+ruleInputLen:])
 				rightMatch, err := rule.RightContext.Matches(right)
 				if err != nil {
 					return []string{}, fmt.Errorf("couldn't execute regexp /%s/ : %s", rule.RightContext.Regexp, err)
@@ -256,8 +295,8 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 	transes := []string{}
 	for _, t := range expanded {
 		if rs.Syllabifier.IsDefined() {
-			s := rs.Syllabifier.syllabify(t)
-			transes = append(transes, s.string(rs.PhonemeDelimiter, rs.SyllableDelimiter))
+			s := rs.Syllabifier.syllabifyToString(t)
+			transes = append(transes, s)
 		} else {
 			transes = append(transes, t.string(rs.PhonemeDelimiter))
 		}
