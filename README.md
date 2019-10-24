@@ -30,7 +30,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 4. Clone the source code
 
-   `$ git clone https://github.com/stts-se/pronlex.git`
+   `$ git clone https://github.com/stts-se/pronlex.git`  
    `$ cd pronlex`   
    
 5. Test (optional)
