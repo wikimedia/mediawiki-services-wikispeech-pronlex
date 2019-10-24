@@ -14,7 +14,7 @@ env:
 
 script:
  - set -e
- - go get -u
+ - go get -u ./...
  - go test -v ./... 
  - bash install/setup.sh /tmp/appdir
 
