@@ -17,15 +17,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 2. Set up `go`
 
-     Download: https://golang.org/dl/ (1.8 or higher)   
+     Download: https://golang.org/dl/ (1.13 or higher)   
      Installation instructions: https://golang.org/doc/install             
-     
-     Add your `GOPATH/bin` to your `PATH` environment variable.    
-     Your `GOPATH` can be found using the following command:    
-     `$ go env GOPATH`
 
-     On Linux-like systems, this is typically the command you could add to your `.profile` file or similar:    
-     `export PATH=$PATH:$(go env GOPATH)/bin`
 
 3. Install [Sqlite3](https://www.sqlite.org/)
 
@@ -37,15 +31,13 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 1. Clone the source code
 
-   `$ mkdir -p $(go env GOPATH)/src/github.com/stts-se`   
-   `$ cd $(go env GOPATH)/src/github.com/stts-se`   
-   `stts-se$ git clone https://github.com/stts-se/pronlex.git`
+   `$ git clone https://github.com/stts-se/pronlex.git`
 
 
 2. Download dependencies
    
-   `$ cd $(go env GOPATH)/src/github.com/stts-se/pronlex`   
-   `pronlex$ go get ./...`
+   `$ cd pronlex`   
+   `pronlex$ go get -u ./...`
 
 
 3. Setup the pronlex server
