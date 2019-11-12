@@ -196,10 +196,10 @@ var header = "DESCRIPTION	SYMBOL	IPA	IPA UNICODE	CATEGORY"
 func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 	var nilRes SymbolSet
 	fh, err := os.Open(fName)
-	defer fh.Close()
 	if err != nil {
 		return nilRes, err
 	}
+	defer fh.Close()
 	s := bufio.NewScanner(fh)
 	n := 0
 	var descIndex = 0

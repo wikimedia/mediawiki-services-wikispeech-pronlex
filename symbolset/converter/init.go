@@ -21,8 +21,7 @@ func isTest(s string) bool {
 var testRe = regexp.MustCompile("^TEST\t([^\t]+)\t([^\t]+)$")
 
 func parseTest(s string) (test, error) {
-	var matchRes []string
-	matchRes = testRe.FindStringSubmatch(s)
+	var matchRes []string = testRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		return test{}, fmt.Errorf("invalid symbol set definition: " + s)
 	}
@@ -54,8 +53,7 @@ func isRegexpRule(s string) bool {
 var regexpRuleRe = regexp.MustCompile("^RE\t([^\t]+)\t([^\t]+)$")
 
 func parseRegexpRule(s string) (Rule, error) {
-	var matchRes []string
-	matchRes = regexpRuleRe.FindStringSubmatch(s)
+	var matchRes []string = regexpRuleRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		return RegexpRule{}, fmt.Errorf("invalid regexp rule definition: " + s)
 	}
@@ -74,8 +72,7 @@ func isSymbolRule(s string) bool {
 var symbolRuleRe = regexp.MustCompile("^SYMBOL\t([^\t]+)\t([^\t]+)$")
 
 func parseSymbolRule(s string) (Rule, error) {
-	var matchRes []string
-	matchRes = symbolRuleRe.FindStringSubmatch(s)
+	var matchRes []string = symbolRuleRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		return SymbolRule{}, fmt.Errorf("invalid symbol rule definition: " + s)
 	}
@@ -91,15 +88,14 @@ func isBlankLine(s string) bool {
 var symbolSetRe = regexp.MustCompile("^(FROM|TO)\t([^\t]+)$")
 
 func parseSymbolSet(s string) (string, error) {
-	var matchRes []string
-	matchRes = symbolSetRe.FindStringSubmatch(s)
+	var matchRes []string = symbolSetRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		return "", fmt.Errorf("invalid symbol set definition: " + s)
 	}
 	return matchRes[2], nil
 }
 
-var fileSuffix = regexp.MustCompile(".[^.]+$")
+//var fileSuffix = regexp.MustCompile(".[^.]+$")
 
 // LoadFile loads a converter file and runs the specified tests
 func LoadFile(symbolSets map[string]symbolset.SymbolSet, fName string) (Converter, TestResult, error) {
@@ -109,10 +105,10 @@ func LoadFile(symbolSets map[string]symbolset.SymbolSet, fName string) (Converte
 	var converter = Converter{Name: name}
 	var err error
 	fh, err := os.Open(fName)
-	defer fh.Close()
 	if err != nil {
 		return Converter{}, TestResult{}, err
 	}
+	defer fh.Close()
 	n := 0
 	s := bufio.NewScanner(fh)
 	var testLines []test
@@ -131,7 +127,7 @@ func LoadFile(symbolSets map[string]symbolset.SymbolSet, fName string) (Converte
 			if val, ok := symbolSets[ss]; ok {
 				converter.From = val
 			} else {
-				return Converter{}, TestResult{}, fmt.Errorf("Symbolset not defined: %s", ss)
+				return Converter{}, TestResult{}, fmt.Errorf("symbolset not defined: %s", ss)
 			}
 		} else if isTo(l) {
 			ss, err := parseSymbolSet(l)
@@ -141,7 +137,7 @@ func LoadFile(symbolSets map[string]symbolset.SymbolSet, fName string) (Converte
 			if val, ok := symbolSets[ss]; ok {
 				converter.To = val
 			} else {
-				return Converter{}, TestResult{}, fmt.Errorf("Symbolset not defined: %s", ss)
+				return Converter{}, TestResult{}, fmt.Errorf("symbolset not defined: %s", ss)
 			}
 		} else if isSymbolRule(l) {
 			rule, err := parseSymbolRule(l)

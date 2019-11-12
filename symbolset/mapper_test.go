@@ -28,12 +28,21 @@ func Test_MapTranscription_EmptyDelimiterInInput1(t *testing.T) {
 		{" ", PhonemeDelimiter, "", IPASymbol{"", ""}},
 	}
 	ss1, err := NewSymbolSet("sampa1", symbols1)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+		return
+	}
+
 	ss2, err := NewSymbolSet("sampa2", symbols2)
 	if err != nil {
 		t.Errorf("MapTranscription() didn't expect error here : %v", err)
 		return
 	}
 	ssm, err := LoadMapper(ss1, ss2)
+	if err != nil {
+		t.Errorf("MapTranscription() didn't expect error here : %v", err)
+		return
+	}
 
 	// --
 	input := "ar*ttr"

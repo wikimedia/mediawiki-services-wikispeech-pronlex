@@ -31,7 +31,7 @@ func (c Converter) Convert(trans string) (string, error) {
 		return "", err
 	}
 	if len(invalid) > 0 {
-		return res, fmt.Errorf("Invalid symbol(s) in output transcription /%s/: %v", res, invalid)
+		return res, fmt.Errorf("invalid symbol(s) in output transcription /%s/: %v", res, invalid)
 	}
 	return res, nil
 }

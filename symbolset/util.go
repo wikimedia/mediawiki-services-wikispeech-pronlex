@@ -123,6 +123,7 @@ func contains(symbols []Symbol, symbol string) bool {
 	return false
 }
 
+/*
 func indexOf(elements []string, element string) int {
 	for i, s := range elements {
 		if s == element {
@@ -131,7 +132,7 @@ func indexOf(elements []string, element string) int {
 	}
 	return -1
 }
-
+*/
 func string2unicode(s string) string {
 	res := ""
 	for _, ch := range s {

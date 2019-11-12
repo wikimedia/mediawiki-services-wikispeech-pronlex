@@ -31,8 +31,9 @@ var ipaAccentI = "\u02C8"
 var ipaAccentII = "\u0300"
 var ipaSecStress = "\u02CC"
 var ipaLength = "\u02D0"
-var ipaSyllDelim = "."
-var cmuString = "cmu"
+
+//var ipaSyllDelim = "."
+//var cmuString = "cmu"
 
 func filterBeforeMappingFromIPA(ss SymbolSet, trans string) (string, error) {
 	// IPA: ˈba`ŋ.ka => ˈ`baŋ.ka"
@@ -47,6 +48,7 @@ func filterBeforeMappingFromIPA(ss SymbolSet, trans string) (string, error) {
 	return res, nil
 }
 
+/*
 func canMapToIPA(ss SymbolSet, trans string) (bool, error) {
 	symbols, err := ss.SplitIPATranscription(trans)
 	if err != nil {
@@ -71,7 +73,7 @@ func canMapToIPA(ss SymbolSet, trans string) (bool, error) {
 	}
 	return true, nil
 }
-
+*/
 func filterAfterMappingToIPA(ss SymbolSet, trans string) (string, error) {
 
 	// only filter stress if the symbol set has a syllable delimiter
