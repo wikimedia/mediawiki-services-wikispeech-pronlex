@@ -38,7 +38,7 @@ func (ws WS) joinComments(comments []lex.EntryComment) (string, error) {
 	}
 	for _, c := range comments {
 		if strings.Contains(c.Comment, commentDelim) {
-			return "", fmt.Errorf("A comment must not contain comment delimiter %s: %s", commentDelim, c.String())
+			return "", fmt.Errorf("a comment must not contain comment delimiter %s: %s", commentDelim, c.String())
 		}
 		res = append(res, strings.Replace(c.String(), "\n", newline, -1))
 	}

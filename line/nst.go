@@ -62,7 +62,7 @@ func (nst NST) ParseToEntry(line string) (lex.Entry, string, error) {
 	paradigm := fs[Paradigm]
 	lemmaStruct := lex.Lemma{Strn: lemma, Reading: reading, Paradigm: paradigm}
 
-	if "" != lemmaStruct.Strn {
+	if lemmaStruct.Strn != "" {
 		res.Lemma = lemmaStruct
 	}
 
@@ -70,7 +70,7 @@ func (nst NST) ParseToEntry(line string) (lex.Entry, string, error) {
 }
 
 func appendTrans(ts []lex.Transcription, trans string, lang string, source string) []lex.Transcription {
-	if "" == strings.TrimSpace(trans) {
+	if strings.TrimSpace(trans) == "" {
 		return ts
 	}
 	ts = append(ts, lex.Transcription{Strn: trans, Language: lang, Sources: []string{source}})
