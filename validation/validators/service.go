@@ -37,11 +37,11 @@ func (vs ValidatorService) testValidator(v validation.Validator) error {
 	}
 	if tr.Size() > 0 {
 		msg := fmt.Sprintf("init tests failed for validator %s", v.Name)
-		log.Printf(msg)
+		log.Print(msg)
 		for _, e := range tr.AllErrors() {
 			log.Printf("%v", e)
 		}
-		return fmt.Errorf("%s, see log for details.", msg)
+		return fmt.Errorf("%s, see log for details", msg)
 	}
 	return nil
 }
@@ -104,9 +104,8 @@ func (vs ValidatorService) Load(symbolsets map[string]symbolset.SymbolSet, symse
 				return fmt.Errorf("couldn't initialize validator from file %s : %v", fName, err)
 			}
 			if v0, ok := vs.Validators[ss.Name]; ok {
-				for _, r := range v0.Rules { // merge two validators!
-					v.Rules = append(v.Rules, r)
-				}
+				// merge two validators!
+				v.Rules = append(v.Rules, v0.Rules...)
 			}
 			err = vs.testValidator(v)
 			if err != nil {

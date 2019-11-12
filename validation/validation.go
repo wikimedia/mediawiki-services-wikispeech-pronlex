@@ -61,14 +61,10 @@ func (v Validator) AllTests() ([]lex.Entry, []lex.Entry) {
 	accept := []lex.Entry{}
 	reject := []lex.Entry{}
 	for _, r := range v.Rules {
-		for _, e := range r.ShouldAccept() {
-			accept = append(accept, e)
-		}
+		accept = append(accept, r.ShouldAccept()...)
 	}
 	for _, r := range v.Rules {
-		for _, e := range r.ShouldReject() {
-			reject = append(reject, e)
-		}
+		reject = append(reject, r.ShouldReject()...)
 	}
 	return accept, reject
 }
@@ -188,6 +184,7 @@ func (v Validator) RunTests() (TestResultContainer, error) {
 	return result, nil
 }
 
+/*
 func (v Validator) validateEntryOLD(e lex.Entry) (lex.Entry, bool) {
 	e.EntryValidations = make([]lex.EntryValidation, 0)
 	for _, rule := range v.Rules {
@@ -212,6 +209,8 @@ func (v Validator) validateEntryOLD(e lex.Entry) (lex.Entry, bool) {
 	}
 	return e, len(e.EntryValidations) == 0
 }
+
+*/
 
 // ValidateEntry is used to validate single entries. Any validation
 // errors are added to the entry's EntryValidations field.
@@ -275,6 +274,7 @@ func (v Validator) ValidateEntries(entries []lex.Entry) ([]lex.Entry, bool) {
 	return v.validateEntriesConcurrent(entries)
 }
 
+/*
 func (v Validator) validateEntriesOLD(entries []lex.Entry) ([]lex.Entry, bool) {
 	var res []lex.Entry
 	var valid = true
@@ -287,3 +287,4 @@ func (v Validator) validateEntriesOLD(entries []lex.Entry) ([]lex.Entry, bool) {
 	}
 	return res, valid
 }
+*/

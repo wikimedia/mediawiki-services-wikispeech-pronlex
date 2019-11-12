@@ -11,7 +11,7 @@ func SelfName(t language.Tag) string {
 	return en.Name(t)
 }
 
-var localeMatcher = language.NewMatcher(SupportedLocales)
+//var localeMatcher = language.NewMatcher(SupportedLocales)
 
 func LookUp(s string) (language.Tag, error) {
 	for _, t := range SupportedLocales {
@@ -19,5 +19,5 @@ func LookUp(s string) (language.Tag, error) {
 			return t, nil
 		}
 	}
-	return language.Tag{}, fmt.Errorf("No such locale: %s", s)
+	return language.Tag{}, fmt.Errorf("no such locale: %s", s)
 }

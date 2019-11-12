@@ -110,10 +110,10 @@ func LoadValidatorFromFile(ss symbolset.SymbolSet, fName string) (validation.Val
 	nilRes := validation.Validator{}
 	rules := []validation.Rule{}
 	fh, err := os.Open(fName)
-	defer fh.Close()
 	if err != nil {
 		return nilRes, err
 	}
+	defer fh.Close()
 	s := bufio.NewScanner(fh)
 	accept := make(map[string][]lex.Entry)
 	reject := make(map[string][]lex.Entry)
@@ -202,13 +202,13 @@ func LoadValidatorFromFile(ss symbolset.SymbolSet, fName string) (validation.Val
 		rNames[r.Name()] = true
 	}
 
-	for rName, _ := range accept {
+	for rName := range accept {
 		_, _, ok := find(rules, rName)
 		if !ok {
 			return nilRes, fmt.Errorf("no rule named %s is defined (found in accept example)", rName)
 		}
 	}
-	for rName, _ := range reject {
+	for rName := range reject {
 		_, _, ok := find(rules, rName)
 		if !ok {
 			return nilRes, fmt.Errorf("no rule named %s is defined (found in reject example)", rName)

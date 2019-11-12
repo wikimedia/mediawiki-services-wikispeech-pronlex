@@ -70,6 +70,7 @@ func newNSTSvHardWired_ForTesting() (symbolset.SymbolSet, error) {
 
 }
 
+/*
 func newNSTNbvHardWired_ForTesting() (symbolset.SymbolSet, error) {
 	name := "NST nob sampa"
 	symbols := []symbolset.Symbol{
@@ -157,6 +158,7 @@ func newNSTNbvHardWired_ForTesting() (symbolset.SymbolSet, error) {
 	}
 	return symbolset.NewSymbolSet(name, symbols)
 }
+*/
 
 func TestWhitespace(t *testing.T) {
 	symbolset, err := newNSTSvHardWired_ForTesting()
