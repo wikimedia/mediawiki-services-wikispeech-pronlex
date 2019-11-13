@@ -128,14 +128,16 @@ CREATE TRIGGER updatePref BEFORE UPDATE ON ENTRY
   END;
 `
 
+/*
 var trigger1 = `CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
   BEGIN
     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
   END;`
-
+*/
+/*
 var trigger2 = `-- Triggers to ensure that there are only one entry status per entry
 CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS
-  BEGIN 
+  BEGIN
     UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
   END;
 CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
@@ -143,7 +145,7 @@ CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
     UPDATE entrystatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
   END;
 `
-
+*/
 func Test_UpdateSchema(t *testing.T) {
 
 	// This could be put in some set-up function
@@ -159,10 +161,11 @@ func Test_UpdateSchema(t *testing.T) {
 	}
 
 	db, err := sql.Open("sqlite3", tstDBName)
-	defer db.Close()
 	if err != nil {
 		t.Errorf("This isn't happening! : %v", err)
 	}
+	defer db.Close()
+
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 		t.Errorf("Please...! : %v", err)

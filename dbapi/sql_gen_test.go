@@ -40,7 +40,7 @@ func TestSql_ToLower(t *testing.T) {
 
 func TestSql_words(t *testing.T) {
 	w, wv := words([]lex.LexName{}, Query{})
-	if "" != w {
+	if w != "" {
 		t.Error("Gah!")
 	}
 	if len(wv) != 0 {

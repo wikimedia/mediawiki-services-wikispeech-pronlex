@@ -6,10 +6,12 @@ import (
 	"os"
 )
 
+/*
 func updateInsertPrefTrigger(tx *sql.Tx) error {
 
 	return nil
 }
+*/
 
 func dropTrigger(tx *sql.Tx, triggerName string) error {
 
@@ -49,7 +51,7 @@ func UpdateSchema(dbFile string) error {
 	//var err error
 
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
-		return fmt.Errorf("dbapi.UpdateSchema: %v\n", err)
+		return fmt.Errorf("dbapi.UpdateSchema: %v", err)
 	}
 
 	db, err := sql.Open("sqlite3", dbFile)
@@ -58,13 +60,17 @@ func UpdateSchema(dbFile string) error {
 	}
 	defer db.Close()
 	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("dbapi.UpdateSchema: %v", err)
+	}
+
 	defer tx.Commit()
 
 	var userVersion int
 	err = tx.QueryRow("PRAGMA user_version").Scan(&userVersion)
 	if err != nil {
 
-		return fmt.Errorf("UpdateSchema: %v", err)
+		return fmt.Errorf("dbapi.UpdateSchema: %v", err)
 	}
 	//fmt.Fprintf(os.Stderr, "dbapi.UpdateSchema: current user_version: %d\n", userVersion)
 

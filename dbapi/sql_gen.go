@@ -70,7 +70,7 @@ func convS(s []string) []interface{} {
 func lexicons(lexNames []lex.LexName) (string, []interface{}) {
 	var res string
 	var resv []interface{}
-	if lexNames == nil || len(lexNames) == 0 {
+	if len(lexNames) == 0 {
 		return res, resv
 	}
 
@@ -350,7 +350,7 @@ WHERE entry.id = transcription.entryid AND entry.lexiconid = lexicon.id` // entr
 // Queries db for all entries with transcriptions and optional lemma forms.
 var baseSQLSelect = "SELECT lexicon.name, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, entry.preferred, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrytag.tag, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp, entryComment.id, entryComment.label, entryComment.source, entryComment.comment " + baseSQLFrom
 
-var baseSQLCount = `SELECT count(distinct entry.id) ` + baseSQLFrom
+//var baseSQLCount = `SELECT count(distinct entry.id) ` + baseSQLFrom
 
 var baseSQLSelectIds = `SELECT distinct entry.id ` + baseSQLFrom
 
@@ -404,7 +404,7 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 
 	// puts together pieces of sql created above with " and " in between
 	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, us, tl, cl, vl, ev}), " AND "))
-	if "" != qRes {
+	if qRes != "" {
 		sql += " AND " + qRes
 	}
 	return sql, args
@@ -439,10 +439,12 @@ func selectEntryIdsSQL(lexNames []lex.LexName, q Query) sqlStmt {
 // CountEntriesSQL creates a SQL query string based on the values of
 // a Query struct instance, along with a slice of values,
 // corresponding to the params to be set (the '?':s of the query)
+/*
 func countEntriesSQL(lexNames []lex.LexName, q Query) sqlStmt {
 	sqlQuery, args := appendQuery(baseSQLCount, lexNames, q)
 	return sqlStmt{sql: sqlQuery, values: args}
 }
+*/
 
 // // entriesFromIdsSelect builds an sql select and returns it along with slice of matching id values
 // func entriesFromIdsSelect(ids []int64) (string, []interface{}) {

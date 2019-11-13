@@ -22,7 +22,7 @@ type StderrLogger struct {
 
 // Progress logs progress info
 func (l StderrLogger) Progress(s string) {
-	fmt.Fprintf(os.Stderr, fmt.Sprintf("\r%s\r", s))
+	fmt.Fprint(os.Stderr, fmt.Sprintf("\r%s\r", s))
 }
 
 // Write logs a message string
@@ -42,7 +42,7 @@ type StdoutLogger struct {
 
 // Progress logs progress info
 func (l StdoutLogger) Progress(s string) {
-	fmt.Fprintf(os.Stdout, fmt.Sprintf("\r%s\r", s))
+	fmt.Fprint(os.Stdout, fmt.Sprintf("\r%s\r", s))
 }
 
 // Write logs a message string

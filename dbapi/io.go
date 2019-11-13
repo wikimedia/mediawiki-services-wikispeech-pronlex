@@ -29,12 +29,12 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 	}
 
 	fh, err := os.Open(lexiconFileName)
-	defer fh.Close()
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to open file : %v", err)
 		logger.Write(msg)
 		return fmt.Errorf("%v", msg)
 	}
+	defer fh.Close()
 
 	var s *bufio.Scanner
 	if strings.HasSuffix(lexiconFileName, ".gz") {
@@ -202,12 +202,12 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 	}
 
 	fh, err := os.Open(lexiconFileName)
-	defer fh.Close()
 	if err != nil {
 		var msg = fmt.Sprintf("ValidateLexiconFile failed to open file : %v", err)
 		log.Println(msg)
 		return fmt.Errorf("%v", msg)
 	}
+	defer fh.Close()
 
 	var s *bufio.Scanner
 	if strings.HasSuffix(lexiconFileName, ".gz") {
