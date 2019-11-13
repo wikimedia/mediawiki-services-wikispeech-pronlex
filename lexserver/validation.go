@@ -279,6 +279,7 @@ var validationHasValidator = urlHandler{
 	},
 }
 
+/*
 func validationHelpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -286,3 +287,4 @@ func validationHelpHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprint(w, html)
 }
+*/

@@ -157,6 +157,11 @@ var lexiconList = urlHandler{
 		var lexs []LexWithEntryCount = []LexWithEntryCount{}
 		for _, lex := range lexs0 {
 			entryCount, err := dbm.EntryCount(lex.LexRef)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("lexicon stats failed : %v", err), http.StatusInternalServerError)
+				return
+			}
+
 			locale, err := dbm.Locale(lex.LexRef)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("lexicon stats failed : %v", err), http.StatusInternalServerError)
@@ -199,7 +204,7 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 				return
 			}
 
-			fmt.Fprintf(w, string(j))
+			fmt.Fprint(w, string(j))
 		} else {
 			statuses, err := dbm.ListCurrentEntryStatuses(lexRef)
 			if err != nil {
@@ -212,7 +217,7 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 				return
 			}
 
-			fmt.Fprintf(w, string(j))
+			fmt.Fprint(w, string(j))
 		}
 	},
 }
@@ -241,7 +246,7 @@ var lexiconListCommentLabels = urlHandler{
 			return
 		}
 
-		fmt.Fprintf(w, string(j))
+		fmt.Fprint(w, string(j))
 	},
 }
 
@@ -269,7 +274,7 @@ var lexiconListCurrentEntryUsers = urlHandler{
 				http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
 				return
 			}
-			fmt.Fprintf(w, string(j))
+			fmt.Fprint(w, string(j))
 
 		} else {
 			users, err := dbm.ListCurrentEntryUsers(lexRef)
@@ -282,7 +287,7 @@ var lexiconListCurrentEntryUsers = urlHandler{
 				http.Error(w, fmt.Sprintf("listCurrentEntryUsers : %v", err), http.StatusInternalServerError)
 				return
 			}
-			fmt.Fprintf(w, string(j))
+			fmt.Fprint(w, string(j))
 		}
 
 	},
@@ -313,7 +318,7 @@ var lexiconListAllEntryStatuses = urlHandler{
 			return
 		}
 
-		fmt.Fprintf(w, string(j))
+		fmt.Fprint(w, string(j))
 	},
 }
 
@@ -560,7 +565,7 @@ var lexiconAddEntry = urlHandler{
 		res, err := json.Marshal(jsids)
 		if err != nil {
 			msg := fmt.Sprintf("lexserver: Failed to marshal ids : %v", err)
-			log.Printf(msg)
+			log.Print(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
@@ -619,7 +624,7 @@ var lexiconValidation = urlHandler{
 
 		clientUUID := getParam("client_uuid", r)
 
-		if "" == strings.TrimSpace(clientUUID) {
+		if strings.TrimSpace(clientUUID) == "" {
 			msg := "lexiconValidation got no client uuid"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusBadRequest)

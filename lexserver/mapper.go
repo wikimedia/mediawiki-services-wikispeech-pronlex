@@ -191,6 +191,7 @@ type mapperTest struct {
 	to   string
 }
 
+/*
 func parseMapperTestLine(l string) (mapperTest, error) {
 	fs := strings.Split(l, "\t")
 	if fs[0] != "TEST" {
@@ -205,6 +206,7 @@ func parseMapperTestLine(l string) (mapperTest, error) {
 		from: from,
 		to:   to}, nil
 }
+*/
 
 func parseMapperTest(l string) (mapperTest, error) {
 	fs := strings.Split(l, "\t")
@@ -249,10 +251,10 @@ func parseMapperTests(mapperLine string, testLines []string) (mapperTests, error
 func loadMapperTestsFromFile(fName string) ([]mapperTests, error) {
 	var res []mapperTests
 	fh, err := os.Open(fName)
-	defer fh.Close()
 	if err != nil {
 		return []mapperTests{}, err
 	}
+	defer fh.Close()
 	s := bufio.NewScanner(fh)
 	n := 0
 	prevMapper := ""

@@ -89,10 +89,12 @@ func listUsers(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(json))
 }
 
+/*
 func hejom(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("%v\n", r)
 }
+*/
 
 //func deleteUser
 
@@ -119,6 +121,11 @@ func main() {
 	}
 
 	userDB, err = lexserver.InitUserDB(dbFile)
+
+	if err != nil {
+		log.Fatalf("failed to init db : %v", err)
+		os.Exit(1)
+	}
 
 	r := mux.NewRouter().StrictSlash(true)
 

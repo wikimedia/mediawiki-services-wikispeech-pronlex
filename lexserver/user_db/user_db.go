@@ -234,7 +234,7 @@ var userDBSchema = `CREATE TABLE IF NOT EXISTS user (
 // CreateEmptyUserDB is used to create an empty user database
 func CreateEmptyUserDB(fName string) error {
 	if _, err := os.Stat(fName); !os.IsNotExist(err) {
-		return fmt.Errorf("Cannot create file that already exists: '%s'", fName)
+		return fmt.Errorf("cannot create file that already exists: '%s'", fName)
 	}
 
 	db, err := sql.Open("sqlite3", fName)

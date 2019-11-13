@@ -228,18 +228,19 @@ var symbolsetList = urlHandler{
 	},
 }
 
+/*
 func symbolSetHelpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	html := `<h1>SymbolSet</h1>
 
 <h2>symbolset_upload</h2> Upload symbol set file
-<pre><a href="/symbolset/upload">/symbolset/upload</a></pre>		
+<pre><a href="/symbolset/upload">/symbolset/upload</a></pre>
 		`
 
 	fmt.Fprint(w, html)
 }
-
+*/
 var symbolsetUploadPage = urlHandler{
 	name:     "upload (page)",
 	url:      "/upload_page",
@@ -263,7 +264,7 @@ var symbolsetUpload = urlHandler{
 
 		clientUUID := getParam("client_uuid", r)
 
-		if "" == strings.TrimSpace(clientUUID) {
+		if strings.TrimSpace(clientUUID) == "" {
 			msg := "doUploadSymbolSetHandler got no client uuid"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusBadRequest)

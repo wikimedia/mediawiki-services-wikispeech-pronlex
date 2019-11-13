@@ -53,7 +53,7 @@ var adminListIDs = urlHandler{
 		res, err := json.Marshal(jsids)
 		if err != nil {
 			msg := fmt.Sprintf("lexserver: Failed to marshal ids : %v", err)
-			log.Printf(msg)
+			log.Print(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
@@ -89,7 +89,7 @@ var adminLexImport = urlHandler{
 
 		clientUUID := getParam("client_uuid", r)
 
-		if "" == strings.TrimSpace(clientUUID) {
+		if strings.TrimSpace(clientUUID) == "" {
 			msg := "adminLexImport got no client uuid"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusBadRequest)

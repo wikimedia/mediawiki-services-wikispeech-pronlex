@@ -111,6 +111,7 @@ func removeInitialSlash(url string) string {
 	return initialSlashRe.ReplaceAllString(url, "")
 }
 
+/*
 func (rout subRouter) handlerExamples() []string {
 	res := []string{}
 	for _, handler := range rout.handlers {
@@ -120,7 +121,7 @@ func (rout subRouter) handlerExamples() []string {
 	}
 	return res
 }
-
+*/
 func newSubRouter(rout *mux.Router, root string, description string) *subRouter {
 	var res = subRouter{
 		router: rout.PathPrefix(root).Subrouter(),
@@ -146,15 +147,15 @@ func newSubRouter(rout *mux.Router, root string, description string) *subRouter 
 // protect: use this call in handlers to catch 'panic' and stack traces and returning a general error to the calling client
 func protect(w http.ResponseWriter) {
 	if r := recover(); r != nil {
-		defer http.Error(w, fmt.Sprintf("%s", "Internal server error"), http.StatusInternalServerError)
+		defer http.Error(w, "internal server error", http.StatusInternalServerError)
 		fmt.Println(errors.Wrap(r, 2).ErrorStack())
 		// TODO: log the actual error to a server log file (but do not return to client)
 	}
 }
 
 // TODO should go into config file
-var uploadFileArea string    // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
-var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
+var uploadFileArea string // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
+//var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
 var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
 var dbFileArea string        // = filepath.Join(".", "db_files")
 var staticFolder string      // = "."
@@ -230,7 +231,7 @@ func initFolders() error {
 // pretty print if the URL paramer 'pp' has a value
 func marshal(v interface{}, r *http.Request) ([]byte, error) {
 
-	if "" != strings.TrimSpace(getParam("pp", r)) {
+	if strings.TrimSpace(getParam("pp", r)) != "" {
 		return json.MarshalIndent(v, "", "  ")
 	}
 
@@ -242,7 +243,7 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, strings.Join(vInfo, "\n"))
+	fmt.Fprint(w, strings.Join(vInfo, "\n"))
 }
 
 // UTC time with format: yyyy-MM-dd HH:mm:ss z | %Y-%m-%d %H:%M:%S %Z
@@ -253,7 +254,7 @@ func getVersionInfo() []string {
 	var buildInfoFile = "/wikispeech/pronlex/build_info.txt"
 	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
-		log.Printf(msg)
+		log.Print(msg)
 		res = append(res, "Application name: pronlex")
 		res = append(res, "Build timestamp: n/a")
 		res = append(res, "Built by: user")
@@ -272,13 +273,15 @@ func getVersionInfo() []string {
 				strings.TrimSpace(string(branch)))))
 		}
 	} else {
-		fh, err := os.Open(buildInfoFile)
-		defer fh.Close()
 
 		fBytes, err := ioutil.ReadFile(buildInfoFile)
+		if err != nil {
+			var msg = fmt.Sprintf("lexserver: error reading file : %v", err)
+			log.Print(msg)
+		}
 		if _, err = os.Stat(buildInfoFile); os.IsNotExist(err) {
 			var msg = fmt.Sprintf("lexserver: error when reading content from timestamp file : %v", err)
-			log.Printf(msg)
+			log.Print(msg)
 		} else {
 			res = strings.Split(strings.TrimSpace(string(fBytes)), "\n")
 		}
@@ -396,11 +399,11 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	paradigmLike := strings.TrimSpace(getParam("paradigmlike", r))
 	paradigmRegexp := strings.TrimSpace(getParam("paradigmregexp", r))
 	var entryStatus []string
-	if "" != getParam("entrystatus", r) {
+	if getParam("entrystatus", r) != "" {
 		entryStatus = splitRE.Split(getParam("entrystatus", r), -1)
 	}
 	var users []string
-	if "" != getParam("users", r) {
+	if getParam("users", r) != "" {
 		users = splitRE.Split(getParam("users", r), -1)
 	}
 	// If true, returns only entries with at least one EntryValidation issue
@@ -494,7 +497,7 @@ func delQuote(s string) string {
 	return strings.TrimSpace(res)
 }
 
-var wsChan = make(chan string)
+//var wsChan = make(chan string)
 
 // See https://blog.golang.org/go-maps-in-action "Concurrency"
 var webSocks = struct {
@@ -584,13 +587,16 @@ func keepClientsAlive() {
 
 var dbm = dbapi.NewDBManager()
 
+/*
 func keepAlive(wsC chan string) {
 	c := time.Tick(57 * time.Second)
 	for range c {
 		wsC <- "WS_KEEPALIVE"
 	}
 }
+*/
 
+/*
 func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -598,7 +604,7 @@ func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 		return
 	}
 }
-
+*/
 func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
 	return symbolset.LoadSymbolSet(fName)
 }
@@ -811,19 +817,19 @@ func createServer(port string) (*http.Server, error) {
 	// load symbol set mappers
 	err = loadSymbolSets(symbolSetFileArea)
 	if err != nil {
-		return s, fmt.Errorf("Failed to load symbol sets from dir "+symbolSetFileArea+" : %v", err)
+		return s, fmt.Errorf("failed to load symbol sets from dir "+symbolSetFileArea+" : %v", err)
 	}
 	log.Printf("lexserver: loaded symbol sets from dir %s", symbolSetFileArea)
 
 	err = loadConverters(symbolSetFileArea)
 	if err != nil {
-		return s, fmt.Errorf("Failed to load converters from dir "+symbolSetFileArea+" : %v", err)
+		return s, fmt.Errorf("failed to load converters from dir "+symbolSetFileArea+" : %v", err)
 	}
 	log.Printf("lexserver: loaded converters from dir %s", symbolSetFileArea)
 
 	err = loadValidators(symbolSetFileArea)
 	if err != nil {
-		return s, fmt.Errorf("Failed to load validators : %v", err)
+		return s, fmt.Errorf("failed to load validators : %v", err)
 	}
 	log.Printf("lexserver: loaded validators : %v", validatorNames())
 
