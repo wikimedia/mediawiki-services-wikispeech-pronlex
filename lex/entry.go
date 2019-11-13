@@ -36,11 +36,11 @@ func ParseLexRef(fullLexName string) (LexRef, error) {
 		return LexRef{}, fmt.Errorf("ParseLexRef: failed to split full lexicon name into two colon separated parts: '%s'", fullLexName)
 	}
 	db := nameSplit[0]
-	if "" == db {
+	if db == "" {
 		return LexRef{}, fmt.Errorf("ParseLexRef: db part of lexicon name empty: '%s'", fullLexName)
 	}
 	lex := nameSplit[1]
-	if "" == lex {
+	if lex == "" {
 		return LexRef{}, fmt.Errorf("ParseLexRef: lexicon part of full lexicon name empty: '%s'", fullLexName)
 	}
 
