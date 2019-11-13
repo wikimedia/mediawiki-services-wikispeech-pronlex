@@ -7,7 +7,7 @@ github.com/go-errors/errors
 github.com/gorilla/mux
 # github.com/mattn/go-sqlite3 v1.11.0
 github.com/mattn/go-sqlite3
-# github.com/stts-se/rbg2p v0.0.0-20191023140523-3380156c83e7
+# github.com/stts-se/rbg2p v0.0.0-20191113104114-c1c7ac4b6a05
 github.com/stts-se/rbg2p
 # golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 golang.org/x/crypto/bcrypt
