@@ -63,6 +63,7 @@ func Sqlite3WithRegex() {
 		})
 }
 
+/*
 func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 	tx, err := db.Begin()
 	if err != nil {
@@ -71,7 +72,7 @@ func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 	defer tx.Commit()
 	return listNamesOfTriggersTx(tx)
 }
-
+*/
 func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	var res []string
 
@@ -123,6 +124,7 @@ func getSchemaVersionTx(tx *sql.Tx) (string, error) {
 
 // ListEntryTableColumnNames is a meta-function that returns the names of the columns of the 'entry' lexicon database table.
 // It can be used for checking that the entry table has the expected columns.
+/*
 func listEntryTableColumnNames(db *sql.DB) ([]string, error) {
 	q := "SELECT * FROM entry LIMIT 0"
 
@@ -138,7 +140,7 @@ func listEntryTableColumnNames(db *sql.DB) ([]string, error) {
 
 	return colNames, err
 }
-
+*/
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., Lexicon structs corresponding to the rows of the lexicon
 // table).
@@ -214,6 +216,7 @@ func getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
 
 // GetLexicons takes a list of lexicon names and returns a list of
 // Lexicon structs corresponding to rows of db lexicon table with those name fields.
+/*
 func getLexicons(db *sql.DB, names []string) ([]lexicon, error) {
 	var res []lexicon
 	found := make(map[string]bool)
@@ -257,9 +260,10 @@ func getLexicons(db *sql.DB, names []string) ([]lexicon, error) {
 
 	return res, err
 }
-
+*/
 // LexiconFromID returns a Lexicon struct corresponding to a row in
 // the lexicon table with the given id
+/*
 func lexiconFromID(db *sql.DB, id int64) (lexicon, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -269,9 +273,10 @@ func lexiconFromID(db *sql.DB, id int64) (lexicon, error) {
 
 	return lexiconFromIDTx(tx, id)
 }
-
+*/
 // LexiconFromIDTx returns a Lexicon struct corresponding to a row in
 // the lexicon table with the given id
+/*
 func lexiconFromIDTx(tx *sql.Tx, id int64) (lexicon, error) {
 	res := lexicon{}
 	err := tx.QueryRow("select id, name, symbolsetname, locale from lexicon where id = ?", id).Scan(&res.id, &res.name, &res.symbolSetName, &res.locale)
@@ -284,7 +289,7 @@ func lexiconFromIDTx(tx *sql.Tx, id int64) (lexicon, error) {
 
 	return res, err
 }
-
+*/
 // DeleteLexicon deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
 // It should be impossible to delete the Lexicon table entry if associated to any entries.
@@ -317,8 +322,7 @@ func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 	// must always return a row, no need to check for empty row
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Println("HEJ DIN FAN")
-			return fmt.Errorf("The was no lexicon with name %s : %v", lexName, err)
+			return fmt.Errorf("the was no lexicon with name %s : %v", lexName, err)
 		}
 		return err
 	}
@@ -698,7 +702,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 		}
 
 		//log.Printf("%v", e)
-		if "" != e.Lemma.Strn { // && "" != e.Lemma.Reading {
+		if e.Lemma.Strn != "" { // && "" != e.Lemma.Reading {
 			lemma, err := setOrGetLemma(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
 			if err != nil {
 				tx.Rollback()
@@ -707,15 +711,15 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 			err = associateLemma2Entry(tx, lemma, e)
 			if err != nil {
 				tx.Rollback()
-				return ids, fmt.Errorf("Failed lemma to entry assoc: %v", err)
+				return ids, fmt.Errorf("failed lemma to entry assoc: %v", err)
 			}
 		}
 
-		if "" != e.Tag {
+		if e.Tag != "" {
 			err = insertEntryTagTx(tx, e.ID, e.Tag)
 			if err != nil {
 				tx.Rollback()
-				return ids, fmt.Errorf("Failed to insert entry tag '%s' for '%s': %v", e.Tag, e.Strn, err)
+				return ids, fmt.Errorf("failed to insert entry tag '%s' for '%s': %v", e.Tag, e.Strn, err)
 			}
 		}
 
@@ -811,13 +815,14 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 	return nil
 }
 
-// InsertLemma saves a lex.Lemma to the db, but does not associate it with anlex.Entry
+// InsertLemma saves a lex.Lemma to the db, but does not associate it with a lex.Entry
 // TODO do we need both InsertLemma and SetOrGetLemma?
 func insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
 	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
 	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
 	if err != nil {
 		err = fmt.Errorf("failed insert lemma "+l.Strn+": %v", err)
+		return lex.Lemma{}, err
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
@@ -1245,6 +1250,7 @@ func getEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 }
 
 // GetEntriesFromIDs is a wrapper around LookUp and returns the lex.Entry corresponding to the db id
+/*
 func getEntriesFromIDs(db *sql.DB, ids []int64, out lex.EntryWriter) error {
 	q := Query{EntryIDs: ids}
 	err := lookUp(db, []lex.LexName{}, q, out)
@@ -1258,7 +1264,7 @@ func getEntriesFromIDs(db *sql.DB, ids []int64, out lex.EntryWriter) error {
 	return nil
 
 }
-
+*/
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
 // TODO Consider how to handle inconsistent input entries
 // TODO Full name of DB as input param?
@@ -1291,6 +1297,10 @@ func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 	//dbEntryMap := //GetEntriesFromIDsTx(tx, []int64{(e.ID)})
 	var esw lex.EntrySliceWriter
 	err = lookUpTx(tx, []lex.LexName{e.LexRef.LexName}, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
+	if err != nil {
+		return false, fmt.Errorf("updateEntryTx : %v", err)
+	}
+
 	dbEntries := esw.Entries
 	if len(dbEntries) == 0 {
 		return updated, fmt.Errorf("no entry with id '%d'", e.ID)
@@ -1535,7 +1545,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	tx.QueryRow("SELECT tag FROM entrytag WHERE entryid = ?", e.ID).Scan(&tagged)
 	if tagged != newTag {
 		tx.Rollback()
-		return false, fmt.Errorf("Failed to set new entrytag to %s (found %s)", newTag, tagged)
+		return false, fmt.Errorf("failed to set new entrytag to %s (found %s)", newTag, tagged)
 	}
 
 	return true, nil
@@ -1611,7 +1621,7 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 	return false, err
 }
 
-var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = ?"
+//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = ?"
 
 //var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
@@ -1786,6 +1796,8 @@ func unique(ns []int64) []int64 {
 	}
 	return res
 }
+
+/*
 func uniqIDs(ss []Symbol) []int64 {
 	res := make([]int64, len(ss))
 	for i, s := range ss {
@@ -1793,7 +1805,7 @@ func uniqIDs(ss []Symbol) []int64 {
 	}
 	return unique(res)
 }
-
+*/
 func entryCount(db *sql.DB, lexiconName string) (int64, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()

@@ -296,6 +296,9 @@ func Test_insertEntries(t *testing.T) {
 	defer tx0.Commit()
 	ff("transaction failed : %v", err)
 	le2, err := insertLemma(tx0, le)
+	if err != nil {
+		t.Errorf("insertLemma : %v", err)
+	}
 	tx0.Commit()
 	if le2.ID < 1 {
 		t.Errorf(fs, "more than zero", le2.ID)
@@ -316,6 +319,10 @@ func Test_insertEntries(t *testing.T) {
 	defer tx00.Commit()
 
 	le3, err := setOrGetLemma(tx00, "apa", "67t", "7(c)")
+	if err != nil {
+		t.Errorf("setOrGetLemma : %v", err)
+	}
+
 	if le3.ID < 1 {
 		t.Errorf(fs, "more than zero", le3.ID)
 	}
@@ -732,6 +739,10 @@ func Test_ImportLexiconFile(t *testing.T) {
 	q := Query{Words: []string{"sprängstoff"}}
 
 	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf("lookUpIntoSlice : %v", err)
+	}
+
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
@@ -815,6 +826,10 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 	q := Query{Words: []string{"sprängstoff"}}
 
 	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf("lookUpIntoSlice : %v", err)
+	}
+
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}

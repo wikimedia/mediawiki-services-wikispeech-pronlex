@@ -41,6 +41,9 @@ func TestEntryTag1(t *testing.T) {
 
 	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
 	l, err = defineLexicon(db, l)
+	if err != nil {
+		t.Errorf("Ooops! : %v", err)
+	}
 
 	tx, err := db.Begin()
 
@@ -95,6 +98,9 @@ func TestEntryTag1(t *testing.T) {
 
 	//var entries map[string][]lex.Entry
 	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+	if err != nil {
+		t.Errorf("Nooo! : %v", err)
+	}
 	if w, g := 1, len(entries); w != g {
 		t.Errorf("Expected '%d' got '%d'", w, g)
 	}
@@ -181,6 +187,9 @@ func TestEntryTag2(t *testing.T) {
 
 	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
 	l, err = defineLexicon(db, l)
+	if err != nil {
+		t.Errorf("failed defineLexicon : %v", err)
+	}
 
 	tx, err := db.Begin()
 
