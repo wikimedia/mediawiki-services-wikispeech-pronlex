@@ -156,7 +156,7 @@ func main() {
 	printMissingFlag := flags.Bool("missing", false, "Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>")
 
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, usage)
+		fmt.Fprint(os.Stderr, usage)
 		os.Exit(0)
 	}
 
@@ -235,6 +235,10 @@ func main() {
 	words = remDupes(words)
 
 	entries, err := lookUp(words, dbFileName, dbm)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: failed look-up : '%v'\n", err)
+		os.Exit(1)
+	}
 
 	// No match
 	if len(entries) == 0 && !*printMissingFlag {

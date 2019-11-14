@@ -40,7 +40,7 @@ func main() {
 	if tr.Size() > 0 {
 		errs := tr.AllErrors()
 		msg := fmt.Sprintf("%d tests failed for validator %s", len(errs), v.Name)
-		fmt.Fprintf(os.Stderr, msg)
+		fmt.Fprint(os.Stderr, msg)
 		for _, e := range tr.AllErrors() {
 			fmt.Fprintf(os.Stderr, "%v\n", e)
 		}

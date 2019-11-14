@@ -56,15 +56,15 @@ SAMPLE INVOCATION:
 		return
 	}
 
-	validator := &validation.Validator{}
+	//validator := &validation.Validator{}
 	err := loadValidators(symsetDirName)
 	if err != nil {
 		msg := fmt.Sprintf("failed to load validators : %v", err)
 		log.Fatal(msg)
 		return
 	}
-	vdat, err := vServ.ValidatorForName(symbolSetName)
-	validator = vdat
+	validator, err := vServ.ValidatorForName(symbolSetName)
+	//validator = vdat
 	if err != nil {
 		msg := fmt.Sprintf("failed to get validator for symbol set %v : %v", symbolSetName, err)
 		log.Fatal(msg)
