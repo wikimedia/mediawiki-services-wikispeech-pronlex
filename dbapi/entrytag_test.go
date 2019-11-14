@@ -255,6 +255,9 @@ func TestEntryTag2(t *testing.T) {
 
 	//var entries map[string][]lex.Entry
 	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+	if err != nil {
+		t.Errorf("lookUpIntoMap : %v", err)
+	}
 	if w, g := 1, len(entries); w != g {
 		t.Errorf("Expected '%d' got '%d'", w, g)
 	}

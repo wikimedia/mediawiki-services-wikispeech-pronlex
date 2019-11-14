@@ -146,6 +146,9 @@ func Test_DBManager(t *testing.T) {
 
 	q := Query{Words: []string{"apa"}}
 	lookRes, err := dbm.LookUpIntoMap(DBMQuery{[]lex.LexRef{lex.NewLexRef("db2", "zuperduperlex")}, q})
+	if err != nil {
+		t.Errorf("dbm.LookUpIntoMap : %v", err)
+	}
 	if w, g := 1, len(lookRes); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}

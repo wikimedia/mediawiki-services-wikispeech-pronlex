@@ -75,7 +75,7 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 // OpenDB is used to open an existing sqlite3 database and add it to the DB manager cache.
 func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 	name := string(dbRef)
-	if "" == name {
+	if name == "" {
 		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not be empty")
 	}
 	if strings.Contains(name, ":") {
@@ -141,7 +141,7 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 // AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk. To create AND add the database, use DefineSqliteDB instead. To open and add an existing db, use OpenDB
 func (dbm *DBManager) AddDB(dbRef lex.DBRef, db *sql.DB) error {
 	name := string(dbRef)
-	if "" == name {
+	if name == "" {
 		return fmt.Errorf("DBManager.AddDB: illegal argument: name must not be empty")
 	}
 	if strings.Contains(name, ":") {
@@ -326,9 +326,9 @@ func (dbm *DBManager) LookUpIntoSlice(q DBMQuery) ([]lex.Entry, error) {
 	if err != nil {
 		return res, err
 	}
-	for _, e := range writer.Entries {
-		res = append(res, e)
-	}
+
+	res = append(res, writer.Entries...)
+
 	return res, nil
 }
 
@@ -437,8 +437,7 @@ func (dbm *DBManager) ListLexicons() ([]lex.LexRefWithInfo, error) {
 
 	// Read result from channel
 	for i := 0; i < len(dbs); i++ {
-		var r lexRes
-		r = <-ch // Blocks until there is a result (I
+		var r lexRes = <-ch // Blocks until there is a result (I
 		// think). Can we be stuck here forever, if
 		// db call hangs?
 
@@ -451,9 +450,8 @@ func (dbm *DBManager) ListLexicons() ([]lex.LexRefWithInfo, error) {
 		// A full lexicon name consists of the name of
 		// the db and the name of the lexicon in the
 		// db joined by ':'
-		for _, lex := range r.lexes {
-			res = append(res, lex)
-		}
+		res = append(res, r.lexes...)
+
 	}
 
 	sort.Slice(res, func(i, j int) bool { return res[i].LexRef.String() < res[j].LexRef.String() })
