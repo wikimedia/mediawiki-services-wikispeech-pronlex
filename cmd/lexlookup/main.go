@@ -41,7 +41,7 @@ func isLikeExpression(s string) bool {
 
 const usage = `USAGE: lexlookup <Sqlite3 pronlex DB file> (<words...> | <stdin>)
 
-If a single word is supplied, it may contain the characters '%%' and '_' for LIKE string search.
+If a single word is supplied, it may contain the characters '%' and '_' for LIKE string search.
 
 
 Print missing words: 
