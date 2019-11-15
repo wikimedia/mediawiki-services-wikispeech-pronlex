@@ -29,7 +29,7 @@ func main() {
 	var args = flag.Args()
 
 	if len(args) != 3 && len(args) != 1 {
-		fmt.Fprintf(os.Stderr, usage)
+		fmt.Fprint(os.Stderr, usage)
 		return
 	}
 
@@ -61,7 +61,7 @@ func main() {
 	lexName := args[1]
 	lexRef := lex.NewLexRef(dbFile, lexName)
 
-	if "" == lexName {
+	if lexName == "" {
 		log.Fatalf("invalid lexicon name '%s'", lexName)
 		return
 	}

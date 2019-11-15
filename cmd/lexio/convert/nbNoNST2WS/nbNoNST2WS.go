@@ -95,10 +95,10 @@ func validPos(pos string) bool {
 		return true
 	}
 	_, ok := sucTags[pos]
-	if ok {
-		return true
-	}
-	return false
+	//	if ok {
+	//		return true
+	//	}
+	return ok
 }
 
 func mapLanguage(lang string) (string, error) {
@@ -146,11 +146,11 @@ func main() {
 	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
 
 	nstFile, err := os.Open(nstFileName)
-	defer nstFile.Close()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't open lexicon file: %v\n", err)
 		return
 	}
+	defer nstFile.Close()
 
 	nstFmt, err := line.NewNST()
 	if err != nil {

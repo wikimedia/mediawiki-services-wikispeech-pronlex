@@ -10,7 +10,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-var fsExpTrans = "Expected: '%v' got: %v'"
+//var fsExpTrans = "Expected: '%v' got: %v'"
 
 func TestProperCloseDontRemoveLockFiles(t *testing.T) {
 

@@ -45,13 +45,13 @@ func out(e lex.Entry) {
 
 func mapPos(pos string) (string, error) {
 	if pos == "" {
-		return "", fmt.Errorf("Empty pos: %s", pos)
+		return "", fmt.Errorf("empty pos: %s", pos)
 	}
 	res, ok := posTags[pos]
 	if ok {
 		return res, nil
 	}
-	return "", fmt.Errorf("Invalid pos: %s", pos)
+	return "", fmt.Errorf("invalid pos: %s", pos)
 }
 
 var initialSyllabicRE = regexp.MustCompile("^([aeiouāēīōūöäE])")
@@ -93,11 +93,11 @@ func main() {
 	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
 
 	nstFile, err := os.Open(nstFileName)
-	defer nstFile.Close()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't open lexicon file: %v\n", err)
 		return
 	}
+	defer nstFile.Close()
 
 	sc := bufio.NewScanner(nstFile)
 	n := 0

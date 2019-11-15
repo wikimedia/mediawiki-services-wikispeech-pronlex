@@ -72,11 +72,11 @@ func main() {
 	phnSet := syller.PhonemeSet
 
 	cmuFile, err := os.Open(cmuFileName)
-	defer cmuFile.Close()
 	if err != nil {
 
 		log.Fatalf("couldn't open input file : %v", err)
 	}
+	defer cmuFile.Close()
 
 	var variant = regexp.MustCompile("\\([0-9]\\)")
 	lastEntry := lex.Entry{}
