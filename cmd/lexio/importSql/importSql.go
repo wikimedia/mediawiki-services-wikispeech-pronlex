@@ -26,6 +26,7 @@ import (
 
 const sqlitePath = "sqlite3"
 
+/*
 func sqlDump(dbFile string, outFile string) error {
 	sqliteCmd := exec.Command(sqlitePath, dbFile, ".dump")
 	out, err := os.Create(outFile)
@@ -42,7 +43,7 @@ func sqlDump(dbFile string, outFile string) error {
 	log.Printf("Exported %s from db %s\n", dbFile, outFile)
 	return nil
 }
-
+*/
 var dotAndAfter = regexp.MustCompile("[.].*$")
 
 func validateSchemaVersion(db *sql.DB) error {
@@ -68,16 +69,19 @@ func validateSchemaVersion(db *sql.DB) error {
 func runPostTests(dbFile string, sqlDumpFile string) {
 
 	db, dbm := defineDB(dbFile)
-	lexes, err := dbm.ListLexicons()
+	//lexes, err := dbm.ListLexicons()
+	//if err != nil {
+	//	log.Fatalf("Failed to list lexicons : %v\n", err)
+	//}
 
 	// (1) check schema version
-	err = validateSchemaVersion(db)
+	err := validateSchemaVersion(db)
 	if err != nil {
 		log.Fatalf("Couldn't read validate schema version in file %s : %v\n", sqlDumpFile, err)
 	}
 
 	// (2) output statistics
-	lexes, err = dbm.ListLexicons()
+	lexes, err := dbm.ListLexicons()
 	if err != nil {
 		log.Fatalf("Couldn't list lexicons : %v", err)
 	}

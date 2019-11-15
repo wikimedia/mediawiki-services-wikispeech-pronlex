@@ -79,7 +79,7 @@ SAMPLE INVOCATION:
   importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym`
 
 	f.Usage = func() {
-		fmt.Fprintf(os.Stderr, usage)
+		fmt.Fprint(os.Stderr, usage)
 	}
 
 	var args = os.Args
