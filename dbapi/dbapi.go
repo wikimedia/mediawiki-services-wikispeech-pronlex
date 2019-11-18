@@ -654,7 +654,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 		return res, fmt.Errorf(msg)
 	}
 
-	where := `WHERE entry.id IN (SELECT a.id FROM entry a WHERE a.lexiconid = ?
+	const where = `WHERE entry.id IN (SELECT a.id FROM entry a WHERE a.lexiconid = ?
                        AND NOT EXISTS(SELECT strn FROM entry WHERE lexiconid = ? AND strn = a.strn))`
 
 	insertQuery := `INSERT INTO entrystatus (name, source, entryid, current) SELECT ?, ?, entry.id, '1' FROM entry ` + where
@@ -1026,9 +1026,13 @@ func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 
 	for rows.Next() {
 		var entryID int64
-		rows.Scan(
+		err = rows.Scan(
 			&entryID,
 		)
+		if err != nil {
+			return result, fmt.Errorf("lookUpIdsTx rows.Scan failed : %v", err)
+		}
+
 		result = append(result, entryID)
 	}
 	if rows.Err() != nil {
@@ -1172,7 +1176,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 	var lastE int64
 	lastE = -1
 	for rows.Next() {
-		rows.Scan(
+		err2 := rows.Scan(
 			&lexiconName,
 			&entryID,
 			&entryStrn,
@@ -1214,6 +1218,11 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 			&entryCommentSource,
 			&entryCommentComment,
 		)
+
+		if err2 != nil {
+			return fmt.Errorf("lookUpTx failed scan rows : %v", err2)
+		}
+
 		// new entry starts here.
 		//
 		// all rows with same entryID belongs to the same entry.
@@ -1224,7 +1233,10 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 		}
 		if lastE != entryID {
 			if lastE != -1 {
-				out.Write(currE)
+				err3 := out.Write(currE)
+				if err3 != nil {
+					return fmt.Errorf("lookUpTx failed to write to lex.EntryWriter : %v", err3)
+				}
 			}
 			currE = lex.Entry{
 				LexRef:       lex.NewLexRef("", lexiconName), // DBRef is not set here (will be set by DBManager)
@@ -1448,7 +1460,11 @@ func updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 		}
 		return res, updated, fmt.Errorf(msg)
 	}
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return res, updated, fmt.Errorf("updateEntry failed db commit : %v", err)
+	}
+
 	res, err = getEntryFromID(db, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed getting updated entry : %v", err)
@@ -1694,8 +1710,12 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 	if e.Lemma.ID == 0 && e.Lemma.Strn == "" {
 		_, err = tx.Exec("delete from lemma where lemma.id = ?", dbE.Lemma.ID)
 		if err != nil {
-			tx.Rollback()
-			return false, fmt.Errorf("failed to delete old lemma : %v", err)
+			msg := fmt.Sprintf("failed to delete old lemma : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return false, fmt.Errorf(msg)
 		}
 	}
 	// Only one alternative left, to update old lemma with new values
@@ -1848,14 +1868,23 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 		// TODO move to a function
 		_, err := tx.Exec("delete from transcription where transcription.id in "+nQs(len(transIDs)), convI(transIDs)...)
 		if err != nil {
-			tx.Rollback()
-			return false, fmt.Errorf("failed transcription delete : %v", err)
+			msg := fmt.Sprintf("failed transcription delete : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return false, fmt.Errorf(msg)
 		}
 		for _, t := range e.Transcriptions {
 			_, err := tx.Exec(transSTMT, e.ID, t.Strn, t.Language, t.SourcesString())
 			if err != nil {
-				tx.Rollback()
-				return false, fmt.Errorf("failed transcription update : %v", err)
+				msg := fmt.Sprintf("failed transcription update : %v", err)
+				err2 := tx.Rollback()
+				if err2 != nil {
+					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+				}
+
+				return false, fmt.Errorf(msg)
 			}
 		}
 		// different sets of transcription, new ones inserted
@@ -1882,8 +1911,12 @@ func updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, er
 		// }
 		_, err = tx.Exec(insertStatus, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
 		if err != nil {
-			tx.Rollback()
-			return false, fmt.Errorf("failed EntryStatus update : %v", err)
+			msg := fmt.Sprintf("failed EntryStatus update : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return false, fmt.Errorf(msg)
 		}
 
 		return true, nil
@@ -1933,8 +1966,12 @@ func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidatio
 	for _, v := range eValis {
 		_, err := tx.Exec(insValiSQL, e.ID, strings.ToLower(v.Level), v.RuleName, v.Message)
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed to insert EntryValidation : %v", err)
+			msg := fmt.Sprintf("failed to insert EntryValidation : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
 	}
 	return nil
@@ -1944,16 +1981,28 @@ func updateValidation(db *sql.DB, entries []lex.Entry) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("failed starting transaction for updating validation : %v", err)
+		msg := fmt.Sprintf("failed starting transaction for updating validation : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return fmt.Errorf(msg)
 	}
 
 	err = updateValidationTx(tx, entries)
 	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("failed updating validation : %v", err)
+		msg := fmt.Sprintf("failed updating validation : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return fmt.Errorf(msg)
 	}
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("updateValidation failed db commit : %v", err)
+	}
+
 	return nil
 }
 
@@ -1970,8 +2019,12 @@ func updateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
 func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
 	_, err := tx.Exec("DELETE FROM entryvalidation WHERE entryid = ?", e.ID)
 	if err != nil {
-		tx.Rollback()
-		return false, fmt.Errorf("failed deleting EntryValidation : %v", err)
+		msg := fmt.Sprintf("failed deleting EntryValidation : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return false, fmt.Errorf(msg)
 	}
 
 	err = insertEntryValidations(tx, e, e.EntryValidations)
@@ -1996,8 +2049,12 @@ func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error)
 	for _, v := range removeValidations {
 		_, err := tx.Exec("DELETE FROM entryvalidation WHERE id = ?", v.ID)
 		if err != nil {
-			tx.Rollback()
-			return false, fmt.Errorf("failed deleting EntryValidation : %v", err)
+			msg := fmt.Sprintf("failed deleting EntryValidation : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return false, fmt.Errorf(msg)
 		}
 	}
 
@@ -2013,15 +2070,23 @@ func insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) er
 	// TODO Handle old comments that are to be kept in a smoother way.
 	_, err := tx.Exec(delEntryCommentsSQL, eID)
 	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("failed deleting EntryComments : %v", err)
+		msg := fmt.Sprintf("failed deleting EntryComments : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return fmt.Errorf(msg)
 	}
 
 	for _, cmt := range eComments {
 		_, err := tx.Exec(insEntryCommentSQL, eID, cmt.Label, cmt.Source, cmt.Comment)
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed inserting EntryComment : %v", err)
+			msg := fmt.Sprintf("failed inserting EntryComment : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
 
 	}
@@ -2143,13 +2208,21 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
-		tx.Rollback() // ?
-		return res, fmt.Errorf("ListCurrentEntryStatuses : %v", err)
+		msg := fmt.Sprintf("ListCurrentEntryStatuses : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return res, fmt.Errorf(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var statusName string
-		rows.Scan(&statusName)
+		err = rows.Scan(&statusName)
+		if err != nil {
+			return res, fmt.Errorf("listEntryStatuses failed db row scan : %v", err)
+		}
+
 		res = append(res, statusName)
 	}
 
@@ -2177,14 +2250,21 @@ func listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool)
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
-		tx.Rollback() // ?
-		return res, fmt.Errorf("ListCurrentEntryStatusesWithFreq : %v", err)
+		msg := fmt.Sprintf("ListCurrentEntryStatusesWithFreq : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return res, fmt.Errorf(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var statusName string
 		var freq int
-		rows.Scan(&statusName, &freq)
+		err = rows.Scan(&statusName, &freq)
+		if err != nil {
+			return res, fmt.Errorf("listEntryStatusesWithFreq failed db rows scan : %v")
+		}
 		res[statusName] = freq
 	}
 
@@ -2211,14 +2291,22 @@ func listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (m
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
-		tx.Rollback() // ?
-		return res, fmt.Errorf("ListCurrentEntryUsersWithFreq : %v", err)
+		msg := fmt.Sprintf("ListCurrentEntryUsersWithFreq : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return res, fmt.Errorf(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var userName string
 		var freq int
-		rows.Scan(&userName, &freq)
+		err = rows.Scan(&userName, &freq)
+		if err != nil {
+			return res, fmt.Errorf("listEntryUsersWithFreq failed db rows scan : %v", err)
+		}
+
 		//res = append(res, userName)
 		res[userName] = freq
 	}
@@ -2244,13 +2332,21 @@ func listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string,
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
-		tx.Rollback() // ?
-		return res, fmt.Errorf("ListCurrentEntryUsers : %v", err)
+		msg := fmt.Sprintf("ListCurrentEntryUsers : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return res, fmt.Errorf(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var userName string
-		rows.Scan(&userName)
+		err = rows.Scan(&userName)
+		if err != nil {
+			return res, fmt.Errorf("listEntryUsers failed db rows scan : %v", err)
+		}
+
 		res = append(res, userName)
 	}
 	err = rows.Err()
@@ -2271,13 +2367,20 @@ func listCommentLabels(db *sql.DB, lexiconName string) ([]string, error) {
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
-		tx.Rollback() // ?
-		return res, fmt.Errorf("ListCommentLabels : %v", err)
+		msg := fmt.Sprintf("ListCommentLabels : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return res, fmt.Errorf(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var label string
-		rows.Scan(&label)
+		err = rows.Scan(&label)
+		if err != nil {
+			return res, fmt.Errorf("listCommentLabels failed db rows scan", err)
+		}
 		res = append(res, label)
 	}
 
