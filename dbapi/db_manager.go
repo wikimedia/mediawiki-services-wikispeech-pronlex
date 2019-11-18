@@ -48,7 +48,6 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	}
 
 	err := dbm.OpenDB(dbRef, dbPath)
-
 	if err != nil {
 		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to open db : %v", err)
 		//log.Println(msg)
@@ -60,12 +59,18 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 		return fmt.Errorf("DBManager.DefineSqliteDB: no such db '%s'", dbRef)
 	}
 
+	// TODO This looks odd, with the db.Close() inside the error handling?
 	_, err = db.Exec(Schema)
 	if err != nil {
-		db.Close()
 		//return fmt.Errorf("sql error : %v", err)
 		msg := fmt.Sprintf("failed to load schema: %v", err)
-		//log.Println(msg)
+
+		err2 := db.Close()
+		if err2 != nil {
+			msg2 := fmt.Sprintf("failed to close db : %v", err2)
+
+			msg = fmt.Sprintf("%s : %s", msg, msg2)
+		}
 		return fmt.Errorf(msg)
 	}
 
@@ -90,48 +95,57 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 	}
 
 	db, err := sql.Open("sqlite3_with_regexp", dbPath)
-	//defer db.Close()
+
+	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
-		if db != nil {
-			db.Close()
-		}
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to open db : %v", err)
-		//log.Println(msg)
+
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
 		return fmt.Errorf(msg)
 	}
 	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
 
+	// TODO This looks odd, with error handling inside the error handling
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
-		if db != nil {
-			db.Close()
-		}
+
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to set foreign keys : %v", err)
-		//log.Println(msg)
+
 		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
-		if db != nil {
-			db.Close()
-		}
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to set case sensitive like : %v", err)
-		//log.Println(msg)
+
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+
 		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA journal_mode=WAL")
+	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
-		if db != nil {
-			db.Close()
-		}
 		msg := fmt.Sprintf("DBManager.OpenDB: failed to set journal_mode=WAL : %v", err)
-		//log.Println(msg)
+
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+
 		return fmt.Errorf(msg)
 	}
-	//_, err = db.Exec("PRAGMA busy_timeout=500") // doesn't seem to do the trick
-	//		if err != nil {
-	//return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-	//}
 
 	dbm.dbs[dbRef] = db
 
@@ -396,7 +410,10 @@ func (dbm *DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 		}
 
 		for _, e := range lkUp.entries {
-			out.Write(e)
+			err := out.Write(e)
+			if err != nil {
+				return fmt.Errorf("error writing to lex.EntryWriter : %v", err)
+			}
 		}
 	}
 
