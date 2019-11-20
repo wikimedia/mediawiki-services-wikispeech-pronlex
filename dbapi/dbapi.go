@@ -2263,7 +2263,7 @@ func listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool)
 		var freq int
 		err = rows.Scan(&statusName, &freq)
 		if err != nil {
-			return res, fmt.Errorf("listEntryStatusesWithFreq failed db rows scan : %v")
+			return res, fmt.Errorf("listEntryStatusesWithFreq failed db rows scan : %v", err)
 		}
 		res[statusName] = freq
 	}
@@ -2379,7 +2379,7 @@ func listCommentLabels(db *sql.DB, lexiconName string) ([]string, error) {
 		var label string
 		err = rows.Scan(&label)
 		if err != nil {
-			return res, fmt.Errorf("listCommentLabels failed db rows scan", err)
+			return res, fmt.Errorf("listCommentLabels failed db rows scan : %v", err)
 		}
 		res = append(res, label)
 	}
