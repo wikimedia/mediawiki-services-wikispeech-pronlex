@@ -21,18 +21,27 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
-		tx.Rollback()
-		return stats, fmt.Errorf("failed to initialize transaction : %v", err)
+		msg := fmt.Sprintf("failed to initialize transaction : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+		}
+		return stats, fmt.Errorf(msg)
 	}
 
 	err = lookUp(db, []lex.LexName{}, q, &w)
 	if err != nil {
-		tx.Rollback()
-		return stats, fmt.Errorf("couldn't lookup from ids : %s", err)
+		msg := fmt.Sprintf("couldn't lookup from ids : %v", err)
+		return stats, fmt.Errorf(msg)
 	}
 	if w.Size() != len(chunk) {
-		tx.Rollback()
-		return stats, fmt.Errorf("got %d input ids, but found %d entries", len(chunk), w.Size())
+		msg := fmt.Sprintf("got %d input ids, but found %d entries", len(chunk), w.Size())
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+		}
+
+		return stats, fmt.Errorf(msg)
 	}
 
 	validated, _ := vd.ValidateEntries(w.Entries)
@@ -62,10 +71,24 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 
 	err = updateValidationTx(tx, updated)
 	if err != nil {
-		tx.Rollback()
-		return stats, fmt.Errorf("couldn't update validation : %s", err)
+		msg := fmt.Sprintf("couldn't update validation : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+		}
+
+		return stats, fmt.Errorf(msg)
 	}
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		msg := fmt.Sprintf("failed to commit : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+		}
+		return stats, fmt.Errorf(msg)
+	}
+
 	return stats, nil
 }
 

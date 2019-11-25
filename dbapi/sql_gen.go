@@ -337,7 +337,7 @@ func ToLower(ss []string) []string {
 
 // This is not sane.
 
-var baseSQLFrom = `FROM lexicon, entry, transcription
+const baseSQLFrom = `FROM lexicon, entry, transcription
 LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id 
 LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid
 LEFT JOIN entrytag ON entrytag.entryid = entry.id

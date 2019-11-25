@@ -29,13 +29,21 @@ func dropTrigger(tx *sql.Tx, triggerName string) error {
 	if _, ok := triggs[triggerName]; ok {
 		rez, err := tx.Exec("DROP TRIGGER " + triggerName)
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("dbapi.UpdateSchema failed when dropping trigger : %v", err)
+			msg := fmt.Sprintf("dbapi.UpdateSchema failed when dropping trigger : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : dropTrigger failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
 		_, err = rez.RowsAffected()
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("dbapi.UpdateSchema failed when calling RowsAffected : %v", err)
+			msg := fmt.Sprintf("dbapi.UpdateSchema failed when calling RowsAffected : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : dropTrigger failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
 		//fmt.Println("DROPPED TRIGGER " + triggerName)
 	} //else {
@@ -80,24 +88,54 @@ func UpdateSchema(dbFile string) error {
 		//Defined in dbapi.go
 		err := dropTrigger(tx, "insertPref")
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("drop trigger insertPref failed : %v", err)
+			msg := fmt.Sprintf("drop trigger updatetPref failed : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
+
 		// Misspelled name of trigger in some version of schema
-		dropTrigger(tx, "updatetPref")
+		err = dropTrigger(tx, "updatetPref")
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("drop trigger updatetPref failed : %v", err)
+			msg := fmt.Sprintf("drop trigger updatetPref failed : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
 
-		dropTrigger(tx, "updatePref")
+		err = dropTrigger(tx, "updatePref")
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("drop trigger updatePref failed : %v", err)
+			msg := fmt.Sprintf("drop trigger updatetPref failed : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
 
-		dropTrigger(tx, "insertEntryStatus")
-		dropTrigger(tx, "updateEntryStatus")
+		err = dropTrigger(tx, "insertEntryStatus")
+		if err != nil {
+			msg := fmt.Sprintf("drop trigger updatetPref failed : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
+		}
+
+		err = dropTrigger(tx, "updateEntryStatus")
+		if err != nil {
+			msg := fmt.Sprintf("drop trigger updatetPref failed : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
+		}
 
 		//fmt.Fprintf(os.Stderr, "%s: user_version %d\n", dbFile, userVersion)
 
@@ -121,13 +159,22 @@ func UpdateSchema(dbFile string) error {
 
 		_, err = tx.Exec(createTriggers)
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed to create trigger : %v", err)
+			err2 := tx.Rollback()
+			msg := fmt.Sprintf("failed to create trigger : %v", err)
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
 		}
 		_, err = tx.Exec("PRAGMA user_version = 1")
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed to set user_version variable : %v", err)
+			msg := fmt.Sprintf("failed to set user_version variable : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
+			return fmt.Errorf(msg)
+
 		}
 
 		//fmt.Fprintf(os.Stderr, "dbapi.UpdateSchema: Created triggers\n")

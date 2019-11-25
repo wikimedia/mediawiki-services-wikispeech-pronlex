@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -28,7 +29,8 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		return fmt.Errorf("%v", msg)
 	}
 
-	fh, err := os.Open(lexiconFileName)
+	// TODO sanitise lexiconFileName
+	fh, err := os.Open(filepath.Clean(lexiconFileName))
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to open file : %v", err)
 		logger.Write(msg)
@@ -201,7 +203,8 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 		return fmt.Errorf("%v", msg)
 	}
 
-	fh, err := os.Open(lexiconFileName)
+	// TODO santise lexiconFileName
+	fh, err := os.Open(filepath.Clean(lexiconFileName))
 	if err != nil {
 		var msg = fmt.Sprintf("ValidateLexiconFile failed to open file : %v", err)
 		log.Println(msg)
