@@ -273,7 +273,13 @@ var symbolsetUpload = urlHandler{
 
 		// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
-		r.ParseMultipartForm(32 << 20)
+		err := r.ParseMultipartForm(32 << 20)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("doUploadSymbolSetHandler failed pars multipart form : %v", err), http.StatusInternalServerError)
+			return
+		}
+
 		file, handler, err := r.FormFile("upload_file")
 		if err != nil {
 			log.Println(err)
@@ -289,7 +295,7 @@ var symbolsetUpload = urlHandler{
 			return
 		}
 
-		f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0755)
+		f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("doUploadSymbolSetHandler failed opening local output file : %v", err), http.StatusInternalServerError)
@@ -317,7 +323,7 @@ var symbolsetUpload = urlHandler{
 			return
 		}
 
-		f.Close()
+		//f.Close()
 
 		mMut.Lock()
 		mMut.service.SymbolSets[ss.Name] = ss

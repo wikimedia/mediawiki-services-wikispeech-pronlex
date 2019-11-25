@@ -140,7 +140,13 @@ var adminLexImport = urlHandler{
 		}
 		// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 
-		r.ParseMultipartForm(32 << 20)
+		err = r.ParseMultipartForm(32 << 20)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("adminLexImport failed parse multipart form : %v", err), http.StatusInternalServerError)
+			return
+		}
+
 		file, handler, err := r.FormFile("file")
 		if err != nil {
 			log.Println(err)
@@ -150,7 +156,7 @@ var adminLexImport = urlHandler{
 		defer file.Close()
 		serverPath := filepath.Join(uploadFileArea, handler.Filename)
 
-		f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0755)
+		f, err := os.OpenFile(serverPath, os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("adminLexImport failed opening local output file : %v", err), http.StatusInternalServerError)
@@ -223,7 +229,7 @@ var adminLexImport = urlHandler{
 			return
 		}
 
-		f.Close()
+		//f.Close()
 		deleteUploadedFile(serverPath)
 
 		entryCount, err := dbm.EntryCount(lexRef)
@@ -383,24 +389,38 @@ var adminCreateDB = urlHandler{
 
 		db, err := sql.Open("sqlite3", dbFile)
 		if err != nil {
-			db.Close()
-			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusBadRequest)
+			//db.Close()
+			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusInternalServerError)
 			return
 		}
 		_, err = db.Exec("PRAGMA foreign_keys = ON")
 		if err != nil {
-			db.Close()
-			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusBadRequest)
+			msg := fmt.Sprintf("sql error : %v", err)
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 
 		_, err = db.Exec(dbapi.Schema)
 		if err != nil {
-			db.Close()
-			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusBadRequest)
+			msg := fmt.Sprintf("sql error : %v", err)
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		dbm.AddDB(lex.DBRef(dbName), db)
+		err = dbm.AddDB(lex.DBRef(dbName), db)
+		if err != nil {
+			msg := fmt.Sprintf("failed to add db : %v", err)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		fmt.Fprint(w, "Created database "+dbName)
 	},
