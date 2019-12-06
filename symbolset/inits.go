@@ -224,6 +224,9 @@ func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 				testLines = append(testLines, l)
 			} else {
 				fs := strings.Split(l, "\t")
+				if len(fs) != 5 {
+					return nilRes, fmt.Errorf("invalid input line in %s (expected %d fields, found %d) : %s", fName, 5, len(fs), l)
+				}
 				symbol := trimIfNeeded(fs[symbolIndex])
 				ipa := trimIfNeeded(fs[ipaIndex])
 				ipaUnicode := trimIfNeeded(fs[ipaUnicodeIndex])
