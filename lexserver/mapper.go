@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sync"
 
@@ -250,7 +251,7 @@ func parseMapperTests(mapperLine string, testLines []string) (mapperTests, error
 
 func loadMapperTestsFromFile(fName string) ([]mapperTests, error) {
 	var res []mapperTests
-	fh, err := os.Open(fName)
+	fh, err := os.Open(filepath.Clean(fName))
 	if err != nil {
 		return []mapperTests{}, err
 	}

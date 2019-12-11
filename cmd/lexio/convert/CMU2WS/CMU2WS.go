@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -71,7 +72,7 @@ func main() {
 	}
 	phnSet := syller.PhonemeSet
 
-	cmuFile, err := os.Open(cmuFileName)
+	cmuFile, err := os.Open(filepath.Clean(cmuFileName))
 	if err != nil {
 
 		log.Fatalf("couldn't open input file : %v", err)

@@ -358,7 +358,7 @@ var nonPhonemes = `[ .%"]*`
 
 // doubleChar returns true iff lhs ends with the same rune as rhs
 // starts with
-func doubleChar(lhs, rhs string) (rune, bool) {
+/*func doubleChar(lhs, rhs string) (rune, bool) {
 	fmt.Printf("LHS: %s\tRHS: %s\n", lhs, rhs)
 
 	var res rune
@@ -380,7 +380,7 @@ func doubleChar(lhs, rhs string) (rune, bool) {
 
 	return res, isSame
 }
-
+*/
 func splitTrans(lhs, rhs, trans string) (string, string, error) {
 
 	lhs = strings.ToLower(lhs)
@@ -686,6 +686,7 @@ func collapseEntriesWithSamePOS(w string, f []Freq) []lex.Entry {
 	return res
 }
 
+/*
 func dump(m map[string]map[WP]int) {
 	for k, v := range m {
 		srt := freqSort(v)
@@ -705,10 +706,10 @@ func dump(m map[string]map[WP]int) {
 		}
 	}
 }
-
+*/
 func toFile(m map[string]map[WP]int, fileName string) error {
 
-	fh, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0755)
+	fh, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 
 		return fmt.Errorf("lexfile2decompPronlex.toFile failed : %v", err)
@@ -763,7 +764,7 @@ func main() {
 	}
 
 	fn := os.Args[1]
-	fh, err := os.Open(fn)
+	fh, err := os.Open(filepath.Clean(fn))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Mabel Tainter Memorial Building! : %v\n", err)
 	}

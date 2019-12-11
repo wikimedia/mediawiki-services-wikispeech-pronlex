@@ -104,7 +104,7 @@ func LoadFile(symbolSets map[string]symbolset.SymbolSet, fName string) (Converte
 	name = name[0 : len(name)-len(extension)]
 	var converter = Converter{Name: name}
 	var err error
-	fh, err := os.Open(fName)
+	fh, err := os.Open(filepath.Clean(fName))
 	if err != nil {
 		return Converter{}, TestResult{}, err
 	}

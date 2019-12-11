@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -92,7 +93,7 @@ func main() {
 
 	ssRuleTo := rules.SymbolSetRule{SymbolSet: mapper.SymbolSet2}
 
-	nstFile, err := os.Open(nstFileName)
+	nstFile, err := os.Open(filepath.Clean(nstFileName))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't open lexicon file: %v\n", err)
 		return

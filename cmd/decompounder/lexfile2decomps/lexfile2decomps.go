@@ -152,9 +152,6 @@ func clean(s string) string {
 
 func ok(s string) bool {
 
-	if len(s) < 4 {
-		return false
-	}
+	return len(s) >= 4
 
-	return true
 }
