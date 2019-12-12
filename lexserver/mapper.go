@@ -315,8 +315,12 @@ func testMappers(mDefFile string) error {
 			for _, from := range mtab.SymbolSet1.Symbols {
 				_, err := mtab.MapSymbol(from)
 				if err != nil {
-					mMut.service.DeleteMapper(mt.fromName, mt.toName)
 					msg := fmt.Sprintf("failed getting map table : %v", err)
+					err2 := mMut.service.DeleteMapper(mt.fromName, mt.toName)
+					if err2 != nil {
+						msg = fmt.Sprintf("%s : failed to delete mapper : %v", msg, err2)
+					}
+
 					log.Println(msg)
 					return err
 				}

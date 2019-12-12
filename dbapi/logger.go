@@ -73,7 +73,13 @@ func (l WebSockLogger) Progress(msg string) {
 
 // Write logs a message string
 func (l WebSockLogger) Write(msg string) {
-	websocket.Message.Send(l.websock, msg)
+	err := websocket.Message.Send(l.websock, msg)
+	if err != nil { // ??
+		//log.Printf("failure to wite to websocket : %v", err)
+		//  TODO Is this where the err should go??
+		fmt.Printf("failure to wite to websocket : %v", err)
+	}
+
 }
 
 // LogInterval speficies logging interval (to be used by the calling process)
