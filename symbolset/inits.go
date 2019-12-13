@@ -195,7 +195,7 @@ var header = "DESCRIPTION	SYMBOL	IPA	IPA UNICODE	CATEGORY"
 // loadSymbolSet_ loads a SymbolSet from file
 func loadSymbolSet0(name string, fName string) (SymbolSet, error) {
 	var nilRes SymbolSet
-	fh, err := os.Open(fName)
+	fh, err := os.Open(filepath.Clean(fName))
 	if err != nil {
 		return nilRes, err
 	}

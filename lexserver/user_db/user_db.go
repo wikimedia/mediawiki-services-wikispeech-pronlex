@@ -47,14 +47,21 @@ func (udb UserDB) GetUsers() ([]User, error) {
 	//rows, err := tx.Query("SELECT id, name, password_hash, roles, dbs FROM user")
 	rows, err := tx.Query("SELECT id, name, roles, dbs FROM user")
 	if err != nil {
-		tx.Rollback()
-		return res, fmt.Errorf("user db query failed : %v", err)
+		msg := fmt.Sprintf("user db query failed : %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		}
+		return res, fmt.Errorf(msg)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		u := User{}
-		rows.Scan(&u.ID, &u.Name /*&u.PasswordHash,*/, &u.Roles, &u.DBs)
+		err = rows.Scan(&u.ID, &u.Name /*&u.PasswordHash,*/, &u.Roles, &u.DBs)
+		if err != nil {
+			return res, err
+		}
 		res = append(res, u)
 	}
 
@@ -76,8 +83,12 @@ func (udb UserDB) GetUserByName(name string) (User, error) {
 	//err = tx.QueryRow("SELECT id, name, password_hash, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name, &res.PasswordHash, &res.Roles, &res.DBs)
 	err = tx.QueryRow("SELECT id, name, roles, dbs FROM user WHERE name = ?", strings.ToLower(name)).Scan(&res.ID, &res.Name /*&res.PasswordHash,*/, &res.Roles, &res.DBs)
 	if err != nil {
-		tx.Rollback()
-		return res, fmt.Errorf("GetUserByName failed to get user '%s' : %v", name, err)
+		msg := fmt.Sprintf("GetUserByName failed to get user '%s' : %v", name, err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err)
+		}
+		return res, fmt.Errorf(msg)
 	}
 
 	return res, nil
@@ -132,8 +143,12 @@ func (udb UserDB) InsertUser(u User, password string) error {
 	_, err = tx.Exec("INSERT INTO user (name, password_hash, roles, dbs) VALUES (?, ?, ?, ?)", name, string(passwordHash), u.Roles, u.DBs)
 
 	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("failed to insert user into db: %v", err)
+		msg := fmt.Sprintf("failed to insert user into db: %v", err)
+		err2 := tx.Rollback()
+		if err2 != nil {
+			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err)
+		}
+		return fmt.Errorf(msg)
 	}
 
 	return nil

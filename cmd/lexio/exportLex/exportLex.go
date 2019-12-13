@@ -41,7 +41,11 @@ func main() {
 
 	dbm := dbapi.NewDBManager()
 	dbRef := lex.DBRef(dbFile)
-	dbm.AddDB(dbRef, db)
+	err = dbm.AddDB(dbRef, db)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to add db to db manager : %v", err)
+		os.Exit(1)
+	}
 
 	lexRefs, err := dbm.ListLexicons()
 	lexNames := make(map[lex.LexName]bool)
@@ -83,9 +87,16 @@ func main() {
 		log.Fatal(err)
 	}
 	if *header {
-		bf.Write([]byte(fmt.Sprintf("#%s\n", wsFmt.Header())))
+		_, err := bf.Write([]byte(fmt.Sprintf("#%s\n", wsFmt.Header())))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "write error : %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	writer := line.FileWriter{Parser: wsFmt, Writer: bf}
-	dbm.LookUp(q, writer)
+	err = dbm.LookUp(q, writer)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to do lexicon lookup : %v\n", err)
+	}
 }

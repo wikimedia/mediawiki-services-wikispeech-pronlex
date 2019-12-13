@@ -180,7 +180,7 @@ func initFolders() error {
 	// If the upload area dir doesn't exist, create it
 	if _, err := os.Stat(uploadFileArea); err != nil {
 		if os.IsNotExist(err) {
-			err2 := os.Mkdir(uploadFileArea, 0755)
+			err2 := os.Mkdir(uploadFileArea, 0750)
 			if err2 != nil {
 				log.Printf("lexserver.init: failed to create %s : %v\n", uploadFileArea, err2)
 			}
@@ -192,7 +192,7 @@ func initFolders() error {
 	// If the download area dir doesn't exist, create it
 	if _, err := os.Stat(downloadFileArea); err != nil {
 		if os.IsNotExist(err) {
-			err2 := os.Mkdir(downloadFileArea, 0755)
+			err2 := os.Mkdir(downloadFileArea, 0750)
 			if err2 != nil {
 				log.Printf("lexserver.init: failed to create %s : %v\n", downloadFileArea, err2)
 			}
@@ -216,7 +216,7 @@ func initFolders() error {
 	// If the db dir doesn't exist, create it
 	if _, err := os.Stat(dbFileArea); err != nil {
 		if os.IsNotExist(err) {
-			err2 := os.Mkdir(dbFileArea, 0755)
+			err2 := os.Mkdir(dbFileArea, 0750)
 			if err2 != nil {
 				log.Printf("lexserver.init: failed to create %s : %v\n", dbFileArea, err2)
 			}
@@ -516,7 +516,8 @@ func messageToClientWebSock(clientUUID string, msg string) {
 	if strings.TrimSpace(clientUUID) != "" {
 		webSocks.Lock()
 		if ws, ok := webSocks.clients[clientUUID]; ok {
-			websocket.Message.Send(ws, msg)
+			err := websocket.Message.Send(ws, msg)
+			log.Printf("websocket send error : %v", err)
 		} else {
 			log.Printf("messageToClientWebSock called with unknown UUID string '%s'", clientUUID)
 		}
@@ -923,7 +924,7 @@ func createServer(port string) (*http.Server, error) {
 	rout.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(staticFolder))))
 
 	var urls = []string{}
-	rout.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+	errW := rout.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		url, err := route.GetPathTemplate()
 		if err != nil {
 			return err
@@ -936,6 +937,10 @@ func createServer(port string) (*http.Server, error) {
 		}
 		return nil
 	})
+
+	if errW != nil {
+		log.Printf("server failed to walk through route handlers : %v", err)
+	}
 
 	meta := newSubRouter(rout, "/meta", "Meta API calls (list served URLs, etc)")
 	meta.addHandler(metaURLsHandler(urls))

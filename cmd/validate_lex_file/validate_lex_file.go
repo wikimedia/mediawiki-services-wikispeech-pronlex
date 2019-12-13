@@ -73,5 +73,8 @@ SAMPLE INVOCATION:
 	log.Println("Validator created for " + validator.Name)
 
 	logger := dbapi.StdoutLogger{}
-	dbapi.ValidateLexiconFile(logger, inFile, validator, printMode)
+	err = dbapi.ValidateLexiconFile(logger, inFile, validator, printMode)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to validate lexicon file : %v", err)
+	}
 }

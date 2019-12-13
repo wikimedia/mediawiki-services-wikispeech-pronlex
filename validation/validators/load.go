@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -109,7 +110,7 @@ var commentRe = regexp.MustCompile("^ *[#/].*")
 func LoadValidatorFromFile(ss symbolset.SymbolSet, fName string) (validation.Validator, error) {
 	nilRes := validation.Validator{}
 	rules := []validation.Rule{}
-	fh, err := os.Open(fName)
+	fh, err := os.Open(filepath.Clean(fName))
 	if err != nil {
 		return nilRes, err
 	}

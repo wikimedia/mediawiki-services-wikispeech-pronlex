@@ -68,7 +68,10 @@ func NewWebSockLogger(websock *websocket.Conn) WebSockLogger {
 
 // Progress logs progress info
 func (l WebSockLogger) Progress(msg string) {
-	websocket.Message.Send(l.websock, msg)
+	err := websocket.Message.Send(l.websock, msg)
+	if err != nil {
+		fmt.Printf("websocket send error : %v", err)
+	}
 }
 
 // Write logs a message string
@@ -77,7 +80,7 @@ func (l WebSockLogger) Write(msg string) {
 	if err != nil { // ??
 		//log.Printf("failure to wite to websocket : %v", err)
 		//  TODO Is this where the err should go??
-		fmt.Printf("failure to wite to websocket : %v", err)
+		fmt.Printf("websocket send error : %v", err)
 	}
 
 }

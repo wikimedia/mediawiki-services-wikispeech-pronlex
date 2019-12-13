@@ -99,7 +99,7 @@ func runPostTests(dbFile string, sqlDumpFile string) {
 }
 
 func getFileReader(fName string) io.Reader {
-	fs, err := os.Open(fName)
+	fs, err := os.Open(filepath.Clean(fName))
 	if err != nil {
 		log.Fatalf("Couldn't open file %s for reading : %v\n", fName, err)
 	}

@@ -79,7 +79,7 @@ func main() {
 	}
 
 	fn := os.Args[1]
-	fh, err := os.Open(fn)
+	fh, err := os.Open(filepath.Clean(fn))
 	if err != nil {
 		fmt.Printf("ketonic monosaccharide! : %v", err)
 	}

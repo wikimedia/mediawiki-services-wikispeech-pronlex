@@ -160,7 +160,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	flags.Parse(os.Args[2:])
+	err := flags.Parse(os.Args[2:])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to parse command line arguments : %v\n", err)
+		os.Exit(1)
+	}
 
 	prettyPrint := true
 
