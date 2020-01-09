@@ -284,6 +284,7 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 				for _, v := range ee.EntryValidations {
 					out = append(out, fmt.Sprintf("#INVALID\t%#v", v.String()))
 				}
+				logger.Write(strings.Join(out, "\n"))
 			}
 
 			n++

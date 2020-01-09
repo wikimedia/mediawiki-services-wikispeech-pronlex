@@ -184,6 +184,7 @@ var validationValidateEntries = urlHandler{
 	},
 }
 
+//lint:ignore S1007 this regexp works so we don't want to change it now
 var trimWhitespaceRe = regexp.MustCompile("[\\s]+")
 
 func trimTranscriptions(e lex.Entry) lex.Entry {

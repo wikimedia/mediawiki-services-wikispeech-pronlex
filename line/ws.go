@@ -29,6 +29,8 @@ const commentDelim = " §§§ "
 const newline = "<br>"
 
 // EntryComment.String() : return fmt.Sprintf("[%s: %s] (%s)", c.Label, c.Comment, c.Source)
+
+//lint:ignore S1007 this regexp works so we don't want to change it now
 var commentRe = regexp.MustCompile("^\\[([^)]+): ([^\\]]+)\\] \\(([a-zåäö0-9_-]+)\\)$")
 
 func (ws WS) joinComments(comments []lex.EntryComment) (string, error) {

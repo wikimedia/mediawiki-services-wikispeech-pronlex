@@ -176,6 +176,7 @@ func testURLsWithContent(port string) (int, int, error) {
 
 func jsonMapTest(port string, url string, expect string) (bool, error) {
 	url = "http://localhost" + port + url
+	/* #nosec G107 */
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
@@ -215,6 +216,7 @@ func jsonMapTest(port string, url string, expect string) (bool, error) {
 
 func jsonTestBool(port string, url string, expect bool) (bool, error) {
 	url = "http://localhost" + port + url
+	/* #nosec G107 */
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
@@ -256,6 +258,7 @@ func contains(slice []string, item string) bool {
 
 func jsonListTestMustContain(port string, url string, expect []string) (bool, error) {
 	url = "http://localhost" + port + url
+	/* #nosec G107 */
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
@@ -296,6 +299,7 @@ func jsonListTestMustContain(port string, url string, expect []string) (bool, er
 
 func lookupTest(port string, url string, expect string) (bool, error) {
 	url = "http://localhost" + port + url
+	/* #nosec G107 */
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
@@ -345,6 +349,7 @@ func lookupTest(port string, url string, expect string) (bool, error) {
 
 func mustExistTest(port string, url string) (bool, error) {
 	url = "http://localhost" + port + url
+	/* #nosec G107 */
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)
@@ -368,6 +373,7 @@ func testExampleURLs(port string) (int, int, error) {
 	nFailed := 0
 	nTests := 0
 
+	/* #nosec G107 */
 	resp, err := http.Get("http://localhost" + port + "/meta/examples")
 	if err != nil {
 		return nFailed, nTests, fmt.Errorf("couldn't retrieve server's url examples : %v", err)
@@ -387,6 +393,7 @@ func testExampleURLs(port string) (int, int, error) {
 	for _, example := range res {
 		nTests = nTests + 1
 		url := "http://localhost" + port + urlEnc(example.URL)
+		/* #nosec G107 */
 		resp, err = http.Get(url)
 		if err != nil {
 			fmt.Printf("** FAILED TEST ** for %s : couldn't retrieve URL : %v\n", url, err)

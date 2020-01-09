@@ -209,6 +209,7 @@ func main() {
 		log.Fatalf("Cannot import sql dump into pre-existing database. Db file already exists: %s\n", dbFile)
 	}
 
+	/* #nosec G204 */
 	sqliteCmd := exec.Command(sqlitePath, dbFile)
 	stdin := sqlDumpFile
 	sqliteCmd.Stdin = getFileReader(stdin)

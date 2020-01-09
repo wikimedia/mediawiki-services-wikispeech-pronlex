@@ -79,6 +79,7 @@ func main() {
 	}
 	defer cmuFile.Close()
 
+	//lint:ignore S1007 this regexp works so we don't want to change it now
 	var variant = regexp.MustCompile("\\([0-9]\\)")
 	lastEntry := lex.Entry{}
 
