@@ -7,6 +7,18 @@ The Entry struct is defined here: https://godoc.org/github.com/stts-se/pronlex/l
 
 A few JSON examples:
 
+   // Minimal example (English)
+   {
+      strn: "things",
+      transcriptions: [
+      {
+         strn: "' T I N z"
+      }
+      ]
+   }
+
+
+
    // Entry "things" from the CMU (US English) lexicon
    {
       id: 112326,
