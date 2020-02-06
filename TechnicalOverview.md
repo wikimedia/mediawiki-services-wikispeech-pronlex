@@ -10,7 +10,7 @@ An entry can be converted to and from JSON.
 
 ### Architecture
 
-The `pronlex` package consists of a lexicon database and a lexicon server, plus some additional helper modules. The server is written in [`Go`](https://golang.org) (version 1.13 or higher).
+The `pronlex` package consists of a lexicon database and a lexicon server, plus some additional helper modules. The server is written in [`Go`](https://golang.org).
 
 The lexicon server has an HTTP Rest API. More information about the HTTP API can be found below.
 
