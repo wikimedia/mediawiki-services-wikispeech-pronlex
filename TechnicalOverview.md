@@ -10,9 +10,9 @@ An entry can be converted to and from JSON.
 
 ### Architecture
 
-The `pronlex` package consists of a lexicon database and a lexicon server, plus some additional helper modules. The server is written in [`golang`](https://golang.org), supporting `go 1.13` or higher.
+The `pronlex` package consists of a lexicon database and a lexicon server, plus some additional helper modules. The server is written in [`Go`](https://golang.org) (version 1.13 or higher).
 
-The lexicon server has an HTTP Rest API (more information about the API can be found below).
+The lexicon server has an HTTP Rest API. More information about the HTTP API can be found below.
 
 The lexicon database stores entries in a relational database, [Sqlite3](https://sqlite.org/index.html). The SQL schema --- the definition of the database structure --- is a string constant found in the file [schema.go](https://github.com/stts-se/pronlex/blob/master/dbapi/schema.go).
 
