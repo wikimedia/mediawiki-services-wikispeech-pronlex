@@ -118,6 +118,9 @@ If you are developing for Wikispeech, and need to make changes to this repositor
 <!-- Wikimedia's installation instructions for Wikispeech: https://www.mediawiki.org/wiki/Extension:Wikispeech-->
 
 
+---
+
+
 ## Overview
 
 The basic function of `pronlex` is to store and retrieve lexical _entries_. An entry consist of a word form, along with a phonetic transcription, a status, a database and lexicon name, and possibly additional values.
