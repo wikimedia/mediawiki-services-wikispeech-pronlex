@@ -130,9 +130,32 @@ A code version of an entry is defined in [lex.Entry](https://github.com/stts-se/
 
 An entry can be converted to and from JSON.
 
+
+### HTTP API
+
+There is an HTTP server for the pronlex database. A documentation of the HTTP API can be accessed once the server is started (default address: http://localhost:8787).
+
+The most important API URLs can be found in the list below. For more information, and a complete list of API calls, please see the full documentation using local running lexicon server.
+
+* /lexicon/list
+* /lexicon/lookup
+* /lexicon/entries_exist
+* /lexicon/info/{lexicon_name}
+* /lexicon/stats/{lexicon_name}
+* /lexicon/updateentry
+* /lexicon/addentry
+* /lexicon/delete_entry/{lexicon_name}/{entry_id}
+* /admin/list_dbs
+* /admin/create_db/{db_name}
+* /admin/define_lex/{lexicon_name}/{locale}/{symbolset_name}
+* /admin/deletelexicon/{lexicon_name}
+* /admin/superdeletelexicon/{lexicon_name}
+
+
+
 ### Database
 
-The entries are ultimately stored in a relational database, Sqlite3. The SQL schema --- the definition of the database structure --- is a string constant found in the following [file](https://github.com/stts-se/pronlex/blob/master/dbapi/schema.go).
+The entries are ultimately stored in a relational database, Sqlite3. The SQL schema --- the definition of the database structure --- is a string constant found in the file [schema.go](https://github.com/stts-se/pronlex/blob/master/dbapi/schema.go).
 
 
 ### Database API
@@ -156,11 +179,6 @@ Such a query struct can be converted to and from JSON.
 A query from the dbapi is converted to a SQL query string. This happens in [sql_gen.go](https://github.com/stts-se/pronlex/blob/master/dbapi/sql_gen.go).
 
 The query string is then used to retrieve entries using functions in `dbapi`. 
-
-
-### HTTP API
-
-There is an HTTP server for the pronlex database. A more extensive documentation of the HTTP API can be accessed once the server is started (default address: http://localhost:8787).
 
 
 ### Helper commands
