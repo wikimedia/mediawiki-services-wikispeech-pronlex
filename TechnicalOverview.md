@@ -8,6 +8,16 @@ A code version of an entry is defined in [lex.Entry](https://github.com/stts-se/
 An entry can be converted to and from JSON.
 
 
+### Architecture
+
+The `pronlex` package consists of a lexicon database and a lexicon server, plus some additional helper modules. The server is written in [`golang`](https://golang.org), supporting `go 1.13` or higher.
+
+The lexicon server has an HTTP Rest API (more information about the API can be found below).
+
+The lexicon database stores entries in a relational database, [Sqlite3](https://sqlite.org/index.html). The SQL schema --- the definition of the database structure --- is a string constant found in the file [schema.go](https://github.com/stts-se/pronlex/blob/master/dbapi/schema.go).
+
+
+
 ### HTTP API
 
 There is an HTTP server for the pronlex database. A documentation of the HTTP API can be accessed once the server is started (default address: http://localhost:8787).
@@ -29,10 +39,6 @@ The most important API URLs can be found in the list below. For more information
 * /admin/superdeletelexicon/{lexicon_name}
 
 
-
-### Database
-
-The entries are ultimately stored in a relational database, Sqlite3. The SQL schema --- the definition of the database structure --- is a string constant found in the file [schema.go](https://github.com/stts-se/pronlex/blob/master/dbapi/schema.go).
 
 
 ### Database API
@@ -78,3 +84,5 @@ There are stand-alone commands for managing the lexicon database. These are loca
 
  * Import an sql dump to a database:
 `gunzip -c <sqlDumpFile> | sqlite3 <dbFile>`
+
+
