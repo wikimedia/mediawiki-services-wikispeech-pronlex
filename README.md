@@ -116,3 +116,50 @@ If you are developing for Wikispeech, and need to make changes to this repositor
 
 
 <!-- Wikimedia's installation instructions for Wikispeech: https://www.mediawiki.org/wiki/Extension:Wikispeech-->
+
+
+## Overview
+
+The basic function of `pronlex` is to store and retrieve lexical _entries_. An entry consist of a word form, along with a phonetic transcription, a status, a database and lexicon name, and possibly additional values.
+
+A code version of an entry is defined in  [[lex.Entry]](https://github.com/stts-se/pronlex/blob/master/lex/entry.go). Documentation is is available [[here]](https://godoc.org/github.com/stts-se/pronlex/lex).
+
+
+An entry can be converted to and from JSON.
+
+### Database
+
+The entries are ultimately stored in a relational database, Sqlite3. The SQL schema --- the definition of the database structure --- is a string constant found in the following [[file]](https://github.com/stts-se/pronlex/blob/master/dbapi/schema.go).
+
+
+### Database API
+
+
+The database can be called using a set of functions defined in the database manager, [[dbapi.DBManager]](https://github.com/stts-se/pronlex/blob/master/dbapi/db_manager.go).
+
+Internally, the database interaction is performed using functions defined in  [[dbapi.go]](https://github.com/stts-se/pronlex/blob/master/dbapi/dbapi.go).
+
+
+The database can be queried through the `DBManager` using a query struct, [[dbapi.DBMQuery]]((https://github.com/stts-se/pronlex/blob/master/dbapi/db_manager.go))
+
+
+The DBMQuery contains the reference to a lexicon and the actual [[dbapi.Query]]((https://godoc.org/github.com/stts-se/pronlex/dbapi#Query)).
+
+Such a query struct can be converted to and from JSON.
+
+
+### Database queries
+
+A query from the dbapi is converted to a SQL query string. This happens in [[sql_gen.go]](https://github.com/stts-se/pronlex/blob/master/dbapi/sql_gen.go).
+
+The query string is then used to retrieve entries using functions in `dbapi`. 
+
+
+### HTTP API
+
+There is an HTTP server for the pronlex database.
+
+
+### Helper commands
+
+There are stand-alone commands for managing the lexicon database.
