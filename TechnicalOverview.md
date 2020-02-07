@@ -57,6 +57,10 @@ The DBMQuery contains the reference to a lexicon and the actual [dbapi.Query](ht
 Such a query struct can be converted to and from JSON.
 
 
+### Database structure
+
+TODO: Overview of the database tables and basic constraints
+
 ### Database queries
 
 A query from the dbapi is converted to a SQL query string. This happens in [sql_gen.go](https://github.com/stts-se/pronlex/blob/master/dbapi/sql_gen.go).
