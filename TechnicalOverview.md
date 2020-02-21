@@ -22,6 +22,9 @@ The lexicon database stores entries in a relational database, [Sqlite3](https://
 
 There is an HTTP server for the pronlex database. A documentation of the HTTP API can be accessed once the server is started (default address: http://localhost:8787).
 
+Core API call for (readonly) TTS usage:
+* /lexicon/lookup
+
 The most important API URLs can be found in the list below. For more information, and a complete list of API calls, please see the full documentation using local running lexicon server.
 
 * /lexicon/list
