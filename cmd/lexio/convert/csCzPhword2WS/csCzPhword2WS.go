@@ -133,7 +133,7 @@ func main() {
 			hasError = true
 		}
 
-		e := lex.Entry{Strn: w, Transcriptions: []lex.Transcription{lex.Transcription{Strn: t}}}
+		e := lex.Entry{Strn: w, Transcriptions: []lex.Transcription{{Strn: t}}}
 
 		e.EntryStatus.Name = "imported"
 		e.EntryStatus.Source = "phword"

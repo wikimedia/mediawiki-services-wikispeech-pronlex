@@ -1050,11 +1050,11 @@ func Test_UpdateComments(t *testing.T) {
 		Language:     "XYZZ",
 		Preferred:    true,
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{Strn: "A: p a", Language: "Svetsko"},
-			lex.Transcription{Strn: "a pp a", Language: "svinspråket"},
+			{Strn: "A: p a", Language: "Svetsko"},
+			{Strn: "a pp a", Language: "svinspråket"},
 		},
 		Comments: []lex.EntryComment{
-			lex.EntryComment{Label: "label1", Source: "anon", Comment: "strålande 1"},
+			{Label: "label1", Source: "anon", Comment: "strålande 1"},
 		},
 		EntryStatus: lex.EntryStatus{Name: "old1", Source: "tst"}}
 
@@ -1075,7 +1075,7 @@ func Test_UpdateComments(t *testing.T) {
 	added := addeds.Entries[0]
 
 	added.Comments = []lex.EntryComment{
-		lex.EntryComment{Label: "label2", Source: "anon", Comment: "strålande 2"},
+		{Label: "label2", Source: "anon", Comment: "strålande 2"},
 	}
 	newE, updated, err := updateEntry(db, added)
 
@@ -1141,15 +1141,15 @@ func Test_ValidationRuleLike(t *testing.T) {
 		Language:     "XYZZ",
 		Preferred:    true,
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{Strn: "A: p a", Language: "Svetsko"},
-			lex.Transcription{Strn: "a pp a", Language: "svinspråket"},
+			{Strn: "A: p a", Language: "Svetsko"},
+			{Strn: "a pp a", Language: "svinspråket"},
 		},
 		Comments: []lex.EntryComment{
-			lex.EntryComment{Label: "label1", Source: "anon", Comment: "strålande 1"},
+			{Label: "label1", Source: "anon", Comment: "strålande 1"},
 		},
 		EntryStatus: lex.EntryStatus{Name: "old1", Source: "tst"},
 		EntryValidations: []lex.EntryValidation{
-			lex.EntryValidation{RuleName: "rule1", Level: "fatal", Message: "nizze"},
+			{RuleName: "rule1", Level: "fatal", Message: "nizze"},
 		},
 	}
 
@@ -1160,15 +1160,15 @@ func Test_ValidationRuleLike(t *testing.T) {
 		Language:     "XYZZ",
 		Preferred:    true,
 		Transcriptions: []lex.Transcription{
-			lex.Transcription{Strn: "A: p a", Language: "Svetsko"},
-			lex.Transcription{Strn: "a pp a", Language: "svinspråket"},
+			{Strn: "A: p a", Language: "Svetsko"},
+			{Strn: "a pp a", Language: "svinspråket"},
 		},
 		Comments: []lex.EntryComment{
-			lex.EntryComment{Label: "label1", Source: "anon", Comment: "strålande 1"},
+			{Label: "label1", Source: "anon", Comment: "strålande 1"},
 		},
 		EntryStatus: lex.EntryStatus{Name: "old1", Source: "tst"},
 		EntryValidations: []lex.EntryValidation{
-			lex.EntryValidation{RuleName: "rule2", Level: "fatal", Message: "nizze"},
+			{RuleName: "rule2", Level: "fatal", Message: "nizze"},
 		},
 	}
 
