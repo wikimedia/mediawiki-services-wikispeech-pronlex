@@ -1,7 +1,7 @@
 # pronlex
 pronlex is a pronunciation lexicon database with a server behind a simple HTTP API.
 
-[![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://godoc.org/github.com/stts-se/pronlex)
+[![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://pkg.go.dev/github.com/stts-se/pronlex/symbolset)
 [![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex) [![Build Status](https://travis-ci.org/stts-se/pronlex.svg?branch=master)](https://travis-ci.org/stts-se/pronlex)
 
 
