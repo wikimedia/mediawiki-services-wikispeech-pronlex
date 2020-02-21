@@ -11,7 +11,7 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/symbolset/mapper"
 	"github.com/stts-se/pronlex/validation/rules"
 	"github.com/stts-se/rbg2p"
 )
@@ -58,7 +58,7 @@ func main() {
 	ssFileName2 := os.Args[3]
 	syllRuleFile := os.Args[4]
 
-	mapper, err := symbolset.LoadMapperFromFile("CMU", "SYMBOL", ssFileName1, ssFileName2)
+	mapper, err := mapper.LoadMapperFromFile("CMU", "SYMBOL", ssFileName1, ssFileName2)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return

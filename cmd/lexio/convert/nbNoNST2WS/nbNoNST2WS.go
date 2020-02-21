@@ -11,7 +11,7 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/symbolset/mapper"
 	"github.com/stts-se/pronlex/validation/rules"
 )
 
@@ -139,7 +139,7 @@ func main() {
 	ssFileName1 := os.Args[2]
 	ssFileName2 := os.Args[3]
 
-	mapper, err := symbolset.LoadMapperFromFile("SAMPA", "SYMBOL", ssFileName1, ssFileName2)
+	mapper, err := mapper.LoadMapperFromFile("SAMPA", "SYMBOL", ssFileName1, ssFileName2)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "couldn't load mappers: %v\n", err)
 		return

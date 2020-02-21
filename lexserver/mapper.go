@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/pronlex/symbolset/mapper"
 	//"os"
 	"encoding/json"
 	"strings"
@@ -18,11 +19,11 @@ import (
 
 var mMut = struct {
 	sync.RWMutex
-	service symbolset.MapperService
+	service mapper.Service
 }{
-	service: symbolset.MapperService{
+	service: mapper.Service{
 		SymbolSets: make(map[string]symbolset.SymbolSet),
-		Mappers:    make(map[string]symbolset.Mapper),
+		Mappers:    make(map[string]mapper.Mapper),
 	},
 }
 

@@ -1,16 +1,17 @@
-package symbolset
+package mapper
 
 import (
 	"fmt"
 
 	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/pronlex/symbolset"
 )
 
 // Mapper is a struct for package private usage. To create a new instance of Mapper, use LoadMapper.
 type Mapper struct {
 	Name       string
-	SymbolSet1 SymbolSet
-	SymbolSet2 SymbolSet
+	SymbolSet1 symbolset.SymbolSet
+	SymbolSet2 symbolset.SymbolSet
 }
 
 // MapTranscription maps one input transcription string into the new symbol set.
@@ -27,11 +28,11 @@ func (m Mapper) MapTranscription(input string) (string, error) {
 }
 
 // MapSymbol maps one input transcription symbol into the new symbol set.
-func (m Mapper) MapSymbol(input Symbol) (Symbol, error) {
+func (m Mapper) MapSymbol(input symbolset.Symbol) (symbolset.Symbol, error) {
 	ipa := input.IPA.String
-	res, err := m.SymbolSet2.getFromIPA(ipa)
+	res, err := m.SymbolSet2.GetFromIPA(ipa)
 	if err != nil {
-		return Symbol{}, fmt.Errorf("couldn't map symbol : %v", err)
+		return symbolset.Symbol{}, fmt.Errorf("couldn't map symbol : %v", err)
 	}
 	return res, nil
 }
@@ -42,7 +43,7 @@ func (m Mapper) MapSymbolString(input string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("couldn't map transcription : %v", err)
 	}
-	res, err = m.SymbolSet2.getFromIPA(res.IPA.String)
+	res, err = m.SymbolSet2.GetFromIPA(res.IPA.String)
 	if err != nil {
 		return "", fmt.Errorf("couldn't map transcription : %v", err)
 	}
