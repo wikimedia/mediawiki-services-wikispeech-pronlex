@@ -1,9 +1,6 @@
 *~
 *.db
 
-OLDdecompounder/test_word_parts_out.txt
-lexserver/user_db/test_server/node_modules/
-lexserver/user_db/test_server/package.json
 Gopkg.lock
 pronlex.log
 
