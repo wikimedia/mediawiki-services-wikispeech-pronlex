@@ -96,8 +96,8 @@ There are stand-alone commands for managing the lexicon database. These are loca
 ### List of additional modules and features
 
 * symbolset - phonetic symbol sets are defined per lexicon, and can be used for validation
-* symbolset mapper - component to convert between different phonetic symbol sets in the same language
-* converter - component to convert transcription between different languages
+  - symbolset mapper - component to convert between different phonetic symbol sets in the same language
+  - converter - component to convert transcription between different languages
 * validation - validation components can be created to validate lexicon entries for various issues
   - phonetic symbols
   - transcription format
@@ -105,9 +105,11 @@ There are stand-alone commands for managing the lexicon database. These are loca
   - syllable boundaries
   - sanity checks
   - etc
-* lexicon data conversion (for more information, see the [lexdata](https://github.com/stts-se/lexdata)) repository
-  - CMU2WS - CMU US English
-  - csCzPhword2WS - Czech dictionary
-  - nbNoNST2WS - NST Norwegian bokmål
-  - svSeNST2WS - NST Swedish
+* lexicon format definitions
+  - default Wikispeech lexicon format
+  - data conversion (for more information, see the [lexdata](https://github.com/stts-se/lexdata)) repository
+    - CMU2WS - CMU US English
+    - csCzPhword2WS - Czech dictionary
+    - nbNoNST2WS - NST Norwegian bokmål
+    - svSeNST2WS - NST Swedish
 * admin - various admin tools apart from those listed above
