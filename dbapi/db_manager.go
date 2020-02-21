@@ -517,7 +517,7 @@ func (dbm *DBManager) InsertEntries(lexRef lex.LexRef, entries []lex.Entry) ([]i
 	return res, err
 }
 
-// UpdateValidation
+// UpdateValidation using the cached validation in the specified lex.Entry
 func (dbm *DBManager) UpdateValidation(e lex.Entry) error {
 	dbm.Lock()
 	defer dbm.Unlock()
@@ -632,7 +632,7 @@ func (dbm *DBManager) ListCurrentEntryStatuses(lexRef lex.LexRef) ([]string, err
 	return listCurrentEntryStatuses(db, string(lexRef.LexName))
 }
 
-// ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status), and the frequency for each status.
+// ListCurrentEntryStatusesWithFreq returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status), and the frequency for each status.
 func (dbm *DBManager) ListCurrentEntryStatusesWithFreq(lexRef lex.LexRef) (map[string]int, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
