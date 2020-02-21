@@ -37,6 +37,10 @@ type JSONIPA struct {
 	Unicode string
 }
 
+func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
+	return symbolset.LoadSymbolSet(fName)
+}
+
 var symbolsetContent = urlHandler{
 	name:     "content",
 	url:      "/content/{name}",

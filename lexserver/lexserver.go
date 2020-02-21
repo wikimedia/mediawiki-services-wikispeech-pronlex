@@ -10,7 +10,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
 	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"log"
@@ -606,10 +605,6 @@ func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 */
-func loadSymbolSetFile(fName string) (symbolset.SymbolSet, error) {
-	return symbolset.LoadSymbolSet(fName)
-}
-
 func isStaticPage(url string) bool {
 	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt" || url == "/ping" || url == "/version"
 }
