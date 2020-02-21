@@ -1,9 +1,7 @@
-/*Package symbolset is used to define symbol sets and mapping between different sets, such as NST-SAMPA to Wikispeech-SAMPA, IPA to SAMPA, and so on.
+/*Package symbolset is used to define symbol sets, such as NST-SAMPA, Wikispeech-SAMPA, and so on.
 
 Each symbol set is defined in a .sym file including each symbol's corresponding IPA representation:
      DESCRIPTION          SYMBOL   IPA	 IPA UNICODE          CATEGORY
-
-Using the IPA definition, it is possible to map between symbol sets that share the same list of IPA symbols (or if the left hand symbol is a subset of the right hand symbol set). The code for the mapper is found in the child package 'mapper'.
 
 Sample lines (Swedish Wikispeech SAMPA):
      DESCRIPTION          SYMBOL   IPA	 IPA UNICODE          CATEGORY
