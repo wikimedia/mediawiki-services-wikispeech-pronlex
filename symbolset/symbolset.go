@@ -207,7 +207,6 @@ func (ss SymbolSet) SplitIPATranscription(input string) ([]string, error) {
 
 // ConvertToIPA maps one input transcription string into an IPA transcription
 func (ss SymbolSet) ConvertToIPA(trans string) (string, error) {
-	res := trans
 	res, err := preFilter(ss, trans, ss.Type)
 	if err != nil {
 		return "", err

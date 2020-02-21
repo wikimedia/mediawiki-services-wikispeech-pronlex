@@ -536,7 +536,7 @@ func webSockRegHandler(ws *websocket.Conn) {
 			log.Printf("webSockRegHandler error : %v\n", err)
 			log.Printf("webSockRegHandler removing socket with id %s", id)
 			deleteWebSocketClient(id)
-			id = ""
+			//id = ""
 			break
 		}
 
@@ -560,7 +560,7 @@ func webSockRegHandler(ws *websocket.Conn) {
 		if err != nil {
 			log.Printf("webSockRegHandler error : %v\n", err)
 			deleteWebSocketClient(id)
-			id = ""
+			//id = ""
 			break
 		}
 	}

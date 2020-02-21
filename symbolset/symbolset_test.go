@@ -232,7 +232,7 @@ func Test_ValidSymbol1(t *testing.T) {
 		return
 	}
 
-	var phn = ""
+	var phn string
 
 	phn = "a"
 	if !ss.ValidSymbol(phn) {
