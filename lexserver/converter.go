@@ -35,13 +35,13 @@ var converterConvert = urlHandler{
 		convName := getParam("converter", r)
 		trans := trimTrans(getParam("trans", r))
 		if len(strings.TrimSpace(convName)) == 0 {
-			msg := fmt.Sprintf("converter name should be specified by variable 'converter'")
+			msg := "converter name should be specified by variable 'converter'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 		if len(strings.TrimSpace(trans)) == 0 {
-			msg := fmt.Sprintf("input trans should be specified by variable 'trans'")
+			msg := "input trans should be specified by variable 'trans'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
@@ -97,7 +97,7 @@ var converterTable = urlHandler{
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		convName := getParam("converter", r)
 		if len(strings.TrimSpace(convName)) == 0 {
-			msg := fmt.Sprintf("converter name should be specified by variable 'converter'")
+			msg := "converter name should be specified by variable 'converter'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return

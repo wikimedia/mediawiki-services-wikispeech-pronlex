@@ -45,7 +45,7 @@ var symbolsetContent = urlHandler{
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		name := getParam("name", r)
 		if len(strings.TrimSpace(name)) == 0 {
-			msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
+			msg := "symbol set should be specified by variable 'name'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
@@ -168,7 +168,7 @@ var symbolsetDelete = urlHandler{
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		name := getParam("name", r)
 		if len(strings.TrimSpace(name)) == 0 {
-			msg := fmt.Sprintf("symbol set should be specified by variable 'name'")
+			msg := "symbol set should be specified by variable 'name'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return

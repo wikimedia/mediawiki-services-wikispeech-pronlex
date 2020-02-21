@@ -51,19 +51,19 @@ var mapperMap = urlHandler{
 		toName := getParam("to", r)
 		trans := trimTrans(getParam("trans", r))
 		if len(strings.TrimSpace(fromName)) == 0 {
-			msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
+			msg := "input symbol set should be specified by variable 'from'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 		if len(strings.TrimSpace(toName)) == 0 {
-			msg := fmt.Sprintf("output symbol set should be specified by variable 'to'")
+			msg := "output symbol set should be specified by variable 'to'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 		if len(strings.TrimSpace(trans)) == 0 {
-			msg := fmt.Sprintf("input trans should be specified by variable 'trans'")
+			msg := "input trans should be specified by variable 'trans'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
@@ -114,13 +114,13 @@ var mapperMaptable = urlHandler{
 		fromName := getParam("from", r)
 		toName := getParam("to", r)
 		if len(strings.TrimSpace(fromName)) == 0 {
-			msg := fmt.Sprintf("input symbol set should be specified by variable 'from'")
+			msg := "input symbol set should be specified by variable 'from'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 		if len(strings.TrimSpace(toName)) == 0 {
-			msg := fmt.Sprintf("output symbol set should be specified by variable 'to'")
+			msg := "output symbol set should be specified by variable 'to'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return

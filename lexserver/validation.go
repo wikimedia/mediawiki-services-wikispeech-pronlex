@@ -260,7 +260,7 @@ var validationHasValidator = urlHandler{
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		symbolSet := getParam("symbolset", r)
 		if len(strings.TrimSpace(symbolSet)) == 0 {
-			msg := fmt.Sprintf("symbol set should be specified by variable 'symbolset'")
+			msg := "symbol set should be specified by variable 'symbolset'"
 			log.Println(msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 			return

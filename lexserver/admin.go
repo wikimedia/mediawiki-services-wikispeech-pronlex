@@ -24,7 +24,7 @@ func deleteUploadedFile(serverPath string) {
 		msg := fmt.Sprintf("couldn't delete temp file from server : %v", err)
 		log.Println(msg)
 	} else {
-		msg := fmt.Sprint("the uploaded temp file has been deleted from server")
+		msg := "the uploaded temp file has been deleted from server"
 		log.Println(msg)
 	}
 }
