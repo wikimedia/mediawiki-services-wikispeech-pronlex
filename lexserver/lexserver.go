@@ -155,9 +155,9 @@ func protect(w http.ResponseWriter) {
 // TODO should go into config file
 var uploadFileArea string // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
 //var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
-var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
-var dbFileArea string        // = filepath.Join(".", "db_files")
-var staticFolder string      // = "."
+//var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
+var dbFileArea string   // = filepath.Join(".", "db_files")
+var staticFolder string // = "."
 
 // TODO config stuff
 func initFolders() error {
@@ -617,7 +617,7 @@ func main() {
 	vInfo = getVersionInfo()
 
 	var test = flag.Bool("test", false, "run server tests")
-	var ssFiles = flag.String("ss_files", filepath.Join(".", "symbol_sets"), "location for symbol set files")
+	//var ssFiles = flag.String("ss_files", filepath.Join(".", "symbol_sets"), "location for symbol set files")
 	var dbFiles = flag.String("db_files", filepath.Join(".", "db_files"), "location for db files")
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var help = flag.Bool("help", false, "print usage/help and exit")
@@ -629,7 +629,6 @@ func main() {
 
 Flags:
      -test       bool    run server tests and exit (default: false)
-     -ss_files   string  location for symbol set files (default: symbol_sets)
      -db_files   string  location for db files (default: db_files)
      -static     string  location for static html files (default: ./)
 
@@ -661,7 +660,7 @@ Default ports:
 		port = ":" + port
 	}
 
-	symbolSetFileArea = *ssFiles
+	//symbolSetFileArea = *ssFiles
 	dbFileArea = *dbFiles
 	staticFolder = *static
 

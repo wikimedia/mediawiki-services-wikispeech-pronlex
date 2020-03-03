@@ -58,5 +58,6 @@ APPDIRABS=`readlink -f $APPDIR`
 
 
 CMDDIR="$PRONLEXPATH/lexserver"
-switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
+#switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
+switches="-db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
 cd $PRONLEXPATH/lexserver && go run *.go $switches -test && go run *.go $switches $PORT

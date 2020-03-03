@@ -70,7 +70,8 @@ APPDIRABS=`readlink -f $APPDIR`
 CMDDIR="$PRONLEXPATH/lexserver"
 
 
-switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
+#switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
+switches="-db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
 
 echo "[$CMD] Go binaries: $gobinaries" >&2
 if [ $gobinaries -eq 1 ]; then
