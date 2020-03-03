@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
+	"github.com/stts-se/symbolset"
 )
 
 // ValidatorService is a container for maintaining 'cached' mappers and their symbol sets. Please note that currently, ValidatorService need to be used as mutex, see lexserver/validation.go

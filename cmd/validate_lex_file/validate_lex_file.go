@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/validation/validators"
+	"github.com/stts-se/symbolset"
 )
 
 var vServ = validators.ValidatorService{Validators: make(map[string]*validation.Validator)}

@@ -10,7 +10,7 @@ import (
 
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/symbolset"
 )
 
 var fs = "Wanted: '%v' got: '%v'"

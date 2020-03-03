@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
+	"github.com/stts-se/symbolset"
 	//"github.com/mattn/go-sqlite3"
 	"log"
 	"os"
@@ -692,7 +692,7 @@ func Test_unique(t *testing.T) {
 
 func Test_ImportLexiconFile(t *testing.T) {
 
-	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.sym")
+	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -781,7 +781,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 
-	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.sym")
+	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -876,8 +876,7 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 
 func Test_ImportLexiconFileInvalid(t *testing.T) {
 
-	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.sym")
-	//ssMapper, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.sym")
+	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -925,7 +924,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 
 func Test_ImportLexiconFileGz(t *testing.T) {
 
-	symbolSet, err := symbolset.LoadSymbolSet("./../symbolset/test_data/sv-se_ws-sampa.sym")
+	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
 		log.Fatal(err)
 	}

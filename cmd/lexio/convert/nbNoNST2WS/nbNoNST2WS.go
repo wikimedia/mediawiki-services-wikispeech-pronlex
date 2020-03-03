@@ -11,8 +11,8 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/symbolset/mapper"
 	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/symbolset/mapper"
 )
 
 var sucTags = map[string]bool{
@@ -171,17 +171,17 @@ func main() {
 			fmt.Fprintf(os.Stderr, "general error	failed reading line %v : %v\n", n, err)
 			hasError = true
 		}
-		line := nst.Text()
+		l := nst.Text()
 
-		e, origOrth, err := nstFmt.ParseToEntry(line)
+		e, origOrth, err := nstFmt.ParseToEntry(l)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "general error	failed to convert line %v to entry : %v\n", n, err)
-			fmt.Fprintf(os.Stderr, "general error	failing line: %v\n", line)
+			fmt.Fprintf(os.Stderr, "general error	failing line: %v\n", l)
 			hasError = true
 		}
 
-		if removableLine(origOrth, line, e) {
-			fmt.Fprintf(os.Stderr, "skipping line	%v\n", line)
+		if removableLine(origOrth, l, e) {
+			fmt.Fprintf(os.Stderr, "skipping line	%v\n", l)
 			continue
 		}
 
@@ -202,7 +202,7 @@ func main() {
 			hasError = true
 		}
 
-		err = mapper.MapTranscriptions(&e)
+		err = line.MapTranscriptions(mapper, &e)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "transcription error	failed to map transcription symbols : %v\n", err)
 			hasError = true

@@ -13,6 +13,8 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stts-se/rbg2p v0.0.0-20191115130802-805ea7ee44a8 h1:djLExbCcModM/knM90+9no9GOugIPxf/lg0kWSdj8NU=
 github.com/stts-se/rbg2p v0.0.0-20191115130802-805ea7ee44a8/go.mod h1:kXZus3aYYrQn7HM0qQN65rBB7IygFiENl+9Z3qExKao=
+github.com/stts-se/symbolset v0.0.0-20200302153131-3d9af51fc645 h1:fHAyZYMiKfEMRArK/C8+VjuQj6KqwSduyV9qsEFkuKY=
+github.com/stts-se/symbolset v0.0.0-20200302153131-3d9af51fc645/go.mod h1:dnvfF7FrV3RJ2Rq7HlOMpGouNAMz1wo8QlJhIpzeUBg=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20191112222119-e1110fd1c708 h1:pXVtWnwHkrWD9ru3sDxY/qFK/bfc0egRovX91EjWjf4=
 golang.org/x/crypto v0.0.0-20191112222119-e1110fd1c708/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=

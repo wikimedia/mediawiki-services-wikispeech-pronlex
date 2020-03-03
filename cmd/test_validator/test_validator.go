@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation/validators"
+	"github.com/stts-se/symbolset"
 )
 
 func main() {

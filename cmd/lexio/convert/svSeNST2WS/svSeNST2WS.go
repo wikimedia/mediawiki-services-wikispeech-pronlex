@@ -11,8 +11,8 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/symbolset/mapper"
 	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/symbolset/mapper"
 )
 
 var sucTags = map[string]bool{
@@ -158,7 +158,7 @@ func testMapTranscriptions() {
 
 func mapTranscriptions(e *lex.Entry, mapper mapper.Mapper) error {
 
-	err := mapper.MapTranscriptions(e)
+	err := line.MapTranscriptions(mapper, e)
 	if err != nil {
 		return err
 	}

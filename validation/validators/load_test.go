@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/symbolset"
 )
 
 func ss_for_test(name string) (symbolset.SymbolSet, error) {

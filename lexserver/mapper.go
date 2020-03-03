@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/stts-se/pronlex/symbolset"
-	"github.com/stts-se/pronlex/symbolset/mapper"
+	"github.com/stts-se/symbolset"
+	"github.com/stts-se/symbolset/mapper"
 	//"os"
 	"encoding/json"
 	"strings"

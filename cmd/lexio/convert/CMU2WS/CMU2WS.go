@@ -11,9 +11,9 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
-	"github.com/stts-se/pronlex/symbolset/mapper"
 	"github.com/stts-se/pronlex/validation/rules"
 	"github.com/stts-se/rbg2p"
+	"github.com/stts-se/symbolset/mapper"
 )
 
 var ws, errrr = line.NewWS()

@@ -2,8 +2,8 @@ package rules
 
 import (
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
+	"github.com/stts-se/symbolset"
 )
 
 func NewRequiredTransRe(ss symbolset.SymbolSet, name string, level string, re string, msg string, accept []lex.Entry, reject []lex.Entry) (validation.Rule, error) {

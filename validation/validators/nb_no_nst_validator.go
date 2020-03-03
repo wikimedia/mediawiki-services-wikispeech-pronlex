@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/dlclark/regexp2"
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/symbolset"
 )
 
 func newNbNoNstValidator(symbolset symbolset.SymbolSet) (validation.Validator, error) {

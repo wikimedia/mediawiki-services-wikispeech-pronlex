@@ -11,9 +11,9 @@ import (
 
 	"github.com/dlclark/regexp2"
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/symbolset"
 )
 
 var vfs = "Wanted: '%v' got: '%v'"

@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/symbolset"
 )
 
 // JSONSymbolSet : JSON container

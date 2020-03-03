@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
+	"github.com/stts-se/symbolset"
 )
 
 var fsExp = "Expected: '%v' got: '%v'"

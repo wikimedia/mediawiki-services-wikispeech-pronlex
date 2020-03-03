@@ -1,5 +1,31 @@
 package line
 
+import (
+	"fmt"
+	"strings"
+
+	"github.com/stts-se/pronlex/lex"
+	"github.com/stts-se/symbolset/mapper"
+)
+
+// MapTranscriptions maps the input entry's transcriptions (in-place)
+func MapTranscriptions(m mapper.Mapper, e *lex.Entry) error {
+	var newTs []lex.Transcription
+	var errs []string
+	for _, t := range e.Transcriptions {
+		newT, err := m.MapTranscription(t.Strn)
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+		newTs = append(newTs, lex.Transcription{ID: t.ID, Strn: newT, EntryID: t.EntryID, Language: t.Language, Sources: t.Sources})
+	}
+	e.Transcriptions = newTs
+	if len(errs) > 0 {
+		return fmt.Errorf("%v", strings.Join(errs, "; "))
+	}
+	return nil
+}
+
 func equals(expect map[Field]string, result map[Field]string) bool {
 	if len(expect) != len(result) {
 		return false

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/stts-se/pronlex/symbolset/converter"
+	"github.com/stts-se/symbolset/converter"
 )
 
 var cMut = struct {

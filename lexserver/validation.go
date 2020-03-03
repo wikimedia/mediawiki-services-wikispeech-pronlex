@@ -11,9 +11,9 @@ import (
 	"sync"
 
 	"github.com/stts-se/pronlex/lex"
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/validation/validators"
+	"github.com/stts-se/symbolset"
 )
 
 // The calls prefixed with '/validation/'

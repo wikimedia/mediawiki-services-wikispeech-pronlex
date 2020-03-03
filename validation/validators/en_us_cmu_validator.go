@@ -1,9 +1,9 @@
 package validators
 
 import (
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/pronlex/validation"
 	"github.com/stts-se/pronlex/validation/rules"
+	"github.com/stts-se/symbolset"
 )
 
 func newEnUsCmuValidator(symbolset symbolset.SymbolSet) (validation.Validator, error) {
