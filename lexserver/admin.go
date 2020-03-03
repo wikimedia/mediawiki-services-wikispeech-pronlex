@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/stts-se/pronlex/dbapi"
@@ -74,9 +73,10 @@ var adminLexImportPage = urlHandler{
 }
 
 var adminLexImport = urlHandler{
-	name:     "lex_import (api)",
-	url:      "/lex_import",
-	help:     "Import lexicon file (API). Requires POST request. Mainly for server internal use.<p/>Available params: lexicon_name, symbolset_name, validate, file",
+	name: "lex_import (api)",
+	url:  "/lex_import",
+	//help:     "Import lexicon file (API). Requires POST request. Mainly for server internal use.<p/>Available params: lexicon_name, symbolset_name, validate, file",
+	help:     "Import lexicon file (API). Requires POST request. Mainly for server internal use.<p/>Available params: lexicon_name, symbolset_name, file",
 	examples: []string{},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 
@@ -125,21 +125,21 @@ var adminLexImport = urlHandler{
 			return
 		}
 
-		vString := r.PostFormValue("validate")
-		if strings.TrimSpace(vString) == "" {
-			msg := "input param <validate> must not be empty (should be 'true' or 'false')"
-			log.Println(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
-			return
-		}
-		validate, err := strconv.ParseBool(vString)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, fmt.Sprintf("adminLexImport failed parsing boolean argument %s : %v", vString, err), http.StatusInternalServerError)
-			return
-		}
-		// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
+		// vString := r.PostFormValue("validate")
+		// if strings.TrimSpace(vString) == "" {
+		// 	msg := "input param <validate> must not be empty (should be 'true' or 'false')"
+		// 	log.Println(msg)
+		// 	http.Error(w, msg, http.StatusInternalServerError)
+		// 	return
+		// }
+		// validate, err := strconv.ParseBool(vString)
+		// if err != nil {
+		// 	log.Println(err)
+		// 	http.Error(w, fmt.Sprintf("adminLexImport failed parsing boolean argument %s : %v", vString, err), http.StatusInternalServerError)
+		// 	return
+		// }
 
+		// (partially) lifted from https://github.com/astaxie/build-web-application-with-golang/blob/master/de/04.5.md
 		err = r.ParseMultipartForm(32 << 20)
 		if err != nil {
 			log.Println(err)
@@ -205,17 +205,17 @@ var adminLexImport = urlHandler{
 		log.Println("Created lexicon: ", lexRef.String())
 
 		var validator *validation.Validator = &validation.Validator{}
-		if validate {
-			vMut.Lock()
-			validator, err = vMut.service.ValidatorForName(symbolSetName)
-			vMut.Unlock()
-			if err != nil {
-				msg := fmt.Sprintf("adminLexImport failed to get validator for symbol set %v : %v", symbolSetName, err)
-				log.Println(msg)
-				http.Error(w, msg, http.StatusBadRequest)
-				return
-			}
-		}
+		// if validate {
+		// 	vMut.Lock()
+		// 	validator, err = vMut.service.ValidatorForName(symbolSetName)
+		// 	vMut.Unlock()
+		// 	if err != nil {
+		// 		msg := fmt.Sprintf("adminLexImport failed to get validator for symbol set %v : %v", symbolSetName, err)
+		// 		log.Println(msg)
+		// 		http.Error(w, msg, http.StatusBadRequest)
+		// 		return
+		// 	}
+		// }
 
 		err = dbm.ImportLexiconFile(lexRef, logger, serverPath, validator)
 

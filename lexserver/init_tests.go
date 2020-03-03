@@ -90,21 +90,21 @@ func testURLsWithContent(port string) (int, int, error) {
 	}
 
 	jsonMapTests := map[string]string{
-		"/mapper/map/sv-se_ws-sampa-DEMO/sv-se_sampa_mary-DEMO/%22%22%20p%20O%20j%20.%20k%20@": `{"From":"sv-se_ws-sampa-DEMO","To":"sv-se_sampa_mary-DEMO","Input":"\"\" p O j . k @","Result":"\" p O j - k @"}`,
-		"/mapper/map/sv-se_sampa_mary-DEMO/sv-se_ws-sampa-DEMO/%22%20p%20O%20j%20-%20k%20@":    `{"From":"sv-se_sampa_mary-DEMO","To":"sv-se_ws-sampa-DEMO","Input":"\" p O j - k @","Result":"\"\" p O j . k @"}`,
-		`/validation/validateentry?symbolsetname=sv-se_ws-sampa-DEMO&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`: `{"id":371546,"lexRef":{},"strn":"häst","language":"SWE","partOfSpeech":"NN SIN|IND|NOM|UTR","wordParts":"häst","lemma":{"id":42815,"strn":"häst","paradigm":"s2q-lapp"},"transcriptions":[{"id":377191,"entryId":371546,"strn":"\" h E s t","language":"SWE"}],"status":{"id":371546,"name":"imported","source":"nst","timestamp":"2016-09-06T12:54:12Z","current":true}}`,
+		// "/mapper/map/sv-se_ws-sampa-DEMO/sv-se_sampa_mary-DEMO/%22%22%20p%20O%20j%20.%20k%20@": `{"From":"sv-se_ws-sampa-DEMO","To":"sv-se_sampa_mary-DEMO","Input":"\"\" p O j . k @","Result":"\" p O j - k @"}`,
+		// "/mapper/map/sv-se_sampa_mary-DEMO/sv-se_ws-sampa-DEMO/%22%20p%20O%20j%20-%20k%20@":    `{"From":"sv-se_sampa_mary-DEMO","To":"sv-se_ws-sampa-DEMO","Input":"\" p O j - k @","Result":"\"\" p O j . k @"}`,
+		//`/validation/validateentry?symbolsetname=sv-se_ws-sampa-DEMO&entry={%22id%22:371546,%22lexiconId%22:1,%22strn%22:%22h%C3%A4st%22,%22language%22:%22SWE%22,%22partOfSpeech%22:%22NN%20SIN|IND|NOM|UTR%22,%22wordParts%22:%22h%C3%A4st%22,%22lemma%22:{%22id%22:42815,%22strn%22:%22h%C3%A4st%22,%22reading%22:%22%22,%22paradigm%22:%22s2q-lapp%22},%22transcriptions%22:[{%22id%22:377191,%22entryId%22:371546,%22strn%22:%22\%22%20h%20E%20s%20t%22,%22language%22:%22SWE%22,%22sources%22:[]}],%22status%22:{%22id%22:371546,%22name%22:%22imported%22,%22source%22:%22nst%22,%22timestamp%22:%222016-09-06T12:54:12Z%22,%22current%22:true}}`: `{"id":371546,"lexRef":{},"strn":"häst","language":"SWE","partOfSpeech":"NN SIN|IND|NOM|UTR","wordParts":"häst","lemma":{"id":42815,"strn":"häst","paradigm":"s2q-lapp"},"transcriptions":[{"id":377191,"entryId":371546,"strn":"\" h E s t","language":"SWE"}],"status":{"id":371546,"name":"imported","source":"nst","timestamp":"2016-09-06T12:54:12Z","current":true}}`,
 	}
 
 	jsonListTestsMustContain := map[string][]string{
-		"/admin/list_dbs":  {"lexserver_testdb"},
-		"/mapper/list":     {"sv-se_ws-sampa-DEMO - sv-se_sampa_mary-DEMO", "sv-se_sampa_mary-DEMO - sv-se_ws-sampa-DEMO"},
-		"/symbolset/list":  {"sv-se_sampa_mary-DEMO", "sv-se_ws-sampa-DEMO", "sv-se_nst-xsampa-DEMO"},
-		"/validation/list": {"sv-se_ws-sampa-DEMO"},
+		"/admin/list_dbs": {"lexserver_testdb"},
+		// "/mapper/list":     {"sv-se_ws-sampa-DEMO - sv-se_sampa_mary-DEMO", "sv-se_sampa_mary-DEMO - sv-se_ws-sampa-DEMO"},
+		// "/symbolset/list":  {"sv-se_sampa_mary-DEMO", "sv-se_ws-sampa-DEMO", "sv-se_nst-xsampa-DEMO"},
+		// "/validation/list": {"sv-se_ws-sampa-DEMO"},
 	}
 
 	jsonBoolTests := map[string]bool{
-		"/validation/has_validator/sv-se_ws-sampa-DEMO": true,
-		"/validation/has_validator/ar_ws-sampa-DEMO":    false,
+		// "/validation/has_validator/sv-se_ws-sampa-DEMO": true,
+		// "/validation/has_validator/ar_ws-sampa-DEMO":    false,
 	}
 
 	mustExistTests := []string{

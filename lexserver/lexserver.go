@@ -301,7 +301,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		html = html + " | " + subRouter.desc + "</p>\n\n"
 
 	}
-	html = html + "<p/><hr/><a href='/version'>Pronlex version info</a>"
+	html = html + "<p/><hr/><a href='/version'>About Pronlex</a>"
 	fmt.Fprint(w, html)
 }
 
@@ -810,24 +810,11 @@ func createServer(port string) (*http.Server, error) {
 
 	log.Printf("lexserver: loaded %v db(s)", nDbs)
 
-	// load symbol set mappers
-	err = loadSymbolSets(symbolSetFileArea)
-	if err != nil {
-		return s, fmt.Errorf("failed to load symbol sets from dir "+symbolSetFileArea+" : %v", err)
-	}
-	log.Printf("lexserver: loaded symbol sets from dir %s", symbolSetFileArea)
-
-	err = loadConverters(symbolSetFileArea)
-	if err != nil {
-		return s, fmt.Errorf("failed to load converters from dir "+symbolSetFileArea+" : %v", err)
-	}
-	log.Printf("lexserver: loaded converters from dir %s", symbolSetFileArea)
-
-	err = loadValidators(symbolSetFileArea)
-	if err != nil {
-		return s, fmt.Errorf("failed to load validators : %v", err)
-	}
-	log.Printf("lexserver: loaded validators : %v", validatorNames())
+	// err = loadValidators(symbolSetFileArea)
+	// if err != nil {
+	// 	return s, fmt.Errorf("failed to load validators : %v", err)
+	// }
+	// log.Printf("lexserver: loaded validators : %v", validatorNames())
 
 	lexicon := newSubRouter(rout, "/lexicon", "Lexicon management/admin, including full validation")
 	lexicon.addHandler(lexiconList)
@@ -839,38 +826,12 @@ func createServer(port string) (*http.Server, error) {
 	lexicon.addHandler(lexiconListCurrentEntryUsers)
 	lexicon.addHandler(lexiconListCurrentEntryStatuses)
 	lexicon.addHandler(lexiconListAllEntryStatuses)
-	lexicon.addHandler(lexiconValidationPage)
-	lexicon.addHandler(lexiconValidation)
+	// lexicon.addHandler(lexiconValidationPage)
+	// lexicon.addHandler(lexiconValidation)
 	lexicon.addHandler(lexiconUpdateEntry)
 	lexicon.addHandler(lexiconUpdateValidation)
 	lexicon.addHandler(lexiconAddEntry)
 	lexicon.addHandler(lexiconDeleteEntry)
-
-	validation := newSubRouter(rout, "/validation", "Transcription/entry validation")
-	validation.addHandler(validationValidateEntry)
-	validation.addHandler(validationValidateEntries)
-	validation.addHandler(validationListValidators)
-	validation.addHandler(validationStats)
-	validation.addHandler(validationHasValidator)
-
-	symbolset := newSubRouter(rout, "/symbolset", "Handle transcription symbol sets")
-	symbolset.addHandler(symbolsetList)
-	symbolset.addHandler(symbolsetDelete)
-	symbolset.addHandler(symbolsetContent)
-	symbolset.addHandler(symbolsetReloadOne)
-	symbolset.addHandler(symbolsetReloadAll)
-	symbolset.addHandler(symbolsetUploadPage)
-	symbolset.addHandler(symbolsetUpload)
-
-	mapper := newSubRouter(rout, "/mapper", "Map transcriptions between different symbol sets")
-	mapper.addHandler(mapperList)
-	mapper.addHandler(mapperMap)
-	mapper.addHandler(mapperMaptable)
-
-	converter := newSubRouter(rout, "/converter", "Convert transcriptions between languages")
-	converter.addHandler(converterConvert)
-	converter.addHandler(converterList)
-	converter.addHandler(converterTable)
 
 	admin := newSubRouter(rout, "/admin", "Misc admin tools")
 	admin.addHandler(adminLexImportPage)

@@ -10,22 +10,20 @@ import (
 	"net/url"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 )
 
-var lexiconValidationPage = urlHandler{
-	name:     "validation (page)",
-	url:      "/validation_page",
-	help:     "Validate lexicon (GUI).",
-	examples: []string{"/validation_page"},
-	handler: func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(staticFolder, "lexicon/validation_page.html"))
-	},
-}
+// var lexiconValidationPage = urlHandler{
+// 	name:     "validation (page)",
+// 	url:      "/validation_page",
+// 	help:     "Validate lexicon (GUI).",
+// 	examples: []string{"/validation_page"},
+// 	handler: func(w http.ResponseWriter, r *http.Request) {
+// 		http.ServeFile(w, r, filepath.Join(staticFolder, "lexicon/validation_page.html"))
+// 	},
+// }
 
 //var lexiconUpdateEntryURL = "/updateentry?entry={...}"
 // TODO: Use a lexicon that exists!
@@ -609,71 +607,71 @@ var lexiconDeleteEntry = urlHandler{
 	handler:  deleteEntry,
 }
 
-var lexiconValidation = urlHandler{
-	name:     "validation (api)",
-	url:      "/validation/{lexicon_name}",
-	help:     "Validate lexicon (API). Requires POST request.",
-	examples: []string{},
-	handler: func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
-			return
-		}
+// var lexiconValidation = urlHandler{
+// 	name:     "validation (api)",
+// 	url:      "/validation/{lexicon_name}",
+// 	help:     "Validate lexicon (API). Requires POST request.",
+// 	examples: []string{},
+// 	handler: func(w http.ResponseWriter, r *http.Request) {
+// 		if r.Method != "POST" {
+// 			http.Error(w, fmt.Sprintf("lexiconfileupload only accepts POST request, got %s", r.Method), http.StatusBadRequest)
+// 			return
+// 		}
 
-		start := time.Now()
+// 		start := time.Now()
 
-		clientUUID := getParam("client_uuid", r)
+// 		clientUUID := getParam("client_uuid", r)
 
-		if strings.TrimSpace(clientUUID) == "" {
-			msg := "lexiconValidation got no client uuid"
-			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
-			return
-		}
-		conn, ok := webSocks.clients[clientUUID]
-		if !ok {
-			msg := fmt.Sprintf("lexiconValidation couldn't find connection for uuid %v", clientUUID)
-			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
-			return
-		}
-		logger := dbapi.NewWebSockLogger(conn)
+// 		if strings.TrimSpace(clientUUID) == "" {
+// 			msg := "lexiconValidation got no client uuid"
+// 			log.Println(msg)
+// 			http.Error(w, msg, http.StatusBadRequest)
+// 			return
+// 		}
+// 		conn, ok := webSocks.clients[clientUUID]
+// 		if !ok {
+// 			msg := fmt.Sprintf("lexiconValidation couldn't find connection for uuid %v", clientUUID)
+// 			log.Println(msg)
+// 			http.Error(w, msg, http.StatusBadRequest)
+// 			return
+// 		}
+// 		logger := dbapi.NewWebSockLogger(conn)
 
-		lexRef, err := getLexRefParam(r)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
-			return
-		}
+// 		lexRef, err := getLexRefParam(r)
+// 		if err != nil {
+// 			log.Println(err)
+// 			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+// 			return
+// 		}
 
-		lexicon, err := dbm.GetLexicon(lexRef)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("couldn't retrive lexicon : %v", err), http.StatusInternalServerError)
-			return
-		}
-		vMut.Lock()
-		v, err := vMut.service.ValidatorForName(lexicon.SymbolSetName)
-		vMut.Unlock()
-		if err != nil {
-			msg := fmt.Sprintf("lexiconValidation failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
-			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
-			return
-		}
+// 		lexicon, err := dbm.GetLexicon(lexRef)
+// 		if err != nil {
+// 			http.Error(w, fmt.Sprintf("couldn't retrive lexicon : %v", err), http.StatusInternalServerError)
+// 			return
+// 		}
+// 		vMut.Lock()
+// 		v, err := vMut.service.ValidatorForName(lexicon.SymbolSetName)
+// 		vMut.Unlock()
+// 		if err != nil {
+// 			msg := fmt.Sprintf("lexiconValidation failed to get validator for symbol set %v : %v", lexicon.SymbolSetName, err)
+// 			log.Println(msg)
+// 			http.Error(w, msg, http.StatusBadRequest)
+// 			return
+// 		}
 
-		q := dbapi.Query{}
-		stats, err := dbm.Validate(lexRef, logger, *v, q)
-		if err != nil {
-			msg := fmt.Sprintf("lexiconValidation failed validate : %v", err)
-			log.Println(msg)
-			http.Error(w, msg, http.StatusBadRequest)
-			return
-		}
-		dur := round(time.Since(start), time.Second)
-		fmt.Fprintf(w, "\nDuration %v\n", dur)
-		fmt.Fprint(w, stats)
-	},
-}
+// 		q := dbapi.Query{}
+// 		stats, err := dbm.Validate(lexRef, logger, *v, q)
+// 		if err != nil {
+// 			msg := fmt.Sprintf("lexiconValidation failed validate : %v", err)
+// 			log.Println(msg)
+// 			http.Error(w, msg, http.StatusBadRequest)
+// 			return
+// 		}
+// 		dur := round(time.Since(start), time.Second)
+// 		fmt.Fprintf(w, "\nDuration %v\n", dur)
+// 		fmt.Fprint(w, stats)
+// 	},
+// }
 
 func round(d, r time.Duration) time.Duration {
 	if r <= 0 {
