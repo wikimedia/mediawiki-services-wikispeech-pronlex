@@ -714,6 +714,7 @@ func toFile(m map[string]map[WP]int, fileName string) error {
 
 		return fmt.Errorf("lexfile2decompPronlex.toFile failed : %v", err)
 	}
+	/* #nosec G307 */
 	defer fh.Close()
 
 	fmt.Fprintf(os.Stderr, "printing compound parts to file '%s'\n", fileName)

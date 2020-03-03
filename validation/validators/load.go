@@ -114,6 +114,7 @@ func LoadValidatorFromFile(ss symbolset.SymbolSet, fName string) (validation.Val
 	if err != nil {
 		return nilRes, err
 	}
+	/* #nosec G307 */
 	defer fh.Close()
 	s := bufio.NewScanner(fh)
 	accept := make(map[string][]lex.Entry)

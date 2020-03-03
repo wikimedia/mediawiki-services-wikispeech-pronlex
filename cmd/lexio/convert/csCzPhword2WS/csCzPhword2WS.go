@@ -98,6 +98,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "couldn't open lexicon file: %v\n", err)
 		return
 	}
+	/* #nosec G307 */
 	defer nstFile.Close()
 
 	sc := bufio.NewScanner(nstFile)

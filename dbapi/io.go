@@ -36,6 +36,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		logger.Write(msg)
 		return fmt.Errorf("%v", msg)
 	}
+	/* #nosec G307 */
 	defer fh.Close()
 
 	var s *bufio.Scanner
@@ -210,6 +211,7 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 		log.Println(msg)
 		return fmt.Errorf("%v", msg)
 	}
+	/* #nosec G307 */
 	defer fh.Close()
 
 	var s *bufio.Scanner

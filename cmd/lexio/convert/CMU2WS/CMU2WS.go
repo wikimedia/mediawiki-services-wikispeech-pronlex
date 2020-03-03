@@ -77,6 +77,7 @@ func main() {
 
 		log.Fatalf("couldn't open input file : %v", err)
 	}
+	/* #nosec G307 */
 	defer cmuFile.Close()
 
 	//lint:ignore S1007 this regexp works so we don't want to change it now
