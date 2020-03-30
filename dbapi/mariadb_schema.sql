@@ -7,7 +7,7 @@
 
 
 -- TODO: Remove!
-DROP TABLE IF EXISTS EntryTag, Entry, Lemma, Lexicon; 
+DROP TABLE IF EXISTS Entry, Lexicon, EntryComment, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus; 
 
 
 -- To keep track of the version of this schema
@@ -71,7 +71,7 @@ CREATE TABLE Entry (
     partOfSpeech varchar(128),
     morphology varchar(128),
     preferred integer not null default 0, -- TODO Why doesn't it work when changing integer -> boolean? 
-foreign key (lexiconId) references Lexicon(id));
+constraint fk_3 foreign key (lexiconId) references Lexicon(id));
 CREATE INDEX language on Entry (language);
 CREATE INDEX strn on Entry (strn(255));
 CREATE INDEX lexiconid ON Entry (lexiconId);
@@ -93,7 +93,7 @@ CREATE TABLE EntryTag (
     entryId integer not null,
     tag text not null,
     wordForm text, -- not null,
-    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
+    constraint fk_4 FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
 );
 -- A single tag per entry
 CREATE UNIQUE INDEX tageid ON EntryTag(entryId);
@@ -102,15 +102,15 @@ CREATE UNIQUE INDEX tageid ON EntryTag(entryId);
 -- long in this multi-column index.
 CREATE UNIQUE INDEX tagentwf ON EntryTag(tag(128), wordForm(128));
 -- Pick the entry word form from the Entry table
-CREATE TRIGGER entryTagTrigger AFTER INSERT ON entryTag
-   BEGIN
-     UPDATE EntryTag SET wordForm = (select strn from entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
-   END;
+CREATE TRIGGER entryTagTrigger AFTER INSERT ON EntryTag
+   FOR EACH ROW
+     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryId) WHERE EntryTag.entryId = NEW.entryId;
+   
 
-CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON entryTag
-   BEGIN
-     UPDATE EntryTag SET wordForm = (select strn from entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
-   END;
+CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON EntryTag
+   FOR EACH ROW
+     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
+
 
 CREATE TABLE EntryComment (
     id integer not null primary key auto_increment,
@@ -119,7 +119,7 @@ CREATE TABLE EntryComment (
     label text not null,
     comment text, -- not null,
     -- Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
-    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
+    constraint fk_5 FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
 );
 CREATE INDEX cmtlabelndx ON EntryComment(label(255)); 
 CREATE INDEX cmtsrcndx ON EntryComment(source(255)); 
@@ -132,7 +132,7 @@ CREATE TABLE EntryValidation (
     -- message varchar(128) not null,
     message text not null,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
-    foreign key (entryId) references Entry(id) on delete cascade);
+    constraint fk_6 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX evallev ON EntryValidation(level);
 CREATE INDEX evalnam ON EntryValidation(name);
 CREATE INDEX entvalEid ON EntryValidation(entryId); 
@@ -146,7 +146,7 @@ CREATE TABLE EntryStatus (
     current boolean default 1 not null,
     id integer not null primary key auto_increment,
     UNIQUE(entryId,id),
-    foreign key (entryId) references Entry(id) on delete cascade);
+    constraint fk_7 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX esn ON EntryStatus (name);
 CREATE INDEX ess ON EntryStatus (source);
 CREATE INDEX esc ON EntryStatus (current);
@@ -165,7 +165,7 @@ CREATE TABLE Transcription (
     -- strn varchar(128) not null,
     strn text not null,
     sources TEXT not null,
-foreign key (entryId) references Entry(id) on delete cascade);
+constraint fk_8 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX traeid ON Transcription (entryId);
 CREATE INDEX idtraeid ON Transcription (id, entryId);
 -- CREATE TABLE TranscriptionStatus (
@@ -180,9 +180,9 @@ CREATE INDEX idtraeid ON Transcription (id, entryId);
 CREATE TABLE Lemma2Entry (
     entryId bigint not null,
     lemmaId bigint not null,
-unique(lemmaId,entryId),
-foreign key (entryId) references Entry(id) on delete cascade,
-foreign key (lemmaId) references Lemma(id) on delete cascade);
+    unique(lemmaId,entryId),
+    constraint fk_1 foreign key (entryId) references Entry(`id`) on delete cascade,
+    constraint fk_2 foreign key (lemmaId) references Lemma(`id`) on delete cascade);
 --CREATE INDEX l2eind1 on Lemma2Entry (entryId);
 CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);
 CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);
@@ -195,19 +195,19 @@ CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 -- When a new entry is added, where preferred is not 0, all other entries for 
 -- the same orthographic word (entry.strn), will have the preferred field set to 0.
 CREATE TRIGGER insertPref BEFORE INSERT ON Entry
-  BEGIN
+  FOR EACH ROW
     UPDATE Entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
-  END;
+    
 CREATE TRIGGER updatePref BEFORE UPDATE ON Entry
-  BEGIN
+  FOR EACH ROW
     UPDATE Entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
-  END;
+
 -- Triggers to ensure that there are only one entry status per entry
 CREATE TRIGGER insertEntryStatus BEFORE INSERT ON EntryStatus
-  BEGIN 
+  FOR EACH ROW 
     UPDATE EntryStatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
-  END;
+  
  CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON EntryStatus
-  BEGIN
+  FOR EACH ROW
     UPDATE EntryStatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
-  END;
+  
