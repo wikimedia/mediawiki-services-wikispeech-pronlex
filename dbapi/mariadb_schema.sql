@@ -25,8 +25,8 @@ CREATE UNIQUE INDEX name ON Lexicon (name);
 CREATE UNIQUE INDEX namesymset ON Lexicon (name, symbolSetName);
 
 CREATE TABLE Lemma (
-    reading varchar(128) not null,
     id integer not null primary key auto_increment,
+    reading varchar(128) not null,
     paradigm varchar(128),
     -- strn varchar(128) not null
     strn text not null
@@ -44,9 +44,9 @@ CREATE UNIQUE INDEX strnreading on Lemma (strn(128),reading);
 -- phonetic transcriptions, found in their own table.
 CREATE TABLE Entry (
     -- wordParts varchar(128),
+    id integer not null primary key auto_increment,
     wordParts text,
     label varchar(128), -- TODO What's this?!
-    id integer not null primary key auto_increment,
     language varchar(128) not null,
     -- strn varchar(128) not null,
     strn text not null,
@@ -54,7 +54,8 @@ CREATE TABLE Entry (
     partOfSpeech varchar(128),
     morphology varchar(128),
     preferred integer not null default 0, -- TODO Why doesn't it work when changing integer -> boolean? 
-constraint fk_3 foreign key (lexiconId) references Lexicon(id));
+    foreign key fk_3  (lexiconId) references Lexicon(id));
+
 CREATE INDEX language on Entry (language);
 CREATE INDEX strn on Entry (strn(255));
 CREATE INDEX lexiconid ON Entry (lexiconId);
@@ -72,7 +73,7 @@ CREATE TABLE EntryTag (
     entryId integer not null,
     tag text not null,
     wordForm text, -- not null,
-    constraint fk_4 FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
+    FOREIGN KEY fk_4 (entryId) REFERENCES Entry(id) ON DELETE CASCADE
 );
 -- A single tag per entry
 CREATE UNIQUE INDEX tageid ON EntryTag(entryId);
@@ -98,7 +99,7 @@ CREATE TABLE EntryComment (
     label text not null,
     comment text, -- not null,
     -- Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
-    constraint fk_5 FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE
+    FOREIGN KEY fk_5 (entryId) REFERENCES Entry(id) ON DELETE CASCADE
 );
 CREATE INDEX cmtlabelndx ON EntryComment(label(255)); 
 CREATE INDEX cmtsrcndx ON EntryComment(source(255)); 
@@ -111,7 +112,7 @@ CREATE TABLE EntryValidation (
     -- message varchar(128) not null,
     message text not null,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
-    constraint fk_6 foreign key (entryId) references Entry(id) on delete cascade);
+    foreign key fk_6 (entryId) references Entry(id) on delete cascade);
 CREATE INDEX evallev ON EntryValidation(level);
 CREATE INDEX evalnam ON EntryValidation(name);
 CREATE INDEX entvalEid ON EntryValidation(entryId); 
@@ -125,7 +126,7 @@ CREATE TABLE EntryStatus (
     current boolean default 1 not null,
     id integer not null primary key auto_increment,
     UNIQUE(entryId,id),
-    constraint fk_7 foreign key (entryId) references Entry(id) on delete cascade);
+    foreign key fk_7 (entryId) references Entry(id) on delete cascade);
 CREATE INDEX esn ON EntryStatus (name);
 CREATE INDEX ess ON EntryStatus (source);
 CREATE INDEX esc ON EntryStatus (current);
@@ -144,17 +145,38 @@ CREATE TABLE Transcription (
     -- strn varchar(128) not null,
     strn text not null,
     sources TEXT not null,
-constraint fk_8 foreign key (entryId) references Entry(id) on delete cascade);
+    foreign key fk_8 (entryId) references Entry(id) on delete cascade);
+
 CREATE INDEX traeid ON Transcription (entryId);
 CREATE INDEX idtraeid ON Transcription (id, entryId);
+
+-- LATEST FOREIGN KEY ERROR
+-- ------------------------
+-- 2020-03-30 23:59:24 7f85a7621700 Error in foreign key constraint of table `test1`.`Lemma2Entry`:
+--  FOREIGN KEY (`entryId`) REFERENCES Entry(`id`) ON DELETE CASCADE,
+--     CONSTRAINT fk_2 FOREIGN KEY (`lemmaId`) REFERENCES Lemma(`id`) ON DELETE CASCADE):
+-- Cannot find an index in the referenced table where the
+-- referenced columns appear as the first columns, or column types
+-- in the table and the referenced table do not match for constraint.
+-- Note that the internal storage type of ENUM and SET changed in
+-- tables created with >= InnoDB-4.1.12, and such columns in old tables
+-- cannot be referenced by such columns in new tables.
+-- See http://dev.mysql.com/doc/refman/5.6/en/innodb-foreign-key-constraints.html
+-- for correct foreign key definition.
+-- Create  table `test1`.`Lemma2Entry` with foreign key constraint failed. Field type or character set for column 'entryId' does not mach referenced column 'id' near ' FOREIGN KEY (`entryId`) REFERENCES Entry(`id`) ON DELETE CASCADE,
+--     CONSTRAINT fk_2 FOREIGN KEY (`lemmaId`) REFERENCES Lemma(`id`) ON DELETE CASCADE)'.
+-- ------------
+
+
 
 -- Linking table between a lemma form and its different surface forms 
 CREATE TABLE Lemma2Entry (
     entryId bigint not null,
     lemmaId bigint not null,
     unique(`lemmaId`,`entryId`),
-    CONSTRAINT fk_1 FOREIGN KEY (`entryId`) REFERENCES Entry(`id`) ON DELETE CASCADE,
-    CONSTRAINT fk_2 foreign KEY (`lemmaId`) REFERENCES Lemma(`id`) ON DELETE CASCADE);
+    -- unique(`entryId`, `lemmaId`),
+    FOREIGN KEY fk_1 (`entryId`) REFERENCES Entry(`id`) ON DELETE CASCADE,
+    FOREIGN KEY fk_2 (`lemmaId`) REFERENCES Lemma(`id`) ON DELETE CASCADE);
 
 --CREATE INDEX l2eind1 on Lemma2Entry (entryId);
 CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);
