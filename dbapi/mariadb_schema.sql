@@ -7,7 +7,7 @@
 
 
 -- TODO: Remove!
-DROP TABLE EntryTag, Entry, Lemma, Lexicon; 
+DROP TABLE IF EXISTS EntryTag, Entry, Lemma, Lexicon; 
 
 
 -- To keep track of the version of this schema
@@ -102,11 +102,11 @@ CREATE UNIQUE INDEX tageid ON EntryTag(entryId);
 -- long in this multi-column index.
 CREATE UNIQUE INDEX tagentwf ON EntryTag(tag(128), wordForm(128));
 -- Pick the entry word form from the Entry table
-CREATE TRIGGER entryTagTrigger AFTER INSERT ON entryTag
+CREATE TRIGGER entryTagTrigger AFTER INSERT ON EntryTag
    BEGIN
-     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryId) WHERE EntryTag.entryId = NEW.entryId;
+     UPDATE EntryTag SET wordForm = (SELECT strn FROM Entry id = entryId) WHERE EntryTag.entryId = NEW.entryId;
    END;
-CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON entryTag
+CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON EntryTag
    BEGIN
      UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryId) WHERE EntryTag.entryId = NEW.entryId;
    END;
