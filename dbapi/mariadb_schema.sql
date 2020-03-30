@@ -150,6 +150,7 @@ CREATE TABLE Transcription (
 CREATE INDEX traeid ON Transcription (entryId);
 CREATE INDEX idtraeid ON Transcription (id, entryId);
 
+-- As root, run SHOW ENGINE INNODB STATUS to get better error messages:
 -- LATEST FOREIGN KEY ERROR
 -- ------------------------
 -- 2020-03-30 23:59:24 7f85a7621700 Error in foreign key constraint of table `test1`.`Lemma2Entry`:
@@ -171,8 +172,8 @@ CREATE INDEX idtraeid ON Transcription (id, entryId);
 
 -- Linking table between a lemma form and its different surface forms 
 CREATE TABLE Lemma2Entry (
-    entryId bigint not null,
-    lemmaId bigint not null,
+    entryId integer not null,
+    lemmaId integer not null,
     unique(`lemmaId`,`entryId`),
     -- unique(`entryId`, `lemmaId`),
     FOREIGN KEY fk_1 (`entryId`) REFERENCES Entry(`id`) ON DELETE CASCADE,
