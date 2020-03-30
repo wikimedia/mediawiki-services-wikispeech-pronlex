@@ -152,9 +152,10 @@ CREATE INDEX idtraeid ON Transcription (id, entryId);
 CREATE TABLE Lemma2Entry (
     entryId bigint not null,
     lemmaId bigint not null,
-    unique(lemmaId,entryId),
-    constraint fk_1 foreign key (entryId) references Entry(`id`) on delete cascade,
-    constraint fk_2 foreign key (lemmaId) references Lemma(`id`) on delete cascade);
+    unique(`lemmaId`,`entryId`),
+    CONSTRAINT fk_1 FOREIGN KEY (`entryId`) REFERENCES Entry(`id`) ON DELETE CASCADE,
+    CONSTRAINT fk_2 foreign KEY (`lemmaId`) REFERENCES Lemma(`id`) ON DELETE CASCADE);
+
 --CREATE INDEX l2eind1 on Lemma2Entry (entryId);
 CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);
 CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);
