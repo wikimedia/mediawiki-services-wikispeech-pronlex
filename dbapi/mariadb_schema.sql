@@ -23,20 +23,7 @@ CREATE TABLE Lexicon (
   );
 CREATE UNIQUE INDEX name ON Lexicon (name);
 CREATE UNIQUE INDEX namesymset ON Lexicon (name, symbolSetName);
--- Symbol set handling moved to file based solution
--- A symbol set is the definition of allowed symbols in a lexicons phonetical transcriptions
--- CREATE TABLE Symbolset (
-    -- description varchar(128),
-    -- description text,
-    -- symbol varchar(128) not null,
-    -- id integer not null primary key auto_increment,
-    -- category varchar(128) not null,
-    -- lexiconId integer not null,
-    -- ipa varchar(128)
---   );
--- CREATE INDEX idx37380686 on Symbolset (symbol);
--- CREATE UNIQUE INDEX idx8bc90a52 on Symbolset (lexiconId,symbol);
--- Lemma forms, or stems, are uninflected (theoretical, one might say) forms of words
+
 CREATE TABLE Lemma (
     reading varchar(128) not null,
     id integer not null primary key auto_increment,
@@ -51,11 +38,7 @@ CREATE INDEX lemidstrn on Lemma (id, strn(255));
 -- TODO: NB: strn length is set to 128 since 255 as used elswhere is too
 -- long in this multi-column index.
 CREATE UNIQUE INDEX strnreading on Lemma (strn(128),reading);
---CREATE TABLE SurfaceForm (
---    id integer not null primary key auto_increment,
---    strn varchar(128) not null
---  );
---CREATE UNIQUE INDEX idx35390652 on SurfaceForm (strn);
+
 -- The actual lexical entries live in this table.
 -- Each entry is linked to a single lexicon, and may have one or more 
 -- phonetic transcriptions, found in their own table.
@@ -79,11 +62,7 @@ CREATE INDEX entrypref ON Entry (preferred);
 CREATE INDEX strnlangue on Entry (strn(255),language);
 CREATE INDEX estrnpref on Entry (strn(255),preferred);
 CREATE INDEX idid on Entry (id, lexiconId);
--- CREATE TABLE Tag (
---     strn text not null,
---     id integer not null primary key auto_increment,
--- );
--- CREATE UNIQUE INDEX tagindex ON Tag (strn);
+
 -- Entry tag is a string used to distinguish between homographs.
 -- Unique for an entry of a specific word form, but not for different
 -- word forms. NOTE: This can be further normalized into a separate Tag
@@ -168,14 +147,7 @@ CREATE TABLE Transcription (
 constraint fk_8 foreign key (entryId) references Entry(id) on delete cascade);
 CREATE INDEX traeid ON Transcription (entryId);
 CREATE INDEX idtraeid ON Transcription (id, entryId);
--- CREATE TABLE TranscriptionStatus (
---    name varchar(128) not null,
---    source varchar(128) not null,
---    timestamp timestamp not null,
---    transcriptionId integer not null,
---    id integer not null primary key auto_increment,
--- foreign key (transcriptionId) references Transcription(id) on delete cascade);
--- CREATE INDEX nizze ON TranscriptionStatus (transcriptionId); 
+
 -- Linking table between a lemma form and its different surface forms 
 CREATE TABLE Lemma2Entry (
     entryId bigint not null,
@@ -187,10 +159,7 @@ CREATE TABLE Lemma2Entry (
 CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);
 CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);
 CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
--- CREATE TABLE SurfaceForm2Entry (
---    entryId bigint not null,
---    surfaceFormId bigint not null,
--- unique(surfaceFormId,entryId));
+
 -- Triggers to ensure only one preferred = 1 per orthographic word
 -- When a new entry is added, where preferred is not 0, all other entries for 
 -- the same orthographic word (entry.strn), will have the preferred field set to 0.
