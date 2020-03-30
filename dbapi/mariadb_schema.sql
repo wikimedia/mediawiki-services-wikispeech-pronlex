@@ -102,14 +102,16 @@ CREATE UNIQUE INDEX tageid ON EntryTag(entryId);
 -- long in this multi-column index.
 CREATE UNIQUE INDEX tagentwf ON EntryTag(tag(128), wordForm(128));
 -- Pick the entry word form from the Entry table
-CREATE TRIGGER entryTagTrigger AFTER INSERT ON EntryTag
+CREATE TRIGGER entryTagTrigger AFTER INSERT ON entryTag
    BEGIN
-     UPDATE EntryTag SET wordForm = (SELECT strn FROM Entry id = entryId) WHERE EntryTag.entryId = NEW.entryId;
+     UPDATE EntryTag SET wordForm = (select strn from entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
    END;
-CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON EntryTag
+
+CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON entryTag
    BEGIN
-     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryId) WHERE EntryTag.entryId = NEW.entryId;
+     UPDATE EntryTag SET wordForm = (select strn from entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
    END;
+
 CREATE TABLE EntryComment (
     id integer not null primary key auto_increment,
     entryId integer not null,
