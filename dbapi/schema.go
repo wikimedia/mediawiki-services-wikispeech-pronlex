@@ -391,13 +391,16 @@ var MariaDBSchema = []string{
 	`-- Triggers to ensure only one preferred = 1 per orthographic word
 	-- When a new entry is added, where preferred is not 0, all other entries for
 	-- the same orthographic word (entry.strn), will have the preferred field set to 0.
-	CREATE TRIGGER insertPref BEFORE INSERT ON Entry
+	-- TODO: This doesn't work in Mysql/MariaDB?
+        CREATE TRIGGER insertPref BEFORE INSERT ON Entry
 	  FOR EACH ROW
-	    UPDATE Entry SET NEW.preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;`,
+          BEGIN
+	    UPDATE Entry SET NEW.preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;
+END;`,
 
-	`CREATE TRIGGER updatePref BEFORE UPDATE ON Entry
-	  FOR EACH ROW
-	    UPDATE Entry SET NEW.preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;`,
+	// `CREATE TRIGGER updatePref BEFORE UPDATE ON Entry
+	//   FOR EACH ROW
+	//     UPDATE Entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;`,
 
 	`-- Triggers to ensure that there are only one entry status per entry
 	CREATE TRIGGER insertEntryStatus BEFORE INSERT ON EntryStatus
