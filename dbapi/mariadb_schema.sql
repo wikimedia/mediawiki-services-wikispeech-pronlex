@@ -7,7 +7,14 @@
 
 
 -- TODO: Remove!
-DROP TABLE IF EXISTS Entry, Lexicon, EntryComment, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus; 
+DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;
+DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;
+DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;
+DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;
+
+CREATE TABLE SchemaVersion (name text not null);
+INSERT INTO SchemaVersion VALUES ('test_version_X');
+
 
 
 -- To keep track of the version of this schema

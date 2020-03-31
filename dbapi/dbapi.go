@@ -21,7 +21,8 @@ import (
 	"sync"
 
 	// installs sqlite3 driver
-	"github.com/mattn/go-sqlite3"
+	//"github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/stts-se/pronlex/lex"
 	//"github.com/stts-se/pronlex/validation"
 )
@@ -50,18 +51,18 @@ var regexMem = func(re, s string) (bool, error) {
 }
 
 // Sqlite3WithRegex registers an Sqlite3 driver with regexp support. (Unfortunately quite slow regexp matching)
-func Sqlite3WithRegex() {
-	// regex := func(re, s string) (bool, error) {
-	// 	//return regexp.MatchString(re, s)
-	// 	return regexp.MatchString(re, s)
-	// }
-	sql.Register("sqlite3_with_regexp",
-		&sqlite3.SQLiteDriver{
-			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
-				return conn.RegisterFunc("regexp", regexMem, true)
-			},
-		})
-}
+// func Sqlite3WithRegex() {
+// 	// regex := func(re, s string) (bool, error) {
+// 	// 	//return regexp.MatchString(re, s)
+// 	// 	return regexp.MatchString(re, s)
+// 	// }
+// 	sql.Register("sqlite3_with_regexp",
+// 		&sqlite3.SQLiteDriver{
+// 			ConnectHook: func(conn *sqlite3.SQLiteConn) error {
+// 				return conn.RegisterFunc("regexp", regexMem, true)
+// 			},
+// 		})
+// }
 
 /*
 func listNamesOfTriggers(db *sql.DB) ([]string, error) {
@@ -163,7 +164,7 @@ func listEntryTableColumnNames(db *sql.DB) ([]string, error) {
 // funcName(db *sql.DB, ...) into methods of the new struct.
 func listLexicons(db *sql.DB) ([]lexicon, error) {
 	var res []lexicon
-	sql := "select id, name, symbolsetname, locale from lexicon"
+	sql := "select id, name, symbolsetname, locale from Lexicon"
 	rows, err := db.Query(sql)
 	if err != nil {
 		return res, fmt.Errorf("db query failed : %v", err)
@@ -197,7 +198,7 @@ func getLexicon(db *sql.DB, name string) (lexicon, error) {
 func getLexiconMapTx(tx *sql.Tx) (map[string]bool, error) {
 	res := make(map[string]bool)
 
-	rows, err := tx.Query("select name from lexicon")
+	rows, err := tx.Query("select name from Lexicon")
 	if err != nil {
 		return res, fmt.Errorf("failed db select on lexicon table : %v", err)
 	}
@@ -219,7 +220,7 @@ func getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
 	name0 := strings.ToLower(name)
 	var err error
 
-	row := tx.QueryRow("select id, name, symbolsetname from lexicon where name = ? ", name0).Scan(&res.id, &res.name, &res.symbolSetName)
+	row := tx.QueryRow("select id, name, symbolsetname from Lexicon where name = ? ", name0).Scan(&res.id, &res.name, &res.symbolSetName)
 	if row == sql.ErrNoRows {
 		return res, fmt.Errorf("couldn't find lexicon '%s'", name)
 	}
@@ -337,7 +338,7 @@ func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 	}
 
 	n := 0
-	err = tx.QueryRow("select count(*) from entry, lexicon where lexicon.name = ? and entry.lexiconid = lexicon.id", lexName).Scan(&n)
+	err = tx.QueryRow("select count(*) from Entry, Lexicon where Lexicon.name = ? and Entry.lexiconId = Lexicon.id", lexName).Scan(&n)
 	// must always return a row, no need to check for empty row
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -349,7 +350,7 @@ func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 		return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: " + strconv.Itoa(n) + ")")
 	}
 
-	_, err = tx.Exec("delete from lexicon where name = ?", lexName)
+	_, err = tx.Exec("delete from Lexicon where name = ?", lexName)
 	if err != nil {
 		msg := fmt.Sprintf("failed to delete lexicon : %v", err)
 
@@ -366,7 +367,7 @@ func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 func lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 
 	var id int64
-	err := tx.QueryRow("SELECT id FROM lexicon WHERE name = ?", lexName).Scan(&id)
+	err := tx.QueryRow("SELECT id FROM Lexicon WHERE name = ?", lexName).Scan(&id)
 	switch {
 	case err == sql.ErrNoRows:
 		return false, nil
@@ -412,7 +413,7 @@ func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 	}
 
 	// delete entries
-	_, err = tx.Exec("DELETE FROM entry WHERE lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", lexName)
+	_, err = tx.Exec("DELETE FROM Entry WHERE lexiconId IN (SELECT id FROM Lexicon WHERE name = ?)", lexName)
 	if err != nil {
 		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to delete entries : %v", err)
 		err2 := tx.Rollback()
@@ -424,7 +425,7 @@ func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 	log.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
 
 	// delete lexicon
-	_, err = tx.Exec("DELETE FROM lexicon WHERE name = ?", lexName)
+	_, err = tx.Exec("DELETE FROM Lexicon WHERE name = ?", lexName)
 
 	if err != nil {
 		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to delete lexicon : %v", err)
@@ -472,7 +473,7 @@ func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 		return 0, fmt.Errorf(msg)
 	}
 
-	res, err := tx.Exec("DELETE FROM entry WHERE  id = ? AND lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", entryID, lexName)
+	res, err := tx.Exec("DELETE FROM Entry WHERE  id = ? AND lexiconId IN (SELECT id FROM Lexicon WHERE name = ?)", entryID, lexName)
 	if err != nil {
 		msg := fmt.Sprintf("dbapi.deleteEntry failed to delete entry with id '%d' from lexicon '%s' : %v", entryID, lexName, err)
 
@@ -544,7 +545,7 @@ func defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 		return l, fmt.Errorf(msg)
 	}
 
-	res, err := tx.Exec("insert into lexicon (name, symbolsetname, locale) values (?, ?, ?)", strings.ToLower(l.name), l.symbolSetName, l.locale)
+	res, err := tx.Exec("insert into Lexicon (name, symbolsetname, locale) values (?, ?, ?)", strings.ToLower(l.name), l.symbolSetName, l.locale)
 	if err != nil {
 		msg := fmt.Sprintf("failed to define lexicon : %v", err)
 		err2 := tx.Rollback()
@@ -654,10 +655,10 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 		return res, fmt.Errorf(msg)
 	}
 
-	const where = `WHERE entry.id IN (SELECT a.id FROM entry a WHERE a.lexiconid = ?
-                       AND NOT EXISTS(SELECT strn FROM entry WHERE lexiconid = ? AND strn = a.strn))`
+	const where = `WHERE Entry.id IN (SELECT a.id FROM Entry a WHERE a.lexiconId = ?
+                       AND NOT EXISTS(SELECT strn FROM Entry WHERE lexiconId = ? AND strn = a.strn))`
 
-	insertQuery := `INSERT INTO entrystatus (name, source, entryid, current) SELECT ?, ?, entry.id, '1' FROM entry ` + where
+	insertQuery := `INSERT INTO EntryStatus (name, source, entryId, current) SELECT ?, ?, entry.id, '1' FROM Entry ` + where
 
 	// updateQuery0 := `UPDATE entrystatus SET current = 1 AND source = ? AND name = ? ` + where + ` AND entrystatus.entryid = entry.id`
 	q0Rez, err := tx.Exec(insertQuery, newStatus, newSource, fromLex.id, toLex.id)
@@ -674,7 +675,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 
 	//_ = q0Rez
 
-	updateQuery := `UPDATE entry SET lexiconid = ? ` + where
+	updateQuery := `UPDATE entry SET lexiconId = ? ` + where
 
 	//log.Printf("Q: %s\n", updateQuery)
 
@@ -703,11 +704,11 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 }
 
 // TODO move to function?
-var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
-var transAfterEntrySTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
+var entrySTMT = "insert into Entry (lexiconId, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
+var transAfterEntrySTMT = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
 
 //var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
-var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
+var insertStatus = "INSERT INTO EntryStatus (entryId, name, source) values (?, ?, ?)"
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
 // TODO: Change second input argument to string (lexicon name) instead of Lexicon struct.

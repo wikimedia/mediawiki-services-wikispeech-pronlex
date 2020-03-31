@@ -9,7 +9,6 @@ const Schema = `
 -- TODO: Remove!
 --DROP TABLE IF EXISTS SchemaVersion, Lexicon, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;
 
-
 -- To keep track of the version of this schema
 CREATE TABLE SchemaVersion (name varchar(255) not null);
 
@@ -231,8 +230,14 @@ CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS
 
 var MariaDBSchema = []string{
 
-	`DROP TABLE IF EXISTS Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
-	
+	`DROP TABLE IF EXISTS SchemaVersion, Lexion, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
+
+	`DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
+
+	`DROP TABLE IF EXISTS SchemaVersion, Lexicon, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
+
+	`DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
+
 	`CREATE TABLE SchemaVersion (name text not null);`,
 
 	`INSERT INTO SchemaVersion VALUES (` + SchemaVersion + `);`,
@@ -253,15 +258,15 @@ var MariaDBSchema = []string{
 	    -- strn varchar(128) not null
 	    strn text not null
 	  );`,
-	CREATE INDEX reading on Lemma (reading);
-	CREATE INDEX paradigm on Lemma (paradigm);
-	CREATE INDEX strn on Lemma (strn(255));
-	CREATE INDEX lemidstrn on Lemma (id, strn(255));
-	-- TODO: NB: strn length is set to 128 since 255 as used elswhere is too
+	`CREATE INDEX reading on Lemma (reading);`,
+	`CREATE INDEX paradigm on Lemma (paradigm);`,
+	`CREATE INDEX strn on Lemma (strn(255));`,
+	`CREATE INDEX lemidstrn on Lemma (id, strn(255));`,
+	`-- TODO: NB: strn length is set to 128 since 255 as used elswhere is too
 	-- long in this multi-column index.
-	CREATE UNIQUE INDEX strnreading on Lemma (strn(128),reading);
+	CREATE UNIQUE INDEX strnreading on Lemma (strn(128),reading);`,
 
-	-- The actual lexical entries live in this table.
+	`-- The actual lexical entries live in this table.
 	-- Each entry is linked to a single lexicon, and may have one or more
 	-- phonetic transcriptions, found in their own table.
 	CREATE TABLE Entry (
@@ -276,17 +281,17 @@ var MariaDBSchema = []string{
 	    partOfSpeech varchar(128),
 	    morphology varchar(128),
 	    preferred integer not null default 0, -- TODO Why doesn't it work when changing integer -> boolean?
-	    foreign key fk_3  (lexiconId) references Lexicon(id));
+	    foreign key fk_3  (lexiconId) references Lexicon(id));`,
 
-	CREATE INDEX language on Entry (language);
-	CREATE INDEX strn on Entry (strn(255));
-	CREATE INDEX lexiconid ON Entry (lexiconId);
-	CREATE INDEX entrypref ON Entry (preferred);
-	CREATE INDEX strnlangue on Entry (strn(255),language);
-	CREATE INDEX estrnpref on Entry (strn(255),preferred);
-	CREATE INDEX idid on Entry (id, lexiconId);
+	`CREATE INDEX language on Entry (language);`,
+	`CREATE INDEX strn on Entry (strn(255));`,
+	`CREATE INDEX lexiconId ON Entry (lexiconId);`,
+	`CREATE INDEX entrypref ON Entry (preferred);`,
+	`CREATE INDEX strnlangue on Entry (strn(255),language);`,
+	`CREATE INDEX estrnpref on Entry (strn(255),preferred);`,
+	`CREATE INDEX idid on Entry (id, lexiconId);`,
 
-	-- Entry tag is a string used to distinguish between homographs.
+	`-- Entry tag is a string used to distinguish between homographs.
 	-- Unique for an entry of a specific word form, but not for different
 	-- word forms. NOTE: This can be further normalized into a separate Tag
 	-- table, for reusable tags.
@@ -296,23 +301,23 @@ var MariaDBSchema = []string{
 	    tag text not null,
 	    wordForm text, -- not null,
 	    FOREIGN KEY fk_4 (entryId) REFERENCES Entry(id) ON DELETE CASCADE
-	);
-	-- A single tag per entry
-	CREATE UNIQUE INDEX tageid ON EntryTag(entryId);
+	);`,
+	`-- A single tag per entry
+	CREATE UNIQUE INDEX tageid ON EntryTag(entryId);`,
 
-	-- TODO: NB: tag and wordForm length is set to 128 since 255 as used elswhere is too
+	`-- TODO: NB: tag and wordForm length is set to 128 since 255 as used elswhere is too
 	-- long in this multi-column index.
-	CREATE UNIQUE INDEX tagentwf ON EntryTag(tag(128), wordForm(128));
-	-- Pick the entry word form from the Entry table
+	CREATE UNIQUE INDEX tagentwf ON EntryTag(tag(128), wordForm(128));`,
+	`-- Pick the entry word form from the Entry table
 	CREATE TRIGGER entryTagTrigger AFTER INSERT ON EntryTag
 	   FOR EACH ROW
-	     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryId) WHERE EntryTag.entryId = NEW.entryId;
+	     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryId) WHERE EntryTag.entryId = NEW.entryId;`,
 
-	CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON EntryTag
+	`CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON EntryTag
 	   FOR EACH ROW
-	     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;
+	     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;`,
 
-	CREATE TABLE EntryComment (
+	`CREATE TABLE EntryComment (
 	    id integer not null primary key auto_increment,
 	    entryId integer not null,
 	    source text,
@@ -320,10 +325,10 @@ var MariaDBSchema = []string{
 	    comment text, -- not null,
 	    -- Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
 	    FOREIGN KEY fk_5 (entryId) REFERENCES Entry(id) ON DELETE CASCADE
-	);
-	CREATE INDEX cmtlabelndx ON EntryComment(label(255));
-	CREATE INDEX cmtsrcndx ON EntryComment(source(255));
-	-- Validiation results of entries
+	);`,
+	`CREATE INDEX cmtlabelndx ON EntryComment(label(255));`,
+	`CREATE INDEX cmtsrcndx ON EntryComment(source(255));`,
+	`-- Validiation results of entries
 	CREATE TABLE EntryValidation (
 	    id integer not null primary key auto_increment,
 	    entryid integer not null,
@@ -332,12 +337,12 @@ var MariaDBSchema = []string{
 	    -- message varchar(128) not null,
 	    message text not null,
 	    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null,
-	    foreign key fk_6 (entryId) references Entry(id) on delete cascade);
-	CREATE INDEX evallev ON EntryValidation(level);
-	CREATE INDEX evalnam ON EntryValidation(name);
-	CREATE INDEX entvalEid ON EntryValidation(entryId);
-	CREATE INDEX identvalEid ON EntryValidation(id,entryId);
-	-- Status of entries
+	    foreign key fk_6 (entryId) references Entry(id) on delete cascade);`,
+	`CREATE INDEX evallev ON EntryValidation(level);`,
+	`CREATE INDEX evalnam ON EntryValidation(name);`,
+	`CREATE INDEX entvalEid ON EntryValidation(entryId);`,
+	`CREATE INDEX identvalEid ON EntryValidation(id,entryId);`,
+	`-- Status of entries
 	CREATE TABLE EntryStatus (
 	    name varchar(128) not null,
 	    source varchar(128) not null,
@@ -346,16 +351,16 @@ var MariaDBSchema = []string{
 	    current boolean default 1 not null,
 	    id integer not null primary key auto_increment,
 	    UNIQUE(entryId,id),
-	    foreign key fk_7 (entryId) references Entry(id) on delete cascade);
-	CREATE INDEX esn ON EntryStatus (name);
-	CREATE INDEX ess ON EntryStatus (source);
-	CREATE INDEX esc ON EntryStatus (current);
-	CREATE INDEX esceid ON EntryStatus (entryId);
-	CREATE INDEX entryidcurrent ON EntryStatus (entryId, current);
-	CREATE UNIQUE INDEX eseii ON EntryStatus  (id, entryId);
-	CREATE UNIQUE INDEX eseiicurr ON EntryStatus  (id, entryId, current);
-	CREATE UNIQUE INDEX idcurr ON EntryStatus  (id, current);
-	CREATE TABLE Transcription (
+	    foreign key fk_7 (entryId) references Entry(id) on delete cascade);`,
+	`CREATE INDEX esn ON EntryStatus (name);`,
+	`CREATE INDEX ess ON EntryStatus (source);`,
+	`CREATE INDEX esc ON EntryStatus (current);`,
+	`CREATE INDEX esceid ON EntryStatus (entryId);`,
+	`CREATE INDEX entryidcurrent ON EntryStatus (entryId, current);`,
+	`CREATE UNIQUE INDEX eseii ON EntryStatus  (id, entryId);`,
+	`CREATE UNIQUE INDEX eseiicurr ON EntryStatus  (id, entryId, current);`,
+	`CREATE UNIQUE INDEX idcurr ON EntryStatus  (id, current);`,
+	`CREATE TABLE Transcription (
 	    entryId integer not null,
 	    preference int,
 	    label varchar(128),
@@ -365,43 +370,41 @@ var MariaDBSchema = []string{
 	    -- strn varchar(128) not null,
 	    strn text not null,
 	    sources TEXT not null,
-	    foreign key fk_8 (entryId) references Entry(id) on delete cascade);
+	    foreign key fk_8 (entryId) references Entry(id) on delete cascade);`,
 
-	CREATE INDEX traeid ON Transcription (entryId);
-	CREATE INDEX idtraeid ON Transcription (id, entryId);
+	`CREATE INDEX traeid ON Transcription (entryId);`,
+	`CREATE INDEX idtraeid ON Transcription (id, entryId);`,
 
-	-- Linking table between a lemma form and its different surface forms
+	`-- Linking table between a lemma form and its different surface forms
 	CREATE TABLE Lemma2Entry (
 	    entryId integer not null,
 	    lemmaId integer not null,
 	    unique(lemmaId,entryId),
 	    -- unique(entryId, lemmaId),
 	    FOREIGN KEY fk_1 (entryId) REFERENCES Entry(id) ON DELETE CASCADE,
-	    FOREIGN KEY fk_2 (lemmaId) REFERENCES Lemma(id) ON DELETE CASCADE);
+	    FOREIGN KEY fk_2 (lemmaId) REFERENCES Lemma(id) ON DELETE CASCADE);`,
 
-	--CREATE INDEX l2eind1 on Lemma2Entry (entryId);
-	CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);
-	CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);
-	CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
+	`CREATE INDEX l2eind2 on Lemma2Entry (lemmaId);`,
+	`CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);`,
+	`CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);`,
 
-	-- Triggers to ensure only one preferred = 1 per orthographic word
+	`-- Triggers to ensure only one preferred = 1 per orthographic word
 	-- When a new entry is added, where preferred is not 0, all other entries for
 	-- the same orthographic word (entry.strn), will have the preferred field set to 0.
 	CREATE TRIGGER insertPref BEFORE INSERT ON Entry
 	  FOR EACH ROW
-	    UPDATE Entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
+	    UPDATE Entry SET NEW.preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;`,
 
-	CREATE TRIGGER updatePref BEFORE UPDATE ON Entry
+	`CREATE TRIGGER updatePref BEFORE UPDATE ON Entry
 	  FOR EACH ROW
-	    UPDATE Entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
+	    UPDATE Entry SET NEW.preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;`,
 
-	-- Triggers to ensure that there are only one entry status per entry
+	`-- Triggers to ensure that there are only one entry status per entry
 	CREATE TRIGGER insertEntryStatus BEFORE INSERT ON EntryStatus
 	  FOR EACH ROW
-	    UPDATE EntryStatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
+	    UPDATE EntryStatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;`,
 
-	 CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON EntryStatus
+	`CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON EntryStatus
 	  FOR EACH ROW
-	    UPDATE EntryStatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;
-		`
+	    UPDATE EntryStatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;`,
 }

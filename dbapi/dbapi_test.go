@@ -2,7 +2,7 @@ package dbapi
 
 import (
 	"database/sql"
-	"flag"
+	//"flag"
 	"reflect"
 	//"fmt"
 	"time"
@@ -26,173 +26,185 @@ func ff(f string, err error) {
 
 func execSchema(db *sql.DB) (sql.Result, error) {
 	ti := time.Now()
-	res, err := db.Exec(Schema)
 
+	var err error
+	//log.Print(MariaDBSchema)
+
+	var res sql.Result
+
+	for _, s := range MariaDBSchema {
+
+		res, err := db.Exec(s)
+		if err != nil {
+			return res, err
+		}
+
+	}
 	_ = ti
 	//fmt.Printf("[dbapi_test] db.Exec(Schema) took %v\n", time.Since(ti))
 	return res, err
 }
 
-func TestMain(m *testing.M) {
-	flag.Parse() // should be here
-	Sqlite3WithRegex()
-	os.Exit(m.Run()) // should be here
-}
+// func TestMain(m *testing.M) {
+// 	flag.Parse() // should be here
+// 	Sqlite3WithRegex()
+// 	os.Exit(m.Run()) // should be here
+// }
 
-func Test_SuperDeleteLexicon(t *testing.T) {
+// func Test_SuperDeleteLexicon(t *testing.T) {
 
-	dbPath := "./testlex_superdelete.db"
+// 	dbPath := "./testlex_superdelete.db"
 
-	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-		err := os.Remove(dbPath)
-		ff("failed to remove "+dbPath+" : %v", err)
-	}
+// 	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+// 		err := os.Remove(dbPath)
+// 		ff("failed to remove "+dbPath+" : %v", err)
+// 	}
 
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
+// 	_, err = db.Exec("PRAGMA foreign_keys = ON")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+// 	ff("Failed to exec PRAGMA call %v", err)
 
-	defer db.Close()
+// 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+// 	_, err = execSchema(db) // Creates new lexicon database
 
-	ff("Failed to create lexicon db: %v", err)
+// 	ff("Failed to create lexicon db: %v", err)
 
-	// TODO Borde returnera error
-	//CreateTables(db, cmds)
+// 	// TODO Borde returnera error
+// 	//CreateTables(db, cmds)
 
-	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
+// 	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
 
-	l, err = defineLexicon(db, l)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
+// 	l, err = defineLexicon(db, l)
+// 	if err != nil {
+// 		t.Errorf(fs, nil, err)
+// 	}
 
-	lxs, err := listLexicons(db)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
-	if len(lxs) != 1 {
-		t.Errorf(fs, 1, len(lxs))
-	}
-	if lxs[0].name != "test" {
-		t.Errorf(fs, "test", lxs[0].name)
-	}
-	if lxs[0].id <= 0 {
-		t.Errorf(fs, ">0", lxs[0].id)
-	}
-	if lxs[0].symbolSetName != "ZZ" {
-		t.Errorf(fs, "ZZ", lxs[0].symbolSetName)
-	}
+// 	lxs, err := listLexicons(db)
+// 	if err != nil {
+// 		t.Errorf(fs, nil, err)
+// 	}
+// 	if len(lxs) != 1 {
+// 		t.Errorf(fs, 1, len(lxs))
+// 	}
+// 	if lxs[0].name != "test" {
+// 		t.Errorf(fs, "test", lxs[0].name)
+// 	}
+// 	if lxs[0].id <= 0 {
+// 		t.Errorf(fs, ">0", lxs[0].id)
+// 	}
+// 	if lxs[0].symbolSetName != "ZZ" {
+// 		t.Errorf(fs, "ZZ", lxs[0].symbolSetName)
+// 	}
 
-	lx, err := getLexicon(db, "test")
-	if err != nil {
-		t.Errorf("expected nil, got %v", err)
-	}
-	if w, g := "test", lx.name; w != g {
-		t.Errorf("Wanted %s got %s", w, g)
-	}
-	if w, g := "ZZ", lx.symbolSetName; w != g {
-		t.Errorf("Wanted %s got %s", w, g)
-	}
-	lx, err = getLexicon(db, "xyzzhga_skdjdj")
-	if err == nil {
-		t.Error("Expected error, got nil")
-	}
-	if w, g := "", lx.name; w != g {
-		t.Errorf("Wanted empty string, got '%s'", g)
-	}
+// 	lx, err := getLexicon(db, "test")
+// 	if err != nil {
+// 		t.Errorf("expected nil, got %v", err)
+// 	}
+// 	if w, g := "test", lx.name; w != g {
+// 		t.Errorf("Wanted %s got %s", w, g)
+// 	}
+// 	if w, g := "ZZ", lx.symbolSetName; w != g {
+// 		t.Errorf("Wanted %s got %s", w, g)
+// 	}
+// 	lx, err = getLexicon(db, "xyzzhga_skdjdj")
+// 	if err == nil {
+// 		t.Error("Expected error, got nil")
+// 	}
+// 	if w, g := "", lx.name; w != g {
+// 		t.Errorf("Wanted empty string, got '%s'", g)
+// 	}
 
-	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
-	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}
+// 	t1 := lex.Transcription{Strn: "A: p a", Language: "Svetsko"}
+// 	t2 := lex.Transcription{Strn: "a pp a", Language: "svinspråket"}
 
-	e1 := lex.Entry{Strn: "apa",
-		PartOfSpeech:   "NN",
-		Morphology:     "NEU UTR",
-		WordParts:      "apa",
-		Language:       "XYZZ",
-		Preferred:      true,
-		Transcriptions: []lex.Transcription{t1, t2},
-		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+// 	e1 := lex.Entry{Strn: "apa",
+// 		PartOfSpeech:   "NN",
+// 		Morphology:     "NEU UTR",
+// 		WordParts:      "apa",
+// 		Language:       "XYZZ",
+// 		Preferred:      true,
+// 		Transcriptions: []lex.Transcription{t1, t2},
+// 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	t1 = lex.Transcription{Strn: "A: p a n", Language: "Svetsko"}
-	t2 = lex.Transcription{Strn: "a pp a n", Language: "svinspråket"}
+// 	t1 = lex.Transcription{Strn: "A: p a n", Language: "Svetsko"}
+// 	t2 = lex.Transcription{Strn: "a pp a n", Language: "svinspråket"}
 
-	e2 := lex.Entry{Strn: "apan",
-		PartOfSpeech:   "NN",
-		Morphology:     "NEU UTR",
-		WordParts:      "apa",
-		Language:       "XYZZ",
-		Preferred:      true,
-		Transcriptions: []lex.Transcription{t1, t2},
-		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+// 	e2 := lex.Entry{Strn: "apan",
+// 		PartOfSpeech:   "NN",
+// 		Morphology:     "NEU UTR",
+// 		WordParts:      "apa",
+// 		Language:       "XYZZ",
+// 		Preferred:      true,
+// 		Transcriptions: []lex.Transcription{t1, t2},
+// 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	_, errx := insertEntries(db, l, []lex.Entry{e1, e2})
-	if errx != nil {
-		t.Errorf(fs, "nil", errx)
-	}
+// 	_, errx := insertEntries(db, l, []lex.Entry{e1, e2})
+// 	if errx != nil {
+// 		t.Errorf(fs, "nil", errx)
+// 	}
 
-	// Check that there are things in db:
-	q := Query{WordLike: "%", Page: 0, PageLength: 25}
+// 	// Check that there are things in db:
+// 	q := Query{WordLike: "%", Page: 0, PageLength: 25}
 
-	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
-	if got, want := len(entries), 2; got != want {
-		t.Errorf(fs, got, want)
-	}
-	lexes, err := listLexicons(db)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
-	if got, want := len(lexes), 1; got != want {
-		t.Errorf(fs, got, want)
-	}
+// 	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+// 	if err != nil {
+// 		t.Errorf(fs, nil, err)
+// 	}
+// 	if got, want := len(entries), 2; got != want {
+// 		t.Errorf(fs, got, want)
+// 	}
+// 	lexes, err := listLexicons(db)
+// 	if err != nil {
+// 		t.Errorf(fs, nil, err)
+// 	}
+// 	if got, want := len(lexes), 1; got != want {
+// 		t.Errorf(fs, got, want)
+// 	}
 
-	superDeleteLexicon(db, "test")
+// 	superDeleteLexicon(db, "test")
 
-	// check that the lexicon named 'test' is deleted
-	lexes, err = listLexicons(db)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
-	if got, want := len(lexes), 0; got != want {
-		t.Errorf(fs, got, want)
-	}
+// 	// check that the lexicon named 'test' is deleted
+// 	lexes, err = listLexicons(db)
+// 	if err != nil {
+// 		t.Errorf(fs, nil, err)
+// 	}
+// 	if got, want := len(lexes), 0; got != want {
+// 		t.Errorf(fs, got, want)
+// 	}
 
-}
+// }
 
 func Test_insertEntries(t *testing.T) {
 
-	dbPath := "./testlex.db"
+	// dbPath := "./testlex.db"
 
-	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-		err := os.Remove(dbPath)
-		ff("failed to remove "+dbPath+" : %v", err)
-	}
+	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbPath)
+	// 	ff("failed to remove "+dbPath+" : %v", err)
+	// }
 
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	db, err := sql.Open("mysql", "nikolaj:@tcp(127.0.0.1:3306)/test1")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
 
-	defer db.Close()
+	// defer db.Close()
 
 	_, err = execSchema(db) // Creates new lexicon database
 
@@ -259,6 +271,7 @@ func Test_insertEntries(t *testing.T) {
 	_, errx := insertEntries(db, l, []lex.Entry{e1})
 	if errx != nil {
 		t.Errorf(fs, "nil", errx)
+		return
 	}
 
 	//time.Sleep(2000 * time.Millisecond)
