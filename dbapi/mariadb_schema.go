@@ -85,6 +85,8 @@ var MariaDBSchema = []string{
 	`-- TODO: NB: tag and wordForm length is set to 128 since 255 as used elswhere is too
 	-- long in this multi-column index.
 	CREATE UNIQUE INDEX tagentwf ON EntryTag(tag(128), wordForm(128));`,
+
+	/* TODO: Replace with other solution --- doesn't work in MariaDB
 	`-- Pick the entry word form from the Entry table
 	CREATE TRIGGER entryTagTrigger AFTER INSERT ON EntryTag
 	   FOR EACH ROW
@@ -93,6 +95,7 @@ var MariaDBSchema = []string{
 	`CREATE TRIGGER entryTagTrigger2 AFTER UPDATE ON EntryTag
 	   FOR EACH ROW
 	     UPDATE EntryTag SET wordForm = (select strn from Entry where id = entryid) WHERE EntryTag.entryId = NEW.entryId;`,
+	*/
 
 	`CREATE TABLE EntryComment (
 	    id integer not null primary key auto_increment,

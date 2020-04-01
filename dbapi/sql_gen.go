@@ -278,17 +278,17 @@ func comments(q Query) (string, []interface{}) {
 	var resv []interface{}
 
 	if q.CommentLabelLike != "" {
-		res = append(res, " Entry.id = EntryComment.entryId AND Entrycomment.label like ? ")
+		res = append(res, " Entry.id = EntryComment.entryId AND EntryComment.label like ? ")
 		resv = append(resv, q.CommentLabelLike)
 	}
 
 	if q.CommentSourceLike != "" {
-		res = append(res, " Entry.id = EntryComment.entryId AND Entrycomment.source like ? ")
+		res = append(res, " Entry.id = EntryComment.entryId AND EntryComment.source like ? ")
 		resv = append(resv, q.CommentSourceLike)
 	}
 
 	if q.CommentLike != "" {
-		res = append(res, " Entry.id = EntryComment.entryId AND Entrycomment.comment like ? ")
+		res = append(res, " Entry.id = EntryComment.entryId AND EntryComment.comment like ? ")
 		resv = append(resv, q.CommentLike)
 	}
 
@@ -337,14 +337,14 @@ func ToLower(ss []string) []string {
 
 // This is not sane.
 
-const baseSQLFrom = `FROM Lexicon, Entry, Transcription
+const baseSQLFrom = `FROM (Lexicon, Entry, Transcription)
 LEFT JOIN Lemma2Entry ON Lemma2Entry.entryId = Entry.id 
 LEFT JOIN Lemma ON Lemma.id = Lemma2Entry.lemmaid
 LEFT JOIN EntryTag ON EntryTag.entryId = Entry.id
 LEFT JOIN EntryStatus ON EntryStatus.entryId = Entry.id AND EntryStatus.current = 1
 LEFT JOIN EntryValidation ON EntryValidation.entryId = Entry.id 
 LEFT JOIN EntryComment ON EntryComment.entryId = Entry.id 
-WHERE Entry.id = Transcription.entryId AND Entry.lexiconid = Lexicon.id` // Entry.lexiconid = Lexicon.id needed when no single input lexicon ID is given
+WHERE Entry.id = Transcription.entryId AND Entry.lexiconId = Lexicon.id` // Entry.lexiconid = Lexicon.id needed when no single input lexicon ID is given
 // AND Lexicon.id = ? ORDER BY Entry.id, Transcription.id ASC`
 
 // Queries db for all entries with transcriptions and optional lemma forms.

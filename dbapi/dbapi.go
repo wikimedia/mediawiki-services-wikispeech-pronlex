@@ -340,7 +340,7 @@ func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 }
 
 //TODO: Check that lexName exists, or report error
-//TODO: Check that entryID exists, or report error
+//TODO: Check that entryId exists, or report error
 func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	tx, err := db.Begin()
 	if err != nil {
@@ -553,9 +553,9 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 	const where = `WHERE Entry.id IN (SELECT a.id FROM Entry a WHERE a.lexiconId = ?
                        AND NOT EXISTS(SELECT strn FROM Entry WHERE lexiconId = ? AND strn = a.strn))`
 
-	insertQuery := `INSERT INTO EntryStatus (name, source, entryId, current) SELECT ?, ?, entry.id, '1' FROM Entry ` + where
+	insertQuery := `INSERT INTO EntryStatus (name, source, entryId, current) SELECT ?, ?, Entry.id, '1' FROM Entry ` + where
 
-	// updateQuery0 := `UPDATE entrystatus SET current = 1 AND source = ? AND name = ? ` + where + ` AND entrystatus.entryid = entry.id`
+	// updateQuery0 := `UPDATE entrystatus SET current = 1 AND source = ? AND name = ? ` + where + ` AND entrystatus.entryId = entry.id`
 	q0Rez, err := tx.Exec(insertQuery, newStatus, newSource, fromLex.id, toLex.id)
 	if err != nil {
 		msg := fmt.Sprintf("failed to update entrystatus : %v", err)
@@ -839,7 +839,7 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 // InsertLemma saves a lex.Lemma to the db, but does not associate it with a lex.Entry
 // TODO do we need both InsertLemma and SetOrGetLemma?
 func insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
-	sql := "insert into lemma (strn, reading, paradigm) values (?, ?, ?)"
+	sql := "insert into Lemma (strn, reading, paradigm) values (?, ?, ?)"
 	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
 	if err != nil {
 		err = fmt.Errorf("failed insert lemma "+l.Strn+": %v", err)
@@ -858,7 +858,7 @@ func insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
 func setOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (lex.Lemma, error) {
 	res := lex.Lemma{}
 
-	sqlS := "select id, strn, reading, paradigm from lemma where strn = ? and reading = ?"
+	sqlS := "select id, strn, reading, paradigm from Lemma where strn = ? and reading = ?"
 	err := tx.QueryRow(sqlS, strn, reading).Scan(&res.ID, &res.Strn, &res.Reading, &res.Paradigm)
 	switch {
 	case err == sql.ErrNoRows:
@@ -1467,7 +1467,7 @@ func updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.Language == dbE.Language {
 		return false, nil
 	}
-	_, err := tx.Exec("update entry set language = ? where entry.id = ?", e.Language, e.ID)
+	_, err := tx.Exec("update Entry set language = ? where Entry.id = ?", e.Language, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed language update : %v", err)
 		err2 := tx.Rollback()
@@ -1491,7 +1491,7 @@ func updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.PartOfSpeech == dbE.PartOfSpeech {
 		return false, nil
 	}
-	_, err := tx.Exec("update entry set partofspeech = ? where entry.id = ?", e.PartOfSpeech, e.ID)
+	_, err := tx.Exec("update Entry set partofspeech = ? where Entry.id = ?", e.PartOfSpeech, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed partofspeech update : %v", err)
 		err2 := tx.Rollback()
@@ -1515,7 +1515,7 @@ func updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.Morphology == dbE.Morphology {
 		return false, nil
 	}
-	_, err := tx.Exec("update entry set morphology = ? where entry.id = ?", e.Morphology, e.ID)
+	_, err := tx.Exec("update Entry set morphology = ? where Entry.id = ?", e.Morphology, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed morphology update : %v", err)
 		err2 := tx.Rollback()
@@ -1539,7 +1539,7 @@ func updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.WordParts == dbE.WordParts {
 		return false, nil
 	}
-	_, err := tx.Exec("update entry set wordparts = ? where entry.id = ?", e.WordParts, e.ID)
+	_, err := tx.Exec("update Entry set wordparts = ? where Entry.id = ?", e.WordParts, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed worparts update : %v", err)
 		err2 := tx.Rollback()
@@ -1569,7 +1569,7 @@ func updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.Preferred {
 		pref = 1
 	}
-	_, err := tx.Exec("update entry set preferred = ? where entry.id = ?", pref, e.ID)
+	_, err := tx.Exec("update Entry set preferred = ? where Entry.id = ?", pref, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed preferred update : %v", err)
 		err2 := tx.Rollback()
@@ -1588,7 +1588,7 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 	// If e.Lemma uninitialized, and different from dbE, then wipe
 	// old lemma from db
 	if e.Lemma.ID == 0 && e.Lemma.Strn == "" {
-		_, err = tx.Exec("delete from lemma where lemma.id = ?", dbE.Lemma.ID)
+		_, err = tx.Exec("delete from Lemma where Lemma.id = ?", dbE.Lemma.ID)
 		if err != nil {
 			msg := fmt.Sprintf("failed to delete old lemma : %v", err)
 			err2 := tx.Rollback()
@@ -1599,7 +1599,7 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 		}
 	}
 	// Only one alternative left, to update old lemma with new values
-	_, err = tx.Exec("update lemma set strn = ?, reading = ?, paradigm = ? where lemma.id = ?", e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm, dbE.Lemma.ID)
+	_, err = tx.Exec("update Lemma set strn = ?, reading = ?, paradigm = ? where Lemma.id = ?", e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm, dbE.Lemma.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed to update lemma : %v", err)
 		err2 := tx.Rollback()
@@ -1635,7 +1635,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 
 	// Delete current tag if new tag is empty
 	if newTag == "" { // && oldTag != ""
-		_, err := tx.Exec("DELETE FROM entrytag WHERE entryid = ?", e.ID)
+		_, err := tx.Exec("DELETE FROM EntryTag WHERE entryId = ?", e.ID)
 		if err != nil {
 			msg := fmt.Sprintf("updateEntryTag failed to delete old tag : %v", err)
 			err2 := tx.Rollback()
@@ -1647,7 +1647,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return true, nil
 	}
 
-	sqlRes, err := tx.Exec("UPDATE entrytag SET tag = ? WHERE entryid = ?", newTag, e.ID)
+	sqlRes, err := tx.Exec("UPDATE EntryTag SET tag = ? WHERE entryId = ?", newTag, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("updateEntryTag failed : %v", err)
 		err2 := tx.Rollback()
@@ -1666,7 +1666,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return false, fmt.Errorf(msg)
 	}
 	if rows == 0 {
-		_, err := tx.Exec("INSERT into entrytag (tag, entryid) values (?, ?)", newTag, e.ID)
+		_, err := tx.Exec("INSERT into EntryTag (tag, entryId) values (?, ?)", newTag, e.ID)
 		if err != nil {
 			msg := fmt.Sprintf("updateEntryTag failed : %v", err)
 			err2 := tx.Rollback()
@@ -1678,7 +1678,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	}
 
 	var tagged string
-	err = tx.QueryRow("SELECT tag FROM entrytag WHERE entryid = ?", e.ID).Scan(&tagged)
+	err = tx.QueryRow("SELECT tag FROM EntryTag WHERE entryId = ?", e.ID).Scan(&tagged)
 	if err != nil {
 		return false, fmt.Errorf("updateEntryTag query failed : %v", err)
 	}
@@ -1726,7 +1726,7 @@ func updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 }
 
 // TODO move to function
-var transSTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
+var transSTMT = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
 
 func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if e.ID != dbE.ID {
@@ -1746,7 +1746,7 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 	if !equal(e.Transcriptions, dbE.Transcriptions) {
 		transIDs := getTIDs(dbE.Transcriptions)
 		// TODO move to a function
-		_, err := tx.Exec("delete from transcription where transcription.id in "+nQs(len(transIDs)), convI(transIDs)...)
+		_, err := tx.Exec("delete from Transcription where Transcription.id in "+nQs(len(transIDs)), convI(transIDs)...)
 		if err != nil {
 			msg := fmt.Sprintf("failed transcription delete : %v", err)
 			err2 := tx.Rollback()
@@ -2050,7 +2050,7 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 
 	// TODO This query seems a bit slow?
 	q := "SELECT DISTINCT EntryStatus.name FROM Lexicon, Entry, EntryStatus WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconID and Entry.id = EntryStatus.entryId"
-	qOnlyCurrent := " AND entryStatus.current = 1"
+	qOnlyCurrent := " AND EntryStatus.current = 1"
 	if onlyCurrent {
 		q += qOnlyCurrent
 	}
@@ -2090,7 +2090,7 @@ func listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool)
 	defer tx.Commit()
 
 	// TODO This query seems a bit slow?
-	q := "SELECT DISTINCT EntryStatus.name, COUNT(entryStatus.name) FROM Lexicon, Entry, EntryStatus WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconId and Entry.id = EntryStatus.entryId"
+	q := "SELECT DISTINCT EntryStatus.name, COUNT(EntryStatus.name) FROM Lexicon, Entry, EntryStatus WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconId and Entry.id = EntryStatus.entryId"
 	qOnlyCurrent := " AND EntryStatus.current = 1"
 	if onlyCurrent {
 		q += qOnlyCurrent
