@@ -45,21 +45,21 @@ func convS(s []string) []interface{} {
 
 // tables returns at least 'entry' since it makes no sense to return the empty string,
 // since the return value of this function is to be used after 'select
-// entry.id from'
+// Entry.id from'
 // func tables(lexNames []lex.LexName, q Query) string {
 // 	var res []string
 // 	if len(lexNames) > 0 {
 // 		res = append(res, "lexicon")
 // 	}
 // 	//if len(q.Words) > 0 || q.WordLike != "" || q.PartOfSpeechLike != "" {
-// 	res = append(res, "entry")
+// 	res = append(res, "Entry")
 // 	//}
 
 // 	if q.TranscriptionLike != "" {
-// 		res = append(res, "transcription")
+// 		res = append(res, "Transcription")
 // 	}
 // 	if len(q.Lemmas) > 0 || q.LemmaLike != "" || q.ReadingLike != "" || q.ParadigmLike != "" {
-// 		res = append(res, "lemma, lemma2entry")
+// 		res = append(res, "lemma, Lemma2Entry")
 // 	}
 
 // 	return strings.Join(res, ", ")
@@ -74,7 +74,7 @@ func lexicons(lexNames []lex.LexName) (string, []interface{}) {
 		return res, resv
 	}
 
-	res += "entry.lexiconid = lexicon.id AND lexicon.name in " + nQs(len(lexNames))
+	res += "Entry.lexiconid = Lexicon.id AND Lexicon.name in " + nQs(len(lexNames))
 
 	lNames := make([]interface{}, len(lexNames))
 	for i, l := range lexNames {
@@ -103,48 +103,48 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 		return "", resv
 	} //else {
 	if len(q.Words) > 0 {
-		reses = append(reses, "entry.strn in "+nQs(len(q.Words)))
+		reses = append(reses, "Entry.strn in "+nQs(len(q.Words)))
 		resv = append(resv, convS(ToLower(q.Words))...)
 	}
 	if len(q.WordParts) > 0 {
-		reses = append(reses, "entry.wordparts in "+nQs(len(q.WordParts)))
+		reses = append(reses, "Entry.wordparts in "+nQs(len(q.WordParts)))
 		resv = append(resv, convS(ToLower(q.WordParts))...)
 	}
 	if trm(q.WordPartsLike) != "" {
-		reses = append(reses, "entry.wordparts like ?")
+		reses = append(reses, "Entry.wordparts like ?")
 		resv = append(resv, q.WordPartsLike)
 	}
 	if trm(q.WordPartsRegexp) != "" {
-		reses = append(reses, "entry.wordparts REGEXP ?")
+		reses = append(reses, "Entry.wordparts REGEXP ?")
 		resv = append(resv, q.WordPartsRegexp)
 	}
 	if len(q.EntryIDs) > 0 {
-		reses = append(reses, "entry.id in "+nQs(len(q.EntryIDs)))
+		reses = append(reses, "Entry.id in "+nQs(len(q.EntryIDs)))
 		resv = append(resv, convI(q.EntryIDs)...)
 	}
 	if trm(q.WordLike) != "" {
-		reses = append(reses, "entry.strn like ?")
+		reses = append(reses, "Entry.strn like ?")
 		resv = append(resv, q.WordLike)
 	}
 	if trm(q.WordRegexp) != "" {
-		reses = append(reses, "entry.strn REGEXP ?")
+		reses = append(reses, "Entry.strn REGEXP ?")
 		resv = append(resv, q.WordRegexp)
 	}
 
 	if trm(q.LanguageLike) != "" {
-		reses = append(reses, "entry.language like ?")
+		reses = append(reses, "Entry.language like ?")
 		resv = append(resv, q.LanguageLike)
 	}
 	if trm(q.MorphologyLike) != "" {
-		reses = append(reses, "entry.morphology like ?")
+		reses = append(reses, "Entry.morphology like ?")
 		resv = append(resv, q.MorphologyLike)
 	}
 	if trm(q.PartOfSpeechLike) != "" {
-		reses = append(reses, "entry.partofspeech like ?")
+		reses = append(reses, "Entry.partofspeech like ?")
 		resv = append(resv, q.PartOfSpeechLike)
 	}
 	if trm(q.PartOfSpeechRegexp) != "" {
-		reses = append(reses, "entry.partofspeech REGEXP ?")
+		reses = append(reses, "Entry.partofspeech REGEXP ?")
 		resv = append(resv, q.PartOfSpeechRegexp)
 	}
 
@@ -153,7 +153,7 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 	res := strings.Join(reses, " AND ")
 
 	if len(lexNames) != 0 {
-		res += " and entry.lexiconid = lexicon.id"
+		res += " and Entry.lexiconid = Lexicon.id"
 	}
 
 	return res, resv
@@ -169,38 +169,38 @@ func lemmas(q Query) (string, []interface{}) {
 		return "", resv
 	}
 	if len(q.Lemmas) > 0 {
-		reses = append(reses, "lemma.strn in "+nQs(len(q.Lemmas)))
+		reses = append(reses, "Lemma.strn in "+nQs(len(q.Lemmas)))
 		resv = append(resv, convS(q.Lemmas)...)
 	}
 	if trm(q.LemmaLike) != "" {
-		reses = append(reses, "lemma.strn like ?")
+		reses = append(reses, "Lemma.strn like ?")
 		resv = append(resv, q.LemmaLike)
 	}
 	if trm(q.LemmaRegexp) != "" {
-		reses = append(reses, "lemma.strn REGEXP ?")
+		reses = append(reses, "Lemma.strn REGEXP ?")
 		resv = append(resv, q.LemmaRegexp)
 	}
 
 	if trm(q.ReadingLike) != "" {
-		reses = append(reses, "lemma.reading like ?")
+		reses = append(reses, "Lemma.reading like ?")
 		resv = append(resv, q.ReadingLike)
 	}
 	if trm(q.ReadingRegexp) != "" {
-		reses = append(reses, "lemma.reading REGEXP ?")
+		reses = append(reses, "Lemma.reading REGEXP ?")
 		resv = append(resv, q.ReadingRegexp)
 	}
 	if trm(q.ParadigmLike) != "" {
-		reses = append(reses, "lemma.paradigm like ?")
+		reses = append(reses, "Lemma.paradigm like ?")
 		resv = append(resv, q.ParadigmLike)
 	}
 	if trm(q.ParadigmRegexp) != "" {
-		reses = append(reses, "lemma.paradigm REGEXP ?")
+		reses = append(reses, "Lemma.paradigm REGEXP ?")
 		resv = append(resv, q.ParadigmRegexp)
 	}
 
 	res := strings.Join(reses, " AND ")
 
-	res += " and lemma.id = lemma2entry.lemmaid and entry.id = lemma2entry.entryid "
+	res += " and Lemma.id = Lemma2Entry.lemmaid and Entry.id = Lemma2Entry.entryId "
 
 	return res, resv
 }
@@ -211,12 +211,12 @@ func transcriptions(q Query) (string, []interface{}) {
 	var resv []interface{}
 
 	if trm(q.TranscriptionLike) != "" {
-		reses = append(reses, "transcription.strn LIKE ?")
+		reses = append(reses, "Transcription.strn LIKE ?")
 		resv = append(resv, q.TranscriptionLike)
 	}
 
 	if trm(q.TranscriptionRegexp) != "" {
-		reses = append(reses, "transcription.strn REGEXP ?")
+		reses = append(reses, "Transcription.strn REGEXP ?")
 		resv = append(resv, q.TranscriptionRegexp)
 	}
 
@@ -233,8 +233,8 @@ func entryStatuses(q Query) (string, []interface{}) {
 	}
 
 	// Lexicon selection should already have been taken care of
-	//res += "entry.lexiconid = lexicon.id AND lexicon.id in " + nQs(len(q.Lexicons))
-	res += "entry.id = entryStatus.entryID AND entryStatus.current = 1 AND entryStatus.name in " + nQs(len(q.EntryStatus))
+	//res += "Entry.lexiconid = Lexicon.id AND Lexicon.id in " + nQs(len(q.Lexicons))
+	res += "Entry.id = EntryStatus.entryId AND EntryStatus.current = 1 AND EntryStatus.name in " + nQs(len(q.EntryStatus))
 	for _, es := range q.EntryStatus {
 		resv = append(resv, es)
 	}
@@ -251,8 +251,8 @@ func users(q Query) (string, []interface{}) {
 	}
 
 	// Lexicon selection should already have been taken care of
-	//res += "entry.lexiconid = lexicon.id AND lexicon.id in " + nQs(len(q.Lexicons))
-	res += "entry.id = entryStatus.entryID AND entryStatus.current = 1 AND entryStatus.source in " + nQs(len(q.Users))
+	//res += "Entry.lexiconid = Lexicon.id AND Lexicon.id in " + nQs(len(q.Lexicons))
+	res += "Entry.id = EntryStatus.entryId AND EntryStatus.current = 1 AND EntryStatus.source in " + nQs(len(q.Users))
 	for _, es := range q.Users {
 		resv = append(resv, es)
 	}
@@ -266,7 +266,7 @@ func entryTag(q Query) (string, []interface{}) {
 	var resv []interface{}
 
 	if q.TagLike != "" {
-		res += " entry.id = entryTag.entryid AND entryTag.tag like ? "
+		res += " Entry.id = EntryTag.entryId AND EntryTag.tag like ? "
 		resv = append(resv, q.TagLike)
 	}
 
@@ -278,17 +278,17 @@ func comments(q Query) (string, []interface{}) {
 	var resv []interface{}
 
 	if q.CommentLabelLike != "" {
-		res = append(res, " entry.id = entryComment.entryid AND entrycomment.label like ? ")
+		res = append(res, " Entry.id = EntryComment.entryId AND Entrycomment.label like ? ")
 		resv = append(resv, q.CommentLabelLike)
 	}
 
 	if q.CommentSourceLike != "" {
-		res = append(res, " entry.id = entryComment.entryid AND entrycomment.source like ? ")
+		res = append(res, " Entry.id = EntryComment.entryId AND Entrycomment.source like ? ")
 		resv = append(resv, q.CommentSourceLike)
 	}
 
 	if q.CommentLike != "" {
-		res = append(res, " entry.id = entryComment.entryid AND entrycomment.comment like ? ")
+		res = append(res, " Entry.id = EntryComment.entryId AND Entrycomment.comment like ? ")
 		resv = append(resv, q.CommentLike)
 	}
 
@@ -300,11 +300,11 @@ func validations(q Query) (string, []interface{}) {
 	var resv []interface{}
 
 	if q.ValidationRuleLike != "" {
-		res = append(res, " entry.id = entryValidation.entryid AND lower(entryValidation.name) like lower(?) ")
+		res = append(res, " Entry.id = EntryValidation.entryId AND lower(EntryValidation.name) like lower(?) ")
 		resv = append(resv, q.ValidationRuleLike)
 	}
 	if q.ValidationLevelLike != "" {
-		res = append(res, " entry.id = entryValidation.entryid AND lower(entryValidation.level) like lower(?) ")
+		res = append(res, " Entry.id = EntryValidation.entryId AND lower(EntryValidation.level) like lower(?) ")
 		resv = append(resv, q.ValidationLevelLike)
 	}
 
@@ -337,22 +337,22 @@ func ToLower(ss []string) []string {
 
 // This is not sane.
 
-const baseSQLFrom = `FROM lexicon, entry, transcription
-LEFT JOIN lemma2entry ON lemma2entry.entryid = entry.id 
-LEFT JOIN lemma ON lemma.id = lemma2entry.lemmaid
-LEFT JOIN entrytag ON entrytag.entryid = entry.id
-LEFT JOIN entrystatus ON entrystatus.entryid = entry.id AND entrystatus.current = 1
-LEFT JOIN entryvalidation ON entryvalidation.entryid = entry.id 
-LEFT JOIN entryComment ON entryComment.entryid = entry.id 
-WHERE entry.id = transcription.entryid AND entry.lexiconid = lexicon.id` // entry.lexiconid = lexicon.id needed when no single input lexicon ID is given
-// AND lexicon.id = ? ORDER BY entry.id, transcription.id ASC`
+const baseSQLFrom = `FROM Lexicon, Entry, Transcription
+LEFT JOIN Lemma2Entry ON Lemma2Entry.entryId = Entry.id 
+LEFT JOIN Lemma ON Lemma.id = Lemma2Entry.lemmaid
+LEFT JOIN EntryTag ON EntryTag.entryId = Entry.id
+LEFT JOIN EntryStatus ON EntryStatus.entryId = Entry.id AND EntryStatus.current = 1
+LEFT JOIN EntryValidation ON EntryValidation.entryId = Entry.id 
+LEFT JOIN EntryComment ON EntryComment.entryId = Entry.id 
+WHERE Entry.id = Transcription.entryId AND Entry.lexiconid = Lexicon.id` // Entry.lexiconid = Lexicon.id needed when no single input lexicon ID is given
+// AND Lexicon.id = ? ORDER BY Entry.id, Transcription.id ASC`
 
 // Queries db for all entries with transcriptions and optional lemma forms.
-var baseSQLSelect = "SELECT lexicon.name, entry.id, entry.strn, entry.language, entry.partofspeech, entry.morphology, entry.wordparts, entry.preferred, transcription.id, transcription.entryid, transcription.strn, transcription.language, transcription.sources, lemma.id, lemma.strn, lemma.reading, lemma.paradigm, entrytag.tag, entrystatus.id, entrystatus.name, entrystatus.source, entrystatus.timestamp, entrystatus.current, entryvalidation.id, entryvalidation.level, entryvalidation.name, entryvalidation.message, entryvalidation.timestamp, entryComment.id, entryComment.label, entryComment.source, entryComment.comment " + baseSQLFrom
+var baseSQLSelect = "SELECT Lexicon.name, Entry.id, Entry.strn, Entry.language, Entry.partofspeech, Entry.morphology, Entry.wordparts, Entry.preferred, Transcription.id, Transcription.entryId, Transcription.strn, Transcription.language, Transcription.sources, Lemma.id, Lemma.strn, Lemma.reading, Lemma.paradigm, EntryTag.tag, EntryStatus.id, EntryStatus.name, EntryStatus.source, EntryStatus.timestamp, EntryStatus.current, EntryValidation.id, EntryValidation.level, EntryValidation.name, EntryValidation.message, EntryValidation.timestamp, EntryComment.id, EntryComment.label, EntryComment.source, EntryComment.comment " + baseSQLFrom
 
-//var baseSQLCount = `SELECT count(distinct entry.id) ` + baseSQLFrom
+//var baseSQLCount = `SELECT count(distinct Entry.id) ` + baseSQLFrom
 
-var baseSQLSelectIds = `SELECT distinct entry.id ` + baseSQLFrom
+var baseSQLSelectIds = `SELECT distinct Entry.id ` + baseSQLFrom
 
 // sqlStmt container class for prepared sql statement:
 // sql is a plain sql string with selects and '?' for arguments to be populated
@@ -399,7 +399,7 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	// HasEntryValidation doesn't take any argument
 	ev := ""
 	if q.HasEntryValidation {
-		ev = "entryValidation.entryId = entry.id"
+		ev = "EntryValidation.entryId = Entry.id"
 	}
 
 	// puts together pieces of sql created above with " and " in between
@@ -417,7 +417,7 @@ func selectEntriesSQL(lexNames []lex.LexName, q Query) sqlStmt {
 	sqlQuery, args := appendQuery(baseSQLSelect, lexNames, q)
 
 	// sort by id to make sql rows -> Entry simpler
-	sqlQuery += " ORDER BY entry.id, transcription.id"
+	sqlQuery += " ORDER BY Entry.id, Transcription.id"
 
 	// When both PageLength and Page values are zero, no page limit is used
 	// This is useful for example when exporting a complete lexicon
@@ -452,12 +452,12 @@ func countEntriesSQL(lexNames []lex.LexName, q Query) sqlStmt {
 // 	resv := convI(ids)
 // 	qs := nQs(len(ids))
 // 	// TODO assumes that every Entry has at least one transcription
-// 	res += "select entry.id, entry.lexiconid, entry.strn, entry.language, entry.partofspeech, entry.wordparts, "
+// 	res += "select Entry.id, Entry.lexiconid, Entry.strn, Entry.language, Entry.partofspeech, Entry.wordparts, "
 // 	res += "transcription.id, transcription.entryid, transcription.strn, transcription.language "
-// 	res += "from lexicon, entry, transcription "
-// 	res += "where lexicon.id = entry.lexiconid "
-// 	res += "and entry.id = transcription.entryId "
-// 	res += "and entry.id in " + qs
-// 	// res += " order by entry.strn asc" // TODO ???
+// 	res += "from Lexicon, entry, transcription "
+// 	res += "where Lexicon.id = Entry.lexiconid "
+// 	res += "and Entry.id = transcription.entryId "
+// 	res += "and Entry.id in " + qs
+// 	// res += " order by Entry.strn asc" // TODO ???
 // 	return res, resv
 // }
