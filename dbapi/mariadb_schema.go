@@ -165,15 +165,17 @@ var MariaDBSchema = []string{
 	`CREATE UNIQUE INDEX l2euind on Lemma2Entry (lemmaId,entryId);`,
 	`CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);`,
 
-	`-- Triggers to ensure only one preferred = 1 per orthographic word
-	-- When a new entry is added, where preferred is not 0, all other entries for
-	-- the same orthographic word (entry.strn), will have the preferred field set to 0.
-	-- TODO: This doesn't work in Mysql/MariaDB?
-        CREATE TRIGGER insertPref BEFORE INSERT ON Entry
-	  FOR EACH ROW
-          BEGIN
-	    UPDATE Entry SET NEW.preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;
-END;`,
+	/* TODO: Triggers removed for now. Triggers compile, but give runtime error
+
+	   	`-- Triggers to ensure only one preferred = 1 per orthographic word
+	   	-- When a new entry is added, where preferred is not 0, all other entries for
+	   	-- the same orthographic word (entry.strn), will have the preferred field set to 0.
+	   	-- TODO: This doesn't work in Mysql/MariaDB?
+	           CREATE TRIGGER insertPref BEFORE INSERT ON Entry
+	   	  FOR EACH ROW
+	             BEGIN
+	   	    UPDATE Entry SET NEW.preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconId = NEW.lexiconId;
+	   END;`,
 
 	// `CREATE TRIGGER updatePref BEFORE UPDATE ON Entry
 	//   FOR EACH ROW
@@ -187,4 +189,6 @@ END;`,
 	`CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON EntryStatus
 	  FOR EACH ROW
 	    UPDATE EntryStatus SET current = 0 WHERE entryid = NEW.entryid AND NEW.current <> 0;`,
+
+	*/
 }

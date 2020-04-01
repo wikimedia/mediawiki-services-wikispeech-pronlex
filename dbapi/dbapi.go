@@ -64,16 +64,6 @@ var regexMem = func(re, s string) (bool, error) {
 // 		})
 // }
 
-/*
-func listNamesOfTriggers(db *sql.DB) ([]string, error) {
-	tx, err := db.Begin()
-	if err != nil {
-		return []string{}, fmt.Errorf("dbapi.listNamesOfTriggers : %v", err)
-	}
-	defer tx.Commit()
-	return listNamesOfTriggersTx(tx)
-}
-*/
 func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	var res []string
 
@@ -137,25 +127,6 @@ func getSchemaVersionTx(tx *sql.Tx) (string, error) {
 	return res, nil
 }
 
-// ListEntryTableColumnNames is a meta-function that returns the names of the columns of the 'entry' lexicon database table.
-// It can be used for checking that the entry table has the expected columns.
-/*
-func listEntryTableColumnNames(db *sql.DB) ([]string, error) {
-	q := "SELECT * FROM entry LIMIT 0"
-
-	rows, err := db.Query(q)
-	if err != nil {
-		return []string{}, fmt.Errorf("ListEntryTableColumnNames : %v", err)
-	}
-	defer rows.Close()
-	colNames, err := rows.Columns()
-	if err != nil {
-		return colNames, fmt.Errorf("ListEntryTableColumnNames : %v", err)
-	}
-
-	return colNames, err
-}
-*/
 // ListLexicons returns a list of the lexicons defined in the db
 // (i.e., Lexicon structs corresponding to the rows of the lexicon
 // table).
@@ -229,82 +200,6 @@ func getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
 
 }
 
-// GetLexicons takes a list of lexicon names and returns a list of
-// Lexicon structs corresponding to rows of db lexicon table with those name fields.
-/*
-func getLexicons(db *sql.DB, names []string) ([]lexicon, error) {
-	var res []lexicon
-	found := make(map[string]bool)
-	if 0 == len(names) {
-		return res, nil
-	}
-
-	rows, err := db.Query("select id, name, symbolsetname, locale from lexicon where name in "+nQs(len(names)), convS(names)...)
-	if err != nil {
-		return res, fmt.Errorf("failed db select on lexicon table : %v", err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		l := lexicon{}
-		err := rows.Scan(&l.id, &l.name, &l.symbolSetName, &l.locale)
-		if err != nil {
-			return res, fmt.Errorf("failed rows scan : %v", err)
-		}
-		found[strings.ToLower(l.name)] = true
-		res = append(res, l)
-	}
-
-	err = rows.Err()
-	//rows.Close()
-
-	if len(res) != len(names) {
-		var missing []string
-		for _, n := range names {
-			if _, ok := found[strings.ToLower(n)]; !ok {
-				missing = append(missing, n)
-			}
-		}
-
-		err0 := fmt.Errorf("unknown lexicon(s): %v", strings.Join(missing, ", "))
-		if err != nil {
-			err = fmt.Errorf("%v : %v", err, err0)
-		} else {
-			err = err0
-		}
-	}
-
-	return res, err
-}
-*/
-// LexiconFromID returns a Lexicon struct corresponding to a row in
-// the lexicon table with the given id
-/*
-func lexiconFromID(db *sql.DB, id int64) (lexicon, error) {
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		return lexicon{}, fmt.Errorf("lexiconFromID failed to start db transaction : %v", err)
-	}
-
-	return lexiconFromIDTx(tx, id)
-}
-*/
-// LexiconFromIDTx returns a Lexicon struct corresponding to a row in
-// the lexicon table with the given id
-/*
-func lexiconFromIDTx(tx *sql.Tx, id int64) (lexicon, error) {
-	res := lexicon{}
-	err := tx.QueryRow("select id, name, symbolsetname, locale from lexicon where id = ?", id).Scan(&res.id, &res.name, &res.symbolSetName, &res.locale)
-	if err == sql.ErrNoRows {
-		return res, fmt.Errorf("no lexicon with id %d : %v", id, err)
-	}
-	if err != nil {
-		return res, fmt.Errorf("query failed %v", err)
-	}
-
-	return res, err
-}
-*/
 // DeleteLexicon deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
 // It should be impossible to delete the Lexicon table entry if associated to any entries.
@@ -675,7 +570,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 
 	//_ = q0Rez
 
-	updateQuery := `UPDATE entry SET lexiconId = ? ` + where
+	updateQuery := `UPDATE Entry SET lexiconId = ? ` + where
 
 	//log.Printf("Q: %s\n", updateQuery)
 
@@ -1420,22 +1315,6 @@ func getEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 
 }
 
-// GetEntriesFromIDs is a wrapper around LookUp and returns the lex.Entry corresponding to the db id
-/*
-func getEntriesFromIDs(db *sql.DB, ids []int64, out lex.EntryWriter) error {
-	q := Query{EntryIDs: ids}
-	err := lookUp(db, []lex.LexName{}, q, out)
-	if err != nil {
-		return fmt.Errorf("LookUp failed : %v", err)
-	}
-
-	if out.Size() != len(ids) {
-		return fmt.Errorf("got %d input ids, but found %d entries", len(ids), out.Size())
-	}
-	return nil
-
-}
-*/
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
 // TODO Consider how to handle inconsistent input entries
 // TODO Full name of DB as input param?
@@ -1895,10 +1774,6 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 	return false, err
 }
 
-//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entryid = ?"
-
-//var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
-
 // TODO always insert new status, or only when name and source have changed. Or...?
 func updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if trm(e.EntryStatus.Name) != "" {
@@ -1961,7 +1836,7 @@ func newValidations(e1 lex.Entry, e2 lex.Entry) ([]lex.EntryValidation, []lex.En
 	return res1, res2
 }
 
-var insValiSQL = "INSERT INTO entryvalidation (entryid, level, name, message) values (?, ?, ?, ?)"
+var insValiSQL = "INSERT INTO EntryValidation (entryId, level, name, message) values (?, ?, ?, ?)"
 
 func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error {
 	for _, v := range eValis {
@@ -2018,7 +1893,7 @@ func updateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
 }
 
 func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
-	_, err := tx.Exec("DELETE FROM entryvalidation WHERE entryid = ?", e.ID)
+	_, err := tx.Exec("DELETE FROM EntryValidation WHERE entryId = ?", e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed deleting EntryValidation : %v", err)
 		err2 := tx.Rollback()
@@ -2048,7 +1923,7 @@ func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error)
 	}
 
 	for _, v := range removeValidations {
-		_, err := tx.Exec("DELETE FROM entryvalidation WHERE id = ?", v.ID)
+		_, err := tx.Exec("DELETE FROM EntryValidation WHERE id = ?", v.ID)
 		if err != nil {
 			msg := fmt.Sprintf("failed deleting EntryValidation : %v", err)
 			err2 := tx.Rollback()
@@ -2062,8 +1937,8 @@ func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error)
 	return true, nil
 }
 
-var delEntryCommentsSQL = "DELETE FROM entrycomment WHERE entryID = ?"
-var insEntryCommentSQL = "INSERT INTO entrycomment (entryid, label, source, comment) values (?, ?, ?, ?)"
+var delEntryCommentsSQL = "DELETE FROM EntryComment WHERE entryId = ?"
+var insEntryCommentSQL = "INSERT INTO EntryComment (entryId, label, source, comment) values (?, ?, ?, ?)"
 
 func insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) error {
 
@@ -2107,15 +1982,6 @@ func unique(ns []int64) []int64 {
 	return res
 }
 
-/*
-func uniqIDs(ss []Symbol) []int64 {
-	res := make([]int64, len(ss))
-	for i, s := range ss {
-		res[i] = s.LexiconID
-	}
-	return unique(res)
-}
-*/
 func entryCount(db *sql.DB, lexiconName string) (int64, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -2126,7 +1992,7 @@ func entryCount(db *sql.DB, lexiconName string) (int64, error) {
 
 	// number of entries in a lexicon
 	var entries int64
-	err = tx.QueryRow("SELECT COUNT(*) FROM entry, lexicon WHERE entry.lexiconid = lexicon.id and lexicon.name = ?", lexiconName).Scan(&entries)
+	err = tx.QueryRow("SELECT COUNT(*) FROM Entry, Lexicon WHERE Entry.lexiconId = Lexicon.id and Lexicon.name = ?", lexiconName).Scan(&entries)
 	if err != nil || err == sql.ErrNoRows {
 		return -1, fmt.Errorf("dbapi.entryCount failed QueryRow : %v", err)
 	}
@@ -2142,30 +2008,12 @@ func locale(db *sql.DB, lexiconName string) (string, error) {
 	}
 
 	var locale string
-	err = tx.QueryRow("SELECT locale FROM lexicon WHERE lexicon.name = ?", lexiconName).Scan(&locale)
+	err = tx.QueryRow("SELECT locale FROM Lexicon WHERE Lexicon.name = ?", lexiconName).Scan(&locale)
 	if err != nil || err == sql.ErrNoRows {
 		return "", fmt.Errorf("dbapi.locale failed QueryRow : %v", err)
 	}
 	return locale, nil
 }
-
-// EntryCount counts the number of lines in a lexicon
-// func entryCount(db *sql.DB, lexiconID int64) (int64, error) {
-// 	tx, err := db.Begin()
-// 	defer tx.Commit()
-
-// 	if err != nil {
-// 		return -1, fmt.Errorf("dbapi.EntryCount failed opening db transaction : %v", err)
-// 	}
-
-// 	// number of entries in a lexicon
-// 	var entries int64
-// 	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
-// 	if err != nil || err == sql.ErrNoRows {
-// 		return -1, fmt.Errorf("dbapi.EntryCount failed QueryRow : %v", err)
-// 	}
-// 	return entries, nil
-// }
 
 // ListCurrentEntryUsers returns a list of all names EntryUsers marked 'current' (i.e., the most recent status).
 func listCurrentEntryUsers(db *sql.DB, lexiconName string) ([]string, error) {
@@ -2201,7 +2049,7 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 	defer tx.Commit()
 
 	// TODO This query seems a bit slow?
-	q := "SELECT DISTINCT entryStatus.name FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
+	q := "SELECT DISTINCT EntryStatus.name FROM Lexicon, Entry, EntryStatus WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconID and Entry.id = EntryStatus.entryId"
 	qOnlyCurrent := " AND entryStatus.current = 1"
 	if onlyCurrent {
 		q += qOnlyCurrent
@@ -2242,12 +2090,12 @@ func listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool)
 	defer tx.Commit()
 
 	// TODO This query seems a bit slow?
-	q := "SELECT DISTINCT entryStatus.name, COUNT(entryStatus.name) FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
-	qOnlyCurrent := " AND entryStatus.current = 1"
+	q := "SELECT DISTINCT EntryStatus.name, COUNT(entryStatus.name) FROM Lexicon, Entry, EntryStatus WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconId and Entry.id = EntryStatus.entryId"
+	qOnlyCurrent := " AND EntryStatus.current = 1"
 	if onlyCurrent {
 		q += qOnlyCurrent
 	}
-	q += " GROUP BY entryStatus.name"
+	q += " GROUP BY EntryStatus.name"
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
@@ -2283,12 +2131,12 @@ func listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (m
 	defer tx.Commit()
 
 	// TODO This query seems a bit slow?
-	q := "SELECT DISTINCT entryStatus.source, COUNT(entryStatus.source) FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
-	qOnlyCurrent := " AND entryStatus.current = 1"
+	q := "SELECT DISTINCT EntryStatus.source, COUNT(EntryStatus.source) FROM Lexicon, Entry, EntryStatus WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconId and Entry.id = EntryStatus.entryId"
+	qOnlyCurrent := " AND EntryStatus.current = 1"
 	if onlyCurrent {
 		q += qOnlyCurrent
 	}
-	q += " GROUP BY entryStatus.source"
+	q += " GROUP BY EntryStatus.source"
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
@@ -2325,8 +2173,8 @@ func listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string,
 	defer tx.Commit()
 
 	// TODO This query seems a bit slow?
-	q := "SELECT DISTINCT entryStatus.source FROM lexicon, entry, entryStatus WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID and entry.id = entryStatus.entryId"
-	qOnlyCurrent := " AND entryStatus.current = 1"
+	q := "SELECT DISTINCT EntryStatus.source FROM Lexicon, Entry, EntryStatus WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconId and Entry.id = EntryStatus.entryId"
+	qOnlyCurrent := " AND EntryStatus.current = 1"
 	if onlyCurrent {
 		q += qOnlyCurrent
 	}
@@ -2364,7 +2212,7 @@ func listCommentLabels(db *sql.DB, lexiconName string) ([]string, error) {
 	}
 	defer tx.Commit()
 
-	q := "SELECT DISTINCT entryComment.label FROM lexicon, entry, entryComment WHERE lexicon.name = ? AND lexicon.id = entry.lexiconID"
+	q := "SELECT DISTINCT EntryComment.label FROM Lexicon, Entry, EntryComment WHERE Lexicon.name = ? AND Lexicon.id = Entry.lexiconId"
 
 	rows, err := tx.Query(q, lexiconName)
 	if err != nil {
@@ -2410,7 +2258,7 @@ func lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 
 	// number of entries in a lexicon
 	var entries int64
-	err = tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&entries)
+	err = tx.QueryRow("SELECT COUNT(*) FROM Entry WHERE Entry.lexiconId = ?", lexiconID).Scan(&entries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.LexiconStats failed QueryRow : %v", err)
 	}
@@ -2421,7 +2269,7 @@ func lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	// t2 := time.Now()
 	// log.Printf("dbapi.LexiconStats TOTAL COUNT TOOK %v\n", t2.Sub(t1))
 
-	rows, err := tx.Query("select entrystatus.name, count(entrystatus.name) from entry, entrystatus where entry.lexiconid = ? and entry.id = entrystatus.entryid and entrystatus.current = 1 group by entrystatus.name", lexiconID)
+	rows, err := tx.Query("select EntryStatus.name, count(EntryStatus.name) from Entry, EntryStatus where Entry.lexiconId = ? and Entry.id = EntryStatus.entryId and EntryStatus.current = 1 group by EntryStatus.name", lexiconID)
 	if err != nil {
 		return res, fmt.Errorf("db query failed : %v", err)
 	}
@@ -2479,7 +2327,7 @@ func validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
 
 	// number of entries in the lexicon
-	err := tx.QueryRow("SELECT COUNT(*) FROM entry WHERE entry.lexiconid = ?", lexiconID).Scan(&res.TotalEntries)
+	err := tx.QueryRow("SELECT COUNT(*) FROM Entry WHERE Entry.lexiconId = ?", lexiconID).Scan(&res.TotalEntries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
@@ -2487,18 +2335,18 @@ func validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 	res.ValidatedEntries = res.TotalEntries
 
 	// number of invalid entries
-	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.entryid) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&res.InvalidEntries)
+	err = tx.QueryRow("SELECT COUNT (DISTINCT EntryValidation.entryId) FROM Entry, EntryValidation WHERE Entry.id = EntryValidation.entryId AND Entry.lexiconId = ?", lexiconID).Scan(&res.InvalidEntries)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
 
 	// number of validations
-	err = tx.QueryRow("SELECT COUNT (DISTINCT entryvalidation.id) FROM entry, entryvalidation WHERE entry.id = entryvalidation.entryid AND entry.lexiconid = ?", lexiconID).Scan(&res.TotalValidations)
+	err = tx.QueryRow("SELECT COUNT (DISTINCT EntryValidation.id) FROM Entry, EntryValidation WHERE Entry.id = EntryValidation.entryId AND Entry.lexiconId = ?", lexiconID).Scan(&res.TotalValidations)
 	if err != nil || err == sql.ErrNoRows {
 		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
 	}
 
-	levels, err := tx.Query("select entryvalidation.level, count(entryvalidation.level) from entry, entryvalidation where entry.lexiconid = ? and entry.id = entryvalidation.entryid group by entryvalidation.level", lexiconID)
+	levels, err := tx.Query("select EntryValidation.level, count(EntryValidation.level) from Entry, EntryValidation where Entry.lexiconId = ? and Entry.id = EntryValidation.entryId group by EntryValidation.level", lexiconID)
 	if err != nil {
 		return res, fmt.Errorf("db query failed : %v", err)
 	}
@@ -2519,7 +2367,7 @@ func validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 		return res, err
 	}
 
-	names, err := tx.Query("select entryvalidation.level, entryvalidation.name, count(entryvalidation.name) from entry, entryvalidation where entry.lexiconid = ? and entry.id = entryvalidation.entryid group by entryvalidation.name", lexiconID)
+	names, err := tx.Query("select EntryValidation.level, EntryValidation.name, count(EntryValidation.name) from Entry, EntryValidation where Entry.lexiconId = ? and Entry.id = EntryValidation.entryId group by EntryValidation.name", lexiconID)
 	if err != nil {
 		return res, fmt.Errorf("db query failed : %v", err)
 	}
