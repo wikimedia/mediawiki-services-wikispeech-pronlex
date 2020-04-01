@@ -796,7 +796,13 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 	return ids, err
 }
 
-var insertEntryTag = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
+// Trigger version
+//var insertEntryTag = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
+
+// Trigger-less version
+var insertEntryTag = "INSERT INTO EntryTag (entryId, tag, wordForm) values (?, ?, ?)"
+
+// TODO: Test that EntryTags work as expected after removal of triggers
 
 //TODO Add tests
 
@@ -840,7 +846,7 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 		return fmt.Errorf("failed prepare : %v", err)
 	}
 
-	_, err = tx.Stmt(insert).Exec(entryID, tag)
+	_, err = tx.Stmt(insert).Exec(entryID, tag, wordForm)
 	if err != nil {
 		// TODO Maybe no rollback?
 		// Let caller be responsible for rollback
@@ -1640,6 +1646,7 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 	return true, nil
 }
 
+// TODO: Test that EntryTags work as expected after removal of triggers
 func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	//log.Printf("dbapi debug updateEntryTag called")
 	if e.ID != dbE.ID {
@@ -1695,7 +1702,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return false, fmt.Errorf(msg)
 	}
 	if rows == 0 {
-		_, err := tx.Exec("INSERT into EntryTag (tag, entryId) values (?, ?)", newTag, e.ID)
+		_, err := tx.Exec("INSERT into EntryTag (tag, entryId, wordForm) values (?, ?, ?)", newTag, e.ID, e.Strn)
 		if err != nil {
 			msg := fmt.Sprintf("updateEntryTag failed : %v", err)
 			err2 := tx.Rollback()
