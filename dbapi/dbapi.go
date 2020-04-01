@@ -602,7 +602,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 var entrySTMT = "insert into Entry (lexiconId, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
 var transAfterEntrySTMT = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
 
-//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
+var statusSetCurrentFalse = "UPDATE EntryStatus SET current = 0 WHERE EntryStatus.entryId = ?"
 var insertStatus = "INSERT INTO EntryStatus (entryId, name, source) values (?, ?, ?)"
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
@@ -730,7 +730,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 		}
 
 		if trm(e.EntryStatus.Name) != "" {
-			//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
+
 			//var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
 			// _, err := tx.Exec(statusSetCurrentFalse, e.ID)
@@ -1778,13 +1778,26 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 func updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if trm(e.EntryStatus.Name) != "" {
 
-		// There is now a db trigger that sets older entry status current flag to false
-
 		// _, err := tx.Exec(statusSetCurrentFalse, dbE.ID)
 		// if err != nil {
 		// 	tx.Rollback()
 		// 	return false, fmt.Errorf("failed EntryStatus.Current update : %v", err)
 		// }
+
+		// TODO: Trigger that in Sqlite nulled previous CURRENT values doesn't work in MariaDB.
+		// We do this manually for now
+		//var statusSetCurrentFalse = "UPDATE EntryStatus SET current = 0 WHERE EntryStatus.entryId = ?"
+		_, err = tx.Exec(statusSetCurrentFalse, e.ID)
+		if err != nil {
+			msg := fmt.Sprintf("nulling previous EntryStatus.current failed : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+
+			return false, fmt.Errorf(msg)
+		}
+
 		_, err = tx.Exec(insertStatus, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
 		if err != nil {
 			msg := fmt.Sprintf("failed EntryStatus update : %v", err)
