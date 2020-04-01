@@ -643,6 +643,21 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 		if e.Preferred {
 			pref = 1
 		}
+
+		//TODO: Sqlite trigger doesn't work in MaryDB. Must set previous preferred to false manually
+		if e.Preferred {
+			var setPreferredFalse = "UPDATE Entry SET preferred = 0 WHERE Entry.strn = ?"
+			_, err := tx.Exec(setPreferredFalse, e.Strn)
+			if err != nil {
+				msg := fmt.Sprintf("failed preferred update of previous entries : %v", err)
+				err2 := tx.Rollback()
+				if err2 != nil {
+					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+				}
+				return ids, fmt.Errorf(msg)
+			}
+		}
+
 		res, err := tx.Stmt(stmt1).Exec(
 			l.id,
 			strings.ToLower(e.Strn),
@@ -1568,6 +1583,20 @@ func updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	var pref int64
 	if e.Preferred {
 		pref = 1
+	}
+
+	//TODO: Sqlite trigger doesn't work in MaryDB. Must set previous preferred to false manually
+	if e.Preferred {
+		var setPreferredFalse = "UPDATE Entry SET preferred = 0 WHERE Entry.strn = ?"
+		_, err := tx.Exec(setPreferredFalse, e.Strn)
+		if err != nil {
+			msg := fmt.Sprintf("failed preferred update of previous entries : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return false, fmt.Errorf(msg)
+		}
 	}
 	_, err := tx.Exec("update Entry set preferred = ? where Entry.id = ?", pref, e.ID)
 	if err != nil {

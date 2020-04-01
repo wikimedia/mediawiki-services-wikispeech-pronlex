@@ -632,16 +632,16 @@ func Test_insertEntries(t *testing.T) {
 	}
 
 	if entries2[0].PartOfSpeech == "XX" && !entries2[0].Preferred {
-		t.Errorf(fs, 1, entries2[0].Preferred)
+		t.Errorf(fs, "true", entries2[0].Preferred)
 	}
 	if entries2[1].PartOfSpeech == "XX" && !entries2[1].Preferred {
-		t.Errorf(fs, 1, entries2[1].Preferred)
+		t.Errorf(fs, "true", entries2[1].Preferred)
 	}
 	if entries2[0].PartOfSpeech != "XX" && entries2[0].Preferred {
-		t.Errorf(fs, 0, entries2[0].Preferred)
+		t.Errorf(fs, "false", entries2[0].Preferred)
 	}
 	if entries2[1].PartOfSpeech != "XX" && entries2[1].Preferred {
-		t.Errorf(fs, 0, entries2[1].Preferred)
+		t.Errorf(fs, "false", entries2[1].Preferred)
 	}
 
 	// TODO should be in a test of its own
