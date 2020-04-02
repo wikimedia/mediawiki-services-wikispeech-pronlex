@@ -107,15 +107,15 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 		resv = append(resv, convS(ToLower(q.Words))...)
 	}
 	if len(q.WordParts) > 0 {
-		reses = append(reses, "Entry.wordparts in "+nQs(len(q.WordParts)))
+		reses = append(reses, "Entry.wordParts in "+nQs(len(q.WordParts)))
 		resv = append(resv, convS(ToLower(q.WordParts))...)
 	}
 	if trm(q.WordPartsLike) != "" {
-		reses = append(reses, "Entry.wordparts like ?")
+		reses = append(reses, "Entry.wordParts like ?")
 		resv = append(resv, q.WordPartsLike)
 	}
 	if trm(q.WordPartsRegexp) != "" {
-		reses = append(reses, "Entry.wordparts REGEXP ?")
+		reses = append(reses, "Entry.wordParts REGEXP ?")
 		resv = append(resv, q.WordPartsRegexp)
 	}
 	if len(q.EntryIDs) > 0 {
@@ -140,11 +140,11 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 		resv = append(resv, q.MorphologyLike)
 	}
 	if trm(q.PartOfSpeechLike) != "" {
-		reses = append(reses, "Entry.partofspeech like ?")
+		reses = append(reses, "Entry.partOfSpeech like ?")
 		resv = append(resv, q.PartOfSpeechLike)
 	}
 	if trm(q.PartOfSpeechRegexp) != "" {
-		reses = append(reses, "Entry.partofspeech REGEXP ?")
+		reses = append(reses, "Entry.partOfSpeech REGEXP ?")
 		resv = append(resv, q.PartOfSpeechRegexp)
 	}
 
@@ -153,7 +153,7 @@ func words(lexNames []lex.LexName, q Query) (string, []interface{}) {
 	res := strings.Join(reses, " AND ")
 
 	if len(lexNames) != 0 {
-		res += " and Entry.lexiconid = Lexicon.id"
+		res += " and Entry.lexiconId = Lexicon.id"
 	}
 
 	return res, resv
@@ -200,7 +200,7 @@ func lemmas(q Query) (string, []interface{}) {
 
 	res := strings.Join(reses, " AND ")
 
-	res += " and Lemma.id = Lemma2Entry.lemmaid and Entry.id = Lemma2Entry.entryId "
+	res += " and Lemma.id = Lemma2Entry.lemmaId and Entry.id = Lemma2Entry.entryId "
 
 	return res, resv
 }
@@ -348,7 +348,7 @@ WHERE Entry.id = Transcription.entryId AND Entry.lexiconId = Lexicon.id` // Entr
 // AND Lexicon.id = ? ORDER BY Entry.id, Transcription.id ASC`
 
 // Queries db for all entries with transcriptions and optional lemma forms.
-var baseSQLSelect = "SELECT Lexicon.name, Entry.id, Entry.strn, Entry.language, Entry.partofspeech, Entry.morphology, Entry.wordparts, Entry.preferred, Transcription.id, Transcription.entryId, Transcription.strn, Transcription.language, Transcription.sources, Lemma.id, Lemma.strn, Lemma.reading, Lemma.paradigm, EntryTag.tag, EntryStatus.id, EntryStatus.name, EntryStatus.source, EntryStatus.timestamp, EntryStatus.current, EntryValidation.id, EntryValidation.level, EntryValidation.name, EntryValidation.message, EntryValidation.timestamp, EntryComment.id, EntryComment.label, EntryComment.source, EntryComment.comment " + baseSQLFrom
+var baseSQLSelect = "SELECT Lexicon.name, Entry.id, Entry.strn, Entry.language, Entry.partOfSpeech, Entry.morphology, Entry.wordParts, Entry.preferred, Transcription.id, Transcription.entryId, Transcription.strn, Transcription.language, Transcription.sources, Lemma.id, Lemma.strn, Lemma.reading, Lemma.paradigm, EntryTag.tag, EntryStatus.id, EntryStatus.name, EntryStatus.source, EntryStatus.timestamp, EntryStatus.current, EntryValidation.id, EntryValidation.level, EntryValidation.name, EntryValidation.message, EntryValidation.timestamp, EntryComment.id, EntryComment.label, EntryComment.source, EntryComment.comment " + baseSQLFrom
 
 //var baseSQLCount = `SELECT count(distinct Entry.id) ` + baseSQLFrom
 

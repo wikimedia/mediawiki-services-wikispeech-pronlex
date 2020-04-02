@@ -49,7 +49,7 @@ func TestSql_words(t *testing.T) {
 
 	//w, wv = words(Query{Words: []string{"fimbul"}})
 	w, wv = words([]lex.LexName{}, Query{Words: []string{"fimbul"}})
-	x := "entry.strn in (?)"
+	x := "Entry.strn in (?)"
 	if w != x {
 		t.Errorf(fs, x, w)
 	}
@@ -59,7 +59,7 @@ func TestSql_words(t *testing.T) {
 
 	//w, _ = words(Query{Lexicons: []Lexicon{Lexicon{}}, Words: []string{"fimbul", "vinter"}})
 	w, _ = words([]lex.LexName{lex.LexName("")}, Query{Words: []string{"fimbul", "vinter"}})
-	x = "entry.strn in (?,?) and entry.lexiconid = lexicon.id"
+	x = "Entry.strn in (?,?) and Entry.lexiconId = Lexicon.id"
 	if w != x {
 		t.Errorf(fs, x, w)
 	}

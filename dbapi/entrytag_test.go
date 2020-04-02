@@ -2,7 +2,8 @@ package dbapi
 
 import (
 	"database/sql"
-	"os"
+	"log"
+	//"os"
 	"testing"
 
 	"github.com/stts-se/pronlex/lex"
@@ -10,27 +11,33 @@ import (
 
 func TestEntryTag1(t *testing.T) {
 
-	dbPath := "./testlex_entrytag.db"
-	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-		err := os.Remove(dbPath)
-		if err != nil {
-			t.Errorf("failed to remove %s : %v", dbPath, err)
-		}
+	// dbPath := "./testlex_entrytag.db"
+	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbPath)
+	// 	if err != nil {
+	// 		t.Errorf("failed to remove %s : %v", dbPath, err)
+	// 	}
+	// }
+
+	// db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	// if err != nil {
+	// 	t.Errorf("Failed to open db file %s : %v", dbPath, err)
+	// }
+
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	t.Errorf("Failed to call PRAGMA on db : %v", err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// if err != nil {
+	// 	t.Errorf("Failed to exec PRAGMA call %v", err)
+	// }
+
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test11")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
-	if err != nil {
-		t.Errorf("Failed to open db file %s : %v", dbPath, err)
-	}
-
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		t.Errorf("Failed to call PRAGMA on db : %v", err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	if err != nil {
-		t.Errorf("Failed to exec PRAGMA call %v", err)
-	}
 	defer db.Close()
 
 	_, err = execSchema(db) // Creates new lexicon database
@@ -156,27 +163,11 @@ func TestEntryTag1(t *testing.T) {
 
 func TestEntryTag2(t *testing.T) {
 
-	dbPath := "./testlex_entrytag.db"
-	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-		err := os.Remove(dbPath)
-		if err != nil {
-			t.Errorf("failed to remove %s : %v", dbPath, err)
-		}
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test12")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
-	if err != nil {
-		t.Errorf("Failed to open db file %s : %v", dbPath, err)
-	}
-
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		t.Errorf("Failed to call PRAGMA on db : %v", err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	if err != nil {
-		t.Errorf("Failed to exec PRAGMA call %v", err)
-	}
 	defer db.Close()
 
 	_, err = execSchema(db) // Creates new lexicon database

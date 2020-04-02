@@ -59,6 +59,18 @@ import (
 // CREATE DATABASE speechoid_pronlex_test10;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test10.* TO 'speechoid'@'localhost' ;
 
+// TestEntryTag1
+// CREATE DATABASE speechoid_pronlex_test11;
+// GRANT ALL PRIVILEGES ON speechoid_pronlex_test11.* TO 'speechoid'@'localhost' ;
+
+// TestEntryTag2
+// CREATE DATABASE speechoid_pronlex_test12;
+// GRANT ALL PRIVILEGES ON speechoid_pronlex_test12.* TO 'speechoid'@'localhost' ;
+
+// Test_Validation1
+// CREATE DATABASE speechoid_pronlex_test13;
+// GRANT ALL PRIVILEGES ON speechoid_pronlex_test13.* TO 'speechoid'@'localhost' ;
+
 // ff is a place holder to be replaced by proper error handling
 func ff(f string, err error) {
 	if err != nil {

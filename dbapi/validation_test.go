@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"log"
-	"os"
+	//"os"
 	"testing"
 
 	"reflect"
@@ -91,23 +91,10 @@ func createValidator() validation.Validator {
 
 func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
 
-	if _, err := os.Stat(vDbPath); !os.IsNotExist(err) {
-		err := os.Remove(vDbPath)
-		ff("failed to remove "+vDbPath+" : %v", err)
-	}
-
-	db, err := sql.Open("sqlite3_with_regexp", vDbPath)
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test13")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
 
 	//defer db.Close()
 

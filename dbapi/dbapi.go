@@ -1683,7 +1683,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 		return true, nil
 	}
 
-	sqlRes, err := tx.Exec("UPDATE EntryTag SET tag = ? WHERE entryId = ?", newTag, e.ID)
+	sqlRes, err := tx.Exec("UPDATE EntryTag SET tag = ?, wordForm = ? WHERE entryId = ?", newTag, e.Strn, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("updateEntryTag failed : %v", err)
 		err2 := tx.Rollback()
