@@ -1084,6 +1084,10 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 }
 
+// Test below can be used to load big lexicon
+// go test -timeout 60m -v -run Test_ImportLexiconBigFileGz
+
+/*
 func Test_ImportLexiconBigFileGz(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
@@ -1174,7 +1178,9 @@ func Test_ImportLexiconBigFileGz(t *testing.T) {
 	// }
 
 }
+*/
 
+/*
 func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
@@ -1268,7 +1274,7 @@ func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
 	// }
 
 }
-
+*/
 func Test_UpdateComments(t *testing.T) {
 	// dbPath := "./testlex_updatecomments.db"
 
