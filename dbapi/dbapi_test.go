@@ -1151,17 +1151,17 @@ func Test_ImportLexiconBigFileGz(t *testing.T) {
 	}
 
 	//Let's throw in a test of deleteEntry as well:
-	eX := res[0]
-	deleteEntry(db, eX.ID, l.name)
+	// eX := res[0]
+	// deleteEntry(db, eX.ID, l.name)
 
-	// Run same query again, efter deleting Entry
-	resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
-	if len(resX) != 0 {
-		t.Errorf(fs, "0", len(res))
-	}
+	// // Run same query again, efter deleting Entry
+	// resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	// if err != nil {
+	// 	t.Errorf(fs, nil, err)
+	// }
+	// if len(resX) != 0 {
+	// 	t.Errorf(fs, "0", len(res))
+	// }
 
 }
 
