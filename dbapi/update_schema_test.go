@@ -1,11 +1,11 @@
 package dbapi
 
 import (
-	"database/sql"
-	"fmt"
-	"os"
-	"testing"
-	//"github.com/stts-se/pronlex/dbapi"
+//"database/sql"
+//"fmt"
+//"os"
+//"testing"
+//"github.com/stts-se/pronlex/dbapi"
 )
 
 var tstSchema1 = `
@@ -146,6 +146,8 @@ CREATE TRIGGER updateEntryStatus BEFORE UPDATE ON ENTRYSTATUS
   END;
 `
 */
+
+/* This is no longer useful?
 func Test_UpdateSchema(t *testing.T) {
 
 	// This could be put in some set-up function
@@ -207,3 +209,4 @@ func Test_UpdateSchema(t *testing.T) {
 	// 	}
 	// }
 }
+*/
