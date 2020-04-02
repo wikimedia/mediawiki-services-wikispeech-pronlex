@@ -978,23 +978,28 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	dbFile := "./iotestlex.db"
-	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-		err := os.Remove(dbFile)
-		ff("failed to remove iotestlex.db : %v", err)
-	}
+	// dbFile := "./iotestlex.db"
+	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbFile)
+	// 	ff("failed to remove iotestlex.db : %v", err)
+	// }
 
-	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
+
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test5")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
 
 	defer db.Close()
 
