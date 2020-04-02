@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
+	//"os"
 	"testing"
 
 	"github.com/stts-se/pronlex/lex"
@@ -12,54 +12,69 @@ import (
 
 func Test_DBManager(t *testing.T) {
 
-	dbPath1 := "./testlex_listlex1.db"
-	dbPath2 := "./testlex_listlex2.db"
+	// dbPath1 := "./testlex_listlex1.db"
+	// dbPath2 := "./testlex_listlex2.db"
 
-	if _, err := os.Stat(dbPath1); !os.IsNotExist(err) {
-		err := os.Remove(dbPath1)
+	// if _, err := os.Stat(dbPath1); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbPath1)
 
-		if err != nil {
-			log.Fatalf("failed to remove '%s' : %v", dbPath1, err)
-		}
-	}
+	// 	if err != nil {
+	// 		log.Fatalf("failed to remove '%s' : %v", dbPath1, err)
+	// 	}
+	// }
 
-	if _, err := os.Stat(dbPath2); !os.IsNotExist(err) {
-		err := os.Remove(dbPath2)
+	// if _, err := os.Stat(dbPath2); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbPath2)
 
-		if err != nil {
-			log.Fatalf("failed to remove '%s' : %v", dbPath2, err)
-		}
-	}
+	// 	if err != nil {
+	// 		log.Fatalf("failed to remove '%s' : %v", dbPath2, err)
+	// 	}
+	// }
 
-	db1, err := sql.Open("sqlite3_with_regexp", dbPath1)
-	if err != nil {
-		log.Fatal(err)
-	}
-	db2, err := sql.Open("sqlite3_with_regexp", dbPath2)
+	db1, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test8")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = db1.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db2.Exec("PRAGMA foreign_keys = ON")
+	//defer db.Close()
+
+	//db1, err := sql.Open("sqlite3_with_regexp", dbPath1)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = db1.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
-	_, err = db2.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
+	db2, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test9")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// defer db.Close()
+
+	//db2, err := sql.Open("sqlite3_with_regexp", dbPath2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// _, err = db1.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db2.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// _, err = db1.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
+	// _, err = db2.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
 
 	defer db1.Close()
 	defer db2.Close()
 
 	_, err = execSchema(db1) // Creates new lexicon database
 	if err != nil {
-		log.Fatalf("NO! %v", err)
+		log.Fatalf("NO! creating db1 failed %v", err)
 	}
 	_, err = execSchema(db2) // Creates new lexicon database
 	if err != nil {
