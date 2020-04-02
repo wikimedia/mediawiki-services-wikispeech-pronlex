@@ -1074,6 +1074,190 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 }
 
+func Test_ImportLexiconBigFileGz(t *testing.T) {
+
+	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// dbFile := "./iotestlex.db"
+	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbFile)
+	// 	ff("failed to remove iotestlex.db : %v", err)
+	// }
+
+	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
+
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	_, err = execSchema(db) // Creates new lexicon database
+	ff("Failed to create lexicon db: %v", err)
+
+	logger := StderrLogger{}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
+
+	l, err = defineLexicon(db, l)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	// actual tests start here
+	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+
+	q := Query{Words: []string{"sprängstoffet"}}
+
+	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o := res[0].Strn
+	if o != "sprängstoff" {
+		t.Errorf(fs, "sprängstoff", o)
+	}
+
+	q = Query{Words: []string{"sittriktiga"}}
+	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o = res[0].Strn
+	if o != "sittriktiga" {
+		t.Errorf(fs, "sittriktiga", o)
+	}
+
+	//Let's throw in a test of deleteEntry as well:
+	eX := res[0]
+	deleteEntry(db, eX.ID, l.name)
+
+	// Run same query again, efter deleting Entry
+	resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(resX) != 0 {
+		t.Errorf(fs, "0", len(res))
+	}
+
+}
+
+func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
+
+	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// dbFile := "./iotestlex.db"
+	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbFile)
+	// 	ff("failed to remove iotestlex.db : %v", err)
+	// }
+
+	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
+
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	// _, err = execSchema(db) // Creates new lexicon database
+	// ff("Failed to create lexicon db: %v", err)
+
+	// logger := StderrLogger{}
+	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
+
+	// l, err = defineLexicon(db, l)
+	// if err != nil {
+	// 	t.Errorf(fs, nil, err)
+	// }
+
+	// // actual tests start here
+	// err = ImportLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
+	// if err != nil {
+	// 	t.Errorf(fs, nil, err)
+	// }
+
+	q := Query{Words: []string{"sprängstoffet"}}
+
+	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o := res[0].Strn
+	if o != "sprängstoffet" {
+		t.Errorf(fs, "sprängstoffet", o)
+	}
+
+	q = Query{Words: []string{"sittriktig"}}
+	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	if err != nil {
+		t.Errorf(fs, nil, err)
+	}
+	if len(res) != 1 {
+		t.Errorf(fs, "1", len(res))
+	}
+	o = res[0].Strn
+	if o != "sittriktig" {
+		t.Errorf(fs, "sittriktig", o)
+	}
+
+	// Doesn't work very well when you want to keep the big db...
+
+	//Let's throw in a test of deleteEntry as well:
+	// eX := res[0]
+	// deleteEntry(db, eX.ID, l.name)
+
+	// // Run same query again, efter deleting Entry
+	// resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	// if err != nil {
+	// 	t.Errorf(fs, nil, err)
+	// }
+	// if len(resX) != 0 {
+	// 	t.Errorf(fs, "0", len(res))
+	// }
+
+}
+
 func Test_UpdateComments(t *testing.T) {
 	// dbPath := "./testlex_updatecomments.db"
 
