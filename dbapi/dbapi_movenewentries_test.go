@@ -3,7 +3,7 @@ package dbapi
 import (
 	"database/sql"
 	"log"
-	"os"
+	//"os"
 	"testing"
 	//"time"
 
@@ -12,26 +12,31 @@ import (
 
 func Test_MoveNewEntries(t *testing.T) {
 
-	dbFile := "./movetestlex.db"
-	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-		err0 := os.Remove(dbFile)
-		if err0 != nil {
-			log.Fatalf("failed to remove %s : %v", dbFile, err0)
-		}
-	}
+	// dbFile := "./movetestlex.db"
+	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+	// 	err0 := os.Remove(dbFile)
+	// 	if err0 != nil {
+	// 		log.Fatalf("failed to remove %s : %v", dbFile, err0)
+	// 	}
+	// }
 
-	db, err := sql.Open("sqlite3_with_regexp", dbFile)
+	// db, err := sql.Open("sqlite3_with_regexp", dbFile)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// if err != nil {
+	// 	log.Fatalf("Failed to exec PRAGMA call %v", err)
+	// }
+
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test10")
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	if err != nil {
-		log.Fatalf("Failed to exec PRAGMA call %v", err)
 	}
 
 	defer db.Close()
