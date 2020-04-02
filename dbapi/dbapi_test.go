@@ -1133,8 +1133,8 @@ func Test_ImportLexiconBigFileGz(t *testing.T) {
 		t.Errorf(fs, "1", len(res))
 	}
 	o := res[0].Strn
-	if o != "sprängstoff" {
-		t.Errorf(fs, "sprängstoff", o)
+	if o != "sprängstoffet" {
+		t.Errorf(fs, "sprängstoffet", o)
 	}
 
 	q = Query{Words: []string{"sittriktiga"}}
