@@ -550,8 +550,8 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 		return res, fmt.Errorf(msg)
 	}
 
-	const where = `WHERE Entry.id IN (SELECT a.id FROM Entry a WHERE a.lexiconId = ?
-                       AND NOT EXISTS(SELECT strn FROM Entry WHERE lexiconId = ? AND strn = a.strn))`
+	const where = `WHERE Entry.id IN (SELECT a.id FROM (select * from Entry) AS a WHERE a.lexiconId = ?
+                       AND NOT EXISTS(SELECT ee.strn FROM (select * from Entry) AS ee WHERE ee.lexiconId = ? AND ee.strn = a.strn))`
 
 	insertQuery := `INSERT INTO EntryStatus (name, source, entryId, current) SELECT ?, ?, Entry.id, '1' FROM Entry ` + where
 
@@ -2378,21 +2378,21 @@ func validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 	// number of entries in the lexicon
 	err := tx.QueryRow("SELECT COUNT(*) FROM Entry WHERE Entry.lexiconId = ?", lexiconID).Scan(&res.TotalEntries)
 	if err != nil || err == sql.ErrNoRows {
-		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
+		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow (1) : %v", err)
 	}
 
 	res.ValidatedEntries = res.TotalEntries
 
 	// number of invalid entries
-	err = tx.QueryRow("SELECT COUNT (DISTINCT EntryValidation.entryId) FROM Entry, EntryValidation WHERE Entry.id = EntryValidation.entryId AND Entry.lexiconId = ?", lexiconID).Scan(&res.InvalidEntries)
+	err = tx.QueryRow("SELECT COUNT(DISTINCT EntryValidation.entryId) FROM Entry, EntryValidation WHERE Entry.id = EntryValidation.entryId AND Entry.lexiconId = ?", lexiconID).Scan(&res.InvalidEntries)
 	if err != nil || err == sql.ErrNoRows {
-		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
+		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow (2) : %v", err)
 	}
 
 	// number of validations
-	err = tx.QueryRow("SELECT COUNT (DISTINCT EntryValidation.id) FROM Entry, EntryValidation WHERE Entry.id = EntryValidation.entryId AND Entry.lexiconId = ?", lexiconID).Scan(&res.TotalValidations)
+	err = tx.QueryRow("SELECT COUNT(DISTINCT EntryValidation.id) FROM Entry, EntryValidation WHERE Entry.id = EntryValidation.entryId AND Entry.lexiconId = ?", lexiconID).Scan(&res.TotalValidations)
 	if err != nil || err == sql.ErrNoRows {
-		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow : %v", err)
+		return res, fmt.Errorf("dbapi.ValidationStats failed QueryRow (3) : %v", err)
 	}
 
 	levels, err := tx.Query("select EntryValidation.level, count(EntryValidation.level) from Entry, EntryValidation where Entry.lexiconId = ? and Entry.id = EntryValidation.entryId group by EntryValidation.level", lexiconID)

@@ -7,7 +7,7 @@ package dbapi
 
 var MariaDBSchema = []string{
 
-	`DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
+	`DROP TABLE IF EXISTS SchemaVersion, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus, Entry, Lexicon;`,
 
 	`DROP TABLE IF EXISTS SchemaVersion, Lexicon, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
 
@@ -109,7 +109,7 @@ var MariaDBSchema = []string{
 	`-- Validiation results of entries
 	CREATE TABLE EntryValidation (
 	    id integer not null primary key auto_increment,
-	    entryid integer not null,
+	    entryId integer not null,
 	    level varchar(128) not null,
 	    name varchar(128) not null,
 	    -- message varchar(128) not null,
