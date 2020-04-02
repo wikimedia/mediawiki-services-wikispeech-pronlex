@@ -7,7 +7,7 @@ package dbapi
 
 var MariaDBSchema = []string{
 
-	`DROP TABLE IF EXISTS SchemaVersion, Lexion, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
+	`DROP TABLE IF EXISTS SchemaVersion, Lexicon, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
 
 	`DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
 
