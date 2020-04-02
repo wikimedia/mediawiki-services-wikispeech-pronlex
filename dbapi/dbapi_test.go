@@ -3,8 +3,8 @@ package dbapi
 import (
 	"database/sql"
 	//"flag"
-	"reflect"
 	//"fmt"
+	"reflect"
 	"time"
 
 	"github.com/stts-se/pronlex/lex"
@@ -1220,6 +1220,7 @@ func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
+
 	if len(res) != 1 {
 		t.Errorf(fs, "1", len(res))
 	}
