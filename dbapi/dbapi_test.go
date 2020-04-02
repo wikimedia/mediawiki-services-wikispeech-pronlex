@@ -183,6 +183,18 @@ func execSchema(db *sql.DB) (sql.Result, error) {
 
 // }
 
+// Set up for local testing
+// CREATE USER 'speechoid'@'localhost';
+// -- DROP DATABASE IF EXISTS speechoid_pronlex_test1;
+
+// Test_insertEntries
+// CREATE DATABASE speechoid_pronlex_test1;
+// GRANT ALL PRIVILEGES ON speechoid_pronlex_test1.* TO 'speechoid'@'localhost' ;
+//
+// Test_importLexiconFile
+// CREATE DATABASE speechoid_pronlex_test2;
+// GRANT ALL PRIVILEGES ON speechoid_pronlex_test2.* TO 'speechoid'@'localhost' ;
+
 func Test_insertEntries(t *testing.T) {
 
 	// dbPath := "./testlex.db"
@@ -192,7 +204,7 @@ func Test_insertEntries(t *testing.T) {
 	// 	ff("failed to remove "+dbPath+" : %v", err)
 	// }
 
-	db, err := sql.Open("mysql", "nikolaj:@tcp(127.0.0.1:3306)/test1")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -710,27 +722,33 @@ func Test_ImportLexiconFile(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	dbFile := "./iotestlex.db"
-	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-		err := os.Remove(dbFile)
-		ff("failed to remove iotestlex.db : %v", err)
-	}
+	// dbFile := "./iotestlex.db"
+	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbFile)
+	// 	ff("failed to remove iotestlex.db : %v", err)
+	// }
 
-	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test2")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	//defer db.Commit()
 	defer db.Close()
 
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
 
-	defer db.Close()
+	// defer db.Close()
 
 	_, err = execSchema(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
