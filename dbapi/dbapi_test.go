@@ -12,7 +12,7 @@ import (
 	"github.com/stts-se/symbolset"
 	//"github.com/mattn/go-sqlite3"
 	"log"
-	"os"
+	//"os"
 	//"regexp"
 	"testing"
 )
@@ -44,6 +44,10 @@ import (
 // Test_UpdateComments
 // CREATE DATABASE speechoid_pronlex_test6;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test6.* TO 'speechoid'@'localhost' ;
+
+// Test_ValidationRuleLike
+// CREATE DATABASE speechoid_pronlex_test7;
+// GRANT ALL PRIVILEGES ON speechoid_pronlex_test7.* TO 'speechoid'@'localhost' ;
 
 // ff is a place holder to be replaced by proper error handling
 func ff(f string, err error) {
@@ -1168,24 +1172,29 @@ func Test_UpdateComments(t *testing.T) {
 }
 
 func Test_ValidationRuleLike(t *testing.T) {
-	dbPath := "./testlex_validationrulelike.db"
+	// dbPath := "./testlex_validationrulelike.db"
 
-	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-		err := os.Remove(dbPath)
-		ff("failed to remove "+dbPath+" : %v", err)
-	}
+	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+	// 	err := os.Remove(dbPath)
+	// 	ff("failed to remove "+dbPath+" : %v", err)
+	// }
 
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	// db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// _, err = db.Exec("PRAGMA foreign_keys = ON")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// ff("Failed to exec PRAGMA call %v", err)
+
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test7")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	ff("Failed to exec PRAGMA call %v", err)
 
 	defer db.Close()
 
