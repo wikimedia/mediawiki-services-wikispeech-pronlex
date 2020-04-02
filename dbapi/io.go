@@ -153,12 +153,13 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 
 	logger.Write("Finalizing import ... ")
 
-	_, err = db.Exec("ANALYZE")
-	if err != nil {
-		var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
-		logger.Write(msg)
-		return fmt.Errorf("%v", msg)
-	}
+	// TODO: Specific to Sqlite. Is there something similar in MariaDB that should be called?
+	// _, err = db.Exec("ANALYZE")
+	// if err != nil {
+	// 	var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
+	// 	logger.Write(msg)
+	// 	return fmt.Errorf("%v", msg)
+	// }
 
 	msg3 := fmt.Sprintf("Lines read:      %d", nTotal)
 	logger.Write(msg3)
