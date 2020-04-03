@@ -11,7 +11,10 @@ import (
 	"regexp"
 	"strings"
 
-	_ "github.com/go-sql-driver/mysql"
+	// TODO: Look at the mysql import
+	// Why isn't the below import needed?
+	// The Sqlite3 driver is needed.
+	//_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
 
 	//"github.com/pkg/profile"
@@ -184,8 +187,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed to parse command line arguments : %v\n", err)
 		os.Exit(1)
 	}
-
-	fmt.Printf("mariadb: %v\n", *mariadbFlag)
 
 	prettyPrint := true
 
