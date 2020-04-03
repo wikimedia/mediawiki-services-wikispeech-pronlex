@@ -52,18 +52,18 @@ Print missing words:
 lexlookup <Sqlite3 pronlex DB file> -missing <words>
 
 Deleting a DB entry:
-lexlookup <Sqlite3 pronlex DB file> -delete -id <int> -db_ref <string> -db_name <string>
+lexlookup <Sqlite3 pronlex DB file> -delete -id <int> -db_ref <string> -lex_name <string>
 
 Flags:
 
   -db_ref string
-    	DB reference name
+    	DB reference name. Currently only used in combination with -delete.
   -delete
     	Delete entry. Required flags: -id <int> -db_ref <string> -lex_name <string>
   -id int
-    	DB entry id
+    	DB entry id.  Currently only used in combination with -delete.
   -lex_name string
-    	Lexicon name
+    	Lexicon name. Currently only used in combination with -delete.
   -mariadb
     	Use MySQL/MariaDB connector to database on localhost, with db username 'speechoid'
   -missing
