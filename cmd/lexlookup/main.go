@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
 
 	//"github.com/pkg/profile"
@@ -49,6 +50,22 @@ lexlookup <Sqlite3 pronlex DB file> -missing <words>
 
 Deleting a DB entry:
 lexlookup <Sqlite3 pronlex DB file> -delete -id <int> -db_ref <string> -db_name <string>
+
+Flags:
+
+  -db_ref string
+    	DB reference name
+  -delete
+    	Delete entry. Required flags: -id <int> -db_ref <string> -lex_name <string>
+  -id int
+    	DB entry id
+  -lex_name string
+    	Lexicon name
+  -mariadb
+    	Use MySQL/MariaDB connector to database on localhost, with db username 'speechoid'
+  -missing
+    	Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>
+
 
 `
 
@@ -155,6 +172,8 @@ func main() {
 
 	printMissingFlag := flags.Bool("missing", false, "Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>")
 
+	mariadbFlag := flags.Bool("mariadb", false, "Use MySQL/MariaDB connector to database on localhost, with db username 'speechoid'")
+
 	if len(os.Args) < 2 {
 		fmt.Fprint(os.Stderr, usage)
 		os.Exit(0)
@@ -166,26 +185,40 @@ func main() {
 		os.Exit(1)
 	}
 
+	fmt.Printf("mariadb: %v\n", *mariadbFlag)
+
 	prettyPrint := true
 
 	dbPath := os.Args[1]
 
-	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "ERROR: could not find pronlex db file '%s'\n", dbPath)
-		os.Exit(1)
-	}
-
-	dbFileName := path.Base(dbPath)
-
+	var db *sql.DB
 	dbm := dbapi.NewDBManager()
 
-	db, err := sql.Open("sqlite3", os.Args[1])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Failed to open pronlex Sqlite3 di file '%s' : %v\n", dbFileName, err)
-		os.Exit(1)
+	if !*mariadbFlag { // Sqlite
+
+		if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "ERROR: could not find pronlex db file '%s'\n", dbPath)
+			os.Exit(1)
+		}
+
+		dbPath := path.Base(dbPath)
+
+		db, err = sql.Open("sqlite3", os.Args[1])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Failed to open pronlex Sqlite3 db file '%s' : %v\n", dbPath, err)
+			os.Exit(1)
+		}
+	} else { // MySQL/MariaDB
+		db, err = sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/"+dbPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Failed to connect to MySQL/MariaDB db '%s' : %v\n", dbPath, err)
+			os.Exit(1)
+
+		}
+
 	}
 
-	err = dbm.AddDB(lex.DBRef(dbFileName), db)
+	err = dbm.AddDB(lex.DBRef(dbPath), db)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: failed to initialise db manager : %v\n", err)
 		os.Exit(1)
@@ -238,7 +271,7 @@ func main() {
 	// Only look up same string once
 	words = remDupes(words)
 
-	entries, err := lookUp(words, dbFileName, dbm)
+	entries, err := lookUp(words, dbPath, dbm)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: failed look-up : '%v'\n", err)
 		os.Exit(1)
@@ -247,7 +280,7 @@ func main() {
 	// No match
 	if len(entries) == 0 && !*printMissingFlag {
 		if verb {
-			fmt.Fprintf(os.Stderr, "lexlookup: no matching entry in db '%s'\n", dbFileName)
+			fmt.Fprintf(os.Stderr, "lexlookup: no matching entry in db '%s'\n", dbPath)
 		}
 		return
 	}
