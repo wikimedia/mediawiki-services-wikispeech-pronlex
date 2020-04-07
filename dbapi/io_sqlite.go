@@ -59,7 +59,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		return fmt.Errorf("%v", msg)
 	}
 
-	lexicon, err := getLexicon(db, string(lexiconName))
+	lexicon, err := sqliteDBIF{}.getLexicon(db, string(lexiconName))
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
 		logger.Write(msg)
@@ -125,7 +125,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 
 		eBuf = append(eBuf, e)
 		if nTotal%1000 == 0 {
-			_, err = insertEntries(db, lexicon, eBuf)
+			_, err = sqliteDBIF{}.insertEntries(db, lexicon, eBuf)
 			if err != nil {
 				var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 				logger.Write(msg)
@@ -141,7 +141,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 			logger.Progress(msg2)
 		}
 	}
-	_, err = insertEntries(db, lexicon, eBuf) // flushing the buffer
+	_, err = sqliteDBIF{}.insertEntries(db, lexicon, eBuf) // flushing the buffer
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 		logger.Write(msg)
