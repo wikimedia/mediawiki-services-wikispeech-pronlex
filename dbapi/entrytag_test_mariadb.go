@@ -9,6 +9,9 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
+// NB: Defined in db_manager.go. Should probably be handled in some other way
+//var dbif = mariaDBIF{}
+
 func TestEntryTag1(t *testing.T) {
 
 	// dbPath := "./testlex_entrytag.db"
@@ -47,7 +50,7 @@ func TestEntryTag1(t *testing.T) {
 	}
 
 	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
-	l, err = defineLexicon(db, l)
+	l, err = dbif.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf("Ooops! : %v", err)
 	}
@@ -61,7 +64,7 @@ func TestEntryTag1(t *testing.T) {
 	}
 
 	// Insert tag for entry that doesn't exist
-	err = insertEntryTagTx(tx, 0, "ohno")
+	err = dbif.insertEntryTagTx(tx, 0, "ohno")
 	//t.Errorf("Error : %v", err)
 	if err == nil {
 		t.Errorf("Expected error for nonexisting entry id, but got nil")
@@ -96,7 +99,7 @@ func TestEntryTag1(t *testing.T) {
 		Transcriptions: []lex.Transcription{t1b, t2b},
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	_, err = insertEntries(db, l, []lex.Entry{e1, e2})
+	_, err = dbif.insertEntries(db, l, []lex.Entry{e1, e2})
 	if err != nil {
 		t.Errorf("failed to insert entries : %v", err)
 	}
@@ -104,7 +107,7 @@ func TestEntryTag1(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	//var entries map[string][]lex.Entry
-	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+	entries, err := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf("Nooo! : %v", err)
 	}
@@ -138,7 +141,7 @@ func TestEntryTag1(t *testing.T) {
 	w := "entrytag_1b"
 	ent1.Tag = w
 
-	entUpdate, updated, err := updateEntry(db, ent1)
+	entUpdate, updated, err := dbif.updateEntry(db, ent1)
 	if err != nil {
 		t.Errorf("updateEntry failed : %v", err)
 	}
@@ -152,7 +155,7 @@ func TestEntryTag1(t *testing.T) {
 
 	// It should not be possible to assign the same Entry.Tag to two different entries
 	ent2.Tag = w //No-no!
-	_, updated2, err2 := updateEntry(db, ent2)
+	_, updated2, err2 := dbif.updateEntry(db, ent2)
 	if updated2 {
 		t.Errorf("did not expect entry to be updated. disappointed.")
 	}
@@ -177,7 +180,7 @@ func TestEntryTag2(t *testing.T) {
 	}
 
 	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
-	l, err = defineLexicon(db, l)
+	l, err = dbif.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf("failed defineLexicon : %v", err)
 	}
@@ -191,7 +194,7 @@ func TestEntryTag2(t *testing.T) {
 	}
 
 	// Insert tag for entry that doesn't exist
-	err = insertEntryTagTx(tx, 0, "ohno")
+	err = dbif.insertEntryTagTx(tx, 0, "ohno")
 	//t.Errorf("Error : %v", err)
 	if err == nil {
 		t.Errorf("Expected error for nonexisting entry id, but got nil")
@@ -226,7 +229,7 @@ func TestEntryTag2(t *testing.T) {
 		Transcriptions: []lex.Transcription{t1b, t2b},
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	_, err = insertEntries(db, l, []lex.Entry{e1, e2})
+	_, err = dbif.insertEntries(db, l, []lex.Entry{e1, e2})
 	if err != nil {
 		t.Errorf("failed to insert entries : %v", err)
 	}
@@ -234,7 +237,7 @@ func TestEntryTag2(t *testing.T) {
 	// Test Query.TagLike
 
 	q00 := Query{TagLike: "entrytag_2"}
-	entries00, err00 := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q00)
+	entries00, err00 := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q00)
 	if err00 != nil {
 		t.Errorf("Got error: %v", err00)
 	}
@@ -245,7 +248,7 @@ func TestEntryTag2(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	//var entries map[string][]lex.Entry
-	entries, err := lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+	entries, err := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf("lookUpIntoMap : %v", err)
 	}
@@ -279,7 +282,7 @@ func TestEntryTag2(t *testing.T) {
 	w := "entrytag_1b"
 	ent1.Tag = w
 
-	entUpdate, updated, err := updateEntry(db, ent1)
+	entUpdate, updated, err := dbif.updateEntry(db, ent1)
 	if err != nil {
 		t.Errorf("updateEntry failed : %v", err)
 	}
@@ -293,7 +296,7 @@ func TestEntryTag2(t *testing.T) {
 
 	// It should not be possible to assign the same Entry.Tag to two different entries
 	ent2.Tag = w //No-no!
-	_, updated2, err2 := updateEntry(db, ent2)
+	_, updated2, err2 := dbif.updateEntry(db, ent2)
 	if updated2 {
 		t.Errorf("did not expect entry to be updated. disappointed.")
 	}

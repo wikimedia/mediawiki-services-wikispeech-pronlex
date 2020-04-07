@@ -98,6 +98,9 @@ func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	return res, nil
 }
 
+type mariaDBIF struct {
+}
+
 // GetSchemaVersion retrieves the schema version from the database (as defined in schema.go on first load)
 func GetSchemaVersion(db *sql.DB) (string, error) {
 	tx, err := db.Begin()
@@ -133,7 +136,7 @@ func getSchemaVersionTx(tx *sql.Tx) (string, error) {
 //
 // TODO: Create a DB struct, and move functions of type
 // funcName(db *sql.DB, ...) into methods of the new struct.
-func listLexicons(db *sql.DB) ([]lexicon, error) {
+func (mdb mariaDBIF) listLexicons(db *sql.DB) ([]lexicon, error) {
 	var res []lexicon
 	sql := "select id, name, symbolsetname, locale from Lexicon"
 	rows, err := db.Query(sql)
@@ -157,16 +160,16 @@ func listLexicons(db *sql.DB) ([]lexicon, error) {
 
 // GetLexicon returns a Lexicon struct matching a lexicon name in the db.
 // Returns error if no such lexicon name in db
-func getLexicon(db *sql.DB, name string) (lexicon, error) {
+func (mdb mariaDBIF) getLexicon(db *sql.DB, name string) (lexicon, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return lexicon{}, fmt.Errorf("failed to create transaction : %v", err)
 	}
 	defer tx.Commit()
-	return getLexiconTx(tx, name)
+	return mdb.getLexiconTx(tx, name)
 }
 
-func getLexiconMapTx(tx *sql.Tx) (map[string]bool, error) {
+func (mdb mariaDBIF) getLexiconMapTx(tx *sql.Tx) (map[string]bool, error) {
 	res := make(map[string]bool)
 
 	rows, err := tx.Query("select name from Lexicon")
@@ -186,7 +189,7 @@ func getLexiconMapTx(tx *sql.Tx) (map[string]bool, error) {
 
 }
 
-func getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
+func (mdb mariaDBIF) getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
 	res := lexicon{}
 	name0 := strings.ToLower(name)
 	var err error
@@ -203,7 +206,7 @@ func getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
 // DeleteLexicon deletes the lexicon name from the lexicon
 // table. Notice that it does not remove the associated entries.
 // It should be impossible to delete the Lexicon table entry if associated to any entries.
-func deleteLexicon(db *sql.DB, lexName string) error {
+func (mdb mariaDBIF) deleteLexicon(db *sql.DB, lexName string) error {
 	log.Printf("deleteLexicon called with lexicon name %s\n", lexName)
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -341,7 +344,7 @@ func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 
 //TODO: Check that lexName exists, or report error
 //TODO: Check that entryId exists, or report error
-func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
+func (mdb mariaDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		msg := fmt.Sprintf("dbapi.deleteEntry failed to start db transaction : %v", err)
@@ -356,7 +359,7 @@ func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	defer tx.Commit()
 
 	// Check that lexicon exists
-	_, err = getLexiconTx(tx, lexName)
+	_, err = mdb.getLexiconTx(tx, lexName)
 	if err != nil {
 		msg := fmt.Sprintf("dbapi.deleteEntry failed to find lexicon '%s' : %v", lexName, err)
 
@@ -402,7 +405,7 @@ func deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 }
 
 // DefineLexicon saves the name of a new lexicon to the db.
-func defineLexicon(db *sql.DB, l lexicon) (lexicon, error) {
+func (mdb mariaDBIF) defineLexicon(db *sql.DB, l lexicon) (lexicon, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return lexicon{}, fmt.Errorf("failed to get db transaction : %v", err)
@@ -487,7 +490,7 @@ type MoveResult struct {
 // rationale behind this function is to first create a small
 // additional lexicon with new entries (the fromLexicon), that can
 // later be appended to the master lexicon (the toLexicon).
-func moveNewEntries(db *sql.DB, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
+func (mdb mariaDBIF) moveNewEntries(db *sql.DB, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
 	if strings.TrimSpace(newSource) == "" {
 		msg := "MoveNewEntries called with the empty 'newSource' argument"
 		return MoveResult{}, fmt.Errorf(msg)
@@ -503,11 +506,11 @@ func moveNewEntries(db *sql.DB, fromLexicon, toLexicon, newSource, newStatus str
 	}
 	defer tx.Commit()
 
-	return moveNewEntriesTx(tx, fromLexicon, toLexicon, newSource, newStatus)
+	return mdb.moveNewEntriesTx(tx, fromLexicon, toLexicon, newSource, newStatus)
 }
 
 // moveNewEntriesTx is documented under MoveNewEntries
-func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
+func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
 	if strings.TrimSpace(newSource) == "" {
 		msg := "moveNewEntriesTx called with the empty 'newSource' argument"
 		err2 := tx.Rollback()
@@ -529,7 +532,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 
 	res := MoveResult{}
 	var err error
-	fromLex, err := getLexiconTx(tx, fromLexicon)
+	fromLex, err := mdb.getLexiconTx(tx, fromLexicon)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't find lexicon %s : %v", fromLexicon, err)
 		err2 := tx.Rollback()
@@ -539,7 +542,7 @@ func moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSource, newStatus s
 
 		return res, fmt.Errorf(msg)
 	}
-	toLex, err := getLexiconTx(tx, toLexicon)
+	toLex, err := mdb.getLexiconTx(tx, toLexicon)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't find lexicon %s : %v", toLexicon, err)
 		err2 := tx.Rollback()
@@ -608,7 +611,7 @@ var insertStatus = "INSERT INTO EntryStatus (entryId, name, source) values (?, ?
 // InsertEntries saves a list of Entries and associates them to Lexicon
 // TODO: Change second input argument to string (lexicon name) instead of Lexicon struct.
 // TODO change input arg to sql.Tx
-func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
+func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 
 	var ids []int64
 	// Transaction -->
@@ -708,7 +711,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 
 		//log.Printf("%v", e)
 		if e.Lemma.Strn != "" { // && "" != e.Lemma.Reading {
-			lemma, err := setOrGetLemma(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
+			lemma, err := mdb.setOrGetLemma(tx, e.Lemma.Strn, e.Lemma.Reading, e.Lemma.Paradigm)
 			if err != nil {
 
 				msg := fmt.Sprintf("failed set or get lemma : %v", err)
@@ -719,7 +722,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 
 				return ids, fmt.Errorf(msg)
 			}
-			err = associateLemma2Entry(tx, lemma, e)
+			err = mdb.associateLemma2Entry(tx, lemma, e)
 			if err != nil {
 				msg := fmt.Sprintf("failed lemma to entry assoc: %v", err)
 				err2 := tx.Rollback()
@@ -732,7 +735,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 		}
 
 		if e.Tag != "" {
-			err = insertEntryTagTx(tx, e.ID, e.Tag)
+			err = mdb.insertEntryTagTx(tx, e.ID, e.Tag)
 			if err != nil {
 				msg := fmt.Sprintf("failed to insert entry tag '%s' for '%s': %v", e.Tag, e.Strn, err)
 				err2 := tx.Rollback()
@@ -765,7 +768,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 			}
 		}
 
-		err = insertEntryValidations(tx, e, e.EntryValidations)
+		err = mdb.insertEntryValidations(tx, e, e.EntryValidations)
 		if err != nil {
 			msg := fmt.Sprintf("inserting EntryValidations failed : %v", err)
 			err2 := tx.Rollback()
@@ -776,7 +779,7 @@ func insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error) {
 			return ids, fmt.Errorf(msg)
 		}
 
-		err = insertEntryComments(tx, e.ID, e.Comments)
+		err = mdb.insertEntryComments(tx, e.ID, e.Comments)
 		if err != nil {
 
 			msg := fmt.Sprintf("inserting EntryComments failed : %v", err)
@@ -809,7 +812,7 @@ var insertEntryTag = "INSERT INTO EntryTag (entryId, tag, wordForm) values (?, ?
 //TODO Add db look-up to see if db uniqueness constraints are
 //violated, to return more gentle error (or no error) instead of
 //failing and rolling back.
-func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
+func (mdb mariaDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 	tag = strings.TrimSpace(strings.ToLower(tag))
 
@@ -859,7 +862,7 @@ func insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 // InsertLemma saves a lex.Lemma to the db, but does not associate it with a lex.Entry
 // TODO do we need both InsertLemma and SetOrGetLemma?
-func insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
+func (mdb mariaDBIF) insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
 	sql := "insert into Lemma (strn, reading, paradigm) values (?, ?, ?)"
 	res, err := tx.Exec(sql, l.Strn, l.Reading, l.Paradigm)
 	if err != nil {
@@ -876,14 +879,14 @@ func insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error) {
 
 // SetOrGetLemma saves a new lex.Lemma to the db, or returns a matching already existing one
 // TODO do we need both InsertLemma and SetOrGetLemma?
-func setOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (lex.Lemma, error) {
+func (mdb mariaDBIF) setOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (lex.Lemma, error) {
 	res := lex.Lemma{}
 
 	sqlS := "select id, strn, reading, paradigm from Lemma where strn = ? and reading = ?"
 	err := tx.QueryRow(sqlS, strn, reading).Scan(&res.ID, &res.Strn, &res.Reading, &res.Paradigm)
 	switch {
 	case err == sql.ErrNoRows:
-		return insertLemma(tx, lex.Lemma{Strn: strn, Reading: reading, Paradigm: paradigm})
+		return mdb.insertLemma(tx, lex.Lemma{Strn: strn, Reading: reading, Paradigm: paradigm})
 	case err != nil:
 		return res, fmt.Errorf("setOrGetLemma failed querying db : %v", err)
 	}
@@ -892,7 +895,7 @@ func setOrGetLemma(tx *sql.Tx, strn string, reading string, paradigm string) (le
 }
 
 // AssociateLemma2Entry adds a lex.Lemma to anlex.Entry via a linking table
-func associateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry) error {
+func (mdb mariaDBIF) associateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry) error {
 	sql := "insert into Lemma2Entry (lemmaId, entryId) values (?, ?)"
 	_, err := db.Exec(sql, l.ID, e.ID)
 	if err != nil {
@@ -902,7 +905,7 @@ func associateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry) error {
 }
 
 // LookUpIds takes a Query struct, searches the lexicon db, and writes the result to a slice of ids
-func lookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
+func (mdb mariaDBIF) lookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -914,14 +917,14 @@ func lookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
 
 		return nil, fmt.Errorf(msg)
 	}
-	return lookUpIdsTx(tx, lexNames, q)
+	return mdb.lookUpIdsTx(tx, lexNames, q)
 }
 
 // LookUpIdsTx takes a Query struct, searches the lexicon db, and returns a slice of ids
-func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
+func (mdb mariaDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 	var result []int64
 
-	err := validateInputLexicons(tx, lexNames, q)
+	err := mdb.validateInputLexicons(tx, lexNames, q)
 	if err != nil {
 		return result, err
 	}
@@ -968,7 +971,7 @@ func lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([]int64, error) {
 
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
-func lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
+func (mdb mariaDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
 	//log.Printf("dbapi lookUp QUWRY %#v\n\n", q)
 
 	if q.Empty() {
@@ -985,10 +988,10 @@ func lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) er
 		}
 		return fmt.Errorf(msg)
 	}
-	return lookUpTx(tx, lexNames, q, out)
+	return mdb.lookUpTx(tx, lexNames, q, out)
 }
 
-func validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
+func (mdb mariaDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
 	if len(lexNames) == 0 && len(q.EntryIDs) == 0 { // if entry id is specified, we can do the search without the lexicon name
 		msg := "cannot perform a search without at least one lexicon specified"
 		err2 := tx.Rollback()
@@ -999,7 +1002,7 @@ func validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
 		return fmt.Errorf(msg)
 	}
 
-	lexiconMap, err := getLexiconMapTx(tx)
+	lexiconMap, err := mdb.getLexiconMapTx(tx)
 	if err != nil {
 		// nothing to rollback here, but may have been called from within another transaction
 		msg := fmt.Sprintf("%v", err)
@@ -1028,7 +1031,7 @@ func validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
 // LookUpTx takes a Query struct, searches the lexicon db, and writes the result to the
 // EntryWriter.
 // TODO: rewrite to go through the result set before building the result. That is, save all structs corresponding to rows in the scanning run, then build the result structure (so that no identical values are duplicated: a result set may have several rows of repeated data)
-func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
+func (mdb mariaDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
 
 	//if q.Empty() {
 	//	return nil
@@ -1042,7 +1045,7 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 
 	//log.Printf("VALUES %v\n\n", values)
 
-	err := validateInputLexicons(tx, lexNames, q)
+	err := mdb.validateInputLexicons(tx, lexNames, q)
 	if err != nil {
 		return err
 	}
@@ -1290,9 +1293,9 @@ func lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out lex.EntryWriter) 
 }
 
 // LookUpIntoSlice is a wrapper around LookUp, returning a slice of Entries
-func lookUpIntoSlice(db *sql.DB, lexNames []lex.LexName, q Query) ([]lex.Entry, error) {
+func (mdb mariaDBIF) lookUpIntoSlice(db *sql.DB, lexNames []lex.LexName, q Query) ([]lex.Entry, error) {
 	var esw lex.EntrySliceWriter
-	err := lookUp(db, lexNames, q, &esw)
+	err := mdb.lookUp(db, lexNames, q, &esw)
 	if err != nil {
 		return esw.Entries, fmt.Errorf("failed lookup : %v", err)
 	}
@@ -1301,10 +1304,10 @@ func lookUpIntoSlice(db *sql.DB, lexNames []lex.LexName, q Query) ([]lex.Entry, 
 
 // LookUpIntoMap is a wrapper around LookUp, returning a map where the
 // keys are word forms and the values are slices of Entries. (There may be several entries with the same Strn value.)
-func lookUpIntoMap(db *sql.DB, lexNames []lex.LexName, q Query) (map[string][]lex.Entry, error) {
+func (mdb mariaDBIF) lookUpIntoMap(db *sql.DB, lexNames []lex.LexName, q Query) (map[string][]lex.Entry, error) {
 	res := make(map[string][]lex.Entry)
 	var esw lex.EntrySliceWriter
-	err := lookUp(db, lexNames, q, &esw)
+	err := mdb.lookUp(db, lexNames, q, &esw)
 	if err != nil {
 		return res, fmt.Errorf("failed lookup : %v", err)
 	}
@@ -1317,11 +1320,11 @@ func lookUpIntoMap(db *sql.DB, lexNames []lex.LexName, q Query) (map[string][]le
 }
 
 // GetEntryFromID is a wrapper around LookUp and returns the lex.Entry corresponding to the db id
-func getEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
+func (mdb mariaDBIF) getEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 	res := lex.Entry{}
 	q := Query{EntryIDs: []int64{id}}
 	esw := lex.EntrySliceWriter{}
-	err := lookUp(db, []lex.LexName{}, q, &esw)
+	err := mdb.lookUp(db, []lex.LexName{}, q, &esw)
 	if err != nil {
 		return res, fmt.Errorf("LookUp failed : %v", err)
 	}
@@ -1339,7 +1342,7 @@ func getEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
 // TODO Consider how to handle inconsistent input entries
 // TODO Full name of DB as input param?
-func updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err error) {
+func (mdb mariaDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -1352,7 +1355,7 @@ func updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 		return res, updated, fmt.Errorf(msg)
 	}
 
-	updated, err = updateEntryTx(tx, e)
+	updated, err = mdb.updateEntryTx(tx, e)
 	if err != nil {
 		msg := fmt.Sprintf("failed updating entry : %v", err)
 		err2 := tx.Rollback()
@@ -1366,7 +1369,7 @@ func updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 		return res, updated, fmt.Errorf("updateEntry failed db commit : %v", err)
 	}
 
-	res, err = getEntryFromID(db, e.ID)
+	res, err = mdb.getEntryFromID(db, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed getting updated entry : %v", err)
 		err2 := tx.Rollback()
@@ -1381,11 +1384,11 @@ func updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err erro
 
 // UpdateEntryTx updates the fields of an lex.Entry that do not match the
 // corresponding values in the db
-func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO return the updated entry?
+func (mdb mariaDBIF) updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO return the updated entry?
 	// updated == false
 	//dbEntryMap := //GetEntriesFromIDsTx(tx, []int64{(e.ID)})
 	var esw lex.EntrySliceWriter
-	err = lookUpTx(tx, []lex.LexName{e.LexRef.LexName}, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
+	err = mdb.lookUpTx(tx, []lex.LexName{e.LexRef.LexName}, Query{EntryIDs: []int64{e.ID}}, &esw) //entryMapToEntrySlice(dbEntryMap)
 	if err != nil {
 		return false, fmt.Errorf("updateEntryTx : %v", err)
 	}
@@ -1399,53 +1402,53 @@ func updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err error) { // TODO 
 		return updated, fmt.Errorf("very bad error, more than one entry with id '%d'", e.ID)
 	}
 
-	updated1, err := updateTranscriptions(tx, e, dbEntries[0])
+	updated1, err := mdb.updateTranscriptions(tx, e, dbEntries[0])
 	if err != nil {
 		return updated1, err
 	}
-	updated2, err := updateLemma(tx, e, dbEntries[0])
+	updated2, err := mdb.updateLemma(tx, e, dbEntries[0])
 	if err != nil {
 		return updated2, err
 	}
 
-	updated3, err := updateWordParts(tx, e, dbEntries[0])
+	updated3, err := mdb.updateWordParts(tx, e, dbEntries[0])
 	if err != nil {
 		return updated3, err
 	}
-	updated4, err := updateLanguage(tx, e, dbEntries[0])
+	updated4, err := mdb.updateLanguage(tx, e, dbEntries[0])
 	if err != nil {
 		return updated4, err
 	}
-	updated5, err := updateEntryStatus(tx, e, dbEntries[0])
+	updated5, err := mdb.updateEntryStatus(tx, e, dbEntries[0])
 	if err != nil {
 		return updated5, err
 	}
 
-	updated6, err := updateEntryValidation(tx, e, dbEntries[0])
+	updated6, err := mdb.updateEntryValidation(tx, e, dbEntries[0])
 	if err != nil {
 		return updated6, err
 	}
 
-	updated7, err := updatePreferred(tx, e, dbEntries[0])
+	updated7, err := mdb.updatePreferred(tx, e, dbEntries[0])
 	if err != nil {
 		return updated7, err
 	}
 
-	updated8, err := updateEntryTag(tx, e, dbEntries[0])
+	updated8, err := mdb.updateEntryTag(tx, e, dbEntries[0])
 	if err != nil {
 		return updated8, err
 	}
 
-	updated9, err := updateEntryComments(tx, e, dbEntries[0])
+	updated9, err := mdb.updateEntryComments(tx, e, dbEntries[0])
 	if err != nil {
 		return updated9, err
 	}
-	updated10, err := updatePartOfSpeech(tx, e, dbEntries[0])
+	updated10, err := mdb.updatePartOfSpeech(tx, e, dbEntries[0])
 	if err != nil {
 		return updated10, err
 	}
 
-	updated11, err := updateMorphology(tx, e, dbEntries[0])
+	updated11, err := mdb.updateMorphology(tx, e, dbEntries[0])
 	if err != nil {
 		return updated11, err
 	}
@@ -1476,7 +1479,7 @@ func equal(ts1 []lex.Transcription, ts2 []lex.Transcription) bool {
 	return true
 }
 
-func updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		msg := "new and old entries have different ids"
 		err2 := tx.Rollback()
@@ -1500,7 +1503,7 @@ func updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	return true, nil
 }
 
-func updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		msg := "new and old entries have different ids"
 		err2 := tx.Rollback()
@@ -1524,7 +1527,7 @@ func updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	return true, nil
 }
 
-func updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		msg := "new and old entries have different ids"
 		err2 := tx.Rollback()
@@ -1548,7 +1551,7 @@ func updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	return true, nil
 }
 
-func updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		msg := "new and old entries have different ids"
 		err2 := tx.Rollback()
@@ -1572,7 +1575,7 @@ func updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	return true, nil
 }
 
-func updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		msg := "new and old entries have different ids"
 		err2 := tx.Rollback()
@@ -1616,7 +1619,7 @@ func updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	return true, nil
 }
 
-func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
+func (mdb mariaDBIF) updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if e.Lemma == dbE.Lemma {
 		return false, nil
 	}
@@ -1647,7 +1650,7 @@ func updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err erro
 }
 
 // TODO: Test that EntryTags work as expected after removal of triggers
-func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	//log.Printf("dbapi debug updateEntryTag called")
 	if e.ID != dbE.ID {
 		msg := "updateEntryTag: new and old entries have different ids"
@@ -1731,7 +1734,7 @@ func updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	return true, nil
 }
 
-func updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 
 	if len(e.Comments) == 0 && len(dbE.Comments) == 0 {
 		return false, nil
@@ -1739,13 +1742,13 @@ func updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 
 	// Update comments if different numbers of comments
 	if len(e.Comments) != len(dbE.Comments) {
-		err := insertEntryComments(tx, dbE.ID, e.Comments)
+		err := mdb.insertEntryComments(tx, dbE.ID, e.Comments)
 		return true, err
 	}
 
 	// New code:
 	if !reflect.DeepEqual(e.Comments, dbE.Comments) {
-		err := insertEntryComments(tx, dbE.ID, e.Comments)
+		err := mdb.insertEntryComments(tx, dbE.ID, e.Comments)
 		return true, err
 	}
 
@@ -1764,7 +1767,7 @@ func updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 // TODO move to function
 var transSTMT = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
 
-func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
+func (mdb mariaDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if e.ID != dbE.ID {
 		return false, fmt.Errorf("update and db entry id differ")
 	}
@@ -1811,7 +1814,7 @@ func updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool,
 }
 
 // TODO always insert new status, or only when name and source have changed. Or...?
-func updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
+func (mdb mariaDBIF) updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if trm(e.EntryStatus.Name) != "" {
 
 		// _, err := tx.Exec(statusSetCurrentFalse, dbE.ID)
@@ -1887,7 +1890,7 @@ func newValidations(e1 lex.Entry, e2 lex.Entry) ([]lex.EntryValidation, []lex.En
 
 var insValiSQL = "INSERT INTO EntryValidation (entryId, level, name, message) values (?, ?, ?, ?)"
 
-func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error {
+func (mdb mariaDBIF) insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error {
 	for _, v := range eValis {
 		_, err := tx.Exec(insValiSQL, e.ID, strings.ToLower(v.Level), v.RuleName, v.Message)
 		if err != nil {
@@ -1902,7 +1905,7 @@ func insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidatio
 	return nil
 }
 
-func updateValidation(db *sql.DB, entries []lex.Entry) error {
+func (mdb mariaDBIF) updateValidation(db *sql.DB, entries []lex.Entry) error {
 	tx, err := db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -1914,7 +1917,7 @@ func updateValidation(db *sql.DB, entries []lex.Entry) error {
 		return fmt.Errorf(msg)
 	}
 
-	err = updateValidationTx(tx, entries)
+	err = mdb.updateValidationTx(tx, entries)
 	if err != nil {
 		msg := fmt.Sprintf("failed updating validation : %v", err)
 		err2 := tx.Rollback()
@@ -1931,9 +1934,9 @@ func updateValidation(db *sql.DB, entries []lex.Entry) error {
 	return nil
 }
 
-func updateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
+func (mdb mariaDBIF) updateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
 	for _, e := range entries {
-		_, err := updateEntryValidationForce(tx, e)
+		_, err := mdb.updateEntryValidationForce(tx, e)
 		if err != nil {
 			return err
 		}
@@ -1941,7 +1944,7 @@ func updateValidationTx(tx *sql.Tx, entries []lex.Entry) error {
 	return nil
 }
 
-func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
 	_, err := tx.Exec("DELETE FROM EntryValidation WHERE entryId = ?", e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed deleting EntryValidation : %v", err)
@@ -1952,7 +1955,7 @@ func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
 		return false, fmt.Errorf(msg)
 	}
 
-	err = insertEntryValidations(tx, e, e.EntryValidations)
+	err = mdb.insertEntryValidations(tx, e, e.EntryValidations)
 	if err != nil {
 		return false, err
 	}
@@ -1960,13 +1963,13 @@ func updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, error) {
 	return true, nil
 }
 
-func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
+func (mdb mariaDBIF) updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	newValidations, removeValidations := newValidations(e, dbE)
 	if len(newValidations) == 0 && len(removeValidations) == 0 {
 		return false, nil
 	}
 
-	err := insertEntryValidations(tx, dbE, newValidations)
+	err := mdb.insertEntryValidations(tx, dbE, newValidations)
 	if err != nil {
 		return false, err
 	}
@@ -1989,7 +1992,7 @@ func updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error)
 var delEntryCommentsSQL = "DELETE FROM EntryComment WHERE entryId = ?"
 var insEntryCommentSQL = "INSERT INTO EntryComment (entryId, label, source, comment) values (?, ?, ?, ?)"
 
-func insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) error {
+func (mdb mariaDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) error {
 
 	// Delete all old comments, before adding the new
 	// TODO Handle old comments that are to be kept in a smoother way.
@@ -2031,7 +2034,7 @@ func unique(ns []int64) []int64 {
 	return res
 }
 
-func entryCount(db *sql.DB, lexiconName string) (int64, error) {
+func (mdb mariaDBIF) entryCount(db *sql.DB, lexiconName string) (int64, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 
@@ -2048,7 +2051,7 @@ func entryCount(db *sql.DB, lexiconName string) (int64, error) {
 	return entries, nil
 }
 
-func locale(db *sql.DB, lexiconName string) (string, error) {
+func (mdb mariaDBIF) locale(db *sql.DB, lexiconName string) (string, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 
@@ -2065,30 +2068,30 @@ func locale(db *sql.DB, lexiconName string) (string, error) {
 }
 
 // ListCurrentEntryUsers returns a list of all names EntryUsers marked 'current' (i.e., the most recent status).
-func listCurrentEntryUsers(db *sql.DB, lexiconName string) ([]string, error) {
-	return listEntryUsers(db, lexiconName, true)
+func (mdb mariaDBIF) listCurrentEntryUsers(db *sql.DB, lexiconName string) ([]string, error) {
+	return mdb.listEntryUsers(db, lexiconName, true)
 }
 
-func listCurrentEntryUsersWithFreq(db *sql.DB, lexiconName string) (map[string]int, error) {
-	return listEntryUsersWithFreq(db, lexiconName, true)
+func (mdb mariaDBIF) listCurrentEntryUsersWithFreq(db *sql.DB, lexiconName string) (map[string]int, error) {
+	return mdb.listEntryUsersWithFreq(db, lexiconName, true)
 }
 
 // ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).
-func listCurrentEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
-	return listEntryStatuses(db, lexiconName, true)
+func (mdb mariaDBIF) listCurrentEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
+	return mdb.listEntryStatuses(db, lexiconName, true)
 }
 
-func listCurrentEntryStatusesWithFreq(db *sql.DB, lexiconName string) (map[string]int, error) {
-	return listEntryStatusesWithFreq(db, lexiconName, true)
+func (mdb mariaDBIF) listCurrentEntryStatusesWithFreq(db *sql.DB, lexiconName string) (map[string]int, error) {
+	return mdb.listEntryStatusesWithFreq(db, lexiconName, true)
 }
 
 // ListAllEntryStatuses returns a list of all names EntryStatuses, also those that are not 'current'  (i.e., the most recent status).
 // In other words, this list potentially includes statuses not in use, but that have been used.
-func listAllEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
-	return listEntryStatuses(db, lexiconName, false)
+func (mdb mariaDBIF) listAllEntryStatuses(db *sql.DB, lexiconName string) ([]string, error) {
+	return mdb.listEntryStatuses(db, lexiconName, false)
 }
 
-func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error) {
+func (mdb mariaDBIF) listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error) {
 	var res []string
 
 	tx, err := db.Begin()
@@ -2129,7 +2132,7 @@ func listEntryStatuses(db *sql.DB, lexiconName string, onlyCurrent bool) ([]stri
 	return res, err
 }
 
-func listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error) {
+func (mdb mariaDBIF) listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error) {
 	var res = make(map[string]int)
 
 	tx, err := db.Begin()
@@ -2170,7 +2173,7 @@ func listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool)
 	return res, err
 }
 
-func listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error) {
+func (mdb mariaDBIF) listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error) {
 	var res = make(map[string]int)
 
 	tx, err := db.Begin()
@@ -2212,7 +2215,7 @@ func listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (m
 	return res, err
 }
 
-func listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error) {
+func (mdb mariaDBIF) listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error) {
 	var res []string
 
 	tx, err := db.Begin()
@@ -2252,7 +2255,7 @@ func listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string,
 	return res, err
 }
 
-func listCommentLabels(db *sql.DB, lexiconName string) ([]string, error) {
+func (mdb mariaDBIF) listCommentLabels(db *sql.DB, lexiconName string) ([]string, error) {
 	var res []string
 
 	tx, err := db.Begin()
@@ -2288,7 +2291,7 @@ func listCommentLabels(db *sql.DB, lexiconName string) ([]string, error) {
 }
 
 // LexiconStats calls the database a number of times, gathering different numbers, e.g. on how many entries there are in a lexicon.
-func lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
+func (mdb mariaDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	res := LexStats{Lexicon: lexName}
 
 	tx, err := db.Begin()
@@ -2297,7 +2300,7 @@ func lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	}
 	defer tx.Commit()
 
-	lex, err := getLexiconTx(tx, lexName)
+	lex, err := mdb.getLexiconTx(tx, lexName)
 	if err != nil {
 		return res, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
 	}
@@ -2342,7 +2345,7 @@ func lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 	// t3 := time.Now()
 	// log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
 
-	valStats, err := validationStatsTx(tx, lexiconID)
+	valStats, err := mdb.validationStatsTx(tx, lexiconID)
 	res.ValStats = valStats
 
 	// t4 := time.Now()
@@ -2356,22 +2359,22 @@ func lexiconStats(db *sql.DB, lexName string) (LexStats, error) {
 
 }
 
-func validationStats(db *sql.DB, lexName string) (ValStats, error) {
+func (mdb mariaDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
 
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
 	}
-	lex, err := getLexiconTx(tx, lexName)
+	lex, err := mdb.getLexiconTx(tx, lexName)
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
 	}
 	lexID := lex.id
-	return validationStatsTx(tx, lexID)
+	return mdb.validationStatsTx(tx, lexID)
 }
 
-func validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
+func (mdb mariaDBIF) validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error) {
 
 	res := ValStats{Rules: make(map[string]int), Levels: make(map[string]int)}
 
