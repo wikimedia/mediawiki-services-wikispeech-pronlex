@@ -73,6 +73,9 @@ func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 	return listNamesOfTriggersTx(tx)
 }
 
+*/
+
+// TODO remove
 func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 	var res []string
 
@@ -106,7 +109,6 @@ func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 
 	return res, nil
 }
-*/
 
 type sqliteDBIF struct{}
 

@@ -88,14 +88,14 @@ func execSchema(db *sql.DB) (sql.Result, error) {
 
 	var res sql.Result
 
-	for _, s := range MariaDBSchema {
+	//for _, s := range MariaDBSchema {
 
-		res, err := db.Exec(s)
-		if err != nil {
-			return res, err
-		}
-
+	res, err = db.Exec(Schema)
+	if err != nil {
+		return res, err
 	}
+
+	//}
 	_ = ti
 	//fmt.Printf("[dbapi_test] db.Exec(Schema) took %v\n", time.Since(ti))
 	return res, err
