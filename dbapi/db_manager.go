@@ -13,6 +13,9 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
+// TODO: Should be handled in som other way, to allow for swapping between different DBIFs
+var dbif DBIF = sqliteDBIF{}
+
 // DBManager is used by external services (i.e., lexserver) to cache sql database instances along with their names
 type DBManager struct {
 	sync.RWMutex
@@ -213,6 +216,9 @@ func (dbm *DBManager) ListDBNames() ([]lex.DBRef, error) {
 	return res, nil
 }
 
+// TODO: Maybe this should be removed. Probably, a db should only be
+// possible to remove manually as an administrator.
+
 // SuperDeleteLexicon deletes the lexicon from the associated lexicon
 // database, and also whipes all associated entries out of existence.
 // Returns an error if the lexicon doesn't exist,
@@ -245,7 +251,7 @@ func (dbm *DBManager) DeleteLexicon(lexRef lex.LexRef) error {
 		return fmt.Errorf("DBManager.DeleteLexicon: no such db '%s'", lexRef.DBRef)
 	}
 
-	err := deleteLexicon(db, string(lexRef.LexName))
+	err := dbif.deleteLexicon(db, string(lexRef.LexName))
 	if err != nil {
 		return fmt.Errorf("DBManager.DeleteLexicon: couldn't delete '%s' : %v", lexRef, err)
 	}
@@ -263,7 +269,7 @@ func (dbm *DBManager) LexiconStats(lexRef lex.LexRef) (LexStats, error) {
 		return LexStats{}, fmt.Errorf("DBManager.LexiconStats: no such db '%s'", lexRef.DBRef)
 	}
 
-	stats, err := lexiconStats(db, string(lexRef.LexName))
+	stats, err := dbif.lexiconStats(db, string(lexRef.LexName))
 	if err != nil {
 		return LexStats{}, fmt.Errorf("DBManager.LexiconStats: couldn't get stats '%s' : %v", lexRef, err)
 	}
@@ -282,7 +288,7 @@ func (dbm *DBManager) DefineLexicons(dbRef lex.DBRef, symbolSetName string, loca
 		if !ok {
 			return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", dbRef)
 		}
-		_, err := defineLexicon(db, lexicon{name: string(l), symbolSetName: symbolSetName, locale: locale})
+		_, err := dbif.defineLexicon(db, lexicon{name: string(l), symbolSetName: symbolSetName, locale: locale})
 		if err != nil {
 			return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s:%s' : %v", dbRef, l, err)
 		}
@@ -301,7 +307,7 @@ func (dbm *DBManager) DefineLexicon(lexRef lex.LexRef, symbolSetName string, loc
 	if !ok {
 		return fmt.Errorf("DBManager.DefineLexicon: No such db: '%s'", lexRef.DBRef)
 	}
-	_, err := defineLexicon(db, lexicon{name: string(lexRef.LexName), symbolSetName: symbolSetName, locale: locale})
+	_, err := dbif.defineLexicon(db, lexicon{name: string(lexRef.LexName), symbolSetName: symbolSetName, locale: locale})
 	if err != nil {
 		return fmt.Errorf("DBManager.DefineLexicon: failed to add '%s' : %v", lexRef.String(), err)
 	}
@@ -325,7 +331,7 @@ func (dbm *DBManager) ListIDs(lexRef lex.LexRef) ([]int64, error) {
 		return []int64{}, fmt.Errorf("DBManager.ListIDs failed: no db of name '%s'", lexRef.DBRef)
 	}
 
-	ids, err := lookUpIds(db, []lex.LexName{lexRef.LexName}, Query{})
+	ids, err := dbif.lookUpIds(db, []lex.LexName{lexRef.LexName}, Query{})
 	if err != nil {
 		return []int64{}, fmt.Errorf("DBManager.ListIDs failed for lexicon : '%s'", lexRef)
 	}
@@ -388,7 +394,7 @@ func (dbm *DBManager) LookUp(q DBMQuery, out lex.EntryWriter) error {
 			rez := lookUpRes{}
 			rez.dbRef = dbRef
 			ew := lex.EntrySliceWriter{}
-			err := lookUp(db0, lexNames, q.Query, &ew)
+			err := dbif.lookUp(db0, lexNames, q.Query, &ew)
 			if err != nil {
 				rez.err = fmt.Errorf("dbapi.LookUp failed for %v:%v : %v", dbRef, lexNames, err)
 				ch <- rez
@@ -440,7 +446,7 @@ func (dbm *DBManager) ListLexicons() ([]lex.LexRefWithInfo, error) {
 	// Go ask each db instance in its own Go-routine
 	for dbRef, db := range dbs {
 		go func(dbRef lex.DBRef, db *sql.DB, ch0 chan lexRes) {
-			lexs, err := listLexicons(db)
+			lexs, err := dbif.listLexicons(db)
 			lexList := []lex.LexRefWithInfo{}
 			for _, ln := range lexs {
 				lexRef := lex.LexRef{DBRef: dbRef, LexName: lex.LexName(ln.name)}
@@ -504,13 +510,13 @@ func (dbm *DBManager) InsertEntries(lexRef lex.LexRef, entries []lex.Entry) ([]i
 
 	//_ = db
 	//_ = lexName
-	l, err := getLexicon(db, string(lexRef.LexName))
+	l, err := dbif.getLexicon(db, string(lexRef.LexName))
 	//fmt.Printf("%v\n", l)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries failed call to getLexicons : %v", err)
 	}
 	//fmt.Println(lexName)
-	res, err = insertEntries(db, l, entries)
+	res, err = dbif.insertEntries(db, l, entries)
 	if err != nil {
 		return res, fmt.Errorf("DBManager.InsertEntries failed: %v", err)
 	}
@@ -526,7 +532,7 @@ func (dbm *DBManager) UpdateValidation(e lex.Entry) error {
 		return fmt.Errorf("DBManager.UpdateValidation: no such db '%s'", e.LexRef.DBRef)
 	}
 
-	return updateValidation(db, []lex.Entry{e})
+	return dbif.updateValidation(db, []lex.Entry{e})
 }
 
 // UpdateEntry wraps call to UpdateEntryTx with a transaction, and returns the updated entry, fresh from the db
@@ -540,7 +546,7 @@ func (dbm *DBManager) UpdateEntry(e lex.Entry) (lex.Entry, bool, error) {
 		return res, false, fmt.Errorf("DBManager.UpdateEntry: no such db '%s'", e.LexRef.DBRef)
 	}
 
-	return updateEntry(db, e)
+	return dbif.updateEntry(db, e)
 }
 
 // DeleteEntry deletes an entry from the database
@@ -552,7 +558,7 @@ func (dbm *DBManager) DeleteEntry(entryID int64, lexRef lex.LexRef) (int64, erro
 		return 0, fmt.Errorf("DBManager.DeleteEntry: no such db '%s'", lexRef.DBRef)
 	}
 
-	return deleteEntry(db, entryID, string(lexRef.LexName))
+	return dbif.deleteEntry(db, entryID, string(lexRef.LexName))
 }
 
 // ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
@@ -574,7 +580,7 @@ func (dbm *DBManager) EntryCount(lexRef lex.LexRef) (int64, error) {
 	if !ok {
 		return 0, fmt.Errorf("DBManager.ImportLexiconFile: no such db '%s'", lexRef.DBRef)
 	}
-	return entryCount(db, string(lexRef.LexName))
+	return dbif.entryCount(db, string(lexRef.LexName))
 }
 
 // Locale looks up the locale for a specific lexicon
@@ -585,7 +591,7 @@ func (dbm *DBManager) Locale(lexRef lex.LexRef) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("DBManager.ImportLexiconFile: no such db '%s'", lexRef.DBRef)
 	}
-	return locale(db, string(lexRef.LexName))
+	return dbif.locale(db, string(lexRef.LexName))
 }
 
 // ListCommentLabels returns a list of all comment labels
@@ -596,7 +602,7 @@ func (dbm *DBManager) ListCommentLabels(lexRef lex.LexRef) ([]string, error) {
 	if !ok {
 		return []string{}, fmt.Errorf("DBManager.ListCommentLabels: no such db '%s'", lexRef.DBRef)
 	}
-	return listCommentLabels(db, string(lexRef.LexName))
+	return dbif.listCommentLabels(db, string(lexRef.LexName))
 }
 
 // ListCurrentEntryUsers returns a list of all names EntryUsers marked 'current' (i.e., the most recent status).
@@ -607,7 +613,7 @@ func (dbm *DBManager) ListCurrentEntryUsers(lexRef lex.LexRef) ([]string, error)
 	if !ok {
 		return []string{}, fmt.Errorf("DBManager.ListCurrentEntryUsers: no such db '%s'", lexRef.DBRef)
 	}
-	return listCurrentEntryUsers(db, string(lexRef.LexName))
+	return dbif.listCurrentEntryUsers(db, string(lexRef.LexName))
 }
 
 // ListCurrentEntryUsersWithFreq returns a map of all names EntryUsers marked 'current' (i.e., the most recent status), and the frequency for each user
@@ -618,7 +624,7 @@ func (dbm *DBManager) ListCurrentEntryUsersWithFreq(lexRef lex.LexRef) (map[stri
 	if !ok {
 		return make(map[string]int), fmt.Errorf("DBManager.ListCurrentEntryUsersWithFreq: no such db '%s'", lexRef.DBRef)
 	}
-	return listCurrentEntryUsersWithFreq(db, string(lexRef.LexName))
+	return dbif.listCurrentEntryUsersWithFreq(db, string(lexRef.LexName))
 }
 
 // ListCurrentEntryStatuses returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status).
@@ -629,7 +635,7 @@ func (dbm *DBManager) ListCurrentEntryStatuses(lexRef lex.LexRef) ([]string, err
 	if !ok {
 		return []string{}, fmt.Errorf("DBManager.ListCurrentEntryStatuses: no such db '%s'", lexRef.DBRef)
 	}
-	return listCurrentEntryStatuses(db, string(lexRef.LexName))
+	return dbif.listCurrentEntryStatuses(db, string(lexRef.LexName))
 }
 
 // ListCurrentEntryStatusesWithFreq returns a list of all names EntryStatuses marked 'current' (i.e., the most recent status), and the frequency for each status.
@@ -640,7 +646,7 @@ func (dbm *DBManager) ListCurrentEntryStatusesWithFreq(lexRef lex.LexRef) (map[s
 	if !ok {
 		return make(map[string]int), fmt.Errorf("DBManager.ListCurrentEntryStatusesWithFreq: no such db '%s'", lexRef.DBRef)
 	}
-	return listCurrentEntryStatusesWithFreq(db, string(lexRef.LexName))
+	return dbif.listCurrentEntryStatusesWithFreq(db, string(lexRef.LexName))
 }
 
 // ListAllEntryStatuses returns a list of all names EntryStatuses, also those that are not 'current'  (i.e., the most recent status).
@@ -652,7 +658,7 @@ func (dbm *DBManager) ListAllEntryStatuses(lexRef lex.LexRef) ([]string, error) 
 	if !ok {
 		return []string{}, fmt.Errorf("DBManager.ListAllEntryStatuses: no such db '%s'", lexRef.DBRef)
 	}
-	return listAllEntryStatuses(db, string(lexRef.LexName))
+	return dbif.listAllEntryStatuses(db, string(lexRef.LexName))
 }
 
 // GetLexicon returns a information (LexRefWithInfo) matching a lexicon name in the db.
@@ -664,7 +670,7 @@ func (dbm *DBManager) GetLexicon(lexRef lex.LexRef) (lex.LexRefWithInfo, error) 
 	if !ok {
 		return lex.LexRefWithInfo{}, fmt.Errorf("DBManager.GetLexicon: no such db '%s'", lexRef.DBRef)
 	}
-	l, err := getLexicon(db, string(lexRef.LexName))
+	l, err := dbif.getLexicon(db, string(lexRef.LexName))
 	if err != nil {
 		return lex.LexRefWithInfo{}, err
 	}
@@ -693,7 +699,7 @@ func (dbm *DBManager) MoveNewEntries(dbRef lex.DBRef, fromLex, toLex lex.LexName
 	if !ok {
 		return MoveResult{}, fmt.Errorf("DBManager.MoveNewEntries: no such db '%s'", dbRef)
 	}
-	return moveNewEntries(db, string(fromLex), string(toLex), newSource, newStatus)
+	return dbif.moveNewEntries(db, string(fromLex), string(toLex), newSource, newStatus)
 }
 
 // Validate all entries given the specified lexRef and search query. Updates validation stats in db, and returns these.
@@ -715,5 +721,5 @@ func (dbm *DBManager) ValidationStats(lexRef lex.LexRef) (ValStats, error) {
 	if !ok {
 		return ValStats{}, fmt.Errorf("DBManager.Validate: no such db '%s'", lexRef.DBRef)
 	}
-	return validationStats(db, string(lexRef.LexName))
+	return dbif.validationStats(db, string(lexRef.LexName))
 }
