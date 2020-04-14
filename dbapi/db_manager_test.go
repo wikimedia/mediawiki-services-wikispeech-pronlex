@@ -2,6 +2,7 @@ package dbapi
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,6 +10,12 @@ import (
 
 	"github.com/stts-se/pronlex/lex"
 )
+
+func TestMain(m *testing.M) {
+	flag.Parse() // should be here
+	Sqlite3WithRegex()
+	os.Exit(m.Run()) // should be here
+}
 
 func TestSqliteDBManager(t *testing.T) {
 
