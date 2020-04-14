@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	//"flag"
 	//"fmt"
+	"os"
 	"reflect"
 	"time"
 
@@ -18,60 +19,6 @@ import (
 )
 
 var dbifSqlite = sqliteDBIF{}
-
-// Set up for local testing
-// CREATE USER 'speechoid'@'localhost';
-// -- DROP DATABASE IF EXISTS speechoid_pronlex_test1;
-
-// TestSqliteinsertEntries
-// CREATE DATABASE speechoid_pronlex_test1;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test1.* TO 'speechoid'@'localhost' ;
-//
-// TestSqliteImportLexiconFile
-// CREATE DATABASE speechoid_pronlex_test2;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test2.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteImportLexiconFileWithDupLines
-// CREATE DATABASE speechoid_pronlex_test3;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test3.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteImportLexiconFileInvalid
-// CREATE DATABASE speechoid_pronlex_test4;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test4.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteImportLexiconFileGz
-// CREATE DATABASE speechoid_pronlex_test5;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test5.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteUpdateComments
-// CREATE DATABASE speechoid_pronlex_test6;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test6.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteValidationRuleLike
-// CREATE DATABASE speechoid_pronlex_test7;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test7.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteDBManager
-// CREATE DATABASE speechoid_pronlex_test8;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test8.* TO 'speechoid'@'localhost' ;
-// CREATE DATABASE speechoid_pronlex_test9;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test9.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteMoveNewEntries
-// CREATE DATABASE speechoid_pronlex_test10;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test10.* TO 'speechoid'@'localhost' ;
-
-// TestEntryTag1
-// CREATE DATABASE speechoid_pronlex_test11;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test11.* TO 'speechoid'@'localhost' ;
-
-// TestEntryTag2
-// CREATE DATABASE speechoid_pronlex_test12;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test12.* TO 'speechoid'@'localhost' ;
-
-// TestSqliteValidation1
-// CREATE DATABASE speechoid_pronlex_test13;
-// GRANT ALL PRIVILEGES ON speechoid_pronlex_test13.* TO 'speechoid'@'localhost' ;
 
 // ff is a place holder to be replaced by proper error handling
 func ff(f string, err error) {
@@ -101,15 +48,33 @@ func execSchema(db *sql.DB) (sql.Result, error) {
 	return res, err
 }
 
-//TODO: defined in db_manager.go. This should be changed.
-//var dbif = mariaDBIF{}
-
 func TestSqliteinsertEntries(t *testing.T) {
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// defer db.Close()
+
+	dbPath := "./testlex_superdelete.db"
+
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		err := os.Remove(dbPath)
+		ff("failed to remove "+dbPath+" : %v", err)
+	}
+
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
 
 	defer db.Close()
 
@@ -617,21 +582,21 @@ func TestSqliteImportLexiconFile(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	// dbFile := "./iotestlex.db"
-	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-	// 	err := os.Remove(dbFile)
-	// 	ff("failed to remove iotestlex.db : %v", err)
-	// }
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
 
-	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test2")
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test2")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	//defer db.Commit()
 	defer db.Close()
@@ -712,28 +677,28 @@ func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	// dbFile := "./iotestlex.db"
-	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-	// 	err := os.Remove(dbFile)
-	// 	ff("failed to remove iotestlex.db : %v", err)
-	// }
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
 
-	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// _, err = db.Exec("PRAGMA foreign_keys = ON")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	// ff("Failed to exec PRAGMA call %v", err)
-
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test3")
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test3")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	defer db.Close()
 
@@ -814,28 +779,28 @@ func TestSqliteImportLexiconFileInvalid(t *testing.T) {
 
 	//symbolSet := ssMapper.From
 
-	// dbFile := "./iotestlex.db"
-	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-	// 	err := os.Remove(dbFile)
-	// 	ff("failed to remove iotestlex.db : %v", err)
-	// }
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
 
-	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// _, err = db.Exec("PRAGMA foreign_keys = ON")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	// ff("Failed to exec PRAGMA call %v", err)
-
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test4")
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test4")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	defer db.Close()
 
@@ -865,28 +830,28 @@ func TestSqliteImportLexiconFileGz(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	// dbFile := "./iotestlex.db"
-	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-	// 	err := os.Remove(dbFile)
-	// 	ff("failed to remove iotestlex.db : %v", err)
-	// }
+	dbFile := "./iotestlex.db"
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		err := os.Remove(dbFile)
+		ff("failed to remove iotestlex.db : %v", err)
+	}
 
-	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// _, err = db.Exec("PRAGMA foreign_keys = ON")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	// ff("Failed to exec PRAGMA call %v", err)
-
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test5")
+	db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test5")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	defer db.Close()
 
@@ -1141,29 +1106,29 @@ func TestSqliteImportLexiconBigFileGzPostTest(t *testing.T) {
 }
 */
 func TestSqliteUpdateComments(t *testing.T) {
-	// dbPath := "./testlex_updatecomments.db"
+	dbPath := "./testlex_updatecomments.db"
 
-	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-	// 	err := os.Remove(dbPath)
-	// 	ff("failed to remove "+dbPath+" : %v", err)
-	// }
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		err := os.Remove(dbPath)
+		ff("failed to remove "+dbPath+" : %v", err)
+	}
 
-	// db, err := sql.Open("sqlite3_with_regexp", dbPath)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// _, err = db.Exec("PRAGMA foreign_keys = ON")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	// ff("Failed to exec PRAGMA call %v", err)
-
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test6")
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test6")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	defer db.Close()
 
@@ -1238,29 +1203,29 @@ func TestSqliteUpdateComments(t *testing.T) {
 }
 
 func TestSqliteValidationRuleLike(t *testing.T) {
-	// dbPath := "./testlex_validationrulelike.db"
+	dbPath := "./testlex_validationrulelike.db"
 
-	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-	// 	err := os.Remove(dbPath)
-	// 	ff("failed to remove "+dbPath+" : %v", err)
-	// }
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		err := os.Remove(dbPath)
+		ff("failed to remove "+dbPath+" : %v", err)
+	}
 
-	// db, err := sql.Open("sqlite3_with_regexp", dbPath)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// _, err = db.Exec("PRAGMA foreign_keys = ON")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	// ff("Failed to exec PRAGMA call %v", err)
-
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test7")
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	ff("Failed to exec PRAGMA call %v", err)
+
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test7")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	defer db.Close()
 
