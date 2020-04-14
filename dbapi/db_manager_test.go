@@ -10,7 +10,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-func Test_DBManager(t *testing.T) {
+func TestSqliteDBManager(t *testing.T) {
 
 	dbPath1 := "./testlex_listlex1.db"
 	dbPath2 := "./testlex_listlex2.db"

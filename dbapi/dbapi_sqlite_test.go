@@ -23,41 +23,41 @@ var dbifSqlite = sqliteDBIF{}
 // CREATE USER 'speechoid'@'localhost';
 // -- DROP DATABASE IF EXISTS speechoid_pronlex_test1;
 
-// Test_insertEntries
+// TestSqliteinsertEntries
 // CREATE DATABASE speechoid_pronlex_test1;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test1.* TO 'speechoid'@'localhost' ;
 //
-// Test_ImportLexiconFile
+// TestSqliteImportLexiconFile
 // CREATE DATABASE speechoid_pronlex_test2;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test2.* TO 'speechoid'@'localhost' ;
 
-// Test_ImportLexiconFileWithDupLines
+// TestSqliteImportLexiconFileWithDupLines
 // CREATE DATABASE speechoid_pronlex_test3;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test3.* TO 'speechoid'@'localhost' ;
 
-// Test_ImportLexiconFileInvalid
+// TestSqliteImportLexiconFileInvalid
 // CREATE DATABASE speechoid_pronlex_test4;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test4.* TO 'speechoid'@'localhost' ;
 
-// Test_ImportLexiconFileGz
+// TestSqliteImportLexiconFileGz
 // CREATE DATABASE speechoid_pronlex_test5;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test5.* TO 'speechoid'@'localhost' ;
 
-// Test_UpdateComments
+// TestSqliteUpdateComments
 // CREATE DATABASE speechoid_pronlex_test6;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test6.* TO 'speechoid'@'localhost' ;
 
-// Test_ValidationRuleLike
+// TestSqliteValidationRuleLike
 // CREATE DATABASE speechoid_pronlex_test7;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test7.* TO 'speechoid'@'localhost' ;
 
-// Test_DBManager
+// TestSqliteDBManager
 // CREATE DATABASE speechoid_pronlex_test8;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test8.* TO 'speechoid'@'localhost' ;
 // CREATE DATABASE speechoid_pronlex_test9;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test9.* TO 'speechoid'@'localhost' ;
 
-// Test_MoveNewEntries
+// TestSqliteMoveNewEntries
 // CREATE DATABASE speechoid_pronlex_test10;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test10.* TO 'speechoid'@'localhost' ;
 
@@ -69,7 +69,7 @@ var dbifSqlite = sqliteDBIF{}
 // CREATE DATABASE speechoid_pronlex_test12;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test12.* TO 'speechoid'@'localhost' ;
 
-// Test_Validation1
+// TestSqliteValidation1
 // CREATE DATABASE speechoid_pronlex_test13;
 // GRANT ALL PRIVILEGES ON speechoid_pronlex_test13.* TO 'speechoid'@'localhost' ;
 
@@ -104,7 +104,7 @@ func execSchema(db *sql.DB) (sql.Result, error) {
 //TODO: defined in db_manager.go. This should be changed.
 //var dbif = mariaDBIF{}
 
-func Test_insertEntries(t *testing.T) {
+func TestSqliteinsertEntries(t *testing.T) {
 
 	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1")
 	if err != nil {
@@ -610,7 +610,7 @@ func Test_unique(t *testing.T) {
 	}
 }
 
-func Test_ImportLexiconFile(t *testing.T) {
+func TestSqliteImportLexiconFile(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -705,7 +705,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 }
 
-func Test_ImportLexiconFileWithDupLines(t *testing.T) {
+func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -805,7 +805,7 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 	}
 }
 
-func Test_ImportLexiconFileInvalid(t *testing.T) {
+func TestSqliteImportLexiconFileInvalid(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -858,7 +858,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 
 }
 
-func Test_ImportLexiconFileGz(t *testing.T) {
+func TestSqliteImportLexiconFileGz(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -950,10 +950,10 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 }
 
 // Test below can be used to load big lexicon
-// go test -timeout 60m -v -run Test_ImportLexiconBigFileGz
+// go test -timeout 60m -v -run TestSqliteImportLexiconBigFileGz
 
 /*
-func Test_ImportLexiconBigFileGz(t *testing.T) {
+func TestSqliteImportLexiconBigFileGz(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -1046,7 +1046,7 @@ func Test_ImportLexiconBigFileGz(t *testing.T) {
 */
 
 /*
-func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
+func TestSqliteImportLexiconBigFileGzPostTest(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -1140,7 +1140,7 @@ func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
 
 }
 */
-func Test_UpdateComments(t *testing.T) {
+func TestSqliteUpdateComments(t *testing.T) {
 	// dbPath := "./testlex_updatecomments.db"
 
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
@@ -1237,7 +1237,7 @@ func Test_UpdateComments(t *testing.T) {
 	}
 }
 
-func Test_ValidationRuleLike(t *testing.T) {
+func TestSqliteValidationRuleLike(t *testing.T) {
 	// dbPath := "./testlex_validationrulelike.db"
 
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
