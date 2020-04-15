@@ -12,7 +12,7 @@ import (
 // NB: Defined in db_manager.go. Should probably be handled in some other way
 //var dbif = mariaDBIF{}
 
-func TestEntryTag1(t *testing.T) {
+func TestEntryTag1Mariadb(t *testing.T) {
 
 	// dbPath := "./testlex_entrytag.db"
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
@@ -43,7 +43,7 @@ func TestEntryTag1(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	if err != nil {
 
 		t.Errorf("Failed to create lexicon db: %v", err)
@@ -164,7 +164,7 @@ func TestEntryTag1(t *testing.T) {
 	}
 }
 
-func TestEntryTag2(t *testing.T) {
+func TestEntryTag2Mariadb(t *testing.T) {
 
 	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test12")
 	if err != nil {
@@ -173,7 +173,7 @@ func TestEntryTag2(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	if err != nil {
 
 		t.Errorf("Failed to create lexicon db: %v", err)

@@ -27,7 +27,7 @@ func ff(f string, err error) {
 	}
 }
 
-func execSchema(db *sql.DB) (sql.Result, error) {
+func execSchemaMariadb(db *sql.DB) (sql.Result, error) {
 	ti := time.Now()
 
 	var err error
@@ -60,7 +60,7 @@ func Test_insertEntries(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 
 	ff("Failed to create lexicon db: %v", err)
 
@@ -592,7 +592,7 @@ func Test_ImportLexiconFile(t *testing.T) {
 
 	// defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -684,7 +684,7 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -786,7 +786,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -837,7 +837,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -932,7 +932,7 @@ func Test_ImportLexiconBigFileGz(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -1025,7 +1025,7 @@ func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
 
 	defer db.Close()
 
-	// _, err = execSchema(db) // Creates new lexicon database
+	// _, err = execSchemaMariadb(db) // Creates new lexicon database
 	// ff("Failed to create lexicon db: %v", err)
 
 	// logger := StderrLogger{}
@@ -1114,7 +1114,7 @@ func Test_UpdateComments(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 
 	ff("Failed to create lexicon db: %v", err)
 
@@ -1211,7 +1211,7 @@ func Test_ValidationRuleLike(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 
 	ff("Failed to create lexicon db: %v", err)
 

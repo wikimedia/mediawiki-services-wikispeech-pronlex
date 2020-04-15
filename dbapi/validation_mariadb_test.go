@@ -89,7 +89,7 @@ func createValidator() validation.Validator {
 	return v
 }
 
-func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
+func vInsertEntriesMariadb(t *testing.T, lexName string) (*sql.DB, string) {
 
 	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test13")
 	if err != nil {
@@ -98,7 +98,7 @@ func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
 
 	//defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	l := lexicon{name: lexName, symbolSetName: "ZZ", locale: "ll"}
@@ -163,8 +163,8 @@ func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
 	return db, l.name
 }
 
-func Test_Validation1(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test1")
+func Test_Validation1Mariadb(t *testing.T) {
+	db, lexName := vInsertEntriesMariadb(t, "test1")
 	v := createValidator()
 
 	q := Query{}
@@ -217,8 +217,8 @@ func Test_Validation1(t *testing.T) {
 	}
 }
 
-func Test_Validation2(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test2")
+func Test_Validation2Mariadb(t *testing.T) {
+	db, lexName := vInsertEntriesMariadb(t, "test2")
 	v := createValidator()
 
 	q := Query{WordRegexp: "a$"}
@@ -307,8 +307,8 @@ func Test_Validation2(t *testing.T) {
 	}
 }
 
-func Test_ValidationUpdate1(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test3")
+func Test_ValidationUpdate1Mariadb(t *testing.T) {
+	db, lexName := vInsertEntriesMariadb(t, "test3")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{WordLike: "%"}, &ew)
@@ -344,8 +344,8 @@ func Test_ValidationUpdate1(t *testing.T) {
 	}
 }
 
-func Test_ValidationUpdate2(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test4")
+func Test_ValidationUpdate2Mariadb(t *testing.T) {
+	db, lexName := vInsertEntriesMariadb(t, "test4")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{WordLike: "%"}, &ew)
@@ -383,8 +383,8 @@ func Test_ValidationUpdate2(t *testing.T) {
 	}
 }
 
-func Test_ValidationUpdate3(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test5")
+func Test_ValidationUpdate3Mariadb(t *testing.T) {
+	db, lexName := vInsertEntriesMariadb(t, "test5")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{WordLike: "%"}, &ew)

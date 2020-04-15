@@ -10,7 +10,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-func Test_MoveNewEntries(t *testing.T) {
+func Test_MoveNewEntriesMariadb(t *testing.T) {
 
 	// dbFile := "./movetestlex.db"
 	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
@@ -41,7 +41,7 @@ func Test_MoveNewEntries(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaMariadb(db) // Creates new lexicon database
 	if err != nil {
 		log.Fatalf("Failed to create lexicon db: %v", err)
 	}

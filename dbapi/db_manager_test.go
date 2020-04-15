@@ -10,7 +10,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-func Test_DBManager(t *testing.T) {
+func Test_DBManagerMariadb(t *testing.T) {
 
 	// dbPath1 := "./testlex_listlex1.db"
 	// dbPath2 := "./testlex_listlex2.db"
@@ -72,11 +72,11 @@ func Test_DBManager(t *testing.T) {
 	defer db1.Close()
 	defer db2.Close()
 
-	_, err = execSchema(db1) // Creates new lexicon database
+	_, err = execSchemaMariadb(db1) // Creates new lexicon database
 	if err != nil {
 		log.Fatalf("NO! creating db1 failed %v", err)
 	}
-	_, err = execSchema(db2) // Creates new lexicon database
+	_, err = execSchemaMariadb(db2) // Creates new lexicon database
 	if err != nil {
 		log.Fatalf("NO! %v", err)
 	}
