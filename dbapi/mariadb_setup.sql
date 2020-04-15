@@ -1,3 +1,5 @@
+-- $ sudo mysql -u root < mariadb_setup.sql
+
 CREATE USER IF NOT EXISTS 'speechoid'@'localhost';
 -- DROP DATABASE IF EXISTS speechoid_pronlex_test1;
 
