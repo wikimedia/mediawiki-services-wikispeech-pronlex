@@ -219,26 +219,26 @@ func (dbm *DBManager) ListDBNames() ([]lex.DBRef, error) {
 // TODO: Maybe this should be removed. Probably, a db should only be
 // possible to remove manually as an administrator.
 
-// SuperDeleteLexicon deletes the lexicon from the associated lexicon
-// database, and also whipes all associated entries out of existence.
-// Returns an error if the lexicon doesn't exist,
-// TODO Send progress message to client over websocket (it takes some time)
-func (dbm *DBManager) SuperDeleteLexicon(lexRef lex.LexRef) error {
-	dbm.Lock()
-	defer dbm.Unlock()
+// // SuperDeleteLexicon deletes the lexicon from the associated lexicon
+// // database, and also whipes all associated entries out of existence.
+// // Returns an error if the lexicon doesn't exist,
+// // TODO Send progress message to client over websocket (it takes some time)
+// func (dbm *DBManager) SuperDeleteLexicon(lexRef lex.LexRef) error {
+// 	dbm.Lock()
+// 	defer dbm.Unlock()
 
-	db, ok := dbm.dbs[lexRef.DBRef]
-	if !ok {
-		return fmt.Errorf("DBManager.SuperDeleteLexicon: no such db '%s'", lexRef.DBRef)
-	}
+// 	db, ok := dbm.dbs[lexRef.DBRef]
+// 	if !ok {
+// 		return fmt.Errorf("DBManager.SuperDeleteLexicon: no such db '%s'", lexRef.DBRef)
+// 	}
 
-	err := superDeleteLexicon(db, string(lexRef.LexName))
-	if err != nil {
-		return fmt.Errorf("DBManager.SuperDeleteLexicon: couldn't delete '%s'", lexRef)
-	}
+// 	err := superDeleteLexicon(db, string(lexRef.LexName))
+// 	if err != nil {
+// 		return fmt.Errorf("DBManager.SuperDeleteLexicon: couldn't delete '%s'", lexRef)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // DeleteLexicon deletes the lexicon from the associated lexicon
 // database. Returns an error if the lexicon doesn't exist,  or if the lexicon is not empty.

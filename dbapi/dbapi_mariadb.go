@@ -14,11 +14,11 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"regexp"
+	//"regexp"
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
+	//"sync"
 
 	// installs sqlite3 driver
 	//"github.com/mattn/go-sqlite3"
@@ -27,28 +27,28 @@ import (
 	//"github.com/stts-se/pronlex/validation"
 )
 
-var remem = struct {
-	sync.Mutex
-	re map[string]*regexp.Regexp
-}{
-	re: make(map[string]*regexp.Regexp),
-}
+// var remem = struct {
+// 	sync.Mutex
+// 	re map[string]*regexp.Regexp
+// }{
+// 	re: make(map[string]*regexp.Regexp),
+// }
 
-var regexMem = func(re, s string) (bool, error) {
+// var regexMem = func(re, s string) (bool, error) {
 
-	remem.Lock()
-	defer remem.Unlock()
-	if r, ok := remem.re[re]; ok {
-		return r.MatchString(s), nil
-	}
+// 	remem.Lock()
+// 	defer remem.Unlock()
+// 	if r, ok := remem.re[re]; ok {
+// 		return r.MatchString(s), nil
+// 	}
 
-	r, err := regexp.Compile(re)
-	if err != nil {
-		return false, err
-	}
-	remem.re[re] = r
-	return r.MatchString(s), nil
-}
+// 	r, err := regexp.Compile(re)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	remem.re[re] = r
+// 	return r.MatchString(s), nil
+// }
 
 // Sqlite3WithRegex registers an Sqlite3 driver with regexp support. (Unfortunately quite slow regexp matching)
 // func Sqlite3WithRegex() {
@@ -63,40 +63,6 @@ var regexMem = func(re, s string) (bool, error) {
 // 			},
 // 		})
 // }
-
-func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
-	var res []string
-
-	q := "select name from sqlite_master where type = 'trigger'"
-	rows, err := tx.Query(q)
-	if err != nil {
-		msg := fmt.Sprintf("dbapi.listNamesOfTriggersTx : %v", err)
-
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
-
-		log.Print(msg)
-		return res, fmt.Errorf(msg)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var name string
-		err = rows.Scan(&name)
-		if err != nil {
-			msg := fmt.Sprintf("dbapi.listNamesOfTriggers : %v", err)
-			err2 := tx.Rollback()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-			}
-			return res, fmt.Errorf(msg)
-		}
-		res = append(res, name)
-	}
-
-	return res, nil
-}
 
 type mariaDBIF struct {
 }
@@ -276,71 +242,71 @@ func lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 	}
 }
 
-// SuperDeleteLexicon deletes the lexicon name from the lexicon
-// table and also whipes all associated entries out of existence.
-// TODO Send progress message to client over websocket
-func superDeleteLexicon(db *sql.DB, lexName string) error {
-	tx, err := db.Begin()
-	defer tx.Commit()
-	if err != nil {
-		return fmt.Errorf("superDeleteLexicon failed to initiate transaction : %v", err)
-	}
-	return superDeleteLexiconTx(tx, lexName)
-}
+// // SuperDeleteLexicon deletes the lexicon name from the lexicon
+// // table and also whipes all associated entries out of existence.
+// // TODO Send progress message to client over websocket
+// func superDeleteLexicon(db *sql.DB, lexName string) error {
+// 	tx, err := db.Begin()
+// 	defer tx.Commit()
+// 	if err != nil {
+// 		return fmt.Errorf("superDeleteLexicon failed to initiate transaction : %v", err)
+// 	}
+// 	return superDeleteLexiconTx(tx, lexName)
+// }
 
-// SuperDeleteLexiconTx deletes the lexicon name from the lexicon
-// table and also whipes all associated entries out of existence.
-func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
+// // SuperDeleteLexiconTx deletes the lexicon name from the lexicon
+// // table and also whipes all associated entries out of existence.
+// func superDeleteLexiconTx(tx *sql.Tx, lexName string) error {
 
-	log.Println("dbapi.superDeleteLexiconTX was called")
+// 	log.Println("dbapi.superDeleteLexiconTX was called")
 
-	// does it exist?
-	lexExists, err := lexiconExists(tx, lexName)
-	if err != nil {
+// 	// does it exist?
+// 	lexExists, err := lexiconExists(tx, lexName)
+// 	if err != nil {
 
-		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to lookup lexicon from name %s : %v", lexName, err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
+// 		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to lookup lexicon from name %s : %v", lexName, err)
+// 		err2 := tx.Rollback()
+// 		if err2 != nil {
+// 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+// 		}
 
-		return fmt.Errorf(msg)
-	}
-	if !lexExists {
-		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : no lexicon exists with name : %s", lexName)
-	}
+// 		return fmt.Errorf(msg)
+// 	}
+// 	if !lexExists {
+// 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : no lexicon exists with name : %s", lexName)
+// 	}
 
-	// delete entries
-	_, err = tx.Exec("DELETE FROM Entry WHERE lexiconId IN (SELECT id FROM Lexicon WHERE name = ?)", lexName)
-	if err != nil {
-		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to delete entries : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
-		return fmt.Errorf(msg)
-	}
-	log.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
+// 	// delete entries
+// 	_, err = tx.Exec("DELETE FROM Entry WHERE lexiconId IN (SELECT id FROM Lexicon WHERE name = ?)", lexName)
+// 	if err != nil {
+// 		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to delete entries : %v", err)
+// 		err2 := tx.Rollback()
+// 		if err2 != nil {
+// 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+// 		}
+// 		return fmt.Errorf(msg)
+// 	}
+// 	log.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
 
-	// delete lexicon
-	_, err = tx.Exec("DELETE FROM Lexicon WHERE name = ?", lexName)
+// 	// delete lexicon
+// 	_, err = tx.Exec("DELETE FROM Lexicon WHERE name = ?", lexName)
 
-	if err != nil {
-		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to delete lexicon : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
+// 	if err != nil {
+// 		msg := fmt.Sprintf("dbapi.SuperDeleteLexiconTx : failed to delete lexicon : %v", err)
+// 		err2 := tx.Rollback()
+// 		if err2 != nil {
+// 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+// 		}
 
-		return fmt.Errorf(msg)
-	}
+// 		return fmt.Errorf(msg)
+// 	}
 
-	log.Println("dbapi.superDeleteLexiconTX finished deleting from lexicon set")
+// 	log.Println("dbapi.superDeleteLexiconTX finished deleting from lexicon set")
 
-	log.Printf("Deleted lexicon named %s\n", lexName)
+// 	log.Printf("Deleted lexicon named %s\n", lexName)
 
-	return nil
-}
+// 	return nil
+// }
 
 //TODO: Check that lexName exists, or report error
 //TODO: Check that entryId exists, or report error
