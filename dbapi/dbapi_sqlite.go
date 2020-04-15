@@ -581,9 +581,10 @@ func (sdb sqliteDBIF) defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 // MoveResult is returned from the MoveNewEntries function.
 // TODO Since it only contains a single int64, this struct is probably not needed.
 // Only useful if more info is to be returned.
-type MoveResult struct {
-	N int64
-}
+// TODO: Defined in dbapi_maria.db
+//type MoveResult struct {
+//	N int64
+//}
 
 // MoveNewEntries moves lexical entries from the lexicon named
 // fromLexicon to the lexicon named toLexicon.  The 'newSource' string is
@@ -709,11 +710,11 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 }
 
 // TODO move to function?
-var entrySTMT = "insert into entry (lexiconid, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
-var transAfterEntrySTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
+var entrySTMTSqlite = "insert into entry (lexiconid, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
+var transAfterEntrySTMTSqlite = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
 //var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
-var insertStatus = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
+var insertStatusSqlite = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
 // TODO: Change second input argument to string (lexicon name) instead of Lexicon struct.
@@ -728,11 +729,11 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 		return ids, fmt.Errorf("begin transaction failed : %v", err)
 	}
 
-	stmt1, err := tx.Prepare(entrySTMT)
+	stmt1, err := tx.Prepare(entrySTMTSqlite)
 	if err != nil {
 		return ids, fmt.Errorf("failed prepare : %v", err)
 	}
-	stmt2, err := tx.Prepare(transAfterEntrySTMT)
+	stmt2, err := tx.Prepare(transAfterEntrySTMTSqlite)
 	if err != nil {
 		return ids, fmt.Errorf("failed prepare : %v", err)
 	}
@@ -848,7 +849,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 			// 	tx.Rollback()
 			// 	return ids, fmt.Errorf("updating lex.EntryStatus.Current failed : %v", err)
 			// }
-			_, err = tx.Exec(insertStatus, e.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source)) //, e.EntryStatus.Current) // TODO?
+			_, err = tx.Exec(insertStatusSqlite, e.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source)) //, e.EntryStatus.Current) // TODO?
 			if err != nil {
 				msg := fmt.Sprintf("inserting EntryStatus failed : %v", err)
 				err2 := tx.Rollback()
@@ -891,7 +892,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 	return ids, err
 }
 
-var insertEntryTag = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
+var insertEntryTagSqlite = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
 
 //TODO Add tests
 
@@ -928,7 +929,7 @@ func (sdb sqliteDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) er
 
 	//err == sql.ErrNoRows
 
-	insert, err := tx.Prepare(insertEntryTag)
+	insert, err := tx.Prepare(insertEntryTagSqlite)
 	if err != nil {
 		// Let caller be responsible for rollback
 		//tx.Rollback()
@@ -1558,6 +1559,8 @@ func (sdb sqliteDBIF) updateEntryTx(tx *sql.Tx, e lex.Entry) (updated bool, err 
 	return updated1 || updated2 || updated3 || updated4 || updated5 || updated6 || updated7 || updated8 || updated9 || updated10 || updated11, err
 }
 
+// TODO: Defined in dbapi_mariadb.go
+/*
 func getTIDs(ts []lex.Transcription) []int64 {
 	var res []int64
 	for _, t := range ts {
@@ -1580,7 +1583,7 @@ func equal(ts1 []lex.Transcription, ts2 []lex.Transcription) bool {
 
 	return true
 }
-
+*/
 func (sdb sqliteDBIF) updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bool, error) {
 	if e.ID != dbE.ID {
 		msg := "new and old entries have different ids"
@@ -1852,7 +1855,7 @@ func (sdb sqliteDBIF) updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry
 }
 
 // TODO move to function
-var transSTMT = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
+var transSTMTSqlite = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
 func (sdb sqliteDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if e.ID != dbE.ID {
@@ -1882,7 +1885,7 @@ func (sdb sqliteDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entr
 			return false, fmt.Errorf(msg)
 		}
 		for _, t := range e.Transcriptions {
-			_, err := tx.Exec(transSTMT, e.ID, t.Strn, t.Language, t.SourcesString())
+			_, err := tx.Exec(transSTMTSqlite, e.ID, t.Strn, t.Language, t.SourcesString())
 			if err != nil {
 				msg := fmt.Sprintf("failed transcription update : %v", err)
 				err2 := tx.Rollback()
@@ -1915,7 +1918,7 @@ func (sdb sqliteDBIF) updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) 
 		// 	tx.Rollback()
 		// 	return false, fmt.Errorf("failed EntryStatus.Current update : %v", err)
 		// }
-		_, err = tx.Exec(insertStatus, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
+		_, err = tx.Exec(insertStatusSqlite, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
 		if err != nil {
 			msg := fmt.Sprintf("failed EntryStatus update : %v", err)
 			err2 := tx.Rollback()
@@ -1931,15 +1934,20 @@ func (sdb sqliteDBIF) updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) 
 	return false, nil
 }
 
+// TODO: Defined in dbapi_mariadb.go
+/*
 type vali struct {
 	level string
 	name  string
 	msg   string
 }
+*/
 
+// TODO: Defined in dbapi_mariadb.go
 // TODO test me
 // returns the validations of e1 not found in e2 as fist return arg
 // returns the validations found only in e2, to be removed, as second arg
+/*
 func newValidations(e1 lex.Entry, e2 lex.Entry) ([]lex.EntryValidation, []lex.EntryValidation) {
 	var res1 []lex.EntryValidation
 	var res2 []lex.EntryValidation
@@ -1965,12 +1973,12 @@ func newValidations(e1 lex.Entry, e2 lex.Entry) ([]lex.EntryValidation, []lex.En
 
 	return res1, res2
 }
-
-var insValiSQL = "INSERT INTO entryvalidation (entryid, level, name, message) values (?, ?, ?, ?)"
+*/
+var insValiSQLSqlite = "INSERT INTO entryvalidation (entryid, level, name, message) values (?, ?, ?, ?)"
 
 func (sdb sqliteDBIF) insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error {
 	for _, v := range eValis {
-		_, err := tx.Exec(insValiSQL, e.ID, strings.ToLower(v.Level), v.RuleName, v.Message)
+		_, err := tx.Exec(insValiSQLSqlite, e.ID, strings.ToLower(v.Level), v.RuleName, v.Message)
 		if err != nil {
 			msg := fmt.Sprintf("failed to insert EntryValidation : %v", err)
 			err2 := tx.Rollback()
@@ -2067,14 +2075,14 @@ func (sdb sqliteDBIF) updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Ent
 	return true, nil
 }
 
-var delEntryCommentsSQL = "DELETE FROM entrycomment WHERE entryID = ?"
-var insEntryCommentSQL = "INSERT INTO entrycomment (entryid, label, source, comment) values (?, ?, ?, ?)"
+var delEntryCommentsSQLSqlite = "DELETE FROM entrycomment WHERE entryID = ?"
+var insEntryCommentSQLSqlite = "INSERT INTO entrycomment (entryid, label, source, comment) values (?, ?, ?, ?)"
 
 func (sdb sqliteDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) error {
 
 	// Delete all old comments, before adding the new
 	// TODO Handle old comments that are to be kept in a smoother way.
-	_, err := tx.Exec(delEntryCommentsSQL, eID)
+	_, err := tx.Exec(delEntryCommentsSQLSqlite, eID)
 	if err != nil {
 		msg := fmt.Sprintf("failed deleting EntryComments : %v", err)
 		err2 := tx.Rollback()
@@ -2085,7 +2093,7 @@ func (sdb sqliteDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex
 	}
 
 	for _, cmt := range eComments {
-		_, err := tx.Exec(insEntryCommentSQL, eID, cmt.Label, cmt.Source, cmt.Comment)
+		_, err := tx.Exec(insEntryCommentSQLSqlite, eID, cmt.Label, cmt.Source, cmt.Comment)
 		if err != nil {
 			msg := fmt.Sprintf("failed inserting EntryComment : %v", err)
 			err2 := tx.Rollback()
@@ -2100,6 +2108,8 @@ func (sdb sqliteDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex
 	return nil
 }
 
+// TODO: Defined in dbapi_mariadb.go
+/*
 func unique(ns []int64) []int64 {
 	tmpMap := make(map[int64]int)
 	var res []int64
@@ -2111,7 +2121,7 @@ func unique(ns []int64) []int64 {
 	}
 	return res
 }
-
+*/
 /*
 func uniqIDs(ss []Symbol) []int64 {
 	res := make([]int64, len(ss))

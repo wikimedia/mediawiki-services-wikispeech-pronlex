@@ -568,11 +568,11 @@ func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSou
 }
 
 // TODO move to function?
-var entrySTMT = "insert into Entry (lexiconId, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
-var transAfterEntrySTMT = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
+var entrySTMTMDB = "insert into Entry (lexiconId, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
+var transAfterEntrySTMTMDB = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
 
 var statusSetCurrentFalse = "UPDATE EntryStatus SET current = 0 WHERE EntryStatus.entryId = ?"
-var insertStatus = "INSERT INTO EntryStatus (entryId, name, source) values (?, ?, ?)"
+var insertStatusMDB = "INSERT INTO EntryStatus (entryId, name, source) values (?, ?, ?)"
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
 // TODO: Change second input argument to string (lexicon name) instead of Lexicon struct.
@@ -587,11 +587,11 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 		return ids, fmt.Errorf("begin transaction failed : %v", err)
 	}
 
-	stmt1, err := tx.Prepare(entrySTMT)
+	stmt1, err := tx.Prepare(entrySTMTMDB)
 	if err != nil {
 		return ids, fmt.Errorf("failed prepare : %v", err)
 	}
-	stmt2, err := tx.Prepare(transAfterEntrySTMT)
+	stmt2, err := tx.Prepare(transAfterEntrySTMTMDB)
 	if err != nil {
 		return ids, fmt.Errorf("failed prepare : %v", err)
 	}
@@ -722,7 +722,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 			// 	tx.Rollback()
 			// 	return ids, fmt.Errorf("updating lex.EntryStatus.Current failed : %v", err)
 			// }
-			_, err = tx.Exec(insertStatus, e.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source)) //, e.EntryStatus.Current) // TODO?
+			_, err = tx.Exec(insertStatusMDB, e.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source)) //, e.EntryStatus.Current) // TODO?
 			if err != nil {
 				msg := fmt.Sprintf("inserting EntryStatus failed : %v", err)
 				err2 := tx.Rollback()
@@ -769,7 +769,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 //var insertEntryTag = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
 
 // Trigger-less version
-var insertEntryTag = "INSERT INTO EntryTag (entryId, tag, wordForm) values (?, ?, ?)"
+var insertEntryTagMDB = "INSERT INTO EntryTag (entryId, tag, wordForm) values (?, ?, ?)"
 
 // TODO: Test that EntryTags work as expected after removal of triggers
 
@@ -808,7 +808,7 @@ func (mdb mariaDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) err
 
 	//err == sql.ErrNoRows
 
-	insert, err := tx.Prepare(insertEntryTag)
+	insert, err := tx.Prepare(insertEntryTagMDB)
 	if err != nil {
 		// Let caller be responsible for rollback
 		//tx.Rollback()
@@ -1731,7 +1731,7 @@ func (mdb mariaDBIF) updateEntryComments(tx *sql.Tx, e lex.Entry, dbE lex.Entry)
 }
 
 // TODO move to function
-var transSTMT = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
+var transSTMTMDB = "insert into Transcription (entryId, strn, language, sources) values (?, ?, ?, ?)"
 
 func (mdb mariaDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updated bool, err error) {
 	if e.ID != dbE.ID {
@@ -1761,7 +1761,7 @@ func (mdb mariaDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry
 			return false, fmt.Errorf(msg)
 		}
 		for _, t := range e.Transcriptions {
-			_, err := tx.Exec(transSTMT, e.ID, t.Strn, t.Language, t.SourcesString())
+			_, err := tx.Exec(transSTMTMDB, e.ID, t.Strn, t.Language, t.SourcesString())
 			if err != nil {
 				msg := fmt.Sprintf("failed transcription update : %v", err)
 				err2 := tx.Rollback()
@@ -1803,7 +1803,7 @@ func (mdb mariaDBIF) updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (
 			return false, fmt.Errorf(msg)
 		}
 
-		_, err = tx.Exec(insertStatus, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
+		_, err = tx.Exec(insertStatusMDB, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
 		if err != nil {
 			msg := fmt.Sprintf("failed EntryStatus update : %v", err)
 			err2 := tx.Rollback()
@@ -1854,11 +1854,11 @@ func newValidations(e1 lex.Entry, e2 lex.Entry) ([]lex.EntryValidation, []lex.En
 	return res1, res2
 }
 
-var insValiSQL = "INSERT INTO EntryValidation (entryId, level, name, message) values (?, ?, ?, ?)"
+var insValiSQLMDB = "INSERT INTO EntryValidation (entryId, level, name, message) values (?, ?, ?, ?)"
 
 func (mdb mariaDBIF) insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error {
 	for _, v := range eValis {
-		_, err := tx.Exec(insValiSQL, e.ID, strings.ToLower(v.Level), v.RuleName, v.Message)
+		_, err := tx.Exec(insValiSQLMDB, e.ID, strings.ToLower(v.Level), v.RuleName, v.Message)
 		if err != nil {
 			msg := fmt.Sprintf("failed to insert EntryValidation : %v", err)
 			err2 := tx.Rollback()
@@ -1955,14 +1955,14 @@ func (mdb mariaDBIF) updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entr
 	return true, nil
 }
 
-var delEntryCommentsSQL = "DELETE FROM EntryComment WHERE entryId = ?"
-var insEntryCommentSQL = "INSERT INTO EntryComment (entryId, label, source, comment) values (?, ?, ?, ?)"
+var delEntryCommentsSQLMDB = "DELETE FROM EntryComment WHERE entryId = ?"
+var insEntryCommentSQLMDB = "INSERT INTO EntryComment (entryId, label, source, comment) values (?, ?, ?, ?)"
 
 func (mdb mariaDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) error {
 
 	// Delete all old comments, before adding the new
 	// TODO Handle old comments that are to be kept in a smoother way.
-	_, err := tx.Exec(delEntryCommentsSQL, eID)
+	_, err := tx.Exec(delEntryCommentsSQLMDB, eID)
 	if err != nil {
 		msg := fmt.Sprintf("failed deleting EntryComments : %v", err)
 		err2 := tx.Rollback()
@@ -1973,7 +1973,7 @@ func (mdb mariaDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.
 	}
 
 	for _, cmt := range eComments {
-		_, err := tx.Exec(insEntryCommentSQL, eID, cmt.Label, cmt.Source, cmt.Comment)
+		_, err := tx.Exec(insEntryCommentSQLMDB, eID, cmt.Label, cmt.Source, cmt.Comment)
 		if err != nil {
 			msg := fmt.Sprintf("failed inserting EntryComment : %v", err)
 			err2 := tx.Rollback()
