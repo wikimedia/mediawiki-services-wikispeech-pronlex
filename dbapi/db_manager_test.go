@@ -64,11 +64,11 @@ func TestSqliteDBManager(t *testing.T) {
 	defer db1.Close()
 	defer db2.Close()
 
-	_, err = execSchema(db1) // Creates new lexicon database
+	_, err = execSchemaSqlite(db1) // Creates new lexicon database
 	if err != nil {
 		log.Fatalf("NO! %v", err)
 	}
-	_, err = execSchema(db2) // Creates new lexicon database
+	_, err = execSchemaSqlite(db2) // Creates new lexicon database
 	if err != nil {
 		log.Fatalf("NO! %v", err)
 	}

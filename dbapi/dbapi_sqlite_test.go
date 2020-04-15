@@ -27,7 +27,7 @@ func ff(f string, err error) {
 	}
 }
 
-func execSchema(db *sql.DB) (sql.Result, error) {
+func execSchemaSqlite(db *sql.DB) (sql.Result, error) {
 	ti := time.Now()
 
 	var err error
@@ -78,7 +78,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 
 	ff("Failed to create lexicon db: %v", err)
 
@@ -610,7 +610,7 @@ func TestSqliteImportLexiconFile(t *testing.T) {
 
 	// defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -702,7 +702,7 @@ func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -804,7 +804,7 @@ func TestSqliteImportLexiconFileInvalid(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -855,7 +855,7 @@ func TestSqliteImportLexiconFileGz(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -950,7 +950,7 @@ func TestSqliteImportLexiconBigFileGz(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	logger := StderrLogger{}
@@ -1043,7 +1043,7 @@ func TestSqliteImportLexiconBigFileGzPostTest(t *testing.T) {
 
 	defer db.Close()
 
-	// _, err = execSchema(db) // Creates new lexicon database
+	// _, err = execSchemaSqlite(db) // Creates new lexicon database
 	// ff("Failed to create lexicon db: %v", err)
 
 	// logger := StderrLogger{}
@@ -1132,7 +1132,7 @@ func TestSqliteUpdateComments(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 
 	ff("Failed to create lexicon db: %v", err)
 
@@ -1229,7 +1229,7 @@ func TestSqliteValidationRuleLike(t *testing.T) {
 
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 
 	ff("Failed to create lexicon db: %v", err)
 

@@ -8,7 +8,7 @@ import (
 	"github.com/stts-se/pronlex/lex"
 )
 
-func TestEntryTag1(t *testing.T) {
+func TestEntryTag1Sqlite(t *testing.T) {
 
 	dbPath := "./testlex_entrytag.db"
 	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
@@ -33,7 +33,7 @@ func TestEntryTag1(t *testing.T) {
 	}
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	if err != nil {
 
 		t.Errorf("Failed to create lexicon db: %v", err)
@@ -154,7 +154,7 @@ func TestEntryTag1(t *testing.T) {
 	}
 }
 
-func TestEntryTag2(t *testing.T) {
+func TestEntryTag2Sqlite(t *testing.T) {
 
 	dbPath := "./testlex_entrytag.db"
 	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
@@ -179,7 +179,7 @@ func TestEntryTag2(t *testing.T) {
 	}
 	defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	if err != nil {
 
 		t.Errorf("Failed to create lexicon db: %v", err)

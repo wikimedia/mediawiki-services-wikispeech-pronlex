@@ -89,7 +89,7 @@ func createValidator() validation.Validator {
 	return v
 }
 
-func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
+func vInsertEntriesSqlite(t *testing.T, lexName string) (*sql.DB, string) {
 
 	if _, err := os.Stat(vDbPath); !os.IsNotExist(err) {
 		err := os.Remove(vDbPath)
@@ -111,7 +111,7 @@ func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
 
 	//defer db.Close()
 
-	_, err = execSchema(db) // Creates new lexicon database
+	_, err = execSchemaSqlite(db) // Creates new lexicon database
 	ff("Failed to create lexicon db: %v", err)
 
 	l := lexicon{name: lexName, symbolSetName: "ZZ", locale: "ll"}
@@ -176,8 +176,8 @@ func vInsertEntries(t *testing.T, lexName string) (*sql.DB, string) {
 	return db, l.name
 }
 
-func Test_Validation1(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test1")
+func Test_Validation1Sqlite(t *testing.T) {
+	db, lexName := vInsertEntriesSqlite(t, "test1")
 	v := createValidator()
 
 	q := Query{}
@@ -230,8 +230,8 @@ func Test_Validation1(t *testing.T) {
 	}
 }
 
-func Test_Validation2(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test2")
+func Test_Validation2Sqlite(t *testing.T) {
+	db, lexName := vInsertEntriesSqlite(t, "test2")
 	v := createValidator()
 
 	q := Query{WordRegexp: "a$"}
@@ -320,8 +320,8 @@ func Test_Validation2(t *testing.T) {
 	}
 }
 
-func Test_ValidationUpdate1(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test3")
+func Test_ValidationUpdate1Sqlite(t *testing.T) {
+	db, lexName := vInsertEntriesSqlite(t, "test3")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{WordLike: "%"}, &ew)
@@ -357,8 +357,8 @@ func Test_ValidationUpdate1(t *testing.T) {
 	}
 }
 
-func Test_ValidationUpdate2(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test4")
+func Test_ValidationUpdate2Sqlite(t *testing.T) {
+	db, lexName := vInsertEntriesSqlite(t, "test4")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{WordLike: "%"}, &ew)
@@ -396,8 +396,8 @@ func Test_ValidationUpdate2(t *testing.T) {
 	}
 }
 
-func Test_ValidationUpdate3(t *testing.T) {
-	db, lexName := vInsertEntries(t, "test5")
+func Test_ValidationUpdate3Sqlite(t *testing.T) {
+	db, lexName := vInsertEntriesSqlite(t, "test5")
 	v := createValidator()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{WordLike: "%"}, &ew)
