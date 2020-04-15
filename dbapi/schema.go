@@ -5,8 +5,13 @@ const SchemaVersion = "3.1"
 
 // Schema is a string containing the SQL definition of the lexicon database
 const Schema = `
+
+-- TODO: Remove!
+--DROP TABLE IF EXISTS SchemaVersion, Lexicon, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;
+
 -- To keep track of the version of this schema
-CREATE TABLE SchemaVersion (name text not null);
+CREATE TABLE SchemaVersion (name varchar(255) not null);
+
 INSERT INTO SchemaVersion VALUES (` + SchemaVersion + `);
 
 -- Each lexical entry belongs to a lexicon.
