@@ -102,12 +102,12 @@ func vInsertEntriesMariadb(t *testing.T, lexName string) (*sql.DB, string) {
 
 	l := lexicon{name: lexName, symbolSetName: "ZZ", locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = mariaDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(vfs, nil, err)
 	}
 
-	lxs, err := dbif.listLexicons(db)
+	lxs, err := mariaDBIF{}.listLexicons(db)
 	if err != nil {
 		t.Errorf(vfs, nil, err)
 	}
@@ -155,7 +155,7 @@ func vInsertEntriesMariadb(t *testing.T, lexName string) (*sql.DB, string) {
 		Transcriptions: []lex.Transcription{t4a},
 		EntryStatus:    lex.EntryStatus{Name: "old", Source: "tst"}}
 
-	_, errx := dbif.insertEntries(db, l, []lex.Entry{e1, e2, e3, e4})
+	_, errx := mariaDBIF{}.insertEntries(db, l, []lex.Entry{e1, e2, e3, e4})
 	if errx != nil {
 		t.Errorf(vfs, "nil", errx)
 	}
@@ -168,7 +168,7 @@ func Test_Validation1Mariadb(t *testing.T) {
 
 	q := Query{}
 
-	stats, err := Validate(db, []lex.LexName{lex.LexName("test1")}, SilentLogger{}, v, q)
+	stats, err := validate(mariaDBIF{}, db, []lex.LexName{lex.LexName("test1")}, SilentLogger{}, v, q)
 	ff("validation failed : %v", err)
 
 	expect := ValStats{
@@ -192,7 +192,7 @@ func Test_Validation1Mariadb(t *testing.T) {
 	}
 
 	// check stats saved in db
-	lexStats, err := dbif.validationStats(db, lexName)
+	lexStats, err := mariaDBIF{}.validationStats(db, lexName)
 	ff("validation stats failed : %v", err)
 
 	expectFull := ValStats{
@@ -223,7 +223,7 @@ func Test_Validation2Mariadb(t *testing.T) {
 	q := Query{WordRegexp: "a$"}
 
 	// test 1
-	stats, err := Validate(db, []lex.LexName{lex.LexName("test2")}, SilentLogger{}, v, q)
+	stats, err := validate(mariaDBIF{}, db, []lex.LexName{lex.LexName("test2")}, SilentLogger{}, v, q)
 	ff("validation failed : %v", err)
 
 	expect := ValStats{
@@ -239,7 +239,7 @@ func Test_Validation2Mariadb(t *testing.T) {
 	}
 
 	// check stats saved in db
-	lexStats, err := dbif.validationStats(db, lexName)
+	lexStats, err := mariaDBIF{}.validationStats(db, lexName)
 	ff("validation stats failed : %v", err)
 
 	expectFull := ValStats{
@@ -258,7 +258,7 @@ func Test_Validation2Mariadb(t *testing.T) {
 	// test 2
 	q = Query{}
 
-	stats, err = Validate(db, []lex.LexName{lex.LexName("test2")}, SilentLogger{}, v, q)
+	stats, err = validate(mariaDBIF{}, db, []lex.LexName{lex.LexName("test2")}, SilentLogger{}, v, q)
 	ff("validation failed : %v", err)
 
 	expect = ValStats{
@@ -282,7 +282,7 @@ func Test_Validation2Mariadb(t *testing.T) {
 	}
 
 	// check stats saved in db
-	lexStats, err = dbif.validationStats(db, lexName)
+	lexStats, err = mariaDBIF{}.validationStats(db, lexName)
 	ff("validation stats failed : %v", err)
 
 	expectFull = ValStats{
@@ -310,16 +310,16 @@ func Test_ValidationUpdate1Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test3")
 	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
-	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{WordLike: "%"}, &ew)
+	err := mariaDBIF{}.lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
 
 	for _, e := range ew.Entries {
 		v.ValidateEntry(&e)
-		err = dbif.updateValidation(db, []lex.Entry{e})
+		err = mariaDBIF{}.updateValidation(db, []lex.Entry{e})
 		ff("update validation failed : %v", err)
 	}
 
-	stats, err := dbif.validationStats(db, lexName)
+	stats, err := mariaDBIF{}.validationStats(db, lexName)
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{
@@ -347,7 +347,7 @@ func Test_ValidationUpdate2Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test4")
 	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
-	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{WordLike: "%"}, &ew)
+	err := mariaDBIF{}.lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
 
 	var es []lex.Entry
@@ -355,10 +355,10 @@ func Test_ValidationUpdate2Mariadb(t *testing.T) {
 		v.ValidateEntry(&e)
 		es = append(es, e)
 	}
-	err = dbif.updateValidation(db, es)
+	err = mariaDBIF{}.updateValidation(db, es)
 	ff("update validation failed : %v", err)
 
-	stats, err := dbif.validationStats(db, lexName)
+	stats, err := mariaDBIF{}.validationStats(db, lexName)
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{
@@ -386,14 +386,14 @@ func Test_ValidationUpdate3Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test5")
 	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
-	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{WordLike: "%"}, &ew)
+	err := mariaDBIF{}.lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
 
 	es, _ := v.ValidateEntries(ew.Entries)
-	err = dbif.updateValidation(db, es)
+	err = mariaDBIF{}.updateValidation(db, es)
 	ff("update validation failed : %v", err)
 
-	stats, err := dbif.validationStats(db, lexName)
+	stats, err := mariaDBIF{}.validationStats(db, lexName)
 	ff("validation stats failed : %v", err)
 
 	expect := ValStats{

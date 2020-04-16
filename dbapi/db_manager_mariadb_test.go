@@ -81,7 +81,7 @@ func Test_DBManagerMariadb(t *testing.T) {
 		log.Fatalf("NO! %v", err)
 	}
 
-	dbm := NewDBManager()
+	dbm := NewMariaDBManager()
 	dbm.AddDB("db1", db1)
 	dbm.AddDB("db2", db2)
 

@@ -14,7 +14,7 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
-func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValStats) (ValStats, error) {
+func processChunk(dbif DBIF, db *sql.DB, chunk []int64, vd validation.Validator, stats ValStats) (ValStats, error) {
 	q := Query{EntryIDs: chunk}
 	var w lex.EntrySliceWriter
 
@@ -93,7 +93,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 }
 
 // Validate all entries given the specified lexRef and search query. Updates validation stats in db, and returns these.
-func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
+func validate(dbif DBIF, db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.Validator, q Query) (ValStats, error) {
 
 	start := time.Now()
 
@@ -126,7 +126,7 @@ func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.V
 		chunk = append(chunk, id)
 
 		if n%chunkSize == 0 {
-			stats, err = processChunk(db, chunk, vd, stats)
+			stats, err = processChunk(dbif, db, chunk, vd, stats)
 			if err != nil {
 				return stats, err
 			}
@@ -143,7 +143,7 @@ func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.V
 		}
 	}
 	if len(chunk) > 0 {
-		stats, err = processChunk(db, chunk, vd, stats)
+		stats, err = processChunk(dbif, db, chunk, vd, stats)
 		if err != nil {
 			return stats, err
 		}

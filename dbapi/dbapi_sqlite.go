@@ -112,6 +112,14 @@ func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
 
 type sqliteDBIF struct{}
 
+func (mdb sqliteDBIF) name() string {
+	return "sqlite"
+}
+
+func (mdb sqliteDBIF) engine() DBEngine {
+	return Sqlite
+}
+
 // GetSchemaVersion retrieves the schema version from the database (as defined in schema.go on first load)
 func (sdb sqliteDBIF) GetSchemaVersion(db *sql.DB) (string, error) {
 	tx, err := db.Begin()

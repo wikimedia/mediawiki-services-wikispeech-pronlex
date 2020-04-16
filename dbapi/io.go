@@ -17,11 +17,22 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
-// ImportLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
-func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexiconFileName string, validator *validation.Validator) error {
+// ImportSqliteLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
+func ImportSqliteLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexiconFileName string, validator *validation.Validator) error {
+	return importLexiconFile(sqliteDBIF{}, db, lexiconName, logger, lexiconFileName, validator)
+}
+
+// ImportMariDBLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
+func ImportMariaDBLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexiconFileName string, validator *validation.Validator) error {
+	return importLexiconFile(mariaDBIF{}, db, lexiconName, logger, lexiconFileName, validator)
+}
+
+// importLexiconFile is intended for 'clean' imports. It doesn't check whether the words already exist and so on. It does not do any sanity checks whatsoever of the transcriptions before they are added. If the validator parameter is initialized, each entry will be validated before import, and the validation result will be added to the db.
+func importLexiconFile(dbif DBIF, db *sql.DB, lexiconName lex.LexName, logger Logger, lexiconFileName string, validator *validation.Validator) error {
 
 	logger.Write(fmt.Sprintf("lexiconName: %v", lexiconName))
 	logger.Write(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
+	logger.Write(fmt.Sprintf("dbif name: %v", dbif.name()))
 
 	if _, err := os.Stat(lexiconFileName); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to open file : %v", err)
@@ -153,11 +164,13 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 
 	logger.Write("Finalizing import ... ")
 
-	_, err = db.Exec("ANALYZE")
-	if err != nil {
-		var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
-		logger.Write(msg)
-		return fmt.Errorf("%v", msg)
+	if dbif.engine() == Sqlite {
+		_, err = db.Exec("ANALYZE")
+		if err != nil {
+			var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
+			logger.Write(msg)
+			return fmt.Errorf("%v", msg)
+		}
 	}
 
 	msg3 := fmt.Sprintf("Lines read:      %d", nTotal)
@@ -190,8 +203,18 @@ const (
 	PrintInvalid
 )
 
-// ValidateLexiconFile validates the input file and prints any validation errors to the specified logger.
-func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
+// ValidateSqliteLexiconFile validates the input file and prints any validation errors to the specified logger.
+func ValidateSqliteLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
+	return validateLexiconFile(sqliteDBIF{}, logger, lexiconFileName, validator, printMode)
+}
+
+// ValidateMariaDBLexiconFile validates the input file and prints any validation errors to the specified logger.
+func ValidateMariaDBLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
+	return validateLexiconFile(mariaDBIF{}, logger, lexiconFileName, validator, printMode)
+}
+
+// validateLexiconFile validates the input file and prints any validation errors to the specified logger.
+func validateLexiconFile(dbif DBIF, logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
 
 	start := time.Now()
 

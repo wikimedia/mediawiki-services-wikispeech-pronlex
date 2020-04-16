@@ -67,17 +67,24 @@ import (
 type mariaDBIF struct {
 }
 
+func (mdb mariaDBIF) name() string {
+	return "mariadb"
+}
+func (mdb mariaDBIF) engine() DBEngine {
+	return MariaDB
+}
+
 // GetSchemaVersion retrieves the schema version from the database (as defined in schema.go on first load)
-func GetSchemaVersion(db *sql.DB) (string, error) {
+func (mdb mariaDBIF) GetSchemaVersion(db *sql.DB) (string, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return "", fmt.Errorf("dbapi.GetSchemaVersion : %v", err)
 	}
 	defer tx.Commit()
-	return getSchemaVersionTx(tx)
+	return mdb.getSchemaVersionTx(tx)
 }
 
-func getSchemaVersionTx(tx *sql.Tx) (string, error) {
+func (mdb mariaDBIF) getSchemaVersionTx(tx *sql.Tx) (string, error) {
 	var res string
 
 	q := "SELECT name FROM SchemaVersion"

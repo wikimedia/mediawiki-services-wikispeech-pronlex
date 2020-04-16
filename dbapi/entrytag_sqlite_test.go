@@ -40,7 +40,7 @@ func TestEntryTag1Sqlite(t *testing.T) {
 	}
 
 	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf("Ooops! : %v", err)
 	}
@@ -54,7 +54,7 @@ func TestEntryTag1Sqlite(t *testing.T) {
 	}
 
 	// Insert tag for entry that doesn't exist
-	err = dbif.insertEntryTagTx(tx, 0, "ohno")
+	err = sqliteDBIF{}.insertEntryTagTx(tx, 0, "ohno")
 	//t.Errorf("Error : %v", err)
 	if err == nil {
 		t.Errorf("Expected error for nonexisting entry id, but got nil")
@@ -89,7 +89,7 @@ func TestEntryTag1Sqlite(t *testing.T) {
 		Transcriptions: []lex.Transcription{t1b, t2b},
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	_, err = dbif.insertEntries(db, l, []lex.Entry{e1, e2})
+	_, err = sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1, e2})
 	if err != nil {
 		t.Errorf("failed to insert entries : %v", err)
 	}
@@ -97,7 +97,7 @@ func TestEntryTag1Sqlite(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	//var entries map[string][]lex.Entry
-	entries, err := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+	entries, err := sqliteDBIF{}.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf("Nooo! : %v", err)
 	}
@@ -131,7 +131,7 @@ func TestEntryTag1Sqlite(t *testing.T) {
 	w := "entrytag_1b"
 	ent1.Tag = w
 
-	entUpdate, updated, err := dbif.updateEntry(db, ent1)
+	entUpdate, updated, err := sqliteDBIF{}.updateEntry(db, ent1)
 	if err != nil {
 		t.Errorf("updateEntry failed : %v", err)
 	}
@@ -145,7 +145,7 @@ func TestEntryTag1Sqlite(t *testing.T) {
 
 	// It should not be possible to assign the same Entry.Tag to two different entries
 	ent2.Tag = w //No-no!
-	_, updated2, err2 := dbif.updateEntry(db, ent2)
+	_, updated2, err2 := sqliteDBIF{}.updateEntry(db, ent2)
 	if updated2 {
 		t.Errorf("did not expect entry to be updated. disappointed.")
 	}
@@ -186,7 +186,7 @@ func TestEntryTag2Sqlite(t *testing.T) {
 	}
 
 	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf("failed defineLexicon : %v", err)
 	}
@@ -200,7 +200,7 @@ func TestEntryTag2Sqlite(t *testing.T) {
 	}
 
 	// Insert tag for entry that doesn't exist
-	err = dbif.insertEntryTagTx(tx, 0, "ohno")
+	err = sqliteDBIF{}.insertEntryTagTx(tx, 0, "ohno")
 	//t.Errorf("Error : %v", err)
 	if err == nil {
 		t.Errorf("Expected error for nonexisting entry id, but got nil")
@@ -235,7 +235,7 @@ func TestEntryTag2Sqlite(t *testing.T) {
 		Transcriptions: []lex.Transcription{t1b, t2b},
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	_, err = dbif.insertEntries(db, l, []lex.Entry{e1, e2})
+	_, err = sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1, e2})
 	if err != nil {
 		t.Errorf("failed to insert entries : %v", err)
 	}
@@ -243,7 +243,7 @@ func TestEntryTag2Sqlite(t *testing.T) {
 	// Test Query.TagLike
 
 	q00 := Query{TagLike: "entrytag_2"}
-	entries00, err00 := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q00)
+	entries00, err00 := sqliteDBIF{}.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q00)
 	if err00 != nil {
 		t.Errorf("Got error: %v", err00)
 	}
@@ -254,7 +254,7 @@ func TestEntryTag2Sqlite(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	//var entries map[string][]lex.Entry
-	entries, err := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+	entries, err := sqliteDBIF{}.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 	if err != nil {
 		t.Errorf("lookUpIntoMap : %v", err)
 	}
@@ -288,7 +288,7 @@ func TestEntryTag2Sqlite(t *testing.T) {
 	w := "entrytag_1b"
 	ent1.Tag = w
 
-	entUpdate, updated, err := dbif.updateEntry(db, ent1)
+	entUpdate, updated, err := sqliteDBIF{}.updateEntry(db, ent1)
 	if err != nil {
 		t.Errorf("updateEntry failed : %v", err)
 	}
@@ -302,7 +302,7 @@ func TestEntryTag2Sqlite(t *testing.T) {
 
 	// It should not be possible to assign the same Entry.Tag to two different entries
 	ent2.Tag = w //No-no!
-	_, updated2, err2 := dbif.updateEntry(db, ent2)
+	_, updated2, err2 := sqliteDBIF{}.updateEntry(db, ent2)
 	if updated2 {
 		t.Errorf("did not expect entry to be updated. disappointed.")
 	}

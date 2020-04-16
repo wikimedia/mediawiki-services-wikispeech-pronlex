@@ -87,12 +87,12 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
-	lxs, err := dbif.listLexicons(db)
+	lxs, err := sqliteDBIF{}.listLexicons(db)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -109,7 +109,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 		t.Errorf(fs, "ZZ", lxs[0].symbolSetName)
 	}
 
-	lx, err := dbif.getLexicon(db, "test")
+	lx, err := sqliteDBIF{}.getLexicon(db, "test")
 	if err != nil {
 		t.Errorf("expected nil, got %v", err)
 	}
@@ -119,7 +119,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	if w, g := "ZZ", lx.symbolSetName; w != g {
 		t.Errorf("Wanted %s got %s", w, g)
 	}
-	lx, err = dbif.getLexicon(db, "xyzzhga_skdjdj")
+	lx, err = sqliteDBIF{}.getLexicon(db, "xyzzhga_skdjdj")
 	if err == nil {
 		t.Error("Expected error, got nil")
 	}
@@ -140,7 +140,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"},
 	}
 
-	_, errx := dbif.insertEntries(db, l, []lex.Entry{e1})
+	_, errx := sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1})
 	if errx != nil {
 		t.Errorf(fs, "nil", errx)
 		return
@@ -152,7 +152,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	var entries map[string][]lex.Entry
-	entries, err = dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
+	entries, err = sqliteDBIF{}.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q) // GetEntries(db, q)
 
 	if err != nil {
 		t.Errorf(fs, nil, err)
@@ -180,7 +180,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	tx0, err := db.Begin()
 	defer tx0.Commit()
 	ff("transaction failed : %v", err)
-	le2, err := dbif.insertLemma(tx0, le)
+	le2, err := sqliteDBIF{}.insertLemma(tx0, le)
 	if err != nil {
 		t.Errorf("insertLemma : %v", err)
 	}
@@ -191,7 +191,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 	que := Query{TranscriptionLike: "%pp%"}
 	var queRez lex.EntrySliceWriter
-	err = dbif.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que, &queRez)
+	err = sqliteDBIF{}.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que, &queRez)
 	if err != nil {
 		t.Errorf("Wanted nil, got %v", err)
 	}
@@ -203,7 +203,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	ff("tx failed : %v", err)
 	defer tx00.Commit()
 
-	le3, err := dbif.setOrGetLemma(tx00, "apa", "67t", "7(c)")
+	le3, err := sqliteDBIF{}.setOrGetLemma(tx00, "apa", "67t", "7(c)")
 	if err != nil {
 		t.Errorf("setOrGetLemma : %v", err)
 	}
@@ -216,7 +216,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	tx01, err := db.Begin()
 	ff("tx failed : %v", err)
 	defer tx01.Commit()
-	err = dbif.associateLemma2Entry(tx01, le3, entries["apa"][0])
+	err = sqliteDBIF{}.associateLemma2Entry(tx01, le3, entries["apa"][0])
 	if err != nil {
 		t.Error(fs, nil, err)
 	}
@@ -224,7 +224,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 	//ess, err := GetEntries(db, q)
 	//var esw lex.EntrySliceWriter
-	ess, err := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q)
+	ess, err := sqliteDBIF{}.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -245,7 +245,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	}
 
 	//ees := GetEntriesFromIDs(db, []int64{ess["apa"][0].ID})
-	ees, err := dbif.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryIDs: []int64{ess["apa"][0].ID}})
+	ees, err := sqliteDBIF{}.lookUpIntoMap(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryIDs: []int64{ess["apa"][0].ID}})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -254,7 +254,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	}
 
 	// Check that no entries with entryvalidation exist
-	noev, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
+	noev, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -283,7 +283,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 	//time.Sleep(2000 * time.Millisecond)
 
-	newE, updated, err := dbif.updateEntry(db, ees0)
+	newE, updated, err := sqliteDBIF{}.updateEntry(db, ees0)
 
 	oldEntryStatus := ees0.EntryStatus
 	newEntryStatus := newE.EntryStatus
@@ -305,7 +305,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 		t.Errorf(fs, got, want)
 	}
 
-	eApa, err := dbif.getEntryFromID(db, ees0.ID)
+	eApa, err := sqliteDBIF{}.getEntryFromID(db, ees0.ID)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -354,7 +354,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	}
 
 	// Check that one entry with entryvalidation exists
-	noev, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
+	noev, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -374,7 +374,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	eApa.Comments = cmts
 
 	//time.Sleep(2000 * time.Millisecond)
-	newE2, updated, err := dbif.updateEntry(db, eApa)
+	newE2, updated, err := sqliteDBIF{}.updateEntry(db, eApa)
 	if err != nil {
 		t.Errorf(fs, "nil", err)
 	}
@@ -385,7 +385,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 		t.Errorf(fs, got, want)
 	}
 
-	eApax, err := dbif.getEntryFromID(db, ees0.ID)
+	eApax, err := sqliteDBIF{}.getEntryFromID(db, ees0.ID)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -407,7 +407,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	}
 
 	// Check that no entries with entryvalidation exist
-	noev, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
+	noev, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{HasEntryValidation: true})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -417,14 +417,14 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 	// Throw in tests of entry comment search for
 	// lex.EntryComment{Label: "label1", Source: "secret", Comment: "strålande"}
-	rezzx, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLabelLike: "745648w8"})
+	rezzx, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLabelLike: "745648w8"})
 	if err != nil {
 		t.Errorf("Got error %v", err)
 	}
 	if w, g := 0, len(rezzx); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}
-	rezzx, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLabelLike: "_abel1"})
+	rezzx, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLabelLike: "_abel1"})
 	if err != nil {
 		t.Errorf("Got error %v", err)
 	}
@@ -432,14 +432,14 @@ func TestSqliteinsertEntries(t *testing.T) {
 		t.Errorf("wanted %d got %d", w, g)
 	}
 
-	rezzx, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentSourceLike: "745648w8"})
+	rezzx, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentSourceLike: "745648w8"})
 	if err != nil {
 		t.Errorf("Got error %v", err)
 	}
 	if w, g := 0, len(rezzx); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}
-	rezzx, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentSourceLike: "secr_t"})
+	rezzx, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentSourceLike: "secr_t"})
 	if err != nil {
 		t.Errorf("Got error %v", err)
 	}
@@ -447,14 +447,14 @@ func TestSqliteinsertEntries(t *testing.T) {
 		t.Errorf("wanted %d got %d", w, g)
 	}
 
-	rezzx, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLike: "745648w8"})
+	rezzx, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLike: "745648w8"})
 	if err != nil {
 		t.Errorf("Got error %v", err)
 	}
 	if w, g := 0, len(rezzx); w != g {
 		t.Errorf("wanted %d got %d", w, g)
 	}
-	rezzx, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLike: "%å%"})
+	rezzx, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{CommentLike: "%å%"})
 	if err != nil {
 		t.Errorf("Got error %v", err)
 	}
@@ -484,7 +484,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 	//time.Sleep(2000 * time.Millisecond)
 
-	_, errxb := dbif.insertEntries(db, l, []lex.Entry{e1b})
+	_, errxb := sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1b})
 	if errxb != nil {
 		t.Errorf("Failed to insert entry: %v", errxb)
 	}
@@ -493,7 +493,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 	//q := Query{Words: []string{"apa"}, Page: 0, PageLength: 25}
 
 	var entries2 []lex.Entry
-	entries2, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	entries2, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	//fmt.Printf("%#v\n", entries2[0])
 	//fmt.Printf("%#v\n", entries2[1])
 	if err != nil {
@@ -517,14 +517,14 @@ func TestSqliteinsertEntries(t *testing.T) {
 	}
 
 	// TODO should be in a test of its own
-	eStatsus, err := dbif.listCurrentEntryStatuses(db, l.name)
+	eStatsus, err := sqliteDBIF{}.listCurrentEntryStatuses(db, l.name)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 	if w, g := 2, len(eStatsus); w != g {
 		t.Errorf(fs, w, g)
 	}
-	eStatsus2, err := dbif.listAllEntryStatuses(db, l.name)
+	eStatsus2, err := sqliteDBIF{}.listAllEntryStatuses(db, l.name)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -532,21 +532,21 @@ func TestSqliteinsertEntries(t *testing.T) {
 		t.Errorf(fs, w, g)
 	}
 
-	stat, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new"}})
+	stat, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new"}})
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 	if w, g := 1, len(stat); w != g {
 		t.Errorf(fs, w, g)
 	}
-	stat1, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"dkhfkhekjeh"}})
+	stat1, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"dkhfkhekjeh"}})
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 	if w, g := 0, len(stat1); w != g {
 		t.Errorf(fs, w, g)
 	}
-	stat2, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new", "old2"}})
+	stat2, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, Query{EntryStatus: []string{"new", "old2"}})
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -616,20 +616,20 @@ func TestSqliteImportLexiconFile(t *testing.T) {
 	logger := StderrLogger{}
 	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest.txt", &validation.Validator{})
+	err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest.txt", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
 	q := Query{Words: []string{"sprängstoff"}}
 
-	res, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf("lookUpIntoSlice : %v", err)
 	}
@@ -643,7 +643,7 @@ func TestSqliteImportLexiconFile(t *testing.T) {
 	}
 
 	q = Query{Words: []string{"sittriktiga"}}
-	res, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -657,10 +657,10 @@ func TestSqliteImportLexiconFile(t *testing.T) {
 
 	//Let's throw in a test of deleteEntry as well:
 	eX := res[0]
-	dbif.deleteEntry(db, eX.ID, l.name)
+	sqliteDBIF{}.deleteEntry(db, eX.ID, l.name)
 
 	// Run same query again, efter deleting Entry
-	resX, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	resX, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -708,20 +708,20 @@ func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 	logger := StderrLogger{}
 	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest-dups.txt", &validation.Validator{})
+	err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest-dups.txt", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
 	q := Query{Words: []string{"sprängstoff"}}
 
-	res, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf("lookUpIntoSlice : %v", err)
 	}
@@ -735,7 +735,7 @@ func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 	}
 
 	q = Query{Words: []string{"sittriktiga"}}
-	res, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -748,7 +748,7 @@ func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 	}
 
 	q = Query{Words: []string{"vadare"}}
-	res, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -761,7 +761,7 @@ func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 	}
 
 	q = Query{WordLike: "%"}
-	res, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -810,13 +810,13 @@ func TestSqliteImportLexiconFileInvalid(t *testing.T) {
 	logger := StderrLogger{}
 	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest-invalid-no-fields.txt", &validation.Validator{})
+	err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest-invalid-no-fields.txt", &validation.Validator{})
 	if err == nil {
 		t.Errorf("Expected errors, but got nil")
 	}
@@ -861,20 +861,20 @@ func TestSqliteImportLexiconFileGz(t *testing.T) {
 	logger := StderrLogger{}
 	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest.txt.gz", &validation.Validator{})
+	err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "./sv-lextest.txt.gz", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
 
 	q := Query{Words: []string{"sprängstoff"}}
 
-	res, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -887,7 +887,7 @@ func TestSqliteImportLexiconFileGz(t *testing.T) {
 	}
 
 	q = Query{Words: []string{"sittriktiga"}}
-	res, err = dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	res, err = sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -901,10 +901,10 @@ func TestSqliteImportLexiconFileGz(t *testing.T) {
 
 	//Let's throw in a test of deleteEntry as well:
 	eX := res[0]
-	dbif.deleteEntry(db, eX.ID, l.name)
+	sqliteDBIF{}.deleteEntry(db, eX.ID, l.name)
 
 	// Run same query again, efter deleting Entry
-	resX, err := dbif.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+	resX, err := sqliteDBIF{}.lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -962,7 +962,7 @@ func TestSqliteImportLexiconBigFileGz(t *testing.T) {
 	}
 
 	// actual tests start here
-	err = ImportLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
+	err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -1055,7 +1055,7 @@ func TestSqliteImportLexiconBigFileGzPostTest(t *testing.T) {
 	// }
 
 	// // actual tests start here
-	// err = ImportLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
+	// err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
 	// if err != nil {
 	// 	t.Errorf(fs, nil, err)
 	// }
@@ -1138,7 +1138,7 @@ func TestSqliteUpdateComments(t *testing.T) {
 
 	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -1159,14 +1159,14 @@ func TestSqliteUpdateComments(t *testing.T) {
 		},
 		EntryStatus: lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	_, err = dbif.insertEntries(db, l, []lex.Entry{e1})
+	_, err = sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1})
 	if err != nil {
 		t.Errorf(fs, "nil", err)
 	}
 
 	que := Query{WordLike: "apa"}
 	var addeds lex.EntrySliceWriter
-	err = dbif.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que, &addeds)
+	err = sqliteDBIF{}.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que, &addeds)
 	if err != nil {
 		t.Errorf("Wanted nil, got %v", err)
 	}
@@ -1178,7 +1178,7 @@ func TestSqliteUpdateComments(t *testing.T) {
 	added.Comments = []lex.EntryComment{
 		{Label: "label2", Source: "anon", Comment: "strålande 2"},
 	}
-	newE, updated, err := dbif.updateEntry(db, added)
+	newE, updated, err := sqliteDBIF{}.updateEntry(db, added)
 
 	if err != nil {
 		t.Errorf(fs, "nil", err)
@@ -1235,7 +1235,7 @@ func TestSqliteValidationRuleLike(t *testing.T) {
 
 	l := lexicon{name: "test", symbolSetName: "ZZ", locale: "ll"}
 
-	l, err = dbif.defineLexicon(db, l)
+	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -1278,14 +1278,14 @@ func TestSqliteValidationRuleLike(t *testing.T) {
 		},
 	}
 
-	_, err = dbif.insertEntries(db, l, []lex.Entry{e1, e2})
+	_, err = sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1, e2})
 	if err != nil {
 		t.Errorf(fs, "nil", err)
 	}
 
 	que1 := Query{ValidationRuleLike: "rule%"}
 	var searchRes1 lex.EntrySliceWriter
-	err = dbif.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que1, &searchRes1)
+	err = sqliteDBIF{}.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que1, &searchRes1)
 	if err != nil {
 		t.Errorf("Wanted nil, got %v", err)
 	}
@@ -1301,7 +1301,7 @@ func TestSqliteValidationRuleLike(t *testing.T) {
 
 	que2 := Query{ValidationRuleLike: "rule1"}
 	var searchRes2 lex.EntrySliceWriter
-	err = dbif.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que2, &searchRes2)
+	err = sqliteDBIF{}.lookUp(db, []lex.LexName{lex.LexName(l.name)}, que2, &searchRes2)
 	if err != nil {
 		t.Errorf("Wanted nil, got %v", err)
 	}

@@ -68,4 +68,15 @@ type DBIF interface {
 	validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error
 	validationStats(db *sql.DB, lexName string) (ValStats, error)
 	validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error)
+
+	name() string
+	engine() DBEngine
 }
+
+type DBEngine int
+
+const (
+	Sqlite DBEngine = iota
+
+	MariaDB
+)

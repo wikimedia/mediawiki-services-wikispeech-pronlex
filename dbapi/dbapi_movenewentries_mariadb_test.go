@@ -47,19 +47,19 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 	}
 
 	l1 := lexicon{name: "test1", symbolSetName: "ZZ", locale: "ll"}
-	l1, err = dbif.defineLexicon(db, l1)
+	l1, err = mariaDBIF{}.defineLexicon(db, l1)
 	if err != nil {
 		t.Errorf("holy cow (1)! : %v", err)
 	}
 
 	l2 := lexicon{name: "test2", symbolSetName: "ZZ", locale: "ll"}
-	l2, err = dbif.defineLexicon(db, l2)
+	l2, err = mariaDBIF{}.defineLexicon(db, l2)
 	if err != nil {
 		t.Errorf("holy cow (2)! : %v", err)
 	}
 
 	l3 := lexicon{name: "test3", symbolSetName: "ZZ", locale: "ll"}
-	l3, err = dbif.defineLexicon(db, l3)
+	l3, err = mariaDBIF{}.defineLexicon(db, l3)
 	if err != nil {
 		t.Errorf("holy cow (3)! : %v", err)
 	}
@@ -76,16 +76,16 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 	}
 
 	// Same entry in both lexica, nothing should be moved
-	_, err = dbif.insertEntries(db, l1, []lex.Entry{e1})
+	_, err = mariaDBIF{}.insertEntries(db, l1, []lex.Entry{e1})
 	if err != nil {
 		t.Errorf("The sky is falling! : %v", err)
 	}
-	_, err = dbif.insertEntries(db, l2, []lex.Entry{e1})
+	_, err = mariaDBIF{}.insertEntries(db, l2, []lex.Entry{e1})
 	if err != nil {
 		t.Errorf("The sky is falling! : %v", err)
 	}
 
-	res, err := dbif.moveNewEntries(db, l1.name, l2.name, "from"+l1.name, "moved")
+	res, err := mariaDBIF{}.moveNewEntries(db, l1.name, l2.name, "from"+l1.name, "moved")
 	if err != nil {
 		t.Errorf("What?! : %v", err)
 	}
@@ -107,18 +107,18 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 		EntryStatus:    lex.EntryStatus{Name: "newEntry", Source: "testSource"},
 	}
 
-	_, err = dbif.insertEntries(db, l1, []lex.Entry{e2})
+	_, err = mariaDBIF{}.insertEntries(db, l1, []lex.Entry{e2})
 	if err != nil {
 		t.Errorf("The horror, the horror : %v", err)
 	}
 
 	// Insert the same entry in "unrelated" third lexicon, to or from which nothing should be moved
-	_, err = dbif.insertEntries(db, l3, []lex.Entry{e2})
+	_, err = mariaDBIF{}.insertEntries(db, l3, []lex.Entry{e2})
 	if err != nil {
 		t.Errorf("Unbelievable! : %v", err)
 	}
 
-	res2, err := dbif.moveNewEntries(db, l1.name, l2.name, "from:"+l1.name, "moved")
+	res2, err := mariaDBIF{}.moveNewEntries(db, l1.name, l2.name, "from:"+l1.name, "moved")
 	if err != nil {
 		t.Errorf("No fun : %v", err)
 	}
@@ -126,14 +126,14 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL1, err := dbif.lexiconStats(db, l1.name)
+	statsL1, err := mariaDBIF{}.lexiconStats(db, l1.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
 	if w, g := int64(1), statsL1.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
-	statsL2, err := dbif.lexiconStats(db, l2.name)
+	statsL2, err := mariaDBIF{}.lexiconStats(db, l2.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
@@ -142,7 +142,7 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 	}
 
 	// Move back again
-	res3, err := dbif.moveNewEntries(db, l2.name, l1.name, "from:"+l2.name, "moved_back")
+	res3, err := mariaDBIF{}.moveNewEntries(db, l2.name, l1.name, "from:"+l2.name, "moved_back")
 	if err != nil {
 		t.Errorf("No fun : %v", err)
 	}
@@ -150,14 +150,14 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL1b, err := dbif.lexiconStats(db, l1.name)
+	statsL1b, err := mariaDBIF{}.lexiconStats(db, l1.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
 	if w, g := int64(2), statsL1b.Entries; w != g {
 		t.Errorf("wanted %v got %v", w, g)
 	}
-	statsL2b, err := dbif.lexiconStats(db, l2.name)
+	statsL2b, err := mariaDBIF{}.lexiconStats(db, l2.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
@@ -165,7 +165,7 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 		t.Errorf("wanted %v got %v", w, g)
 	}
 
-	statsL3, err := dbif.lexiconStats(db, l3.name)
+	statsL3, err := mariaDBIF{}.lexiconStats(db, l3.name)
 	if err != nil {
 		t.Errorf("didn't expect that : %v", err)
 	}
