@@ -2332,6 +2332,10 @@ func (mdb mariaDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error) 
 
 }
 
+func (mdb mariaDBIF) firstTimePopulateDBCache(dbClusterLocation string) error {
+	return fmt.Errorf("mariaDBIF.listDatabases : not implemented")
+}
+
 func (mdb mariaDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()

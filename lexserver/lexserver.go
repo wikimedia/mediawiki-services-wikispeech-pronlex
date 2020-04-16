@@ -156,8 +156,8 @@ func protect(w http.ResponseWriter) {
 var uploadFileArea string // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
 //var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
 //var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
-var dbFileArea string   // = filepath.Join(".", "db_files")
-var staticFolder string // = "."
+var dbClusterLocation string // = filepath.Join(".", "db_files")
+var staticFolder string      // = "."
 
 // TODO config stuff
 func initFolders() error {
@@ -213,11 +213,11 @@ func initFolders() error {
 	// } // else: already exists, hopefully
 
 	// If the db dir doesn't exist, create it
-	if _, err := os.Stat(dbFileArea); err != nil {
+	if _, err := os.Stat(dbClusterLocation); err != nil {
 		if os.IsNotExist(err) {
-			err2 := os.Mkdir(dbFileArea, 0750)
+			err2 := os.Mkdir(dbClusterLocation, 0750)
 			if err2 != nil {
-				log.Printf("lexserver.init: failed to create %s : %v\n", dbFileArea, err2)
+				log.Printf("lexserver.init: failed to create %s : %v\n", dbClusterLocation, err2)
 			}
 		} else {
 			log.Printf("lexserver.init: peculiar error : %v", err)
@@ -585,7 +585,7 @@ func keepClientsAlive() {
 	}
 }
 
-var dbm = dbapi.NewDBManager()
+var dbm *dbapi.DBManager
 
 /*
 func keepAlive(wsC chan string) {
@@ -611,37 +611,44 @@ func isStaticPage(url string) bool {
 
 func main() {
 
-	port := ":8787"
+	port := "8787"
 	testPort := ":8799"
 	tag := "standard"
 	vInfo = getVersionInfo()
 
 	var test = flag.Bool("test", false, "run server tests")
 	//var ssFiles = flag.String("ss_files", filepath.Join(".", "symbol_sets"), "location for symbol set files")
-	var dbFiles = flag.String("db_files", filepath.Join(".", "db_files"), "location for db files")
+	var sqliteDBLocation = flag.String("sqlite", filepath.Join(".", "db_files"), "location for sqlite db files")
+	var mariaDBServer = flag.String("mariadb", filepath.Join(".", "speechoid:@tcp(127.0.0.1:3306"), "address to mariadb server")
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var help = flag.Bool("help", false, "print usage/help and exit")
 
-	usage := `Usage:
+	var printUsage = func() {
+		fmt.Fprintf(os.Stderr, `Usage:
      $ lexserver [flags] <PORT>
      $ lexserver [flags]
       - use default port
 
 Flags:
-     -test       bool    run server tests and exit (default: false)
-     -db_files   string  location for db files (default: db_files)
-     -static     string  location for static html files (default: ./)
+`)
 
+		flag.PrintDefaults()
 
-Default ports:
-     ` + port + `  for the standard server
-     ` + testPort + `  for the test server
-`
+		fmt.Fprintf(os.Stderr, `Default ports:
+     `+port+`  for the standard server
+     `+testPort+`  for the test server
+`)
+	}
+
+	flag.Usage = func() {
+		printUsage()
+		os.Exit(0)
+	}
 
 	flag.Parse()
 
 	if *help {
-		fmt.Println(usage)
+		printUsage()
 		os.Exit(1)
 	}
 
@@ -651,7 +658,7 @@ Default ports:
 	}
 
 	if len(flag.Args()) > 1 {
-		fmt.Println(usage)
+		printUsage()
 		os.Exit(1)
 	} else if len(flag.Args()) == 1 {
 		port = flag.Args()[0]
@@ -661,7 +668,7 @@ Default ports:
 	}
 
 	//symbolSetFileArea = *ssFiles
-	dbFileArea = *dbFiles
+	dbClusterLocation = *dbFiles
 	staticFolder = *static
 
 	err := initFolders()
@@ -670,11 +677,19 @@ Default ports:
 		os.Exit(1)
 	}
 
-	dbapi.Sqlite3WithRegex()
+	engine := dbapi.Sqlite
+	dbm, err = dbapi.NewDBManager(engine)
+	if err != nil {
+		log.Fatal(fmt.Errorf("lexserver: couldn't initialize db manager : %v", err))
+		os.Exit(1)
+	}
+	if engine == dbapi.Sqlite {
+		dbapi.Sqlite3WithRegex()
+	}
 
 	log.Println("lexserver: started")
 
-	err = setupDemoDB()
+	err = setupDemoDB(engine)
 	if err != nil {
 		log.Printf("COULDN'T INITIALISE DEMO DB : %v\n", err)
 		os.Exit(1)
@@ -747,15 +762,15 @@ func createServer(port string) (*http.Server, error) {
 
 	var err error // återanvänds för alla fel
 
-	log.Print("lexserver: loading dbs from folder ", dbFileArea)
-	files, err := ioutil.ReadDir(dbFileArea)
+	log.Print("lexserver: loading dbs from location ", dbClusterLocation)
+	files, err := ioutil.ReadDir(dbClusterLocation)
 	if err != nil {
 		return s, fmt.Errorf("couldn't open db file area: %v", err)
 	}
 
 	nDbs := 0
 	for _, f := range files {
-		dbPath := filepath.Join(dbFileArea, f.Name())
+		dbPath := filepath.Join(dbClusterLocation, f.Name())
 		if !strings.HasSuffix(dbPath, ".db") {
 			log.Printf("lexserver: skipping file: '%s'\n", dbPath)
 			continue
@@ -840,7 +855,7 @@ func createServer(port string) (*http.Server, error) {
 	admin.addHandler(adminDefineLex)
 	admin.addHandler(adminMoveNewEntries)
 	admin.addHandler(adminDeleteLex)
-	admin.addHandler(adminSuperDeleteLex)
+	// // admin.addHandler(adminSuperDeleteLex)
 	admin.addHandler(adminListIDs)
 
 	// Sqlite3 ANALYZE command in some instances make search quicker,

@@ -943,10 +943,10 @@ func TestSqliteImportLexiconBigFileGz(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	defer db.Close()
 
@@ -1036,10 +1036,10 @@ func TestSqliteImportLexiconBigFileGzPostTest(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	defer db.Close()
 

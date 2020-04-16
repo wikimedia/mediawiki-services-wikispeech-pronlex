@@ -23,6 +23,21 @@ type DBManager struct {
 	dbif DBIF
 }
 
+func (dbm DBManager) Engine() DBEngine {
+	return dbm.dbif.engine()
+}
+
+// NewDBManager creates a new DBManager instance with empty cache
+func NewDBManager(engine DBEngine) (*DBManager, error) {
+	if engine == Sqlite {
+		return NewSqliteDBManager(), nil
+	} else if engine == MariaDB {
+		return NewMariaDBManager(), nil
+	} else {
+		return &DBManager{}, fmt.Errorf("", engine.String())
+	}
+}
+
 // NewSqliteDBManager creates a new DBManager instance with empty cache
 func NewSqliteDBManager() *DBManager {
 	return &DBManager{dbs: make(map[lex.DBRef]*sql.DB), dbif: sqliteDBIF{}}
@@ -56,7 +71,7 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 		return fmt.Errorf("DBManager.DefineSqliteDB: db file already exists : %v", err)
 	}
 
-	err := dbm.OpenDB(dbRef, dbPath)
+	err := dbm.OpenSqliteDB(dbRef, dbPath)
 	if err != nil {
 		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to open db : %v", err)
 		//log.Println(msg)
@@ -86,28 +101,28 @@ func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	return nil
 }
 
-// OpenDB is used to open an existing sqlite3 database and add it to the DB manager cache.
-func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
+// OpenSqliteDB is used to open an existing sqlite3 database and add it to the DB manager cache.
+func (dbm *DBManager) OpenSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	name := string(dbRef)
 	if name == "" {
-		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not be empty")
+		return fmt.Errorf("DBManager.OpenSqliteDB: illegal argument: name must not be empty")
 	}
 	if strings.Contains(name, ":") {
-		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not contain ':'")
+		return fmt.Errorf("DBManager.OpenSqliteDB: illegal argument: name must not contain ':'")
 	}
 
 	dbm.Lock()
 	defer dbm.Unlock()
 
 	if _, ok := dbm.dbs[dbRef]; ok {
-		return fmt.Errorf("DBManager.OpenDB: db is already loaded: '%s'", name)
+		return fmt.Errorf("DBManager.OpenSqliteDB: db is already loaded: '%s'", name)
 	}
 
 	db, err := sql.Open("sqlite3_with_regexp", dbPath)
 
 	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
-		msg := fmt.Sprintf("DBManager.OpenDB: failed to open db : %v", err)
+		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to open db : %v", err)
 
 		if db != nil {
 			err2 := db.Close()
@@ -123,14 +138,14 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
 	if err != nil {
 
-		msg := fmt.Sprintf("DBManager.OpenDB: failed to set foreign keys : %v", err)
+		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to set foreign keys : %v", err)
 
 		return fmt.Errorf(msg)
 	}
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
-		msg := fmt.Sprintf("DBManager.OpenDB: failed to set case sensitive like : %v", err)
+		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to set case sensitive like : %v", err)
 
 		if db != nil {
 			err2 := db.Close()
@@ -144,7 +159,7 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 	_, err = db.Exec("PRAGMA journal_mode=WAL")
 	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
-		msg := fmt.Sprintf("DBManager.OpenDB: failed to set journal_mode=WAL : %v", err)
+		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to set journal_mode=WAL : %v", err)
 
 		if db != nil {
 			err2 := db.Close()
@@ -729,4 +744,9 @@ func (dbm *DBManager) ValidationStats(lexRef lex.LexRef) (ValStats, error) {
 		return ValStats{}, fmt.Errorf("DBManager.Validate: no such db '%s'", lexRef.DBRef)
 	}
 	return dbm.dbif.validationStats(db, string(lexRef.LexName))
+}
+
+// FirstTimePopulateDBCache returns available database names
+func (dbm *DBManager) FirstTimePopulateDBCache(dbClusterLocation string) error {
+	return dbm.dbif.firstTimePopulateDBCache(dbClusterLocation)
 }

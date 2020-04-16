@@ -323,32 +323,32 @@ var adminDeleteLex = urlHandler{
 	},
 }
 
-var adminSuperDeleteLex = urlHandler{
-	name:     "superdeletelexicon",
-	url:      "/superdeletelexicon/{lexicon_name}",
-	help:     "Delete a complete lexicon from the database, including associated entries. This make take some time.",
-	examples: []string{},
-	handler: func(w http.ResponseWriter, r *http.Request) {
-		lexRef, err := getLexRefParam(r)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
-			return
-		}
+// var adminSuperDeleteLex = urlHandler{
+// 	name:     "superdeletelexicon",
+// 	url:      "/superdeletelexicon/{lexicon_name}",
+// 	help:     "Delete a complete lexicon from the database, including associated entries. This make take some time.",
+// 	examples: []string{},
+// 	handler: func(w http.ResponseWriter, r *http.Request) {
+// 		lexRef, err := getLexRefParam(r)
+// 		if err != nil {
+// 			log.Println(err)
+// 			http.Error(w, fmt.Sprintf("couldn't parse lexicon ref %v : %v", lexRef, err), http.StatusInternalServerError)
+// 			return
+// 		}
 
-		uuid := getParam("client_uuid", r)
-		log.Println("adminSuperDeleteLex was called")
-		messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon %s", lexRef.String()))
-		err = dbm.SuperDeleteLexicon(lexRef)
-		if err != nil {
+// 		uuid := getParam("client_uuid", r)
+// 		log.Println("adminSuperDeleteLex was called")
+// 		messageToClientWebSock(uuid, fmt.Sprintf("Super delete was called. This may take quite a while. Lexicon %s", lexRef.String()))
+// 		err = dbm.SuperDeleteLexicon(lexRef)
+// 		if err != nil {
 
-			http.Error(w, fmt.Sprintf("failed super deleting lexicon : %v", err), http.StatusExpectationFailed)
-			return
-		}
+// 			http.Error(w, fmt.Sprintf("failed super deleting lexicon : %v", err), http.StatusExpectationFailed)
+// 			return
+// 		}
 
-		messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon %s", lexRef))
-	},
-}
+// 		messageToClientWebSock(uuid, fmt.Sprintf("Done deleting lexicon %s", lexRef))
+// 	},
+// }
 
 var adminListDBs = urlHandler{
 	name:     "list_dbs",

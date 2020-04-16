@@ -38,6 +38,7 @@ type DBIF interface {
 	listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error)
 	listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error)
 	listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error)
+	firstTimePopulateDBCache(dbClusterLocation string) error
 	listLexicons(db *sql.DB) ([]lexicon, error)
 	locale(db *sql.DB, lexiconName string) (string, error)
 	lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error

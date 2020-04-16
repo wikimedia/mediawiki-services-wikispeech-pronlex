@@ -12,7 +12,10 @@ package dbapi
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"sort"
@@ -2480,6 +2483,73 @@ func (sdb sqliteDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error)
 
 	return res, err
 
+}
+
+func (sdb sqliteDBIF) firstTimePopulateDBCache(dbClusterLocation string) error {
+	var err error // återanvänds för alla fel
+
+	log.Print("dbapi_sqlite: loading dbs from location ", dbClusterLocation)
+	files, err := ioutil.ReadDir(dbClusterLocation)
+	if err != nil {
+		return fmt.Errorf("couldn't open db file area: %v", err)
+	}
+
+	nDbs := 0
+	for _, f := range files {
+		dbPath := filepath.Join(dbClusterLocation, f.Name())
+		if !strings.HasSuffix(dbPath, ".db") {
+			log.Printf("dbapi_sqlite: skipping file: '%s'\n", dbPath)
+			continue
+		}
+		nDbs = nDbs + 1
+		log.Print("dbapi_sqlite: connecting to Sqlite3 db ", dbPath)
+		// kolla att db-filen existerar
+		_, err = os.Stat(dbPath)
+		if err != nil {
+			return fmt.Errorf("dbapi_sqlite: cannot find db file. %v", err)
+		}
+		dbName := filepath.Base(dbPath)
+		var extension = filepath.Ext(dbName)
+		dbName = dbName[0 : len(dbName)-len(extension)]
+		dbRef := lex.DBRef(dbName)
+		err := dbm.OpenSqliteDB(dbRef, dbPath)
+
+		if err != nil {
+			return fmt.Errorf("dbapi_sqlite: failed to open db : %v", err)
+		}
+
+		// db, err = sql.Open("sqlite3_with_regexp", dbPath)
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to open dbfile %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA foreign_keys = ON")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA journal_mode=WAL")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
+		// db, ok := dbm.dbs[dbRef]
+		// if !ok {
+		// 	return s, fmt.Errorf("No such db '%s'", dbRef)
+		// }
+
+		// err = dbm.AddDB(dbRef, db)
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to add db: %v", err)
+		// }
+
+	}
+
+	log.Printf("dbapi_sqlite: loaded %v db(s)", nDbs)
+	return nil
 }
 
 func (sdb sqliteDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {

@@ -163,7 +163,7 @@ func demoEntries() []lex.Entry {
 	return entries
 }
 
-func setupDemoDB() error {
+func setupDemoDB(engine dbapi.DBEngine) error {
 	var err error
 
 	log.Println("demo_setup: creating demo database ...")
@@ -186,7 +186,10 @@ func setupDemoDB() error {
 		}
 	}
 
-	var dbmx = dbapi.NewDBManager()
+	dbmx, err := dbapi.NewDBManager(engine)
+	if err != nil {
+		return fmt.Errorf("failed to init db manager : %v", err)
+	}
 	defer dbmx.CloseDB(lexRef.DBRef)
 	if dbmx.ContainsDB(lexRef.DBRef) {
 		err := dbmx.RemoveDB(lexRef.DBRef)
