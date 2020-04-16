@@ -29,7 +29,7 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 		return stats, fmt.Errorf(msg)
 	}
 
-	err = mariaDBIF{}.lookUp(db, []lex.LexName{}, q, &w)
+	err = dbif.lookUp(db, []lex.LexName{}, q, &w)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't lookup from ids : %v", err)
 		return stats, fmt.Errorf(msg)
@@ -68,8 +68,8 @@ func processChunk(db *sql.DB, chunk []int64, vd validation.Validator, stats ValS
 			}
 		}
 	}
-	// TODO
-	err = mariaDBIF{}.updateValidationTx(tx, updated)
+
+	err = dbif.updateValidationTx(tx, updated)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't update validation : %v", err)
 		err2 := tx.Rollback()
@@ -105,7 +105,7 @@ func Validate(db *sql.DB, lexNames []lex.LexName, logger Logger, vd validation.V
 	q.Page = 0       //todo?
 
 	logger.Write("Fetching entries from lexicon ... ")
-	ids, err := mariaDBIF{}.lookUpIds(db, lexNames, q)
+	ids, err := dbif.lookUpIds(db, lexNames, q)
 	if err != nil {
 		return stats, fmt.Errorf("couldn't lookup for validation : %s", err)
 	}

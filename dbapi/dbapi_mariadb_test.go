@@ -538,7 +538,7 @@ func Test_insertEntries(t *testing.T) {
 
 }
 
-func Test_unique(t *testing.T) {
+func TestMariadbUnique(t *testing.T) {
 	in := []int64{1, 2, 3}
 
 	res := unique(in)
@@ -557,7 +557,7 @@ func Test_unique(t *testing.T) {
 	}
 }
 
-func Test_ImportLexiconFile(t *testing.T) {
+func TestMariadbImportLexiconFile(t *testing.T) {
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {

@@ -16,10 +16,9 @@ import (
 	"github.com/stts-se/symbolset"
 )
 
-var vfs = "Wanted: '%v' got: '%v'"
-var vDbPath = "./vtestlex.db"
+//var vfs = "Wanted: '%v' got: '%v'"
 
-func createValidator() validation.Validator {
+func createValidatorMariadbTest() validation.Validator {
 	name := "sampa"
 	symbols := []symbolset.Symbol{
 		{String: "a", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
@@ -165,7 +164,7 @@ func vInsertEntriesMariadb(t *testing.T, lexName string) (*sql.DB, string) {
 
 func Test_Validation1Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test1")
-	v := createValidator()
+	v := createValidatorMariadbTest()
 
 	q := Query{}
 
@@ -219,7 +218,7 @@ func Test_Validation1Mariadb(t *testing.T) {
 
 func Test_Validation2Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test2")
-	v := createValidator()
+	v := createValidatorMariadbTest()
 
 	q := Query{WordRegexp: "a$"}
 
@@ -309,7 +308,7 @@ func Test_Validation2Mariadb(t *testing.T) {
 
 func Test_ValidationUpdate1Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test3")
-	v := createValidator()
+	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
@@ -346,7 +345,7 @@ func Test_ValidationUpdate1Mariadb(t *testing.T) {
 
 func Test_ValidationUpdate2Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test4")
-	v := createValidator()
+	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
@@ -385,7 +384,7 @@ func Test_ValidationUpdate2Mariadb(t *testing.T) {
 
 func Test_ValidationUpdate3Mariadb(t *testing.T) {
 	db, lexName := vInsertEntriesMariadb(t, "test5")
-	v := createValidator()
+	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)

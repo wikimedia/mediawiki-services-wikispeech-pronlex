@@ -21,11 +21,11 @@ import (
 var dbifSqlite = sqliteDBIF{}
 
 // ff is a place holder to be replaced by proper error handling
-func ff(f string, err error) {
-	if err != nil {
-		log.Fatalf(f, err)
-	}
-}
+// func ff(f string, err error) {
+// 	if err != nil {
+// 		log.Fatalf(f, err)
+// 	}
+// }
 
 func execSchemaSqlite(db *sql.DB) (sql.Result, error) {
 	ti := time.Now()
@@ -556,7 +556,7 @@ func TestSqliteinsertEntries(t *testing.T) {
 
 }
 
-func Test_unique(t *testing.T) {
+func TestSqliteUnique(t *testing.T) {
 	in := []int64{1, 2, 3}
 
 	res := unique(in)

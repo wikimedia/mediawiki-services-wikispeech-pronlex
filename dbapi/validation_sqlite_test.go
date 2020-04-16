@@ -19,7 +19,7 @@ import (
 var vfs = "Wanted: '%v' got: '%v'"
 var vDbPath = "./vtestlex.db"
 
-func createValidator() validation.Validator {
+func createValidatorSqliteTest() validation.Validator {
 	name := "sampa"
 	symbols := []symbolset.Symbol{
 		{String: "a", Cat: symbolset.Syllabic, Desc: "", IPA: symbolset.IPASymbol{String: "", Unicode: ""}},
@@ -178,7 +178,7 @@ func vInsertEntriesSqlite(t *testing.T, lexName string) (*sql.DB, string) {
 
 func Test_Validation1Sqlite(t *testing.T) {
 	db, lexName := vInsertEntriesSqlite(t, "test1")
-	v := createValidator()
+	v := createValidatorSqliteTest()
 
 	q := Query{}
 
@@ -232,7 +232,7 @@ func Test_Validation1Sqlite(t *testing.T) {
 
 func Test_Validation2Sqlite(t *testing.T) {
 	db, lexName := vInsertEntriesSqlite(t, "test2")
-	v := createValidator()
+	v := createValidatorSqliteTest()
 
 	q := Query{WordRegexp: "a$"}
 
@@ -322,7 +322,7 @@ func Test_Validation2Sqlite(t *testing.T) {
 
 func Test_ValidationUpdate1Sqlite(t *testing.T) {
 	db, lexName := vInsertEntriesSqlite(t, "test3")
-	v := createValidator()
+	v := createValidatorSqliteTest()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test3")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
@@ -359,7 +359,7 @@ func Test_ValidationUpdate1Sqlite(t *testing.T) {
 
 func Test_ValidationUpdate2Sqlite(t *testing.T) {
 	db, lexName := vInsertEntriesSqlite(t, "test4")
-	v := createValidator()
+	v := createValidatorSqliteTest()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test4")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)
@@ -398,7 +398,7 @@ func Test_ValidationUpdate2Sqlite(t *testing.T) {
 
 func Test_ValidationUpdate3Sqlite(t *testing.T) {
 	db, lexName := vInsertEntriesSqlite(t, "test5")
-	v := createValidator()
+	v := createValidatorSqliteTest()
 	ew := lex.EntrySliceWriter{}
 	err := dbif.lookUp(db, []lex.LexName{lex.LexName("test5")}, Query{WordLike: "%"}, &ew)
 	ff("lookup failed : %v", err)

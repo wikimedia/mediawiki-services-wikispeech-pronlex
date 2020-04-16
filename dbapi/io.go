@@ -59,7 +59,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 		return fmt.Errorf("%v", msg)
 	}
 
-	lexicon, err := mariaDBIF{}.getLexicon(db, string(lexiconName))
+	lexicon, err := dbif.getLexicon(db, string(lexiconName))
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to get lexicon id for lexicon: %s : %v", lexiconName, err)
 		logger.Write(msg)
@@ -125,7 +125,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 
 		eBuf = append(eBuf, e)
 		if nTotal%1000 == 0 {
-			_, err = mariaDBIF{}.insertEntries(db, lexicon, eBuf)
+			_, err = dbif.insertEntries(db, lexicon, eBuf)
 			if err != nil {
 				var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 				logger.Write(msg)
@@ -141,7 +141,7 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 			logger.Progress(msg2)
 		}
 	}
-	_, err = mariaDBIF{}.insertEntries(db, lexicon, eBuf) // flushing the buffer
+	_, err = dbif.insertEntries(db, lexicon, eBuf) // flushing the buffer
 	if err != nil {
 		var msg = fmt.Sprintf("ImportLexiconFile failed to insert entries : %v", err)
 		logger.Write(msg)
@@ -153,13 +153,12 @@ func ImportLexiconFile(db *sql.DB, lexiconName lex.LexName, logger Logger, lexic
 
 	logger.Write("Finalizing import ... ")
 
-	// TODO: Specific to Sqlite. Is there something similar in MariaDB that should be called?
-	// _, err = db.Exec("ANALYZE")
-	// if err != nil {
-	// 	var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
-	// 	logger.Write(msg)
-	// 	return fmt.Errorf("%v", msg)
-	// }
+	_, err = db.Exec("ANALYZE")
+	if err != nil {
+		var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
+		logger.Write(msg)
+		return fmt.Errorf("%v", msg)
+	}
 
 	msg3 := fmt.Sprintf("Lines read:      %d", nTotal)
 	logger.Write(msg3)
