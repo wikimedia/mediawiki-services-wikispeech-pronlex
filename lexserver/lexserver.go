@@ -616,9 +616,12 @@ func main() {
 	tag := "standard"
 	vInfo = getVersionInfo()
 
+	defaultSqliteCluster := filepath.Join(".", "db_files")
+	defaultMariaDBCluster := "speechoid:@tcp(127.0.0.1:3306)"
+
 	var test = flag.Bool("test", false, "run server tests")
 	var dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
-	dbClusterLocation = flag.String("db_cluster", filepath.Join(".", "db_files"), "db cluster location")
+	dbClusterLocation = flag.String("db_cluster", "", fmt.Sprintf("db cluster location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteCluster, defaultMariaDBCluster))
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var help = flag.Bool("help", false, "print usage/help and exit")
 
@@ -679,8 +682,14 @@ Flags:
 	var engine dbapi.DBEngine
 	if *dbEngine == "sqlite" {
 		engine = dbapi.Sqlite
+		if *dbClusterLocation == "" {
+			dbClusterLocation = &defaultSqliteCluster
+		}
 	} else if *dbEngine == "mariadb" {
 		engine = dbapi.MariaDB
+		if *dbClusterLocation == "" {
+			dbClusterLocation = &defaultMariaDBCluster
+		}
 	} else {
 		log.Fatalf("Invalid db engine: %s", *dbEngine)
 	}
