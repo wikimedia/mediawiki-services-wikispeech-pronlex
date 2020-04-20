@@ -252,8 +252,8 @@ func getVersionInfo() []string {
 	res := []string{}
 	var buildInfoFile = "/wikispeech/pronlex/build_info.txt"
 	if _, err := os.Stat(buildInfoFile); os.IsNotExist(err) {
-		var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
-		log.Print(msg)
+		//var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
+		//log.Print(msg)
 		res = append(res, "Application name: pronlex")
 		res = append(res, "Build timestamp: n/a")
 		res = append(res, "Built by: user")
@@ -286,7 +286,7 @@ func getVersionInfo() []string {
 		}
 	}
 	res = append(res, "Started: "+startedTimestamp)
-	log.Println("lexserver: parsed version info", res)
+	//log.Println("lexserver: parsed version info", res)
 	return res
 }
 
@@ -623,6 +623,7 @@ func main() {
 	var dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	dbClusterLocation = flag.String("db_cluster", "", fmt.Sprintf("db cluster location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteCluster, defaultMariaDBCluster))
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
+	var version = flag.Bool("version", false, "print version and exit")
 	var help = flag.Bool("help", false, "print usage/help and exit")
 
 	var printUsage = func() {
@@ -636,7 +637,8 @@ Flags:
 
 		flag.PrintDefaults()
 
-		fmt.Fprintf(os.Stderr, `Default ports:
+		fmt.Fprintf(os.Stderr, `
+Default ports:
      `+port+`  for the standard server
      `+testPort+`  for the test server
 `)
@@ -648,6 +650,13 @@ Flags:
 	}
 
 	flag.Parse()
+
+	if *version {
+		for _, info := range vInfo {
+			fmt.Println(info)
+		}
+		os.Exit(0)
+	}
 
 	if *help {
 		printUsage()
