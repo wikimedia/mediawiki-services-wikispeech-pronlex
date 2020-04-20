@@ -169,7 +169,7 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 
 	dbName := "lexserver_testdb"
 	lexRef := lex.NewLexRef(dbName, "sv")
-	dbPath := filepath.Join(*dbClusterLocation, dbName+".db")
+	dbPath := filepath.Join(*dbClusterLocation, dbName) // +".db")
 
 	dbmx, err := dbapi.NewDBManager(engine)
 	if err != nil {

@@ -2600,7 +2600,7 @@ func (sdb sqliteDBIF) listLexiconDatabases(dbClusterLocation string) (map[lex.DB
 		dbName = dbName[0 : len(dbName)-len(extension)]
 		dbRef := lex.DBRef(dbName)
 		//err := dbm.OpenDB(dbRef, dbPath)
-		res[dbRef] = dbPath
+		res[dbRef] = strings.TrimSuffix(dbPath, ".db")
 
 		if err != nil {
 			return res, fmt.Errorf("dbapi_sqlite: failed to open db : %v", err)
@@ -2641,7 +2641,7 @@ func (sdb sqliteDBIF) listLexiconDatabases(dbClusterLocation string) (map[lex.DB
 }
 
 func (sdb sqliteDBIF) openDB(dbPath string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	db, err := sql.Open("sqlite3_with_regexp", dbPath+".db")
 
 	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
@@ -2718,7 +2718,7 @@ func (sbd sqliteDBIF) defineDB(db *sql.DB, dbPath string) error {
 
 func (sdb sqliteDBIF) dropDB(dbPath string) error {
 
-	dbRelatedPaths, err := filepath.Glob(dbPath + "*")
+	dbRelatedPaths, err := filepath.Glob(dbPath + ".db*")
 	if err != nil {
 		return fmt.Errorf("failed to retrieve list of db files for '%s' : %v", dbPath, err)
 	}
