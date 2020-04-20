@@ -212,17 +212,19 @@ func initFolders() error {
 	// 	}
 	// } // else: already exists, hopefully
 
-	// If the db dir doesn't exist, create it
-	if _, err := os.Stat(*dbClusterLocation); err != nil {
-		if os.IsNotExist(err) {
-			err2 := os.Mkdir(*dbClusterLocation, 0750)
-			if err2 != nil {
-				log.Printf("lexserver.init: failed to create %s : %v\n", *dbClusterLocation, err2)
+	if *dbEngine == "sqlite" {
+		// If the db dir doesn't exist, create it
+		if _, err := os.Stat(*dbClusterLocation); err != nil {
+			if os.IsNotExist(err) {
+				err2 := os.Mkdir(*dbClusterLocation, 0750)
+				if err2 != nil {
+					log.Printf("lexserver.init: failed to create %s : %v\n", *dbClusterLocation, err2)
+				}
+			} else {
+				log.Printf("lexserver.init: peculiar error : %v", err)
 			}
-		} else {
-			log.Printf("lexserver.init: peculiar error : %v", err)
-		}
-	} // else: already exists, hopefully
+		} // else: already exists, hopefully
+	}
 	return nil
 }
 
@@ -586,6 +588,7 @@ func keepClientsAlive() {
 }
 
 var dbm *dbapi.DBManager
+var dbEngine *string
 
 /*
 func keepAlive(wsC chan string) {
@@ -620,7 +623,7 @@ func main() {
 	defaultMariaDBCluster := "speechoid:@tcp(127.0.0.1:3306)"
 
 	var test = flag.Bool("test", false, "run server tests")
-	var dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
+	dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	dbClusterLocation = flag.String("db_cluster", "", fmt.Sprintf("db cluster location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteCluster, defaultMariaDBCluster))
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var version = flag.Bool("version", false, "print version and exit")
@@ -682,12 +685,6 @@ Default ports:
 	//dbClusterLocation = *dbFiles
 	staticFolder = *static
 
-	err := initFolders()
-	if err != nil {
-		log.Fatal(fmt.Errorf("lexserver: couldn't initialize folders : %v", err))
-		os.Exit(1)
-	}
-
 	var engine dbapi.DBEngine
 	if *dbEngine == "sqlite" {
 		engine = dbapi.Sqlite
@@ -702,6 +699,14 @@ Default ports:
 	} else {
 		log.Fatalf("Invalid db engine: %s", *dbEngine)
 	}
+	log.Printf("lexserver: db_cluster = %s", *dbClusterLocation)
+
+	err := initFolders()
+	if err != nil {
+		log.Fatal(fmt.Errorf("lexserver: couldn't initialize folders : %v", err))
+		os.Exit(1)
+	}
+
 	dbm, err = dbapi.NewDBManager(engine)
 	if err != nil {
 		log.Fatal(fmt.Errorf("lexserver: couldn't initialize db manager : %v", err))
