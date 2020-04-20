@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -34,7 +33,7 @@ func NewDBManager(engine DBEngine) (*DBManager, error) {
 	} else if engine == MariaDB {
 		return NewMariaDBManager(), nil
 	} else {
-		return &DBManager{}, fmt.Errorf("", engine.String())
+		return &DBManager{}, fmt.Errorf("unknown db engine: %s", engine.String())
 	}
 }
 
@@ -64,111 +63,75 @@ func (dbm *DBManager) CloseDB(dbRef lex.DBRef) error {
 	return err
 }
 
-// DefineSqliteDB is used to define a new sqlite3 database and add it to the DB manager cache.
-func (dbm *DBManager) DefineSqliteDB(dbRef lex.DBRef, dbPath string) error {
-	// kolla att db-filen inte existerar
-	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-		return fmt.Errorf("DBManager.DefineSqliteDB: db file already exists : %v", err)
+// FirstTimePopulateDBCache reads all available dbs into the database cache
+func (dbm *DBManager) FirstTimePopulateDBCache(dbClusterLocation string) error {
+	var err error // återanvänds för alla fel
+
+	log.Print("dbapi_sqlite: loading dbs from location ", dbClusterLocation)
+	dbs, err := dbm.dbif.listLexiconDatabases(dbClusterLocation)
+	if err != nil {
+		return fmt.Errorf("couldn't open db file area: %v", err)
 	}
 
-	err := dbm.OpenSqliteDB(dbRef, dbPath)
+	for dbRef, dbPath := range dbs {
+		err := dbm.OpenDB(dbRef, dbPath)
+		if err != nil {
+			return fmt.Errorf("db_manager: failed to open db : %v", err)
+		}
+	}
+
+	log.Printf("db_manager: loaded %v db(s)", len(dbs))
+	return nil
+}
+
+// DefineDB is used to define a new sqlite3 database and add it to the DB manager cache.
+func (dbm *DBManager) DefineDB(dbRef lex.DBRef, dbPath string) error {
+	// TODO: Check that the db doesn't exist???
+	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+	// 	return fmt.Errorf("dbapi_sqlite: db file already exists : %v", err)
+	// }
+
+	err := dbm.OpenDB(dbRef, dbPath)
 	if err != nil {
-		msg := fmt.Sprintf("DBManager.DefineSqliteDB: failed to open db : %v", err)
-		//log.Println(msg)
+		msg := fmt.Sprintf("DBManager.DefineDB: failed to open db : %v", err)
 		return fmt.Errorf(msg)
 	}
 
 	db, ok := dbm.dbs[dbRef]
 	if !ok {
-		return fmt.Errorf("DBManager.DefineSqliteDB: no such db '%s'", dbRef)
+		return fmt.Errorf("DBManager.DefineDB: no such db '%s'", dbRef)
 	}
 
-	// TODO This looks odd, with the db.Close() inside the error handling?
-	_, err = db.Exec(Schema)
+	err = dbm.dbif.defineDB(db, dbPath)
 	if err != nil {
-		//return fmt.Errorf("sql error : %v", err)
-		msg := fmt.Sprintf("failed to load schema: %v", err)
-
-		err2 := db.Close()
-		if err2 != nil {
-			msg2 := fmt.Sprintf("failed to close db : %v", err2)
-
-			msg = fmt.Sprintf("%s : %s", msg, msg2)
-		}
+		msg := fmt.Sprintf("DBManager.DefineDB: failed to define db : %v", err)
 		return fmt.Errorf(msg)
 	}
 
 	return nil
 }
 
-// OpenSqliteDB is used to open an existing sqlite3 database and add it to the DB manager cache.
-func (dbm *DBManager) OpenSqliteDB(dbRef lex.DBRef, dbPath string) error {
+// OpenDB is used to open an existing sqlite3 database and add it to the DB manager cache.
+func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 	name := string(dbRef)
 	if name == "" {
-		return fmt.Errorf("DBManager.OpenSqliteDB: illegal argument: name must not be empty")
+		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not be empty")
 	}
 	if strings.Contains(name, ":") {
-		return fmt.Errorf("DBManager.OpenSqliteDB: illegal argument: name must not contain ':'")
+		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not contain ':'")
 	}
 
 	dbm.Lock()
 	defer dbm.Unlock()
 
 	if _, ok := dbm.dbs[dbRef]; ok {
-		return fmt.Errorf("DBManager.OpenSqliteDB: db is already loaded: '%s'", name)
+		return fmt.Errorf("DBManager.OpenDB: db is already loaded: '%s'", name)
 	}
 
-	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+	db, err := dbm.dbif.openDB(dbPath)
 
-	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
-		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to open db : %v", err)
-
-		if db != nil {
-			err2 := db.Close()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
-			}
-		}
-		return fmt.Errorf(msg)
-	}
-	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
-
-	// TODO This looks odd, with error handling inside the error handling
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-
-		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to set foreign keys : %v", err)
-
-		return fmt.Errorf(msg)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	// TODO This looks odd, with error handling inside the error handling
-	if err != nil {
-		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to set case sensitive like : %v", err)
-
-		if db != nil {
-			err2 := db.Close()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
-			}
-		}
-
-		return fmt.Errorf(msg)
-	}
-	_, err = db.Exec("PRAGMA journal_mode=WAL")
-	// TODO This looks odd, with error handling inside the error handling
-	if err != nil {
-		msg := fmt.Sprintf("DBManager.OpenSqliteDB: failed to set journal_mode=WAL : %v", err)
-
-		if db != nil {
-			err2 := db.Close()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
-			}
-		}
-
-		return fmt.Errorf(msg)
+		return fmt.Errorf("DBManager.OpenDB: couldn't open db : %v", err)
 	}
 
 	dbm.dbs[dbRef] = db
@@ -176,7 +139,7 @@ func (dbm *DBManager) OpenSqliteDB(dbRef lex.DBRef, dbPath string) error {
 	return nil
 }
 
-// AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk. To create AND add the database, use DefineSqliteDB instead. To open and add an existing db, use OpenDB
+// AddDB is used to add a database to the cached map of available databases. It does NOT create the database on disk. To create AND add the database, use DefineDB instead. To open and add an existing db, use OpenDB
 func (dbm *DBManager) AddDB(dbRef lex.DBRef, db *sql.DB) error {
 	name := string(dbRef)
 	if name == "" {
@@ -741,12 +704,25 @@ func (dbm *DBManager) ValidationStats(lexRef lex.LexRef) (ValStats, error) {
 	defer dbm.Unlock()
 	db, ok := dbm.dbs[lexRef.DBRef]
 	if !ok {
-		return ValStats{}, fmt.Errorf("DBManager.Validate: no such db '%s'", lexRef.DBRef)
+		return ValStats{}, fmt.Errorf("DBManager.ValidationStats: no such db '%s'", lexRef.DBRef)
 	}
 	return dbm.dbif.validationStats(db, string(lexRef.LexName))
 }
 
-// FirstTimePopulateDBCache returns available database names
-func (dbm *DBManager) FirstTimePopulateDBCache(dbClusterLocation string) error {
-	return dbm.dbif.firstTimePopulateDBCache(dbClusterLocation)
+// GetSchemaVersion retrieves the schema version from the database
+func (dbm *DBManager) GetSchemaVersion(lexRef lex.LexRef) (string, error) {
+	dbm.Lock()
+	defer dbm.Unlock()
+	db, ok := dbm.dbs[lexRef.DBRef]
+	if !ok {
+		return "", fmt.Errorf("DBManager.GetSchemaVersion: no such db '%s'", lexRef.DBRef)
+	}
+	return dbm.dbif.getSchemaVersion(db)
+
+}
+
+// DropDB drop the database (table drop or db drop depending on database engine)
+func (dbm *DBManager) DropDB(dbPath string) error {
+	return dbm.dbif.dropDB(dbPath)
+
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
 
 	"github.com/stts-se/pronlex/dbapi"
@@ -170,27 +169,20 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 
 	dbName := "lexserver_testdb"
 	lexRef := lex.NewLexRef(dbName, "sv")
-	dbPath := filepath.Join(dbFileArea, dbName+".db")
-
-	dbRelatedPaths, err := filepath.Glob(dbPath + "*")
-	if err != nil {
-		return fmt.Errorf("failed to retrieve list of db files for '%s' : %v", dbPath, err)
-	}
-	for _, file := range dbRelatedPaths {
-		if _, err = os.Stat(file); !os.IsNotExist(err) {
-			log.Printf("demo_setup: deleting db file: %v", file)
-			err := os.Remove(file)
-			if err != nil {
-				return fmt.Errorf("failed to remove %s : %v", file, err)
-			}
-		}
-	}
+	dbPath := filepath.Join(*dbClusterLocation, dbName+".db")
 
 	dbmx, err := dbapi.NewDBManager(engine)
 	if err != nil {
 		return fmt.Errorf("failed to init db manager : %v", err)
 	}
 	defer dbmx.CloseDB(lexRef.DBRef)
+
+	// drop old db
+	err = dbmx.DropDB(dbPath)
+	if err != nil {
+		return fmt.Errorf("failed to to drop db : %v", err)
+	}
+
 	if dbmx.ContainsDB(lexRef.DBRef) {
 		err := dbmx.RemoveDB(lexRef.DBRef)
 		if err != nil {
@@ -198,7 +190,7 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 		}
 	}
 
-	err = dbmx.DefineSqliteDB(lexRef.DBRef, dbPath)
+	err = dbmx.DefineDB(lexRef.DBRef, dbPath)
 	if err != nil {
 		return fmt.Errorf("failed to define db %s | %v : %v", dbPath, lexRef, err)
 	}

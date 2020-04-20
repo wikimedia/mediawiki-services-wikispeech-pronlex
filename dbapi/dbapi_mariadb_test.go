@@ -48,6 +48,23 @@ func execSchemaMariadb(db *sql.DB) (sql.Result, error) {
 	return res, err
 }
 
+func Test_listMariaDBLexiconDatabases(t *testing.T) {
+
+	exp := map[lex.DBRef]string{"speechoid_pronlex_test1": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1", "speechoid_pronlex_test10": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test10", "speechoid_pronlex_test11": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test11", "speechoid_pronlex_test12": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test12", "speechoid_pronlex_test13": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test13", "speechoid_pronlex_test2": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test2", "speechoid_pronlex_test3": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test3", "speechoid_pronlex_test4": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test4", "speechoid_pronlex_test5": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test5", "speechoid_pronlex_test6": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test6", "speechoid_pronlex_test7": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test7", "speechoid_pronlex_test8": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test8", "speechoid_pronlex_test9": "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test9"}
+
+	loc := "speechoid:@tcp(127.0.0.1:3306)/"
+	res, err := mariaDBIF{}.listLexiconDatabases(loc)
+
+	if err != nil {
+		t.Errorf("open db failed : %v", err)
+	}
+
+	if !reflect.DeepEqual(exp, res) {
+		t.Errorf("Got: %v Wanted: %v", exp, res)
+	}
+
+}
+
 func Test_insertEntries(t *testing.T) {
 
 	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1")

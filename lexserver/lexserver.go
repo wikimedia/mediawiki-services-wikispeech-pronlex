@@ -156,8 +156,8 @@ func protect(w http.ResponseWriter) {
 var uploadFileArea string // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
 //var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
 //var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
-var dbClusterLocation string // = filepath.Join(".", "db_files")
-var staticFolder string      // = "."
+var dbClusterLocation *string // = filepath.Join(".", "db_files")
+var staticFolder string       // = "."
 
 // TODO config stuff
 func initFolders() error {
@@ -213,11 +213,11 @@ func initFolders() error {
 	// } // else: already exists, hopefully
 
 	// If the db dir doesn't exist, create it
-	if _, err := os.Stat(dbClusterLocation); err != nil {
+	if _, err := os.Stat(*dbClusterLocation); err != nil {
 		if os.IsNotExist(err) {
-			err2 := os.Mkdir(dbClusterLocation, 0750)
+			err2 := os.Mkdir(*dbClusterLocation, 0750)
 			if err2 != nil {
-				log.Printf("lexserver.init: failed to create %s : %v\n", dbClusterLocation, err2)
+				log.Printf("lexserver.init: failed to create %s : %v\n", *dbClusterLocation, err2)
 			}
 		} else {
 			log.Printf("lexserver.init: peculiar error : %v", err)
@@ -611,15 +611,14 @@ func isStaticPage(url string) bool {
 
 func main() {
 
-	port := "8787"
+	port := ":8787"
 	testPort := ":8799"
 	tag := "standard"
 	vInfo = getVersionInfo()
 
 	var test = flag.Bool("test", false, "run server tests")
-	//var ssFiles = flag.String("ss_files", filepath.Join(".", "symbol_sets"), "location for symbol set files")
-	var sqliteDBLocation = flag.String("sqlite", filepath.Join(".", "db_files"), "location for sqlite db files")
-	var mariaDBServer = flag.String("mariadb", filepath.Join(".", "speechoid:@tcp(127.0.0.1:3306"), "address to mariadb server")
+	var dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
+	dbClusterLocation = flag.String("db_cluster", filepath.Join(".", "db_files"), "db cluster location")
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var help = flag.Bool("help", false, "print usage/help and exit")
 
@@ -668,7 +667,7 @@ Flags:
 	}
 
 	//symbolSetFileArea = *ssFiles
-	dbClusterLocation = *dbFiles
+	//dbClusterLocation = *dbFiles
 	staticFolder = *static
 
 	err := initFolders()
@@ -677,7 +676,14 @@ Flags:
 		os.Exit(1)
 	}
 
-	engine := dbapi.Sqlite
+	var engine dbapi.DBEngine
+	if *dbEngine == "sqlite" {
+		engine = dbapi.Sqlite
+	} else if *dbEngine == "mariadb" {
+		engine = dbapi.MariaDB
+	} else {
+		log.Fatalf("Invalid db engine: %s", *dbEngine)
+	}
 	dbm, err = dbapi.NewDBManager(engine)
 	if err != nil {
 		log.Fatal(fmt.Errorf("lexserver: couldn't initialize db manager : %v", err))
@@ -762,68 +768,8 @@ func createServer(port string) (*http.Server, error) {
 
 	var err error // återanvänds för alla fel
 
-	log.Print("lexserver: loading dbs from location ", dbClusterLocation)
-	files, err := ioutil.ReadDir(dbClusterLocation)
-	if err != nil {
-		return s, fmt.Errorf("couldn't open db file area: %v", err)
-	}
-
-	nDbs := 0
-	for _, f := range files {
-		dbPath := filepath.Join(dbClusterLocation, f.Name())
-		if !strings.HasSuffix(dbPath, ".db") {
-			log.Printf("lexserver: skipping file: '%s'\n", dbPath)
-			continue
-		}
-		nDbs = nDbs + 1
-		log.Print("lexserver: connecting to Sqlite3 db ", dbPath)
-		// kolla att db-filen existerar
-		_, err = os.Stat(dbPath)
-		if err != nil {
-			return s, fmt.Errorf("lexserver: cannot find db file. %v", err)
-		}
-		dbName := filepath.Base(dbPath)
-		var extension = filepath.Ext(dbName)
-		dbName = dbName[0 : len(dbName)-len(extension)]
-		dbRef := lex.DBRef(dbName)
-		err := dbm.OpenDB(dbRef, dbPath)
-
-		if err != nil {
-			return s, fmt.Errorf("lexserver: failed to open db : %v", err)
-		}
-
-		// db, err = sql.Open("sqlite3_with_regexp", dbPath)
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to open dbfile %v", err)
-		// }
-		// _, err = db.Exec("PRAGMA foreign_keys = ON")
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		// }
-		// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		// }
-		// _, err = db.Exec("PRAGMA journal_mode=WAL")
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		// }
-		// db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
-
-		// db, ok := dbm.dbs[dbRef]
-		// if !ok {
-		// 	return s, fmt.Errorf("No such db '%s'", dbRef)
-		// }
-
-		// err = dbm.AddDB(dbRef, db)
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to add db: %v", err)
-		// }
-
-	}
-
-	log.Printf("lexserver: loaded %v db(s)", nDbs)
-
+	log.Print("lexserver: loading dbs from location ", *dbClusterLocation)
+	dbm.FirstTimePopulateDBCache(*dbClusterLocation)
 	// err = loadValidators(symbolSetFileArea)
 	// if err != nil {
 	// 	return s, fmt.Errorf("failed to load validators : %v", err)

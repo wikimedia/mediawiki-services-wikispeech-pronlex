@@ -13,6 +13,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"path/filepath"
 	"reflect"
 	//"regexp"
 	"sort"
@@ -74,8 +75,8 @@ func (mdb mariaDBIF) engine() DBEngine {
 	return MariaDB
 }
 
-// GetSchemaVersion retrieves the schema version from the database (as defined in schema.go on first load)
-func (mdb mariaDBIF) GetSchemaVersion(db *sql.DB) (string, error) {
+// getSchemaVersion retrieves the schema version from the database (as defined in schema_mariadb.go on first load)
+func (mdb mariaDBIF) getSchemaVersion(db *sql.DB) (string, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return "", fmt.Errorf("dbapi.GetSchemaVersion : %v", err)
@@ -2332,10 +2333,6 @@ func (mdb mariaDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error) 
 
 }
 
-func (mdb mariaDBIF) firstTimePopulateDBCache(dbClusterLocation string) error {
-	return fmt.Errorf("mariaDBIF.listDatabases : not implemented")
-}
-
 func (mdb mariaDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -2422,4 +2419,115 @@ func (mdb mariaDBIF) validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, e
 	// finally
 	return res, err
 
+}
+
+func (mdb mariaDBIF) listLexiconDatabases(dbClusterLocation string) (map[lex.DBRef]string, error) {
+	log.Print("dbapi_mariadb: loading dbs from location ", dbClusterLocation)
+
+	var res = make(map[lex.DBRef]string)
+
+	db, err := sql.Open("mysql", dbClusterLocation)
+	if err != nil {
+		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+		return res, fmt.Errorf(msg)
+	}
+
+	defer db.Close()
+
+	sql := "show databases"
+	rows, err := db.Query(sql)
+	defer rows.Close()
+	if err != nil {
+		return res, fmt.Errorf("failed to list databases")
+	}
+	for rows.Next() {
+		var db string
+		err = rows.Scan(&db)
+		if err != nil {
+			return res, fmt.Errorf("scanning row failed : %v", err)
+		}
+		dbPath := filepath.Join(dbClusterLocation, db)
+		res[lex.DBRef(db)] = dbPath
+	}
+	delete(res, "information_schema")
+
+	log.Printf("dbapi_mariadb: loaded %v db(s)", len(res))
+	return res, nil
+}
+
+func (mdb mariaDBIF) dropDB(dbPath string) error {
+
+	// NB NOT deleting db
+
+	db, err := sql.Open("mysql", dbPath)
+	if err != nil {
+		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+		return fmt.Errorf(msg)
+	}
+	defer db.Close()
+
+	sql1 := "show tables"
+	rows1, err := db.Query(sql1)
+	defer rows1.Close()
+	if err != nil {
+		return fmt.Errorf("failed to list tables")
+	}
+	tables := []string{}
+	for rows1.Next() {
+		var s string
+		err = rows1.Scan(&s)
+		if err != nil {
+			return fmt.Errorf("scanning row failed : %v", err)
+		}
+		tables = append(tables, s)
+	}
+
+	for _, table := range tables {
+		sql2 := "drop table ?"
+		_, err = db.Exec(sql2, table)
+		if err != nil {
+			return fmt.Errorf("failed to drop table %s", table)
+		}
+	}
+	return nil
+}
+
+func (mdb mariaDBIF) openDB(dbPath string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dbPath)
+	if err != nil {
+		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+		return db, fmt.Errorf(msg)
+	}
+	return db, nil
+}
+
+func (mbd mariaDBIF) defineDB(db *sql.DB, dbPath string) error {
+
+	// NB NOT creating db
+
+	for _, s := range MariaDBSchema {
+		_, err := db.Exec(s)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

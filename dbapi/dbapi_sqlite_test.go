@@ -37,7 +37,7 @@ func execSchemaSqlite(db *sql.DB) (sql.Result, error) {
 
 	//for _, s := range MariaDBSchema {
 
-	res, err = db.Exec(Schema)
+	res, err = db.Exec(SqliteSchema)
 	if err != nil {
 		return res, err
 	}

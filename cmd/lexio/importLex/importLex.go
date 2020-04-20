@@ -152,7 +152,7 @@ SAMPLE INVOCATION:
 
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
 		if *createDb {
-			err := dbm.DefineSqliteDB(dbRef, dbFile)
+			err := dbm.DefineDB(dbRef, dbFile)
 			if err != nil {
 				log.Fatalf("couldn't create db %s : %v", dbFile, err)
 				return

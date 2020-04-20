@@ -1,7 +1,7 @@
 package main
 
 import (
-	"database/sql"
+	//"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -382,45 +382,53 @@ var adminCreateDB = urlHandler{
 			http.Error(w, "no value for parameter 'db_name'", http.StatusBadRequest)
 			return
 		}
-		dbFile := filepath.Join(dbFileArea, dbName+".db")
-		if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-			http.Error(w, "Cannot create a db that already exists: "+dbName, http.StatusBadRequest)
+
+		//func (dbm *DBManager) DefineDB(dbRef lex.DBRef, dbPath string) error {
+		//dbPath := filepath.Join(*dbClusterLocation, dbName+".db")
+		err := dbm.DefineDB(lex.DBRef(dbName), *dbClusterLocation)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("couldn't define db : %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		db, err := sql.Open("sqlite3", dbFile)
-		if err != nil {
-			//db.Close()
-			http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusInternalServerError)
-			return
-		}
-		_, err = db.Exec("PRAGMA foreign_keys = ON")
-		if err != nil {
-			msg := fmt.Sprintf("sql error : %v", err)
-			err2 := db.Close()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
-			}
-			http.Error(w, msg, http.StatusInternalServerError)
-			return
-		}
+		// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		// 	http.Error(w, "Cannot create a db that already exists: "+dbName, http.StatusBadRequest)
+		// 	return
+		// }
 
-		_, err = db.Exec(dbapi.Schema)
-		if err != nil {
-			msg := fmt.Sprintf("sql error : %v", err)
-			err2 := db.Close()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
-			}
-			http.Error(w, msg, http.StatusInternalServerError)
-			return
-		}
-		err = dbm.AddDB(lex.DBRef(dbName), db)
-		if err != nil {
-			msg := fmt.Sprintf("failed to add db : %v", err)
-			http.Error(w, msg, http.StatusInternalServerError)
-			return
-		}
+		// db, err := sql.Open("sqlite3", dbFile)
+		// if err != nil {
+		// 	//db.Close()
+		// 	http.Error(w, fmt.Sprintf("sql error : %v", err), http.StatusInternalServerError)
+		// 	return
+		// }
+		// _, err = db.Exec("PRAGMA foreign_keys = ON")
+		// if err != nil {
+		// 	msg := fmt.Sprintf("sql error : %v", err)
+		// 	err2 := db.Close()
+		// 	if err2 != nil {
+		// 		msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+		// 	}
+		// 	http.Error(w, msg, http.StatusInternalServerError)
+		// 	return
+		// }
+
+		// _, err = db.Exec(dbapi.Schema)
+		// if err != nil {
+		// 	msg := fmt.Sprintf("sql error : %v", err)
+		// 	err2 := db.Close()
+		// 	if err2 != nil {
+		// 		msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+		// 	}
+		// 	http.Error(w, msg, http.StatusInternalServerError)
+		// 	return
+		// }
+		// err = dbm.AddDB(lex.DBRef(dbName), db)
+		// if err != nil {
+		// 	msg := fmt.Sprintf("failed to add db : %v", err)
+		// 	http.Error(w, msg, http.StatusInternalServerError)
+		// 	return
+		// }
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		fmt.Fprint(w, "Created database "+dbName)

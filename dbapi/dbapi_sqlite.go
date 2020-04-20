@@ -123,8 +123,8 @@ func (mdb sqliteDBIF) engine() DBEngine {
 	return Sqlite
 }
 
-// GetSchemaVersion retrieves the schema version from the database (as defined in schema.go on first load)
-func (sdb sqliteDBIF) GetSchemaVersion(db *sql.DB) (string, error) {
+// getSchemaVersion retrieves the schema version from the database (as defined in schema_sqlite.go on first load)
+func (sdb sqliteDBIF) getSchemaVersion(db *sql.DB) (string, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return "", fmt.Errorf("dbapi.GetSchemaVersion : %v", err)
@@ -2485,73 +2485,6 @@ func (sdb sqliteDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error)
 
 }
 
-func (sdb sqliteDBIF) firstTimePopulateDBCache(dbClusterLocation string) error {
-	var err error // återanvänds för alla fel
-
-	log.Print("dbapi_sqlite: loading dbs from location ", dbClusterLocation)
-	files, err := ioutil.ReadDir(dbClusterLocation)
-	if err != nil {
-		return fmt.Errorf("couldn't open db file area: %v", err)
-	}
-
-	nDbs := 0
-	for _, f := range files {
-		dbPath := filepath.Join(dbClusterLocation, f.Name())
-		if !strings.HasSuffix(dbPath, ".db") {
-			log.Printf("dbapi_sqlite: skipping file: '%s'\n", dbPath)
-			continue
-		}
-		nDbs = nDbs + 1
-		log.Print("dbapi_sqlite: connecting to Sqlite3 db ", dbPath)
-		// kolla att db-filen existerar
-		_, err = os.Stat(dbPath)
-		if err != nil {
-			return fmt.Errorf("dbapi_sqlite: cannot find db file. %v", err)
-		}
-		dbName := filepath.Base(dbPath)
-		var extension = filepath.Ext(dbName)
-		dbName = dbName[0 : len(dbName)-len(extension)]
-		dbRef := lex.DBRef(dbName)
-		err := dbm.OpenSqliteDB(dbRef, dbPath)
-
-		if err != nil {
-			return fmt.Errorf("dbapi_sqlite: failed to open db : %v", err)
-		}
-
-		// db, err = sql.Open("sqlite3_with_regexp", dbPath)
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to open dbfile %v", err)
-		// }
-		// _, err = db.Exec("PRAGMA foreign_keys = ON")
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		// }
-		// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		// }
-		// _, err = db.Exec("PRAGMA journal_mode=WAL")
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
-		// }
-		// db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
-
-		// db, ok := dbm.dbs[dbRef]
-		// if !ok {
-		// 	return s, fmt.Errorf("No such db '%s'", dbRef)
-		// }
-
-		// err = dbm.AddDB(dbRef, db)
-		// if err != nil {
-		// 	return s, fmt.Errorf("Failed to add db: %v", err)
-		// }
-
-	}
-
-	log.Printf("dbapi_sqlite: loaded %v db(s)", nDbs)
-	return nil
-}
-
 func (sdb sqliteDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {
 	tx, err := db.Begin()
 	defer tx.Commit()
@@ -2638,4 +2571,165 @@ func (sdb sqliteDBIF) validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, 
 	// finally
 	return res, err
 
+}
+
+func (sdb sqliteDBIF) listLexiconDatabases(dbClusterLocation string) (map[lex.DBRef]string, error) {
+	var err error // återanvänds för alla fel
+	var res = make(map[lex.DBRef]string)
+
+	log.Print("dbapi_sqlite: loading dbs from location ", dbClusterLocation)
+	files, err := ioutil.ReadDir(dbClusterLocation)
+	if err != nil {
+		return res, fmt.Errorf("couldn't open db file area: %v", err)
+	}
+
+	for _, f := range files {
+		dbPath := filepath.Join(dbClusterLocation, f.Name())
+		if !strings.HasSuffix(dbPath, ".db") {
+			log.Printf("dbapi_sqlite: skipping file: '%s'\n", dbPath)
+			continue
+		}
+		log.Print("dbapi_sqlite: connecting to Sqlite3 db ", dbPath)
+		// kolla att db-filen existerar
+		_, err = os.Stat(dbPath)
+		if err != nil {
+			return res, fmt.Errorf("dbapi_sqlite: cannot find db file. %v", err)
+		}
+		dbName := filepath.Base(dbPath)
+		var extension = filepath.Ext(dbName)
+		dbName = dbName[0 : len(dbName)-len(extension)]
+		dbRef := lex.DBRef(dbName)
+		//err := dbm.OpenDB(dbRef, dbPath)
+		res[dbRef] = dbPath
+
+		if err != nil {
+			return res, fmt.Errorf("dbapi_sqlite: failed to open db : %v", err)
+		}
+
+		// db, err = sql.Open("sqlite3_with_regexp", dbPath)
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to open dbfile %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA foreign_keys = ON")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// _, err = db.Exec("PRAGMA journal_mode=WAL")
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to exec PRAGMA call %v", err)
+		// }
+		// db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
+		// db, ok := dbm.dbs[dbRef]
+		// if !ok {
+		// 	return s, fmt.Errorf("No such db '%s'", dbRef)
+		// }
+
+		// err = dbm.AddDB(dbRef, db)
+		// if err != nil {
+		// 	return s, fmt.Errorf("Failed to add db: %v", err)
+		// }
+
+	}
+
+	log.Printf("dbapi_sqlite: loaded %v db(s)", len(res))
+	return res, nil
+}
+
+func (sdb sqliteDBIF) openDB(dbPath string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
+
+	// TODO This looks odd, with error handling inside the error handling
+	if err != nil {
+		msg := fmt.Sprintf("dbapi_sqlite: failed to open db : %v", err)
+
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+		return db, fmt.Errorf(msg)
+	}
+	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+
+	// TODO This looks odd, with error handling inside the error handling
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+
+		msg := fmt.Sprintf("dbapi_sqlite: failed to set foreign keys : %v", err)
+
+		return db, fmt.Errorf(msg)
+	}
+	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
+	// TODO This looks odd, with error handling inside the error handling
+	if err != nil {
+		msg := fmt.Sprintf("dbapi_sqlite: failed to set case sensitive like : %v", err)
+
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+
+		return db, fmt.Errorf(msg)
+	}
+	_, err = db.Exec("PRAGMA journal_mode=WAL")
+	// TODO This looks odd, with error handling inside the error handling
+	if err != nil {
+		msg := fmt.Sprintf("dbapi_sqlite: failed to set journal_mode=WAL : %v", err)
+
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+
+		return db, fmt.Errorf(msg)
+	}
+	return db, nil
+}
+
+func (sbd sqliteDBIF) defineDB(db *sql.DB, dbPath string) error {
+	var err error
+
+	// TODO This looks odd, with the db.Close() inside the error handling?
+	_, err = db.Exec(SqliteSchema)
+	if err != nil {
+		//return fmt.Errorf("sql error : %v", err)
+		msg := fmt.Sprintf("failed to load schema: %v", err)
+
+		err2 := db.Close()
+		if err2 != nil {
+			msg2 := fmt.Sprintf("failed to close db : %v", err2)
+
+			msg = fmt.Sprintf("%s : %s", msg, msg2)
+		}
+		return fmt.Errorf(msg)
+	}
+	return nil
+}
+
+func (sdb sqliteDBIF) dropDB(dbPath string) error {
+
+	dbRelatedPaths, err := filepath.Glob(dbPath + "*")
+	if err != nil {
+		return fmt.Errorf("failed to retrieve list of db files for '%s' : %v", dbPath, err)
+	}
+	for _, file := range dbRelatedPaths {
+		if _, err = os.Stat(file); !os.IsNotExist(err) {
+			log.Printf("dbapi_sqlite: deleting db file: %v", file)
+			err := os.Remove(file)
+			if err != nil {
+				return fmt.Errorf("failed to remove %s : %v", file, err)
+			}
+		}
+	}
+	return nil
 }

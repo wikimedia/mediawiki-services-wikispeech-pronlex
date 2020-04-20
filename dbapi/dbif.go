@@ -38,7 +38,6 @@ type DBIF interface {
 	listEntryStatusesWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error)
 	listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent bool) ([]string, error)
 	listEntryUsersWithFreq(db *sql.DB, lexiconName string, onlyCurrent bool) (map[string]int, error)
-	firstTimePopulateDBCache(dbClusterLocation string) error
 	listLexicons(db *sql.DB) ([]lexicon, error)
 	locale(db *sql.DB, lexiconName string) (string, error)
 	lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error
@@ -69,6 +68,14 @@ type DBIF interface {
 	validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error
 	validationStats(db *sql.DB, lexName string) (ValStats, error)
 	validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error)
+
+	defineDB(db *sql.DB, dbPath string) error
+	openDB(dbPath string) (*sql.DB, error)
+	dropDB(dbPath string) error
+	getSchemaVersion(db *sql.DB) (string, error)
+
+	// listLexiconDatabases returns a map with dbref + full dbpath
+	listLexiconDatabases(dbClusterLocation string) (map[lex.DBRef]string, error)
 
 	name() string
 	engine() DBEngine

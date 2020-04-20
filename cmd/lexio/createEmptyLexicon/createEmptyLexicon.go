@@ -23,7 +23,7 @@ func createEmptyLexicon(dbPath string, lexRefX lex.LexRefWithInfo, locale string
 
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
 		if createDbIfNotExists {
-			err := dbm.DefineSqliteDB(lexRef.DBRef, dbPath)
+			err := dbm.DefineDB(lexRef.DBRef, dbPath)
 			if err != nil {
 				return fmt.Errorf("couldn't create db %s : %v", dbPath, err)
 			}
