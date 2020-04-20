@@ -2573,9 +2573,9 @@ func (sdb sqliteDBIF) validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, 
 
 }
 
-func (sdb sqliteDBIF) listLexiconDatabases(dbClusterLocation string) (map[lex.DBRef]string, error) {
+func (sdb sqliteDBIF) listLexiconDatabases(dbClusterLocation string) ([]lex.DBRef, error) {
 	var err error // återanvänds för alla fel
-	var res = make(map[lex.DBRef]string)
+	var res = []lex.DBRef{}
 
 	log.Print("dbapi_sqlite: loading dbs from location ", dbClusterLocation)
 	files, err := ioutil.ReadDir(dbClusterLocation)
@@ -2600,7 +2600,7 @@ func (sdb sqliteDBIF) listLexiconDatabases(dbClusterLocation string) (map[lex.DB
 		dbName = dbName[0 : len(dbName)-len(extension)]
 		dbRef := lex.DBRef(dbName)
 		//err := dbm.OpenDB(dbRef, dbPath)
-		res[dbRef] = strings.TrimSuffix(dbPath, ".db")
+		res = append(res, dbRef)
 
 		if err != nil {
 			return res, fmt.Errorf("dbapi_sqlite: failed to open db : %v", err)
@@ -2640,8 +2640,9 @@ func (sdb sqliteDBIF) listLexiconDatabases(dbClusterLocation string) (map[lex.DB
 	return res, nil
 }
 
-func (sdb sqliteDBIF) openDB(dbPath string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3_with_regexp", dbPath+".db")
+func (sdb sqliteDBIF) openDB(dbClusterLocation string, dbRef lex.DBRef) (*sql.DB, error) {
+	dbPath := filepath.Join(dbClusterLocation, string(dbRef)+".db")
+	db, err := sql.Open("sqlite3_with_regexp", dbPath)
 
 	// TODO This looks odd, with error handling inside the error handling
 	if err != nil {
@@ -2696,8 +2697,13 @@ func (sdb sqliteDBIF) openDB(dbPath string) (*sql.DB, error) {
 	return db, nil
 }
 
-func (sbd sqliteDBIF) defineDB(db *sql.DB, dbPath string) error {
+func (sbd sqliteDBIF) defineDB(dbClusterLocation string, dbRef lex.DBRef) error {
 	var err error
+
+	db, err := sbd.openDB(dbClusterLocation, dbRef)
+	if err != nil {
+		return err
+	}
 
 	// TODO This looks odd, with the db.Close() inside the error handling?
 	_, err = db.Exec(SqliteSchema)
@@ -2716,9 +2722,10 @@ func (sbd sqliteDBIF) defineDB(db *sql.DB, dbPath string) error {
 	return nil
 }
 
-func (sdb sqliteDBIF) dropDB(dbPath string) error {
+func (sdb sqliteDBIF) dropDB(dbClusterLocation string, dbRef lex.DBRef) error {
 
-	dbRelatedPaths, err := filepath.Glob(dbPath + ".db*")
+	dbPath := filepath.Join(dbClusterLocation, string(dbRef)+".db")
+	dbRelatedPaths, err := filepath.Glob(dbPath + "*")
 	if err != nil {
 		return fmt.Errorf("failed to retrieve list of db files for '%s' : %v", dbPath, err)
 	}

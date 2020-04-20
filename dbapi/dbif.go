@@ -69,13 +69,14 @@ type DBIF interface {
 	validationStats(db *sql.DB, lexName string) (ValStats, error)
 	validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, error)
 
-	defineDB(db *sql.DB, dbPath string) error
-	openDB(dbPath string) (*sql.DB, error)
-	dropDB(dbPath string) error
+	defineDB(dbClusterLocation string, dbRef lex.DBRef) error
+	openDB(dbClusterLocation string, dbRef lex.DBRef) (*sql.DB, error)
+	dropDB(dbClusterLocation string, dbRef lex.DBRef) error
+
 	getSchemaVersion(db *sql.DB) (string, error)
 
 	// listLexiconDatabases returns a map with dbref + full dbpath
-	listLexiconDatabases(dbClusterLocation string) (map[lex.DBRef]string, error)
+	listLexiconDatabases(dbClusterLocation string) ([]lex.DBRef, error)
 
 	name() string
 	engine() DBEngine

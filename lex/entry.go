@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// DBRef a database reference string (i.e., the database filename without extension)
+// DBRef a database reference string (for mariadb: the database name; for sqlite: the database filename without extension)
 type DBRef string
 
 // LexName a lexicon name

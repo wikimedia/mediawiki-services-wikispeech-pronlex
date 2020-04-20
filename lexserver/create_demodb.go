@@ -178,9 +178,9 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 	defer dbmx.CloseDB(lexRef.DBRef)
 
 	// drop old db
-	err = dbmx.DropDB(dbPath)
+	err = dbmx.DropDB(*dbClusterLocation, lexRef.DBRef)
 	if err != nil {
-		return fmt.Errorf("failed to to drop db : %v", err)
+		return fmt.Errorf("failed to drop db : %v", err)
 	}
 
 	if dbmx.ContainsDB(lexRef.DBRef) {
@@ -190,7 +190,7 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 		}
 	}
 
-	err = dbmx.DefineDB(lexRef.DBRef, dbPath)
+	err = dbmx.DefineDB(*dbClusterLocation, lexRef.DBRef)
 	if err != nil {
 		return fmt.Errorf("failed to define db %s | %v : %v", dbPath, lexRef, err)
 	}

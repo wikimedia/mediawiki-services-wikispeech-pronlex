@@ -12,9 +12,6 @@ import (
 	"github.com/stts-se/pronlex/validation"
 )
 
-// TODO: Should be handled in som other way, to allow for swapping between different DBIFs
-//var dbif DBIF = sqliteDBIF{}
-
 // DBManager is used by external services (i.e., lexserver) to cache sql database instances along with their names
 type DBManager struct {
 	sync.RWMutex
@@ -67,14 +64,14 @@ func (dbm *DBManager) CloseDB(dbRef lex.DBRef) error {
 func (dbm *DBManager) FirstTimePopulateDBCache(dbClusterLocation string) error {
 	var err error // återanvänds för alla fel
 
-	log.Print("dbapi_sqlite: loading dbs from location ", dbClusterLocation)
+	log.Print("db_manager: loading dbs from location ", dbClusterLocation)
 	dbs, err := dbm.dbif.listLexiconDatabases(dbClusterLocation)
 	if err != nil {
 		return fmt.Errorf("couldn't open db file area: %v", err)
 	}
 
-	for dbRef, dbPath := range dbs {
-		err := dbm.OpenDB(dbRef, dbPath)
+	for _, dbRef := range dbs {
+		err := dbm.OpenDB(dbClusterLocation, dbRef)
 		if err != nil {
 			return fmt.Errorf("db_manager: failed to open db : %v", err)
 		}
@@ -84,35 +81,45 @@ func (dbm *DBManager) FirstTimePopulateDBCache(dbClusterLocation string) error {
 	return nil
 }
 
-// DefineDB is used to define a new sqlite3 database and add it to the DB manager cache.
-func (dbm *DBManager) DefineDB(dbRef lex.DBRef, dbPath string) error {
+// DefineDB is used to define a new database and add it to the DB manager cache.
+func (dbm *DBManager) DefineDB(dbClusterLocation string, dbRef lex.DBRef) error {
 	// TODO: Check that the db doesn't exist???
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
 	// 	return fmt.Errorf("dbapi_sqlite: db file already exists : %v", err)
 	// }
 
-	err := dbm.OpenDB(dbRef, dbPath)
-	if err != nil {
-		msg := fmt.Sprintf("DBManager.DefineDB: failed to open db : %v", err)
-		return fmt.Errorf(msg)
-	}
+	// err := dbm.OpenDB(dbRef, dbPath)
+	// if err != nil {
+	// 	msg := fmt.Sprintf("DBManager.DefineDB: failed to open db : %v", err)
+	// 	return fmt.Errorf(msg)
+	// }
 
-	db, ok := dbm.dbs[dbRef]
-	if !ok {
-		return fmt.Errorf("DBManager.DefineDB: no such db '%s'", dbRef)
-	}
+	// db, ok := dbm.dbs[dbRef]
+	// if !ok {
+	// 	return fmt.Errorf("DBManager.DefineDB: no such db '%s'", dbRef)
+	// }
 
-	err = dbm.dbif.defineDB(db, dbPath)
+	err := dbm.dbif.defineDB(dbClusterLocation, dbRef)
 	if err != nil {
 		msg := fmt.Sprintf("DBManager.DefineDB: failed to define db : %v", err)
 		return fmt.Errorf(msg)
 	}
 
+	err = dbm.OpenDB(dbClusterLocation, dbRef)
+	if err != nil {
+		msg := fmt.Sprintf("DBManager.DefineDB: failed to open db : %v", err)
+		return fmt.Errorf(msg)
+	}
+
+	// db, ok := dbm.dbs[dbRef]
+	// if !ok {
+	// 	return fmt.Errorf("DBManager.DefineDB: no such db '%s'", dbRef)
+	// }
 	return nil
 }
 
-// OpenDB is used to open an existing sqlite3 database and add it to the DB manager cache.
-func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
+// OpenDB is used to open an existing database and add it to the DB manager cache.
+func (dbm *DBManager) OpenDB(dbClusterLocation string, dbRef lex.DBRef) error {
 	name := string(dbRef)
 	if name == "" {
 		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not be empty")
@@ -128,7 +135,7 @@ func (dbm *DBManager) OpenDB(dbRef lex.DBRef, dbPath string) error {
 		return fmt.Errorf("DBManager.OpenDB: db is already loaded: '%s'", name)
 	}
 
-	db, err := dbm.dbif.openDB(dbPath)
+	db, err := dbm.dbif.openDB(dbClusterLocation, dbRef)
 
 	if err != nil {
 		return fmt.Errorf("DBManager.OpenDB: couldn't open db : %v", err)
@@ -721,8 +728,8 @@ func (dbm *DBManager) GetSchemaVersion(lexRef lex.LexRef) (string, error) {
 
 }
 
-// DropDB drop the database (table drop or db drop depending on database engine)
-func (dbm *DBManager) DropDB(dbPath string) error {
-	return dbm.dbif.dropDB(dbPath)
+// DropDB drop the database (cannot be undone)
+func (dbm *DBManager) DropDB(dbClusterLocation string, dbRef lex.DBRef) error {
+	return dbm.dbif.dropDB(dbClusterLocation, dbRef)
 
 }
