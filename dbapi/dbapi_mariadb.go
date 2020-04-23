@@ -2421,12 +2421,12 @@ func (mdb mariaDBIF) validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, e
 
 }
 
-func (mdb mariaDBIF) listLexiconDatabases(dbClusterLocation string) ([]lex.DBRef, error) {
-	log.Print("dbapi_mariadb: loading dbs from location ", dbClusterLocation)
+func (mdb mariaDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, error) {
+	log.Print("dbapi_mariadb: loading dbs from location ", dbLocation)
 
 	var res = []lex.DBRef{}
 
-	db, err := sql.Open("mysql", dbClusterLocation+"/")
+	db, err := sql.Open("mysql", dbLocation+"/")
 	if err != nil {
 		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
 		if db != nil {
@@ -2490,8 +2490,9 @@ func (mdb mariaDBIF) listLexiconDatabases(dbClusterLocation string) ([]lex.DBRef
 	return res, nil
 }
 
-func (mdb mariaDBIF) dropDB(dbClusterLocation string, dbRef lex.DBRef) error {
-	db, err := sql.Open("mysql", dbClusterLocation+"/")
+func (mdb mariaDBIF) dropDB(dbLocation string, dbRef lex.DBRef) error {
+	dbPath := filepath.Join(dbLocation, string(dbRef))
+	db, err := sql.Open("mysql", dbPath)
 	if err != nil {
 		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
 		if db != nil {
@@ -2504,30 +2505,15 @@ func (mdb mariaDBIF) dropDB(dbClusterLocation string, dbRef lex.DBRef) error {
 	}
 	defer db.Close()
 
-	if strings.ContainsAny(string(dbRef), "'\"` ;") {
-		return fmt.Errorf("cannot use table name %s in drop database statamanet", dbRef)
-	}
-
-	rows, err := db.Query("show databases")
-	for rows.Next() {
-		var s string
-		err = rows.Scan(&s)
-		if err != nil {
-			return fmt.Errorf("scanning row failed : %v", err)
-		}
-	}
-
-	sql1 := fmt.Sprintf("drop database if exists %s", dbRef)
-	_, err = db.Exec(sql1)
+	_, err = db.Exec(mariaDBDropTableStmt)
 	if err != nil {
-		//panic(err)
-		return fmt.Errorf("failed to drop database : %v", err)
+		return fmt.Errorf("drop table failed : %v", err)
 	}
 	return nil
 }
 
-func (mdb mariaDBIF) openDB(dbClusterLocation string, dbRef lex.DBRef) (*sql.DB, error) {
-	dbPath := filepath.Join(dbClusterLocation, string(dbRef))
+func (mdb mariaDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error) {
+	dbPath := filepath.Join(dbLocation, string(dbRef))
 	db, err := sql.Open("mysql", dbPath)
 	if err != nil {
 		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
@@ -2542,31 +2528,9 @@ func (mdb mariaDBIF) openDB(dbClusterLocation string, dbRef lex.DBRef) (*sql.DB,
 	return db, nil
 }
 
-func (mbd mariaDBIF) defineDB(dbClusterLocation string, dbRef lex.DBRef) error {
+func (mbd mariaDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
 
-	dbPath := filepath.Join(dbClusterLocation, string(dbRef))
-	db0, err := sql.Open("mysql", dbClusterLocation+"/")
-	if err != nil {
-		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
-		if db0 != nil {
-			err2 := db0.Close()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
-			}
-		}
-		return fmt.Errorf(msg)
-	}
-
-	if strings.ContainsAny(string(dbRef), "'\"` ;") {
-		db0.Close()
-		return fmt.Errorf("cannot use table name %s in create database statamanet", dbRef)
-	}
-	sql1 := fmt.Sprintf("create database %s", dbRef)
-	_, err = db0.Exec(sql1)
-	if err != nil {
-		return fmt.Errorf("failed to create database : %v", err)
-	}
-	db0.Close()
+	dbPath := filepath.Join(dbLocation, string(dbRef))
 
 	db, err := sql.Open("mysql", dbPath)
 	if err != nil {
@@ -2581,7 +2545,7 @@ func (mbd mariaDBIF) defineDB(dbClusterLocation string, dbRef lex.DBRef) error {
 	}
 	defer db.Close()
 
-	db, err = mbd.openDB(dbClusterLocation, dbRef)
+	db, err = mbd.openDB(dbLocation, dbRef)
 	if err != nil {
 		return err
 	}

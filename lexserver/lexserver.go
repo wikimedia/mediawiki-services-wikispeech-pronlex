@@ -156,8 +156,8 @@ func protect(w http.ResponseWriter) {
 var uploadFileArea string // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
 //var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
 //var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
-var dbClusterLocation *string // = filepath.Join(".", "db_files")
-var staticFolder string       // = "."
+var dbLocation *string  // = filepath.Join(".", "db_files")
+var staticFolder string // = "."
 
 // TODO config stuff
 func initFolders() error {
@@ -214,11 +214,11 @@ func initFolders() error {
 
 	if *dbEngine == "sqlite" {
 		// If the db dir doesn't exist, create it
-		if _, err := os.Stat(*dbClusterLocation); err != nil {
+		if _, err := os.Stat(*dbLocation); err != nil {
 			if os.IsNotExist(err) {
-				err2 := os.Mkdir(*dbClusterLocation, 0750)
+				err2 := os.Mkdir(*dbLocation, 0750)
 				if err2 != nil {
-					log.Printf("lexserver.init: failed to create %s : %v\n", *dbClusterLocation, err2)
+					log.Printf("lexserver.init: failed to create %s : %v\n", *dbLocation, err2)
 				}
 			} else {
 				log.Printf("lexserver.init: peculiar error : %v", err)
@@ -619,12 +619,12 @@ func main() {
 	tag := "standard"
 	vInfo = getVersionInfo()
 
-	defaultSqliteCluster := filepath.Join(".", "db_files")
-	defaultMariaDBCluster := "speechoid:@tcp(127.0.0.1:3306)"
+	defaultSqliteLocation := filepath.Join(".", "db_files")
+	defaultMariaDBLocation := "speechoid:@tcp(127.0.0.1:3306)"
 
 	var test = flag.Bool("test", false, "run server tests")
 	dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
-	dbClusterLocation = flag.String("db_cluster", "", fmt.Sprintf("db cluster location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteCluster, defaultMariaDBCluster))
+	dbLocation = flag.String("db_location", "", fmt.Sprintf("db location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteLocation, defaultMariaDBLocation))
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var version = flag.Bool("version", false, "print version and exit")
 	var help = flag.Bool("help", false, "print usage/help and exit")
@@ -682,24 +682,24 @@ Default ports:
 	}
 
 	//symbolSetFileArea = *ssFiles
-	//dbClusterLocation = *dbFiles
+	//dbLocation = *dbFiles
 	staticFolder = *static
 
 	var engine dbapi.DBEngine
 	if *dbEngine == "sqlite" {
 		engine = dbapi.Sqlite
-		if *dbClusterLocation == "" {
-			dbClusterLocation = &defaultSqliteCluster
+		if *dbLocation == "" {
+			dbLocation = &defaultSqliteLocation
 		}
 	} else if *dbEngine == "mariadb" {
 		engine = dbapi.MariaDB
-		if *dbClusterLocation == "" {
-			dbClusterLocation = &defaultMariaDBCluster
+		if *dbLocation == "" {
+			dbLocation = &defaultMariaDBLocation
 		}
 	} else {
 		log.Fatalf("Invalid db engine: %s", *dbEngine)
 	}
-	log.Printf("lexserver: db_cluster = %s", *dbClusterLocation)
+	log.Printf("lexserver: db_location = %s", *dbLocation)
 
 	err := initFolders()
 	if err != nil {
@@ -791,8 +791,8 @@ func createServer(port string) (*http.Server, error) {
 
 	var err error // återanvänds för alla fel
 
-	log.Print("lexserver: loading dbs from location ", *dbClusterLocation)
-	dbm.FirstTimePopulateDBCache(*dbClusterLocation)
+	log.Print("lexserver: loading dbs from location ", *dbLocation)
+	dbm.FirstTimePopulateDBCache(*dbLocation)
 	// err = loadValidators(symbolSetFileArea)
 	// if err != nil {
 	// 	return s, fmt.Errorf("failed to load validators : %v", err)

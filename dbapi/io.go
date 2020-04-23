@@ -205,18 +205,8 @@ const (
 	PrintInvalid
 )
 
-// ValidateSqliteLexiconFile validates the input file and prints any validation errors to the specified logger.
-func ValidateSqliteLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
-	return validateLexiconFile(sqliteDBIF{}, logger, lexiconFileName, validator, printMode)
-}
-
-// ValidateMariaDBLexiconFile validates the input file and prints any validation errors to the specified logger.
-func ValidateMariaDBLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
-	return validateLexiconFile(mariaDBIF{}, logger, lexiconFileName, validator, printMode)
-}
-
-// validateLexiconFile validates the input file and prints any validation errors to the specified logger.
-func validateLexiconFile(dbif DBIF, logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
+// ValidateLexiconFile validates the input file and prints any validation errors to the specified logger.
+func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *validation.Validator, printMode PrintMode) error {
 
 	start := time.Now()
 

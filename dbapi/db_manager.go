@@ -61,17 +61,17 @@ func (dbm *DBManager) CloseDB(dbRef lex.DBRef) error {
 }
 
 // FirstTimePopulateDBCache reads all available dbs into the database cache
-func (dbm *DBManager) FirstTimePopulateDBCache(dbClusterLocation string) error {
+func (dbm *DBManager) FirstTimePopulateDBCache(dbLocation string) error {
 	var err error // återanvänds för alla fel
 
-	log.Print("db_manager: loading dbs from location ", dbClusterLocation)
-	dbs, err := dbm.dbif.listLexiconDatabases(dbClusterLocation)
+	log.Print("db_manager: loading dbs from location ", dbLocation)
+	dbs, err := dbm.dbif.listLexiconDatabases(dbLocation)
 	if err != nil {
 		return fmt.Errorf("couldn't open db file area: %v", err)
 	}
 
 	for _, dbRef := range dbs {
-		err := dbm.OpenDB(dbClusterLocation, dbRef)
+		err := dbm.OpenDB(dbLocation, dbRef)
 		if err != nil {
 			return fmt.Errorf("db_manager: failed to open db : %v", err)
 		}
@@ -82,7 +82,9 @@ func (dbm *DBManager) FirstTimePopulateDBCache(dbClusterLocation string) error {
 }
 
 // DefineDB is used to define a new database and add it to the DB manager cache.
-func (dbm *DBManager) DefineDB(dbClusterLocation string, dbRef lex.DBRef) error {
+// For sqlite, the database is created; for mariadb, it has to be created beforehand by an administrator.
+// In both cases, all required tables are then added to the database.
+func (dbm *DBManager) DefineDB(dbLocation string, dbRef lex.DBRef) error {
 	// TODO: Check that the db doesn't exist???
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
 	// 	return fmt.Errorf("dbapi_sqlite: db file already exists : %v", err)
@@ -99,13 +101,13 @@ func (dbm *DBManager) DefineDB(dbClusterLocation string, dbRef lex.DBRef) error 
 	// 	return fmt.Errorf("DBManager.DefineDB: no such db '%s'", dbRef)
 	// }
 
-	err := dbm.dbif.defineDB(dbClusterLocation, dbRef)
+	err := dbm.dbif.defineDB(dbLocation, dbRef)
 	if err != nil {
 		msg := fmt.Sprintf("DBManager.DefineDB: failed to define db : %v", err)
 		return fmt.Errorf(msg)
 	}
 
-	err = dbm.OpenDB(dbClusterLocation, dbRef)
+	err = dbm.OpenDB(dbLocation, dbRef)
 	if err != nil {
 		msg := fmt.Sprintf("DBManager.DefineDB: failed to open db : %v", err)
 		return fmt.Errorf(msg)
@@ -119,7 +121,7 @@ func (dbm *DBManager) DefineDB(dbClusterLocation string, dbRef lex.DBRef) error 
 }
 
 // OpenDB is used to open an existing database and add it to the DB manager cache.
-func (dbm *DBManager) OpenDB(dbClusterLocation string, dbRef lex.DBRef) error {
+func (dbm *DBManager) OpenDB(dbLocation string, dbRef lex.DBRef) error {
 	name := string(dbRef)
 	if name == "" {
 		return fmt.Errorf("DBManager.OpenDB: illegal argument: name must not be empty")
@@ -135,7 +137,7 @@ func (dbm *DBManager) OpenDB(dbClusterLocation string, dbRef lex.DBRef) error {
 		return fmt.Errorf("DBManager.OpenDB: db is already loaded: '%s'", name)
 	}
 
-	db, err := dbm.dbif.openDB(dbClusterLocation, dbRef)
+	db, err := dbm.dbif.openDB(dbLocation, dbRef)
 
 	if err != nil {
 		return fmt.Errorf("DBManager.OpenDB: couldn't open db : %v", err)
@@ -728,8 +730,8 @@ func (dbm *DBManager) GetSchemaVersion(lexRef lex.LexRef) (string, error) {
 
 }
 
-// DropDB drop the database (cannot be undone)
-func (dbm *DBManager) DropDB(dbClusterLocation string, dbRef lex.DBRef) error {
-	return dbm.dbif.dropDB(dbClusterLocation, dbRef)
-
+// DropDB drop the database (cannot be undone).
+// sqlite drops the actual database; mariadb just clear the database from tables
+func (dbm *DBManager) DropDB(dbLocation string, dbRef lex.DBRef) error {
+	return dbm.dbif.dropDB(dbLocation, dbRef)
 }

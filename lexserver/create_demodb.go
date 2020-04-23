@@ -169,7 +169,7 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 
 	dbName := "lexserver_testdb"
 	lexRef := lex.NewLexRef(dbName, "sv")
-	dbPath := filepath.Join(*dbClusterLocation, dbName) // +".db")
+	dbPath := filepath.Join(*dbLocation, dbName) // +".db")
 
 	dbmx, err := dbapi.NewDBManager(engine)
 	if err != nil {
@@ -178,7 +178,7 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 	defer dbmx.CloseDB(lexRef.DBRef)
 
 	// drop old db
-	err = dbmx.DropDB(*dbClusterLocation, lexRef.DBRef)
+	err = dbmx.DropDB(*dbLocation, lexRef.DBRef)
 	if err != nil {
 		return fmt.Errorf("failed to drop db : %v", err)
 	}
@@ -189,8 +189,7 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 			return fmt.Errorf("failed to remove db: %v", err)
 		}
 	}
-
-	err = dbmx.DefineDB(*dbClusterLocation, lexRef.DBRef)
+	err = dbmx.DefineDB(*dbLocation, lexRef.DBRef)
 	if err != nil {
 		return fmt.Errorf("failed to define db %s | %v : %v", dbPath, lexRef, err)
 	}

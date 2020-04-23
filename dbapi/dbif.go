@@ -72,6 +72,7 @@ type DBIF interface {
 	defineDB(dbClusterLocation string, dbRef lex.DBRef) error
 	openDB(dbClusterLocation string, dbRef lex.DBRef) (*sql.DB, error)
 	dropDB(dbClusterLocation string, dbRef lex.DBRef) error
+	//dbExists(dbClusterLocation string, dbRef lex.DBRef) (bool, error)
 
 	getSchemaVersion(db *sql.DB) (string, error)
 

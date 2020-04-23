@@ -43,35 +43,6 @@ func isLikeExpression(s string) bool {
 	return false
 }
 
-const usage = `USAGE: lexlookup <Sqlite3 pronlex DB file> (<words...> | <stdin>)
-
-If a single word is supplied, it may contain the characters '%' and '_' for LIKE string search.
-
-
-Print missing words: 
-lexlookup <Sqlite3 pronlex DB file> -missing <words>
-
-Deleting a DB entry:
-lexlookup <Sqlite3 pronlex DB file> -delete -id <int> -db_ref <string> -lex_name <string>
-
-Flags:
-
-  -db_ref string
-    	DB reference name. Currently only used in combination with -delete.
-  -delete
-    	Delete entry. Required flags: -id <int> -db_ref <string> -lex_name <string>
-  -id int
-    	DB entry id.  Currently only used in combination with -delete.
-  -lex_name string
-    	Lexicon name. Currently only used in combination with -delete.
-  -mariadb
-    	Use MySQL/MariaDB connector to database on localhost, with db username 'speechoid'
-  -missing
-    	Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>
-
-
-`
-
 func deleteEntry(dbm *dbapi.DBManager, entryID int64, dbRef, lexName string) error {
 	lexRef := lex.LexRef{DBRef: lex.DBRef(dbRef), LexName: lex.LexName(lexName)}
 	_, err := dbm.DeleteEntry(entryID, lexRef)
@@ -96,17 +67,17 @@ func remDupes(words []string) []string {
 // Max number of words in each lookup call
 const lookUpChunk = 100
 
-func lookUp0(dbFileName string, q dbapi.DBMQuery, dbm *dbapi.DBManager) ([]lex.Entry, error) {
+func lookUp0(dbRef lex.DBRef, q dbapi.DBMQuery, dbm *dbapi.DBManager) ([]lex.Entry, error) {
 	var res []lex.Entry
 
 	lexica, err := dbm.ListLexicons()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: failed to list lexicons in db file '%s' %v\n", dbFileName, err)
+		fmt.Fprintf(os.Stderr, "ERROR: failed to list lexicons in db '%s' %v\n", dbRef, err)
 		os.Exit(1)
 	}
 	lexRefs := []lex.LexRef{}
 	for _, l := range lexica {
-		lexRef := lex.NewLexRef(dbFileName, string(l.LexRef.LexName))
+		lexRef := lex.NewLexRef(string(dbRef), string(l.LexRef.LexName))
 		lexRefs = append(lexRefs, lexRef)
 	}
 
@@ -122,7 +93,7 @@ func lookUp0(dbFileName string, q dbapi.DBMQuery, dbm *dbapi.DBManager) ([]lex.E
 	return resWriter.Entries, nil
 }
 
-func lookUp(words []string, dbFileName string, dbm *dbapi.DBManager) ([]lex.Entry, error) {
+func lookUp(words []string, dbRef lex.DBRef, dbm *dbapi.DBManager) ([]lex.Entry, error) {
 	var res []lex.Entry
 
 	q := dbapi.NewQuery()
@@ -133,7 +104,7 @@ func lookUp(words []string, dbFileName string, dbm *dbapi.DBManager) ([]lex.Entr
 	if len(words) == 1 && isLikeExpression(words[0]) {
 		q.WordLike = words[0]
 		dbmq := dbapi.DBMQuery{Query: q}
-		return lookUp0(dbFileName, dbmq, dbm)
+		return lookUp0(dbRef, dbmq, dbm)
 	}
 
 	var chunk []string
@@ -143,7 +114,7 @@ func lookUp(words []string, dbFileName string, dbm *dbapi.DBManager) ([]lex.Entr
 		if (i >= lookUpChunk && i%lookUpChunk == 0) || i == len(words)-1 {
 
 			q.Words = chunk
-			l, err := lookUp0(dbFileName, dbapi.DBMQuery{Query: q}, dbm)
+			l, err := lookUp0(dbRef, dbapi.DBMQuery{Query: q}, dbm)
 			if err != nil {
 				return res, err
 			}
@@ -162,55 +133,88 @@ func lookUp(words []string, dbFileName string, dbm *dbapi.DBManager) ([]lex.Entr
 
 func main() {
 
+	var err error
 	//defer profile.Start().Stop()
 
 	verb := true
 
-	var flags = flag.NewFlagSet("lexlookup", flag.ExitOnError)
+	deleteFlag := flag.Bool("delete", false, "Delete entry. Required flags: -id <int> -db_ref <string> -lex_name <string>")
+	idFlag := flag.Int("id", 0, "DB entry id")
+	dbLocation := flag.String("db_location", "", "DB location (folder for sqlite; address for mariadb)")
+	dbName := flag.String("db_name", "", "DB reference name")
+	lexName := flag.String("lex_name", "", "Lexicon name")
 
-	deleteFlag := flags.Bool("delete", false, "Delete entry. Required flags: -id <int> -db_ref <string> -lex_name <string>")
-	idFlag := flags.Int("id", 0, "DB entry id")
-	dbFlag := flags.String("db_ref", "", "DB reference name")
-	lexFlag := flags.String("lex_name", "", "Lexicon name")
+	printMissingFlag := flag.Bool("missing", false, "Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>")
 
-	printMissingFlag := flags.Bool("missing", false, "Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>")
+	engineFlag := flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 
-	mariadbFlag := flags.Bool("mariadb", false, "Use MySQL/MariaDB connector to database on localhost, with db username 'speechoid'")
+	var printUsage = func() {
+		fmt.Fprintf(os.Stderr, `USAGE: lexlookup (<words...> | <stdin>)
 
-	if len(os.Args) < 2 {
-		fmt.Fprint(os.Stderr, usage)
+If a single word is supplied, it may contain the characters '%%' and '_' for LIKE string search.
+
+
+Print missing words: 
+lexlookup -missing <words>
+
+Deleting a DB entry:
+lexlookup -delete -id <int> -db_ref <string> -lex_name <string>
+
+Flags:
+
+`)
+		flag.PrintDefaults()
+	}
+
+	flag.Usage = func() {
+		printUsage()
+		os.Exit(0)
+	}
+	flag.Parse()
+	if len(flag.Args()) < 1 {
+		printUsage()
 		os.Exit(0)
 	}
 
-	err := flags.Parse(os.Args[2:])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to parse command line arguments : %v\n", err)
-		os.Exit(1)
+	if *dbLocation == "" || *dbName == "" || *engineFlag == "" {
+		printUsage()
+		os.Exit(0)
 	}
 
 	prettyPrint := true
 
-	dbPath := os.Args[1]
-
 	var db *sql.DB
-	dbm := dbapi.NewDBManager()
+	var engine dbapi.DBEngine
+	var dbm *dbapi.DBManager
+	if *engineFlag == "mariadb" {
+		engine = dbapi.MariaDB
+		dbm = dbapi.NewMariaDBManager()
+	} else if *engineFlag == "sqlite" {
+		engine = dbapi.Sqlite
+		dbm = dbapi.NewSqliteDBManager()
+	} else {
+		fmt.Fprintf(os.Stderr, "invalid db engine : %s\n", *engineFlag)
+		os.Exit(1)
+	}
 
-	if !*mariadbFlag { // Sqlite
+	if engine == dbapi.Sqlite { // Sqlite
 
+		dbPath := path.Join(*dbLocation, *dbName+".db")
 		if _, err := os.Stat(dbPath); os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "ERROR: could not find pronlex db file '%s'\n", dbPath)
 			os.Exit(1)
 		}
 
-		dbPath := path.Base(dbPath)
+		//dbPath := path.Base(dbPath)
 
 		db, err = sql.Open("sqlite3", os.Args[1])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Failed to open pronlex Sqlite3 db file '%s' : %v\n", dbPath, err)
 			os.Exit(1)
 		}
-	} else { // MySQL/MariaDB
-		db, err = sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/"+dbPath)
+	} else if engine == dbapi.MariaDB { // MySQL/MariaDB
+		dbPath := path.Join(*dbLocation, *dbName)
+		db, err = sql.Open("mysql", dbPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Failed to connect to MySQL/MariaDB db '%s' : %v\n", dbPath, err)
 			os.Exit(1)
@@ -219,7 +223,7 @@ func main() {
 
 	}
 
-	err = dbm.AddDB(lex.DBRef(dbPath), db)
+	err = dbm.AddDB(lex.DBRef(*dbName), db)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: failed to initialise db manager : %v\n", err)
 		os.Exit(1)
@@ -227,7 +231,7 @@ func main() {
 
 	// Delete entry
 	if *deleteFlag {
-		err := deleteEntry(dbm, int64(*idFlag), *dbFlag, *lexFlag)
+		err := deleteEntry(dbm, int64(*idFlag), *dbName, *lexName)
 
 		if err != nil {
 
@@ -241,7 +245,7 @@ func main() {
 
 	words := []string{}
 	// read from stdin
-	if len(flags.Args()) == 0 {
+	if len(flag.Args()) == 0 {
 		s := bufio.NewScanner(os.Stdin)
 		r, err := regexp.Compile(`\s+`)
 		if err != nil {
@@ -261,7 +265,7 @@ func main() {
 			}
 		}
 	} else {
-		words = flags.Args() //os.Args[2:]
+		words = flag.Args() //os.Args[2:]
 	}
 
 	if len(words) == 0 {
@@ -272,7 +276,7 @@ func main() {
 	// Only look up same string once
 	words = remDupes(words)
 
-	entries, err := lookUp(words, dbPath, dbm)
+	entries, err := lookUp(words, lex.DBRef(*dbName), dbm)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: failed look-up : '%v'\n", err)
 		os.Exit(1)
@@ -281,7 +285,7 @@ func main() {
 	// No match
 	if len(entries) == 0 && !*printMissingFlag {
 		if verb {
-			fmt.Fprintf(os.Stderr, "lexlookup: no matching entry in db '%s'\n", dbPath)
+			fmt.Fprintf(os.Stderr, "lexlookup: no matching entry in db '%s'\n", *dbName)
 		}
 		return
 	}

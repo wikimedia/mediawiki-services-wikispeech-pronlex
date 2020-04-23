@@ -385,7 +385,7 @@ var adminCreateDB = urlHandler{
 
 		//func (dbm *DBManager) DefineDB(dbRef lex.DBRef, dbPath string) error {
 		//dbPath := filepath.Join(*dbClusterLocation, dbName+".db")
-		err := dbm.DefineDB(*dbClusterLocation, lex.DBRef(dbName))
+		err := dbm.DefineDB(*dbLocation, lex.DBRef(dbName))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("couldn't define db : %v", err), http.StatusInternalServerError)
 			return

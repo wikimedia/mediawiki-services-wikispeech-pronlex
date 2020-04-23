@@ -5,14 +5,9 @@ package dbapi
 
 // TODO: SchemaVersion defined in schema.go
 
+const mariaDBDropTableStmt = `DROP TABLE IF EXISTS SchemaVersion, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus, Entry, Lexicon;`
+
 var MariaDBSchema = []string{
-
-	`DROP TABLE IF EXISTS SchemaVersion, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus, Entry, Lexicon;`,
-
-	`DROP TABLE IF EXISTS SchemaVersion, Lexicon, Entry, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
-
-	`DROP TABLE IF EXISTS SchemaVersion, Entry, Lexicon, EntryComment, Lemma2Entry, Lemma, Transcription, EntryTag, EntryValidation, EntryStatus;`,
-
 	`CREATE TABLE SchemaVersion (name text not null);`,
 
 	`INSERT INTO SchemaVersion VALUES (` + SchemaVersion + `);`,
