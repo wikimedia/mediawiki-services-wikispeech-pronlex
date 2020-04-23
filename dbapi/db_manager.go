@@ -719,12 +719,12 @@ func (dbm *DBManager) ValidationStats(lexRef lex.LexRef) (ValStats, error) {
 }
 
 // GetSchemaVersion retrieves the schema version from the database
-func (dbm *DBManager) GetSchemaVersion(lexRef lex.LexRef) (string, error) {
+func (dbm *DBManager) GetSchemaVersion(dbRef lex.DBRef) (string, error) {
 	dbm.Lock()
 	defer dbm.Unlock()
-	db, ok := dbm.dbs[lexRef.DBRef]
+	db, ok := dbm.dbs[dbRef]
 	if !ok {
-		return "", fmt.Errorf("DBManager.GetSchemaVersion: no such db '%s'", lexRef.DBRef)
+		return "", fmt.Errorf("DBManager.GetSchemaVersion: no such db '%s'", dbRef)
 	}
 	return dbm.dbif.getSchemaVersion(db)
 
@@ -734,4 +734,9 @@ func (dbm *DBManager) GetSchemaVersion(lexRef lex.LexRef) (string, error) {
 // sqlite drops the actual database; mariadb just clear the database from tables
 func (dbm *DBManager) DropDB(dbLocation string, dbRef lex.DBRef) error {
 	return dbm.dbif.dropDB(dbLocation, dbRef)
+}
+
+// DBExists checks if a database exist
+func (dbm *DBManager) DBExists(dbLocation string, dbRef lex.DBRef) (bool, error) {
+	return dbm.dbif.dbExists(dbLocation, dbRef)
 }

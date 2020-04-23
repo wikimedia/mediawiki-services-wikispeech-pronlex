@@ -134,19 +134,28 @@ func lookUp(words []string, dbRef lex.DBRef, dbm *dbapi.DBManager) ([]lex.Entry,
 func main() {
 
 	var err error
+	var cmdName = "lexlookup"
 	//defer profile.Start().Stop()
 
 	verb := true
 
 	deleteFlag := flag.Bool("delete", false, "Delete entry. Required flags: -id <int> -db_ref <string> -lex_name <string>")
 	idFlag := flag.Int("id", 0, "DB entry id")
-	dbLocation := flag.String("db_location", "", "DB location (folder for sqlite; address for mariadb)")
-	dbName := flag.String("db_name", "", "DB reference name")
-	lexName := flag.String("lex_name", "", "Lexicon name")
 
 	printMissingFlag := flag.Bool("missing", false, "Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>")
 
 	engineFlag := flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
+	dbLocation := flag.String("db_location", "", "DB location (folder for sqlite; address for mariadb)")
+	dbName := flag.String("db_name", "", "DB reference name")
+	lexName := flag.String("lexicon", "", "Lexicon name")
+
+	var fatalError = false
+	var dieIfEmptyFlag = func(name string, val *string) {
+		if *val == "" {
+			fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] flag %s is required", cmdName, name))
+			fatalError = true
+		}
+	}
 
 	var printUsage = func() {
 		fmt.Fprintf(os.Stderr, `USAGE: lexlookup (<words...> | <stdin>)
@@ -176,28 +185,32 @@ Flags:
 		os.Exit(0)
 	}
 
-	if *dbLocation == "" || *dbName == "" || *engineFlag == "" {
-		printUsage()
-		os.Exit(0)
+	dieIfEmptyFlag("db_engine", engineFlag)
+	dieIfEmptyFlag("db_location", dbLocation)
+	dieIfEmptyFlag("db_name", dbName)
+	dieIfEmptyFlag("lexicon", lexName)
+	if fatalError {
+		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
+		os.Exit(1)
 	}
 
 	prettyPrint := true
 
 	var db *sql.DB
-	var engine dbapi.DBEngine
+	var dbEngine dbapi.DBEngine
 	var dbm *dbapi.DBManager
 	if *engineFlag == "mariadb" {
-		engine = dbapi.MariaDB
+		dbEngine = dbapi.MariaDB
 		dbm = dbapi.NewMariaDBManager()
 	} else if *engineFlag == "sqlite" {
-		engine = dbapi.Sqlite
+		dbEngine = dbapi.Sqlite
 		dbm = dbapi.NewSqliteDBManager()
 	} else {
 		fmt.Fprintf(os.Stderr, "invalid db engine : %s\n", *engineFlag)
 		os.Exit(1)
 	}
 
-	if engine == dbapi.Sqlite { // Sqlite
+	if dbEngine == dbapi.Sqlite { // Sqlite
 
 		dbPath := path.Join(*dbLocation, *dbName+".db")
 		if _, err := os.Stat(dbPath); os.IsNotExist(err) {
@@ -207,12 +220,12 @@ Flags:
 
 		//dbPath := path.Base(dbPath)
 
-		db, err = sql.Open("sqlite3", os.Args[1])
+		db, err = sql.Open("sqlite3", dbPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Failed to open pronlex Sqlite3 db file '%s' : %v\n", dbPath, err)
 			os.Exit(1)
 		}
-	} else if engine == dbapi.MariaDB { // MySQL/MariaDB
+	} else if dbEngine == dbapi.MariaDB { // MySQL/MariaDB
 		dbPath := path.Join(*dbLocation, *dbName)
 		db, err = sql.Open("mysql", dbPath)
 		if err != nil {

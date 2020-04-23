@@ -18,8 +18,6 @@ import (
 	"testing"
 )
 
-var dbifSqlite = sqliteDBIF{}
-
 // ff is a place holder to be replaced by proper error handling
 // func ff(f string, err error) {
 // 	if err != nil {

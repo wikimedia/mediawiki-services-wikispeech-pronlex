@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
-	"database/sql"
+	"path"
+	//	"database/sql"
+	"flag"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stts-se/pronlex/dbapi"
@@ -18,13 +20,16 @@ import (
 	"strings"
 )
 
-// SQL DUMP:
-// sqlite3 <dbFile> .dump | gzip -c > <sqlDumpFile>
+// SQLITE
+// - DUMP: sqlite3 <dbFile> .dump | gzip -c > <sqlDumpFile>
+// - LOAD:  gunzip -c <dumpFile> | sqlite3 <dbFile>
 
-// SQL LOAD:
-// gunzip -c <dumpFile> | sqlite3 <dbFile>
+// MARIADB
+// - DUMP:  mysqldump -u speechoid -h <dbHost> <dbName> |gzip -c > <sqlDumpFile>
+// - LOAD:  gunzip -c <dumpFile> | mysql -u speechoid -h <dbHost> <dbName>
 
 const sqlitePath = "sqlite3"
+const mariaDBPath = "mysql"
 
 /*
 func sqlDump(dbFile string, outFile string) error {
@@ -46,8 +51,8 @@ func sqlDump(dbFile string, outFile string) error {
 */
 var dotAndAfter = regexp.MustCompile("[.].*$")
 
-func validateSchemaVersion(db *sql.DB) error {
-	dbVer, err := dbapi.GetSchemaVersion(db)
+func validateSchemaVersion(dbm *dbapi.DBManager, dbRef lex.DBRef) error {
+	dbVer, err := dbm.GetSchemaVersion(dbRef)
 	apiVer := dbapi.SchemaVersion
 	if err != nil {
 		log.Fatalf("Couldn't retrive schema version : %v", err)
@@ -66,16 +71,20 @@ func validateSchemaVersion(db *sql.DB) error {
 	return nil
 }
 
-func runPostTests(dbFile string, sqlDumpFile string) {
+func runPostTests(dbm *dbapi.DBManager, dbLocation string, dbRef lex.DBRef, sqlDumpFile string) {
 
-	db, dbm := defineDB(dbFile)
+	//err = dbm.DefineDB(dbm, dbLocation, dbRef)
+	err := dbm.OpenDB(dbLocation, dbRef)
+	if err != nil {
+		log.Fatalf("Couldn't open db: %v", err)
+	}
 	//lexes, err := dbm.ListLexicons()
 	//if err != nil {
 	//	log.Fatalf("Failed to list lexicons : %v\n", err)
 	//}
 
 	// (1) check schema version
-	err := validateSchemaVersion(db)
+	err = validateSchemaVersion(dbm, dbRef)
 	if err != nil {
 		log.Fatalf("Couldn't read validate schema version in file %s : %v\n", sqlDumpFile, err)
 	}
@@ -144,87 +153,136 @@ func printStats(stats dbapi.LexStats, validate bool) error {
 	return nil
 }
 
-func defineDB(dbFile string) (*sql.DB, *dbapi.DBManager) {
-	var db *sql.DB
-	var dbm = dbapi.NewDBManager()
-	var err error
-
-	dbapi.Sqlite3WithRegex()
-	db, err = sql.Open("sqlite3_with_regexp", dbFile)
-	if err != nil {
-		log.Fatalf("Failed to open dbfile %v", err)
-	}
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatalf("Failed to exec PRAGMA call %v", err)
-	}
-	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	if err != nil {
-		log.Fatalf("Failed to exec PRAGMA call %v", err)
-	}
-	_, err = db.Exec("PRAGMA journal_mode=WAL")
-	if err != nil {
-		log.Fatalf("Failed to exec PRAGMA call %v", err)
-	}
-
-	dbName := filepath.Base(dbFile)
-	var extension = filepath.Ext(dbName)
-	dbName = dbName[0 : len(dbName)-len(extension)]
-	dbRef := lex.DBRef(dbName)
-	err = dbm.AddDB(dbRef, db)
-	if err != nil {
-		log.Fatalf("Failed to add db: %v", err)
-	}
-	return db, dbm
-}
-
 func main() {
+	var cmdName = "importSql"
 
-	if len(os.Args) != 3 {
+	var engineFlag = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
+	var sqliteFolder = flag.String("sqlite_folder", "", "")
+	var mariaDBUser = flag.String("mariadb_user", "speechoid", "")
+	var mariaDBHost = flag.String("mariadb_host", "localhost", "")
+	var mariaDBPort = flag.String("mariadb_port", "3306", "")
+	var mariaDBProtocol = flag.String("mariadb_protocol", "tcp", "")
+	var dbName = flag.String("db_name", "", "db name")
+
+	var fatalError = false
+	var dieIfEmptyFlag = func(name string, val *string) {
+		if *val == "" {
+			fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] flag %s is required", cmdName, name))
+			fatalError = true
+		}
+	}
+
+	var printUsage = func() {
 		fmt.Fprintf(os.Stderr, `USAGE:
-      importSql <SQL DUMP FILE> <NEW DB FILE>
+      importSql [FLAGS] <SQL DUMP FILE>
 
       <SQL DUMP FILE> - sql dump of a lexicon database (.sql or .sql.gz)
-      <NEW DB FILE>   - new (non-existing) db file to import into (<DBNAME>.db)
      
      SAMPLE INVOCATION:
-       importSql [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.sql.gz sv_se_nst_lex.db
+       importSql go run . -db_engine mariadb -mariadb_user speechoid -mariadb_host 127.0.0.1 -db_name testfest swe030224NST.pron-ws.utf8.mariadb.sql.gz
 
 `)
+		flag.PrintDefaults()
+
+		// <NEW DB FILE>   - new (non-existing) db file to import into (<DBNAME>.db)
+	}
+
+	flag.Parse()
+
+	if len(flag.Args()) != 1 {
+		printUsage()
 		os.Exit(1)
 	}
 
-	var sqlDumpFile = os.Args[1]
-	var dbFile = os.Args[2]
+	dieIfEmptyFlag("db_engine", engineFlag)
+	dieIfEmptyFlag("db_name", dbName)
+	if fatalError {
+		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
+		os.Exit(1)
+	}
+
+	var sqlDumpFile = flag.Args()[0]
+
+	var dbm *dbapi.DBManager
+	var dbLocation string
+	if *engineFlag == "mariadb" {
+		dbm = dbapi.NewMariaDBManager()
+		dieIfEmptyFlag("mariadb_user", mariaDBUser)
+		dieIfEmptyFlag("mariadb_host", mariaDBHost)
+		dieIfEmptyFlag("mariadb_port", mariaDBPort)
+		dieIfEmptyFlag("mariadb_protocol", mariaDBProtocol)
+		dbLocation = fmt.Sprintf("%s:@%s(%s:%s)", *mariaDBUser, *mariaDBProtocol, *mariaDBHost, *mariaDBPort) // "speechoid:@tcp(127.0.0.1:3306)
+	} else if *engineFlag == "sqlite" {
+		dbm = dbapi.NewSqliteDBManager()
+		dieIfEmptyFlag("sqlite_folder", sqliteFolder)
+		dbLocation = *sqliteFolder
+	} else {
+		fmt.Fprintf(os.Stderr, "invalid db engine : %s\n", *engineFlag)
+		os.Exit(1)
+	}
+	if fatalError {
+		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
+		os.Exit(1)
+	}
 
 	log.Printf("Input file: %s\n", sqlDumpFile)
-	log.Printf("Output db: %s\n", dbFile)
+	log.Printf("Output db: %s\n", *dbName)
 
-	_, err := os.Stat(sqlDumpFile)
+	dbExists, err := dbm.DBExists(dbLocation, lex.DBRef(*dbName))
 	if err != nil {
-		log.Fatalf("Input file does not exist : %v\n", err)
+		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] %v", cmdName, err))
+		os.Exit(1)
+	}
+	if dbExists {
+		log.Fatalf("Cannot import sql dump into pre-existing database. Db already exists: %s\n", *dbName)
 	}
 
-	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-		log.Fatalf("Cannot import sql dump into pre-existing database. Db file already exists: %s\n", dbFile)
-	}
+	// _, err := os.Stat(sqlDumpFile)
+	// if err != nil {
+	// 	log.Fatalf("Input file does not exist : %v\n", err)
+	// }
 
-	/* #nosec G204 */
-	sqliteCmd := exec.Command(sqlitePath, dbFile)
-	stdin := sqlDumpFile
-	sqliteCmd.Stdin = getFileReader(stdin)
-	var sqliteOut bytes.Buffer
-	sqliteCmd.Stdout = &sqliteOut
-	sqliteCmd.Stderr = os.Stderr
-	err = sqliteCmd.Run()
-	if len(sqliteOut.String()) > 0 {
-		log.Println(sqliteOut.String())
-	}
-	if err != nil {
-		log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, dbFile, err)
-	}
+	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+	// 	log.Fatalf("Cannot import sql dump into pre-existing database. Db file already exists: %s\n", dbFile)
+	// }
 
-	log.Printf("Imported %s into db %s\n", sqlDumpFile, dbFile)
+	if dbm.Engine() == dbapi.Sqlite {
+		execPath := sqlitePath
+		dbFile := path.Join(dbLocation, *dbName+".db")
+		/* #nosec G204 */
+		cmd := exec.Command(execPath, dbFile)
+		stdin := sqlDumpFile
+		cmd.Stdin = getFileReader(stdin)
+		var cmdOut bytes.Buffer
+		cmd.Stdout = &cmdOut
+		cmd.Stderr = os.Stderr
+		err = cmd.Run()
+		if len(cmdOut.String()) > 0 {
+			log.Println(cmdOut.String())
+		}
+		if err != nil {
+			log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, *dbName, err)
+		}
 
-	runPostTests(dbFile, sqlDumpFile)
+	} else if dbm.Engine() == dbapi.MariaDB {
+		// - LOAD:  gunzip -c <dumpFile> | mysql -u speechoid -h <dbHost> <dbName>
+		execPath := mariaDBPath
+		/* #nosec G204 */
+		cmd := exec.Command(execPath, "-u", *mariaDBUser, "-h", *mariaDBHost, "--port", *mariaDBPort, "--protocol", *mariaDBProtocol, "--database", *dbName)
+		stdin := sqlDumpFile
+		cmd.Stdin = getFileReader(stdin)
+		var cmdOut bytes.Buffer
+		cmd.Stdout = &cmdOut
+		cmd.Stderr = os.Stderr
+		err = cmd.Run()
+		if len(cmdOut.String()) > 0 {
+			log.Println(cmdOut.String())
+		}
+		if err != nil {
+			log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, *dbName, err)
+		}
+	}
+	log.Printf("Imported %s into db %s\n", sqlDumpFile, *dbName)
+
+	runPostTests(dbm, dbLocation, lex.DBRef(*dbName), sqlDumpFile)
 }

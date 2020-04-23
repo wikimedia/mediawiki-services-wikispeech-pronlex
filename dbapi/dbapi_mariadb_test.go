@@ -51,24 +51,25 @@ func execSchemaMariadb(db *sql.DB) (sql.Result, error) {
 	return res, err
 }
 
-func Test_listMariaDBLexiconDatabases(t *testing.T) {
+// cannot test this, we can add other databases anytime... and then the test won't work
+// func Test_listMariaDBLexiconDatabases(t *testing.T) {
 
-	exp := []lex.DBRef{
-		"lexserver_testdb",
-	}
+// 	exp := []lex.DBRef{
+// 		"lexserver_testdb",
+// 	}
 
-	loc := "speechoid:@tcp(127.0.0.1:3306)"
-	res, err := mariaDBIF{}.listLexiconDatabases(loc)
+// 	loc := "speechoid:@tcp(127.0.0.1:3306)"
+// 	res, err := mariaDBIF{}.listLexiconDatabases(loc)
 
-	if err != nil {
-		t.Errorf("open db failed : %v", err)
-	}
+// 	if err != nil {
+// 		t.Errorf("open db failed : %v", err)
+// 	}
 
-	if !reflect.DeepEqual(exp, res) {
-		t.Errorf("Got: %v Wanted: %v", res, exp)
-	}
+// 	if !reflect.DeepEqual(exp, res) {
+// 		t.Errorf("Got: %v Wanted: %v", res, exp)
+// 	}
 
-}
+// }
 
 func Test_insertEntries(t *testing.T) {
 

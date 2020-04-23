@@ -47,6 +47,11 @@ func ParseLexRef(fullLexName string) (LexRef, error) {
 	return NewLexRef(db, lex), nil
 }
 
+// NewDBRef creates a database reference from input (downcased) strings
+func NewDBRef(dbName string) DBRef {
+	return DBRef(strings.ToLower(strings.TrimSpace(dbName)))
+}
+
 // NewLexRef creates a lexicon reference from input (downcased) strings
 func NewLexRef(lexDB string, lexName string) LexRef {
 	return LexRef{DBRef: DBRef(strings.ToLower(strings.TrimSpace(lexDB))),

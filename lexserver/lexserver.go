@@ -513,20 +513,20 @@ func deleteWebSocketClient(id string) {
 	webSocks.Unlock()
 }
 
-func messageToClientWebSock(clientUUID string, msg string) {
-	if strings.TrimSpace(clientUUID) != "" {
-		webSocks.Lock()
-		if ws, ok := webSocks.clients[clientUUID]; ok {
-			err := websocket.Message.Send(ws, msg)
-			log.Printf("websocket send error : %v", err)
-		} else {
-			log.Printf("messageToClientWebSock called with unknown UUID string '%s'", clientUUID)
-		}
-		webSocks.Unlock()
-	} else {
-		log.Printf("messageToClientWebSock called with empty UUID string and message '%s'", msg)
-	}
-}
+// func messageToClientWebSock(clientUUID string, msg string) {
+// 	if strings.TrimSpace(clientUUID) != "" {
+// 		webSocks.Lock()
+// 		if ws, ok := webSocks.clients[clientUUID]; ok {
+// 			err := websocket.Message.Send(ws, msg)
+// 			log.Printf("websocket send error : %v", err)
+// 		} else {
+// 			log.Printf("messageToClientWebSock called with unknown UUID string '%s'", clientUUID)
+// 		}
+// 		webSocks.Unlock()
+// 	} else {
+// 		log.Printf("messageToClientWebSock called with empty UUID string and message '%s'", msg)
+// 	}
+// }
 
 func webSockRegHandler(ws *websocket.Conn) {
 	var id string
@@ -792,7 +792,10 @@ func createServer(port string) (*http.Server, error) {
 	var err error // återanvänds för alla fel
 
 	log.Print("lexserver: loading dbs from location ", *dbLocation)
-	dbm.FirstTimePopulateDBCache(*dbLocation)
+	err = dbm.FirstTimePopulateDBCache(*dbLocation)
+	if err != nil {
+		return s, err
+	}
 	// err = loadValidators(symbolSetFileArea)
 	// if err != nil {
 	// 	return s, fmt.Errorf("failed to load validators : %v", err)

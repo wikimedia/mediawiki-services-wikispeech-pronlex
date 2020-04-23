@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"reflect"
 	//"regexp"
+	//	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -2421,6 +2422,52 @@ func (mdb mariaDBIF) validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, e
 
 }
 
+// func (mdb mariaDBIF) isLexiconDB(dbLocation string, dbRef lex.DBRef) (bool, error) {
+// 	db, err := sql.Open("mysql", path.Join(dbLocation, string(dbRef)))
+// 	if err != nil {
+// 		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
+// 		if db != nil {
+// 			err2 := db.Close()
+// 			if err2 != nil {
+// 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+// 			}
+// 		}
+// 		return false, fmt.Errorf(msg)
+// 	}
+
+// 	defer db.Close()
+
+// 	rows, err := db.Query("show tables")
+// 	defer rows.Close()
+// 	if err != nil {
+// 		return false, fmt.Errorf("failed to list tables : %v", err)
+// 	}
+// 	for rows.Next() {
+// 		var db string
+// 		err = rows.Scan(&db)
+// 		if err != nil {
+// 			return false, fmt.Errorf("scanning row failed : %v", err)
+// 		}
+// 		if db == string(dbRef) {
+// 			return true, nil
+// 		}
+// 	}
+// 	return false, nil
+// }
+
+func (mdb mariaDBIF) isLexiconDatabase(dbTables []string) bool {
+	foundSchemaVersionTable := false
+	foundLexiconTable := false
+	for _, tbl := range dbTables {
+		if tbl == "SchemaVersion" {
+			foundSchemaVersionTable = true
+		} else if tbl == "Lexicon" {
+			foundLexiconTable = true
+		}
+	}
+	return foundSchemaVersionTable && foundLexiconTable
+}
+
 func (mdb mariaDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, error) {
 	log.Print("dbapi_mariadb: loading dbs from location ", dbLocation)
 
@@ -2456,34 +2503,31 @@ func (mdb mariaDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, error
 			dbsTmp = append(dbsTmp, db)
 		}
 	}
+
 	for _, dbName := range dbsTmp {
+		tables := []string{}
 
 		_, err = db.Exec(fmt.Sprintf("use %s", dbName))
 		if err != nil {
-			return res, fmt.Errorf("failed to list databases : %v", err)
+			return res, fmt.Errorf("failed to use database %s : %v", dbName, err)
 		}
 		tbRows, err := db.Query("show tables")
 		defer tbRows.Close()
 		if err != nil {
-			return res, fmt.Errorf("failed to list databases : %v", err)
+			return res, fmt.Errorf("failed to show tables : %v", err)
 		}
-		foundSchemaVersionTable := false
-		foundLexiconTable := false
 		for tbRows.Next() {
 			var tbl string
 			err = tbRows.Scan(&tbl)
 			if err != nil {
 				return res, fmt.Errorf("scanning row failed : %v", err)
 			}
-			if tbl == "SchemaVersion" {
-				foundSchemaVersionTable = true
-			} else if tbl == "Lexicon" {
-				foundLexiconTable = true
-			}
+			tables = append(tables, tbl)
 		}
-		if foundSchemaVersionTable && foundLexiconTable {
+		if mdb.isLexiconDatabase(tables) {
 			res = append(res, lex.DBRef(dbName))
 		}
+
 	}
 
 	log.Printf("dbapi_mariadb: loaded %v db(s)", len(res))
@@ -2529,7 +2573,6 @@ func (mdb mariaDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error)
 }
 
 func (mbd mariaDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
-
 	dbPath := filepath.Join(dbLocation, string(dbRef))
 
 	db, err := sql.Open("mysql", dbPath)
@@ -2557,4 +2600,66 @@ func (mbd mariaDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
 		}
 	}
 	return nil
+}
+
+func (mdb mariaDBIF) dbExists(dbLocation string, dbRef lex.DBRef) (bool, error) {
+	dbName := string(dbRef)
+	db, err := sql.Open("mysql", dbLocation+"/")
+	if err != nil {
+		msg := fmt.Sprintf("dbapi_mariadb: failed to open db : %v", err)
+		if db != nil {
+			err2 := db.Close()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
+			}
+		}
+		return false, fmt.Errorf(msg)
+	}
+
+	defer db.Close()
+
+	rows, err := db.Query("show databases")
+	defer rows.Close()
+	if err != nil {
+		return false, fmt.Errorf("failed to list databases : %v", err)
+	}
+	dbFound := false
+	for rows.Next() {
+		var db string
+		err = rows.Scan(&db)
+		if err != nil {
+			return false, fmt.Errorf("scanning row failed : %v", err)
+		}
+		if db == dbName {
+			dbFound = true
+		}
+	}
+	if !dbFound {
+		return false, nil
+	}
+
+	// db found, but does it have the right tables?
+	tables := []string{}
+
+	_, err = db.Exec(fmt.Sprintf("use %s", dbName))
+	if err != nil {
+		return false, fmt.Errorf("failed to use database %s : %v", dbName, err)
+	}
+	tbRows, err := db.Query("show tables")
+	defer tbRows.Close()
+	if err != nil {
+		return false, fmt.Errorf("failed to list tables : %v", err)
+	}
+	for tbRows.Next() {
+		var tbl string
+		err = tbRows.Scan(&tbl)
+		if err != nil {
+			return false, fmt.Errorf("scanning row failed : %v", err)
+		}
+		tables = append(tables, tbl)
+	}
+	if mdb.isLexiconDatabase(tables) {
+		return true, nil
+	}
+	return false, nil
 }

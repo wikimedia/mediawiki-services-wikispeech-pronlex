@@ -79,39 +79,39 @@ func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 */
 
 // TODO remove
-func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
-	var res []string
+// func listNamesOfTriggersTx(tx *sql.Tx) ([]string, error) {
+// 	var res []string
 
-	q := "select name from sqlite_master where type = 'trigger'"
-	rows, err := tx.Query(q)
-	if err != nil {
-		msg := fmt.Sprintf("dbapi.listNamesOfTriggersTx : %v", err)
+// 	q := "select name from sqlite_master where type = 'trigger'"
+// 	rows, err := tx.Query(q)
+// 	if err != nil {
+// 		msg := fmt.Sprintf("dbapi.listNamesOfTriggersTx : %v", err)
 
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
+// 		err2 := tx.Rollback()
+// 		if err2 != nil {
+// 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+// 		}
 
-		log.Print(msg)
-		return res, fmt.Errorf(msg)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var name string
-		err = rows.Scan(&name)
-		if err != nil {
-			msg := fmt.Sprintf("dbapi.listNamesOfTriggers : %v", err)
-			err2 := tx.Rollback()
-			if err2 != nil {
-				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-			}
-			return res, fmt.Errorf(msg)
-		}
-		res = append(res, name)
-	}
+// 		log.Print(msg)
+// 		return res, fmt.Errorf(msg)
+// 	}
+// 	defer rows.Close()
+// 	for rows.Next() {
+// 		var name string
+// 		err = rows.Scan(&name)
+// 		if err != nil {
+// 			msg := fmt.Sprintf("dbapi.listNamesOfTriggers : %v", err)
+// 			err2 := tx.Rollback()
+// 			if err2 != nil {
+// 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+// 			}
+// 			return res, fmt.Errorf(msg)
+// 		}
+// 		res = append(res, name)
+// 	}
 
-	return res, nil
-}
+// 	return res, nil
+// }
 
 type sqliteDBIF struct{}
 
@@ -2740,11 +2740,10 @@ func (sdb sqliteDBIF) dropDB(dbLocation string, dbRef lex.DBRef) error {
 	return nil
 }
 
-// func (sdb sqliteDBIF) dbExists(dbLocation string, dbRef lex.DBRef) (bool, error) {
-
-// 	dbPath := filepath.Join(dbLocation, string(dbRef)+".db")
-// 	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
-// 		return false, nil
-// 	}
-// 	return true, nil
-// }
+func (sdb sqliteDBIF) dbExists(dbLocation string, dbRef lex.DBRef) (bool, error) {
+	dbPath := filepath.Join(dbLocation, string(dbRef)+".db")
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, nil
+}

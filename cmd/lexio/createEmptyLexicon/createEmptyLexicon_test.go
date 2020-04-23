@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -16,17 +17,19 @@ func TestProperCloseDontRemoveLockFilesSqlite(t *testing.T) {
 
 	// 1. SETUP
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-A")
+	fmt.Printf("TMPDIR: %s\n", tmpDir)
 	//defer os.RemoveAll(tmpDir)
 	if err != nil {
 		t.Errorf("didn't expect error here, found : %v", err)
 		return
 	}
 
-	dbRef := lex.DBRef("createEmptyLexicon1")
+	dbName := "createEmptyLexicon2"
 	lexName := "lex_test1"
 	ssName := "ss_test1"
 	locale := "en_US"
-	lexRefX := lex.NewLexRefWithInfo(string(dbRef), lexName, ssName)
+	lexRefX := lex.NewLexRefWithInfo(dbName, lexName, ssName)
+	dbRef := lexRefX.LexRef.DBRef
 	closeAfter := true
 	createDB := true // if not exists
 
@@ -38,19 +41,6 @@ func TestProperCloseDontRemoveLockFilesSqlite(t *testing.T) {
 	}
 
 	// 3. DO NOT REMOVE shm/wal FILES
-	dbPath := path.Join(tmpDir, string(dbRef)+".db")
-	walFile := dbPath + "-wal"
-	shmFile := dbPath + "-shm"
-	err = os.RemoveAll(walFile)
-	if err != nil {
-		t.Errorf("didn't expect error here, found : %v", err)
-		return
-	}
-	err = os.RemoveAll(shmFile)
-	if err != nil {
-		t.Errorf("didn't expect error here, found : %v", err)
-		return
-	}
 
 	// 4. OPEN THE SAME DB
 	createDB = false
@@ -66,17 +56,19 @@ func TestProperCloseRemoveLockFilesSqlite(t *testing.T) {
 
 	// 1. SETUP
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-B")
-	defer os.RemoveAll(tmpDir)
+	//fmt.Printf("TMPDIR: %s\n", tmpDir)
+	//defer os.RemoveAll(tmpDir)
 	if err != nil {
 		t.Errorf("didn't expect error here, found : %v", err)
 		return
 	}
 
-	dbRef := lex.DBRef("createEmptyLexicon2")
+	dbName := "createEmptyLexicon2"
 	lexName := "lex_test1"
 	ssName := "ss_test1"
 	locale := "en_US"
-	lexRefX := lex.NewLexRefWithInfo(string(dbRef), lexName, ssName)
+	lexRefX := lex.NewLexRefWithInfo(dbName, lexName, ssName)
+	dbRef := lexRefX.LexRef.DBRef
 	closeAfter := false
 	createDB := true // if not exists
 
