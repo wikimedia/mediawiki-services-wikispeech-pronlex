@@ -12,8 +12,8 @@ env:
  - RELEASE=master SLEEP=60
  - RELEASE=master SLEEP=60 DO_IMPORT=1
 
-install:
- - sudo apt-get install mariadb-server mariadb-server-10.1
+addons:
+  mariadb: '10.0'
 
 script:
  - set -e
