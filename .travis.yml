@@ -9,8 +9,11 @@ notifications:
     on_failure: change
 
 env:
- - RELEASE=schemaversion_3.1 SLEEP=60
- - RELEASE=schemaversion_3.1 SLEEP=60 DO_IMPORT=1
+ - RELEASE=master SLEEP=60
+ - RELEASE=master SLEEP=60 DO_IMPORT=1
+
+install:
+ - sudo apt-get install mariadb
 
 script:
  - set -e
@@ -24,7 +27,7 @@ script:
 
  - | 
    if [ -v DO_IMPORT ]; then
-     bash install/import.sh lexdata /tmp/appdir schemaversion_3.1 || bash install/import.sh lexdata /tmp/appdir master
+     bash install/import.sh lexdata /tmp/appdir master
    fi
    
  - bash install/start_server.sh -a /tmp/appdir &
