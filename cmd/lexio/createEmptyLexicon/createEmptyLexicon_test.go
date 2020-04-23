@@ -16,7 +16,7 @@ func TestProperCloseDontRemoveLockFilesSqlite(t *testing.T) {
 
 	// 1. SETUP
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-A")
-	defer os.RemoveAll(tmpDir)
+	//defer os.RemoveAll(tmpDir)
 	if err != nil {
 		t.Errorf("didn't expect error here, found : %v", err)
 		return
