@@ -24,12 +24,13 @@ script:
  - go get honnef.co/go/tools/cmd/staticcheck
  - staticcheck ./...
  - bash install/setup.sh /tmp/appdir
+ - sudo mysql -u root < dbapi/mariadb_setup.sql
 
  - | 
    if [ -v DO_IMPORT ]; then
      bash install/import.sh lexdata /tmp/appdir master
    fi
-   
+
  - bash install/start_server.sh -a /tmp/appdir &
  - export pid=$!
  - echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shutting down"
