@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -17,8 +16,8 @@ func TestProperCloseDontRemoveLockFilesSqlite(t *testing.T) {
 
 	// 1. SETUP
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-A")
-	fmt.Printf("TMPDIR: %s\n", tmpDir)
-	//defer os.RemoveAll(tmpDir)
+	//fmt.Printf("TMPDIR: %s\n", tmpDir)
+	defer os.RemoveAll(tmpDir)
 	if err != nil {
 		t.Errorf("didn't expect error here, found : %v", err)
 		return
@@ -57,7 +56,7 @@ func TestProperCloseRemoveLockFilesSqlite(t *testing.T) {
 	// 1. SETUP
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "pronlex-tmp-B")
 	//fmt.Printf("TMPDIR: %s\n", tmpDir)
-	//defer os.RemoveAll(tmpDir)
+	defer os.RemoveAll(tmpDir)
 	if err != nil {
 		t.Errorf("didn't expect error here, found : %v", err)
 		return
