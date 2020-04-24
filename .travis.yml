@@ -15,7 +15,7 @@ env:
 addons:
   mariadb: '10.0'
 
-services: mariadb
+services: mysql
 
 script:
  - set -e
