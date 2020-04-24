@@ -63,9 +63,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
    `pronlex$ bash scripts/setup.sh -a <application folder> -e <db engine> -l <db location>*`   
    Example:     
-   `pronlex$ bash scritps/setup.sh -a ~/wikispeech/sqlite -e sqlite`    
+   `pronlex$ bash scripts/setup.sh -a ~/wikispeech/sqlite -e sqlite`    
    Usage info:      
-   `pronlex$ bash scritps/setup.sh -h`
+   `pronlex$ bash scripts/setup.sh -h`
 
    Sets up the pronlex server using the specified database engine and specified location, and a set of test data. The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
 
