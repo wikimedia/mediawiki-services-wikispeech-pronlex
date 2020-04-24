@@ -62,9 +62,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 1. Setup the pronlex server:
 
    `pronlex$ bash scripts/setup.sh -a <application folder> -e <db engine> -l <db location>*`   
-   Example: 
+   Example:     
    `pronlex$ bash scritps/setup.sh -a ~/wikispeech/sqlite -e sqlite`    
-   Usage info: 
+   Usage info:      
    `pronlex$ bash scritps/setup.sh -h`
 
    Sets up the pronlex server using the specified database engine and specified location, and a set of test data. The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
@@ -73,7 +73,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 2. Import lexicon data (optional)
 
    `pronlex$ bash scripts/import.sh -a <application folder> -e <db engine> -l <db location>* -f <lexdata git> `    
-   Example: 
+   Example:      
    `pronlex$ bash scripts/import.sh -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/lexdata`   
 
    Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
