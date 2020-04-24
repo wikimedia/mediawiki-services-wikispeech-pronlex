@@ -104,7 +104,7 @@ initial_setup() {
 	echo "[$CMD] Application folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
-    if [ -f $APPDIR/lexserver_testdb.db ] ; then
+    if [ -f $APPDIR/speechoid_lexserver_testdb.db ] ; then
 	echo "[$CMD] Application folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
@@ -127,6 +127,10 @@ initial_setup() {
     cp $DEMOFILES/*.cnv $SS_FILES/ || exit 1
     cp $DEMOFILES/mappers.txt $SS_FILES/ || exit 1
 
+    if [ $GOBINARIES -e 1 ]; then
+	cd $PRONLEXPATH/lexserver && go build && cd -
+    fi
+    
     cp -r $PRONLEXPATH/lexserver/static $APPDIR || exit 1
 
     cp $PRONLEXPATH/scripts/import.sh $APPDIR || exit 1
@@ -161,7 +165,7 @@ cd $SCRIPTDIR/..
 
 
 if [ $DBENGINE == "mariadb" ]; then
-    sudo mysql -u root < mariadb_setup.sql
+    sudo mysql -u root < $SCRIPTDIR/mariadb_setup.sql
     sudo mysql -u root -e "create database $LEXDB ; GRANT ALL PRIVILEGES ON $LEXDB.* TO 'speechoid'@'localhost' "
 fi
 if run_go_command createEmptyDB -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB ; then
@@ -214,6 +218,8 @@ fi
 echo "[$CMD] Clearing lexdata cache" >&2
 rm -fr $APPDIR/lexdata.git
 
+
+## INVOCATION TIPS
 if [ $DBENGINE == "sqlite" ]; then
     invocation_args="-e $DBENGINE -a $APPDIR"
     else
