@@ -141,7 +141,6 @@ initial_setup() {
 function run_go_command {
     cmd=$1
     args=${@:2}
-    echo $args
     if [ $GOBINARIES -eq 1 ]; then
 	$cmd $args
     else

@@ -119,7 +119,7 @@ fi
 
 
 echo "[$CMD] OPTIONS:" >&2
-echo "[$CMD] applciation folder: $APPDIR" >&2
+echo "[$CMD] application folder: $APPDIR" >&2
 echo "[$CMD] db engine: $DBENGINE" >&2
 echo "[$CMD] db location: $DBLOCATION" >&2
 echo "[$CMD] lexserver port: $PORT" >&2
