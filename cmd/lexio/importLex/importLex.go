@@ -89,8 +89,9 @@ FLAGS:
 
 		fmt.Fprintf(os.Stderr, `
 SAMPLE INVOCATION:
-  importLex -validate sqlite ~/wikispeech/ pronlex sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym
-  importLex -validate mariadb 'speechoid:@tcp(127.0.0.1:3306)' pronlex sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym
+  importLex -db_engine mariadb -db_location 'speechoid:@tcp(127.0.0.1:3306)' -lex_name sv-se.nst -locale sv_SE -lex_file [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz -db_name svtest -symbolset [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym 
+  importLex -db_engine sqlite -db_location ~/wikispeech/sqlite -lex_name sv-se.nst -locale sv_SE -lex_file [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz -db_name svtest -symbolset [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym 
+
 `)
 	}
 
@@ -218,7 +219,9 @@ SAMPLE INVOCATION:
 		// 	log.Printf("Deleted lexicon %s\n", lexRef)
 
 		// } else {
-		log.Fatalf("Nothing will be added. Lexicon already exists in database: %s. Use the -replace switch if you want to replace the old lexicon.", lexRef)
+		//log.Fatalf("Nothing will be added. Lexicon already exists in database: %s. Use the -replace switch if you want to replace the old lexicon.", lexRef)
+		//return
+		log.Fatalf("Nothing will be added. Lexicon already exists in database: %s.", lexRef)
 		return
 		// }
 	}

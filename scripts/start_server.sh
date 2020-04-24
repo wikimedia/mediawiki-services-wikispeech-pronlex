@@ -23,7 +23,7 @@ print_help(){
 USAGE bash $CMD [options]
 
 Options:
-  -h print help/options
+  -h print help/options and exit
   -H call $GOCMD help and exit
   -e db engine (required)
   -a application folder (required)
@@ -36,8 +36,8 @@ Options:
      $TESTONLY: exit after tests
 
 EXAMPLE INVOCATIONS:
- bash $0 -e sqlite -l ~/wikispeech/
- bash $0 -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+ bash $0 -a ~/wikispeech/sqlite -e sqlite
+ bash $0 -a ~/wikispeech/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
 " >&2
 }
 
@@ -86,12 +86,12 @@ while getopts "hHbt:p:l:e:a:" opt; do
 done
 
 if [ -z "$DBENGINE" ] ; then
-    echo "[$CMD] DBENGINE must be specified using -e" >&2
+    echo "[$CMD] db engine must be specified using -e" >&2
     print_help
     exit 1
 fi
 if [ -z "$APPDIR" ] ; then
-    echo "[$CMD] APPDIR must be specified using -a" >&2
+    echo "[$CMD] application folder must be specified using -a" >&2
     print_help
     exit 1
 fi
@@ -99,7 +99,7 @@ if [ -z "$DBLOCATION" ] ; then
     if [ $DBENGINE == "sqlite" ]; then
 	DBLOCATION=$APPDIR
     else
-	echo "[$CMD] DBLOCATION must be specified using -l" >&2
+	echo "[$CMD] db location must be specified using -l" >&2
 	print_help
 	exit 1
     fi

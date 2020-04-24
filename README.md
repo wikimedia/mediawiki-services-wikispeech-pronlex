@@ -59,29 +59,32 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 ### III: Server setup
 
-1. Setup the pronlex server
+1. Setup the pronlex server:
 
-   `pronlex$ bash scripts/setup.sh <APPDIR>`   
-   Example:
-   `pronlex$ bash scritps/setup.sh ~/wikispeech`
+   `pronlex$ bash scripts/setup.sh -a <application folder> -e <db engine> -l <db location>*`   
+   Example:     
+   `pronlex$ bash scritps/setup.sh -a ~/wikispeech/sqlite -e sqlite`    
+   Usage info:     
+   `pronlex$ bash scritps/setup.sh -h`
 
-   Sets up the pronlex server and a set of test data in the folder specified by `<APPDIR>`.
+   Sets up the pronlex server using the specified database engine and specified location, and a set of test data. The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
 
 
 2. Import lexicon data (optional)
 
-   `pronlex$ bash scripts/import.sh <LEXDATA-GIT> <APPDIR>`   
-   Example:
-   `pronlex$ bash scripts/import.sh ~/git_repos/lexdata ~/wikispeech` 
+   `pronlex$ bash scripts/import.sh -a <application folder> -e <db engine> -l <db location>* -f <lexdata git> `    
+   Example:    
+   `pronlex$ bash scripts/import.sh -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/lexdata`   
 
    Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
-If the `<LEXDATA-GIT>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
+If the `<lexdata git>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
+The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
 
    If you want to import other lexicon data, or just a subset of the data above, you can use one of the following methods:
    
    * Import lexicon files using the lexserver web API (http://localhost:8787/admin/lex_import_page if you have a running lexicon server on localhost)
-   * Import lexicon files from the command line using this import script: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
-   * Import database sql dumps files from the command line using this import script: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
+   * Import lexicon files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
+   * Import database sql dumps files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
 
 
 You can create your own lexicon files, or you can use existing data in the [lexdata repository](https://github.com/stts-se/lexdata). The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
@@ -89,17 +92,13 @@ You can create your own lexicon files, or you can use existing data in the [lexd
 
 ### IV. Start the lexicon server
 
-The server is started using this script
+The server is started using this script:
 
-`pronlex$ bash scripts/start_server.sh -a <APPDIR>`
+`pronlex$ bash scripts/start_server.sh -e <db engine> -l <db location> -a <application folder>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
 When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
-
-To specify port, run:   
-`pronlex$ bash scripts/start_server.sh -a <APPDIR> -p <PORT>`
-
 
 For a complete set of options, run:  
 `pronlex$ bash scripts/start_server.sh -h`

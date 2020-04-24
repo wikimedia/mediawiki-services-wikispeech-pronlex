@@ -154,6 +154,8 @@ func printStats(stats dbapi.LexStats, validate bool) error {
 }
 
 func main() {
+	dbapi.Sqlite3WithRegex()
+
 	var cmdName = "importSql"
 
 	var engineFlag = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
@@ -172,7 +174,7 @@ func main() {
 		}
 	}
 
-	var printUsage = func() {
+	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, `USAGE:
       importSql [FLAGS] <SQL DUMP FILE>
 
@@ -190,7 +192,7 @@ func main() {
 	flag.Parse()
 
 	if len(flag.Args()) != 1 {
-		printUsage()
+		flag.Usage()
 		os.Exit(1)
 	}
 

@@ -1,16 +1,37 @@
    
    
      $ go run importLex.go 
-     
+          
      USAGE:
-      importLex <FLAGS> <DB FILE> <LEXICON NAME> <LOCALE> <LEXICON FILE> <SYMBOLSET NAME> <SYMBOLSET FOLDER>
+      importLex [FLAGS]
      
      FLAGS:
-        -validate bool  validate each entry, and save the validation in the database (default: false)
-        -force    bool  force loading of lexicon even if the symbolset is undefined (default: false)
-        -replace  bool  if the lexicon already exists, delete it before importing the new input data (default: false)
-        -quiet    bool  mute information logging (default: false)
-        -help     bool  print help message
+       -createdb
+         	create db if it doesn't exist
+       -db_engine string
+         	db engine (sqlite or mariadb) (default "sqlite")
+       -db_location string
+         	db location (folder for sqlite; address for mariadb)
+       -db_name string
+         	db name
+       -force
+         	force loading of lexicon even if the symbolset is undefined (default: false)
+       -help
+         	print help message
+       -lex_file string
+         	lexicon file
+       -lex_name string
+         	lexicon name
+       -locale string
+         	lexicon locale
+       -quiet
+         	mute information logging (default: false)
+       -symbolset string
+         	lexicon symbolset file
+       -validate
+         	validate each entry, and save the validation in the database (default: false)
      
      SAMPLE INVOCATION:
-       importLex -validate pronlex.db sv-se.nst sv_SE [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz sv-se_ws-sampa [SYMBOLSET FOLDER]
+       importLex -db_engine mariadb -db_location 'speechoid:@tcp(127.0.0.1:3306)' -lex_name sv-se.nst -locale sv_SE -lex_file [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz -db_name svtest -symbolset [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym 
+       importLex -db_engine sqlite -db_location ~/wikispeech/sqlite -lex_name sv-se.nst -locale sv_SE -lex_file [LEX FILE FOLDER]/swe030224NST.pron-ws.utf8.gz -db_name svtest -symbolset [SYMBOLSET FOLDER]/sv-se_ws-sampa.sym 
+     

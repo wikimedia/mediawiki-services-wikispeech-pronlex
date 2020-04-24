@@ -13,15 +13,15 @@ print_help() {
 USAGE: bash $CMD [options]
 
 Options:
-  -h print help/options
+  -h print help/options and exit
   -e db engine (required)
   -a application folder (required)
   -l db location (required for mariadb; for sqlite default is application folder)
   -b use go binaries (optional, as opposed to 'go run' with source code)
 
 EXAMPLE INVOCATIONS:
- bash $0 -e sqlite -a ~/wikispeech/sqlite
- bash $0 -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -a ~/wikispeech/mariadb
+ bash $0 -a ~/wikispeech/sqlite -e sqlite
+ bash $0 -a ~/wikispeech/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
 
 Setup files will be added to the application folder.
 " >&2
@@ -59,12 +59,12 @@ while getopts "hbe:l:a:" opt; do
 done
 
 if [ -z "$DBENGINE" ] ; then
-    echo "[$CMD] DBENGINE must be specified using -e" >&2
+    echo "[$CMD] db engine must be specified using -e" >&2
     print_help
     exit 1
 fi
 if [ -z "$APPDIR" ] ; then
-    echo "[$CMD] APPDIR must be specified using -a" >&2
+    echo "[$CMD] application folder must be specified using -a" >&2
     print_help
     exit 1
 fi
@@ -72,7 +72,7 @@ if [ -z "$DBLOCATION" ] ; then
     if [ $DBENGINE == "sqlite" ]; then
 	DBLOCATION=$APPDIR
     else
-	echo "[$CMD] DBLOCATION must be specified using -l" >&2
+	echo "[$CMD] db location must be specified using -l" >&2
 	print_help
 	exit 1
     fi
@@ -127,10 +127,6 @@ initial_setup() {
     cp $DEMOFILES/*.cnv $SS_FILES/ || exit 1
     cp $DEMOFILES/mappers.txt $SS_FILES/ || exit 1
 
-    if [ $GOBINARIES -e 1 ]; then
-	cd $PRONLEXPATH/lexserver && go build && cd -
-    fi
-    
     cp -r $PRONLEXPATH/lexserver/static $APPDIR || exit 1
 
     cp $PRONLEXPATH/scripts/import.sh $APPDIR || exit 1
@@ -149,7 +145,6 @@ function run_go_command {
     if [ $GOBINARIES -eq 1 ]; then
 	$cmd $args
     else
-	echo "go run $CMDDIR/$cmd/$cmd.go $args"
 	go run $CMDDIR/$cmd/$cmd.go $args
     fi
 }
@@ -164,7 +159,12 @@ initial_setup
 cd $SCRIPTDIR/..
 
 
+DEFAULT_MARIADB_LOCATION="speechoid:@tcp(127.0.0.1:3306)"
 if [ $DBENGINE == "mariadb" ]; then
+    if [ $DBLOCATION != $DEFAULT_MARIADB_LOCATION ]; then
+	echo "[$CMD] Not not implemented for $DBENGINE location '$DBLOCATION'. Please use '$DEFAULT_MARIADB_LOCATION' or contact a developer to update this script." >&2
+	exit 1
+    fi
     sudo mysql -u root < $SCRIPTDIR/mariadb_setup.sql
     sudo mysql -u root -e "create database $LEXDB ; GRANT ALL PRIVILEGES ON $LEXDB.* TO 'speechoid'@'localhost' "
 fi
@@ -221,9 +221,9 @@ rm -fr $APPDIR/lexdata.git
 
 ## INVOCATION TIPS
 if [ $DBENGINE == "sqlite" ]; then
-    invocation_args="-e $DBENGINE -a $APPDIR"
+    invocation_args="-a $APPDIR -e $DBENGINE"
     else
-    invocation_args="-e $DBENGINE -l '$DBLOCATION' -a $APPDIR"
+    invocation_args="-a $APPDIR -e $DBENGINE -l '$DBLOCATION'"
 fi
 
 echo "
@@ -235,7 +235,7 @@ BUILD COMPLETED! YOU CAN NOW START THE LEXICON SERVER BY INVOKING:
 
 
 OR IMPORT STANDARD LEXICON DATA FROM MASTER BRANCH:
-  $ bash $SCRIPTDIR/import.sh $invocation_args -L <LEXDATA-GIT> master
+  $ bash $SCRIPTDIR/import.sh $invocation_args -f <LEXDATA-GIT>
 
   USAGE INFO:
   $ bash $SCRIPTDIR/import.sh -h
