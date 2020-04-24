@@ -25,12 +25,10 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 3. Install database support
 
-   a. [Sqlite3](https://www.sqlite.org/)
-
+   [Sqlite3](https://www.sqlite.org/)    
       On Linux systems with `apt`, run `sudo apt install sqlite3`
 
-   b. [MariaDB](https://mariadb.org/)
-
+   [MariaDB](https://mariadb.org/)    
       On Linux systems with `apt`, run `sudo apt install mariadb-server` or similar
 
 
