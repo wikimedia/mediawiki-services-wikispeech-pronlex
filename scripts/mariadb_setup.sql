@@ -4,8 +4,8 @@ CREATE USER IF NOT EXISTS 'speechoid'@'localhost';
 -- DROP DATABASE IF EXISTS speechoid_pronlex_test1;
 
 -- lexserver demo db
-CREATE DATABASE lexserver_testdb;
-GRANT ALL PRIVILEGES ON lexserver_testdb.* TO 'speechoid'@'localhost' ;
+CREATE DATABASE speechoid_lexserver_testdb;
+GRANT ALL PRIVILEGES ON speechoid_lexserver_testdb.* TO 'speechoid'@'localhost' ;
 
 -- Test_insertEntries
 CREATE DATABASE speechoid_pronlex_test1;

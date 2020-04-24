@@ -16,12 +16,12 @@ Options:
   -h print help/options
   -e db engine (required)
   -a application folder (required)
-  -l db location (required for mariadb; for sqlite default is appdir)
+  -l db location (required for mariadb; for sqlite default is application folder)
   -b use go binaries (optional, as opposed to 'go run' with source code)
 
 EXAMPLE INVOCATIONS:
- $CMD -e sqlite -a ~/wikispeech/sqlite
- $CMD -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -a ~/wikispeech/mariadb
+ bash $0 -e sqlite -a ~/wikispeech/sqlite
+ bash $0 -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -a ~/wikispeech/mariadb
 
 Setup files will be added to the application folder.
 " >&2
@@ -88,12 +88,12 @@ fi
 
 
 echo "[$CMD] OPTIONS:" >&2
-echo "[$CMD] appdir: $APPDIR" >&2
+echo "[$CMD] application folder: $APPDIR" >&2
 echo "[$CMD] db engine: $DBENGINE" >&2
 echo "[$CMD] db location: $DBLOCATION" >&2
 echo "[$CMD] go binaries: $GOBINARIES" >&2
 
-LEXDB=speechoid_demo
+LEXDB=speechoid_lexserver_demo
 SS_FILES="$APPDIR/symbol_sets"
 DEMOFILES=$PRONLEXPATH/lexserver/demo_files
 CMDDIR="$PRONLEXPATH/cmd/lexio"
@@ -127,6 +127,8 @@ initial_setup() {
     cp $DEMOFILES/*.cnv $SS_FILES/ || exit 1
     cp $DEMOFILES/mappers.txt $SS_FILES/ || exit 1
 
+    cp -r $PRONLEXPATH/lexserver/static $APPDIR || exit 1
+
     cp $PRONLEXPATH/scripts/import.sh $APPDIR || exit 1
     cp $PRONLEXPATH/scripts/start_server.sh $APPDIR || exit 1
 
@@ -143,7 +145,7 @@ function run_go_command {
     if [ $GOBINARIES -eq 1 ]; then
 	$cmd $args
     else
-	#echo "go run $CMDDIR/$cmd/$cmd.go $args"
+	echo "go run $CMDDIR/$cmd/$cmd.go $args"
 	go run $CMDDIR/$cmd/$cmd.go $args
     fi
 }
@@ -159,7 +161,8 @@ cd $SCRIPTDIR/..
 
 
 if [ $DBENGINE == "mariadb" ]; then
-    mysql -u root -e "create database $LEXDB ; GRANT ALL PRIVILEGES ON $LEXDB.* TO 'speechoid'@'localhost' "
+    sudo mysql -u root < mariadb_setup.sql
+    sudo mysql -u root -e "create database $LEXDB ; GRANT ALL PRIVILEGES ON $LEXDB.* TO 'speechoid'@'localhost' "
 fi
 if run_go_command createEmptyDB -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB ; then
     echo "[$CMD] Created empty db $LEXDB @ $DBLOCATION for $DBENGINE" >&2
@@ -211,17 +214,22 @@ fi
 echo "[$CMD] Clearing lexdata cache" >&2
 rm -fr $APPDIR/lexdata.git
 
+if [ $DBENGINE == "sqlite" ]; then
+    invocation_args="-e $DBENGINE -a $APPDIR"
+    else
+    invocation_args="-e $DBENGINE -l '$DBLOCATION' -a $APPDIR"
+fi
 
 echo "
 BUILD COMPLETED! YOU CAN NOW START THE LEXICON SERVER BY INVOKING:
-  $ bash $SCRIPTDIR/start_server.sh -e $DBENGINE -l $DBLOCATION
+  $ bash $SCRIPTDIR/start_server.sh $invocation_args
 
   USAGE INFO:
   $ bash $SCRIPTDIR/start_server.sh -h
 
 
 OR IMPORT STANDARD LEXICON DATA FROM MASTER BRANCH:
-  $ bash $SCRIPTDIR/import.sh -e $DBENGINE -l $DBLOCATION -L <LEXDATA-GIT> master
+  $ bash $SCRIPTDIR/import.sh $invocation_args -L <LEXDATA-GIT> master
 
   USAGE INFO:
   $ bash $SCRIPTDIR/import.sh -h

@@ -32,7 +32,7 @@ var adminListIDs = urlHandler{
 	name:     "list_ids",
 	url:      "/list_ids/{lexicon_name}",
 	help:     "List all IDs for the entries in one lexicon.",
-	examples: []string{"/list_ids/lexserver_testdb:sv"},
+	examples: []string{"/list_ids/speechoid_lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {

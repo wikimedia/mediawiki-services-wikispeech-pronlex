@@ -1,0 +1,15 @@
+DROP DATABASE IF EXISTS speechoid_lexserver_demo;
+DROP DATABASE IF EXISTS speechoid_lexserver_testdb;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;
+DROP DATABASE IF EXISTS speechoid_pronlex_test;

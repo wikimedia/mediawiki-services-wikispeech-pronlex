@@ -26,7 +26,8 @@ Options:
   -h print help/options
   -H call $GOCMD help and exit
   -e db engine (required)
-  -l db location (required)
+  -a application folder (required)
+  -l db location (required for mariadb; for sqlite default is application folder)
   -p lexserver port (default: $PORT)
   -b use go binaries (optional, as opposed to 'go run' with source code)
   -t test mode (default: $TESTMODE)
@@ -35,12 +36,12 @@ Options:
      $TESTONLY: exit after tests
 
 EXAMPLE INVOCATIONS:
- $CMD -e sqlite -l ~/wikispeech/
- $CMD -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+ bash $0 -e sqlite -l ~/wikispeech/
+ bash $0 -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
 " >&2
 }
 
-while getopts "hHbt:p:l:e:" opt; do
+while getopts "hHbt:p:l:e:a:" opt; do
     case $opt in
 	h)
 	    print_help
@@ -56,6 +57,9 @@ while getopts "hHbt:p:l:e:" opt; do
 		print_help
 		exit 1
 	    fi
+	    ;;
+	a)
+	    APPDIR=$OPTARG
 	    ;;
 	l)
 	    DBLOCATION=$OPTARG
@@ -86,11 +90,21 @@ if [ -z "$DBENGINE" ] ; then
     print_help
     exit 1
 fi
-if [ -z "$DBLOCATION" ] ; then
-    echo "[$CMD] DBLOCATION must be specified using -l" >&2
+if [ -z "$APPDIR" ] ; then
+    echo "[$CMD] APPDIR must be specified using -a" >&2
     print_help
     exit 1
 fi
+if [ -z "$DBLOCATION" ] ; then
+    if [ $DBENGINE == "sqlite" ]; then
+	DBLOCATION=$APPDIR
+    else
+	echo "[$CMD] DBLOCATION must be specified using -l" >&2
+	print_help
+	exit 1
+    fi
+fi
+
 
 shift $(expr $OPTIND - 1 )
 
@@ -105,31 +119,30 @@ fi
 
 
 echo "[$CMD] OPTIONS:" >&2
+echo "[$CMD] applciation folder: $APPDIR" >&2
 echo "[$CMD] db engine: $DBENGINE" >&2
 echo "[$CMD] db location: $DBLOCATION" >&2
 echo "[$CMD] lexserver port: $PORT" >&2
 echo "[$CMD] go binaries: $GOBINARIES" >&2
 echo "[$CMD] test mode: $TESTMODE" >&2
 
-CMDDIR="$PRONLEXPATH/lexserver"
-
 function run_go_cmd {
     args=${@:1}
     if [ $GOBINARIES -eq 1 ]; then
 	$GOCMD $args
     else
+	cd $PRONLEXPATH/lexserver
 	go run *.go $args
     fi
 }
 
-switches="-db_engine $DBENGINE -db_location $DBLOCATION -static $CMDDIR/static"
+switches="-db_engine $DBENGINE -db_location $DBLOCATION -static $APPDIR/static "
 if [ $SERVERHELP -eq 1 ]; then
     switches="-help"
     echo "[$CMD] Calling lexserver help and exit" >&2
     echo "" >&2
 fi
 
-cd $PRONLEXPATH/lexserver
 if [ $TESTMODE == $TESTON ] || [ $TESTMODE == $TESTONLY ] ; then
     run_go_cmd $switches -test
 fi
