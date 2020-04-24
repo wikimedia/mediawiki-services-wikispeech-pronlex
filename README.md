@@ -23,9 +23,15 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
      Installation instructions: https://golang.org/doc/install             
 
 
-3. Install [Sqlite3](https://www.sqlite.org/)
+3. Install database support
 
-     On Linux systems with `apt`, run `sudo apt install sqlite3`
+   a. [Sqlite3](https://www.sqlite.org/)
+
+      On Linux systems with `apt`, run `sudo apt install sqlite3`
+
+   b. [MariaDB](https://mariadb.org/)
+
+      On Linux systems with `apt`, run `sudo apt install mariadb-server` or similar
 
 
 4. Clone the source code
@@ -59,19 +65,18 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 1. Setup the pronlex server
 
-   `pronlex$ cd install`   
-   `install$ bash setup.sh <APPDIR>`   
+   `pronlex$ bash scripts/setup.sh <APPDIR>`   
    Example:
-   `install$ bash setup.sh ~/wikispeech`
+   `pronlex$ bash scritps/setup.sh ~/wikispeech`
 
    Sets up the pronlex server and a set of test data in the folder specified by `<APPDIR>`.
 
 
 2. Import lexicon data (optional)
 
-   `install$ bash import.sh <LEXDATA-GIT> <APPDIR>`   
+   `pronlex$ bash scripts/import.sh <LEXDATA-GIT> <APPDIR>`   
    Example:
-   `install$ bash import.sh ~/git_repos/lexdata ~/wikispeech` 
+   `pronlex$ bash scripts/import.sh ~/git_repos/lexdata ~/wikispeech` 
 
    Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
 If the `<LEXDATA-GIT>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
@@ -90,18 +95,18 @@ You can create your own lexicon files, or you can use existing data in the [lexd
 
 The server is started using this script
 
-`install$ bash start_server.sh -a <APPDIR>`
+`pronlex$ bash scripts/start_server.sh -a <APPDIR>`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
 When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
 
 To specify port, run:   
-`install$ bash start_server.sh -a <APPDIR> -p <PORT>`
+`pronlex$ bash scripts/start_server.sh -a <APPDIR> -p <PORT>`
 
 
 For a complete set of options, run:  
-`install$ bash start_server.sh -h`
+`pronlex$ bash scripts/start_server.sh -h`
 
 
 <!--
