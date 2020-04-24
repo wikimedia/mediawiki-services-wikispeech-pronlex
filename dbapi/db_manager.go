@@ -82,8 +82,8 @@ func (dbm *DBManager) FirstTimePopulateDBCache(dbLocation string) error {
 }
 
 // DefineDB is used to define a new database and add it to the DB manager cache.
-// For sqlite, the database is created; for mariadb, it has to be created beforehand by an administrator.
-// In both cases, all required tables are then added to the database.
+// For Sqlite, the database is created, for MariaDB, it has to be created beforehand by an administrator.
+// In both cases, all required tables and triggers are added to the database.
 func (dbm *DBManager) DefineDB(dbLocation string, dbRef lex.DBRef) error {
 	// TODO: Check that the db doesn't exist???
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
@@ -731,12 +731,12 @@ func (dbm *DBManager) GetSchemaVersion(dbRef lex.DBRef) (string, error) {
 }
 
 // DropDB drop the database (cannot be undone).
-// sqlite drops the actual database; mariadb just clear the database from tables
+// For Sqlite, the database is entirely dropped, for MariaDB, all database tables are dropped, but the database is not deleted. Deletion of MariaDB databases should be done by a server admiinstrator.
 func (dbm *DBManager) DropDB(dbLocation string, dbRef lex.DBRef) error {
 	return dbm.dbif.dropDB(dbLocation, dbRef)
 }
 
-// DBExists checks if a database exist
+// DBExists checks if a database exist. For Sqlite, it checks if the actual database file exists. For MariaDB, it checks if the database exists, and contains tables required for a lexicon database. The reason for this is how the user privileges work for MariaDB. See also DefinedDB and DropDB.
 func (dbm *DBManager) DBExists(dbLocation string, dbRef lex.DBRef) (bool, error) {
 	return dbm.dbif.dbExists(dbLocation, dbRef)
 }
