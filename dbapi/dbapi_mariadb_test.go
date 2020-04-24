@@ -18,7 +18,7 @@ import (
 )
 
 // Set up for local testing, run:
-// $ sudo mysql -u root < mariadb_setup.sql
+// $ sudo mysql -u root < scripts/mariadb_setup.sql
 
 // ff is a place holder to be replaced by proper error handling
 func ff(f string, err error) {

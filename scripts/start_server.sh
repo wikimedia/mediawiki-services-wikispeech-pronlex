@@ -2,47 +2,77 @@
 
 #############################################################
 ### SERVER STARTUP SCRIPT
-## 1. STARTS A TEST SERVER AND RUNS A SET OF TESTS
-## 2. SHUTS DOWN TEST SERVER
-## 3. IF NO ERRORS ARE FOUND, THE STANDARD SERVER IS STARTED USING THE DEFAULT PORT
 
+set -e
 
 CMD=`basename $0`
+GOCMD="lexserver"
 PORT="8787"
 PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
-gobinaries=0
+GOBINARIES=0
+SERVERHELP=0
+
+# Test mode:
+TESTON="on"
+TESTOFF="off"
+TESTONLY="test"
+TESTMODE=$TESTON
 
 print_help(){
 	    echo "
-[$CMD] SERVER STARTUP SCRIPT
-   1. STARTS A TEST SERVER AND RUNS A SET OF TESTS
-   2. SHUTS DOWN TEST SERVER
-   3. IF NO ERRORS ARE FOUND, THE STANDARD SERVER IS STARTED USING THE DEFAULT PORT
+USAGE bash $CMD [options]
 
 Options:
-  -h help
-  -a appdir (required)
-  -p port   (default: $PORT)
+  -h print help/options
+  -H call $GOCMD help and exit
+  -e db engine (required)
+  -l db location (required)
+  -p lexserver port (default: $PORT)
   -b use go binaries (optional, as opposed to 'go run' with source code)
+  -t test mode (default: $TESTMODE)
+     $TESTOFF: no tests
+     $TESTON: test before starting lexserver, exit on error
+     $TESTONLY: exit after tests
 
-EXAMPLE INVOCATION: $CMD -a lexserver_files
+EXAMPLE INVOCATIONS:
+ $CMD -e sqlite -l ~/wikispeech/
+ $CMD -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
 " >&2
 }
 
-while getopts ":hp:a:b" opt; do
+while getopts "hHbt:p:l:e:" opt; do
     case $opt in
 	h)
 	    print_help
 	    exit 1
 	    ;;
-	a)
-	    APPDIR=$OPTARG
+	H)
+	    SERVERHELP=1
+	    ;;
+	e)
+	    DBENGINE=$OPTARG
+	    if [ "$DBENGINE" != "sqlite" ] && [ "$DBENGINE" != "mariadb" ] ; then
+		echo "[$CMD] Invalid db engine: $DBENGINE" >&2
+		print_help
+		exit 1
+	    fi
+	    ;;
+	l)
+	    DBLOCATION=$OPTARG
 	    ;;
 	p)
 	    PORT=$OPTARG
 	    ;;
 	b)
-	    gobinaries=1
+	    GOBINARIES=1
+	    ;;
+	t)
+	    TESTMODE=$OPTARG
+	    if [ "$TESTMODE" != "$TESTON" ] && [ "$TESTMODE" != "$TESTOFF" ] && [ "$TESTMODE" != "$TESTONLY" ] ; then
+		echo "[$CMD] Invalid test mode: $TESTMODE" >&2
+		print_help
+		exit 1
+	    fi
 	    ;;
 	\?)
 	    echo "Invalid option: -$OPTARG" >&2
@@ -51,8 +81,13 @@ while getopts ":hp:a:b" opt; do
     esac
 done
 
-if [ -z "$APPDIR" ] ; then
-    echo "[$CMD] APPDIR must be specified using -a!" >&2
+if [ -z "$DBENGINE" ] ; then
+    echo "[$CMD] DBENGINE must be specified using -e" >&2
+    print_help
+    exit 1
+fi
+if [ -z "$DBLOCATION" ] ; then
+    echo "[$CMD] DBLOCATION must be specified using -l" >&2
     print_help
     exit 1
 fi
@@ -60,22 +95,45 @@ fi
 shift $(expr $OPTIND - 1 )
 
 if [ $# -ne 0 ]; then
-    echo "[$CMD] invalid option(s): $*" >&2
+    echo "[$CMD] Invalid option(s): $*" >&2
     exit 1
 fi
 
-APPDIRABS=`readlink -f $APPDIR`
+if [ "$DBENGINE" == "sqlite" ]; then
+    DBLOCATION=`readlink -f $DBLOCATION`
+fi
 
+
+echo "[$CMD] OPTIONS:" >&2
+echo "[$CMD] db engine: $DBENGINE" >&2
+echo "[$CMD] db location: $DBLOCATION" >&2
+echo "[$CMD] lexserver port: $PORT" >&2
+echo "[$CMD] go binaries: $GOBINARIES" >&2
+echo "[$CMD] test mode: $TESTMODE" >&2
 
 CMDDIR="$PRONLEXPATH/lexserver"
 
+function run_go_cmd {
+    args=${@:1}
+    if [ $GOBINARIES -eq 1 ]; then
+	$GOCMD $args
+    else
+	go run *.go $args
+    fi
+}
 
-#switches="-ss_files $APPDIRABS/symbol_sets/ -db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
-switches="-db_files $APPDIRABS/db_files/ -static $CMDDIR/static"
-
-echo "[$CMD] Go binaries: $gobinaries" >&2
-if [ $gobinaries -eq 1 ]; then
-    lexserver $switches -test && lexserver $switches $PORT
-else
-    cd $PRONLEXPATH/lexserver && go run *.go $switches -test && go run *.go $switches $PORT
+switches="-db_engine $DBENGINE -db_location $DBLOCATION -static $CMDDIR/static"
+if [ $SERVERHELP -eq 1 ]; then
+    switches="-help"
+    echo "[$CMD] Calling lexserver help and exit" >&2
+    echo "" >&2
 fi
+
+cd $PRONLEXPATH/lexserver
+if [ $TESTMODE == $TESTON ] || [ $TESTMODE == $TESTONLY ] ; then
+    run_go_cmd $switches -test
+fi
+if [ $TESTMODE != $TESTONLY ]; then
+    run_go_cmd $switches $PORT
+fi
+
