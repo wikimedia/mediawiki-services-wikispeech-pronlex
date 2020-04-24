@@ -159,6 +159,15 @@ if [ $DBENGINE == "sqlite" ]; then
 	exit 1
     fi
 elif [ $DBENGINE == "mariadb" ]; then
+    MARIADB_HOST="127.0.0.1"
+    MARIADB_USER="speechoid"
+    MARIADB_PROTOCOL="tcp"
+    MARIADB_PORT="3306"
+    DEFAULT_MARIADB_LOCATION="$MARIADB_USER:@$MARIADB_PROTOCOL($MARIADB_HOST:$MARIADB_PORT)"
+    if [ $DBLOCATION != $DEFAULT_MARIADB_LOCATION ]; then
+	echo "[$CMD] Not not implemented for $DBENGINE location '$DBLOCATION'. Please use '$DEFAULT_MARIADB_LOCATION' or contact a developer to update this script." >&2
+	exit 1
+    fi
     sudo mysql -u root -e "create database $SVLEX ; GRANT ALL PRIVILEGES ON $SVLEX.* TO 'speechoid'@'localhost' "
     sudo mysql -u root -e "create database $NOBLEX ; GRANT ALL PRIVILEGES ON $NOBLEX.* TO 'speechoid'@'localhost' "
     sudo mysql -u root -e "create database $AMELEX ; GRANT ALL PRIVILEGES ON $AMELEX.* TO 'speechoid'@'localhost' "
@@ -218,7 +227,7 @@ import_file $NOBLEX nb-no.nst nb_NO $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8
 
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
-import_file $AMELEX en-us.cmu en-US $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8.gz $APPDIR/symbol_sets/en-us_ws-sampa.sym
+import_file $AMELEX en-us.cmu en-US $LEXDATA/en-us/cmudict/cmudict-0.7b-ws.utf8 $APPDIR/symbol_sets/en-us_ws-sampa.sym
 
 echo "" >&2
 echo "IMPORT: $ARLEX" >&2
