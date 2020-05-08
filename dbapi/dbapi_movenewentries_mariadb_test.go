@@ -34,7 +34,7 @@ func Test_MoveNewEntriesMariadb(t *testing.T) {
 	// 	log.Fatalf("Failed to exec PRAGMA call %v", err)
 	// }
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test10")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test10")
 	if err != nil {
 		log.Fatal(err)
 	}

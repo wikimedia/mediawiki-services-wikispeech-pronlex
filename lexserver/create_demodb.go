@@ -167,7 +167,7 @@ func setupDemoDB(engine dbapi.DBEngine) error {
 
 	log.Println("demo_setup: creating demo database ...")
 
-	dbName := "speechoid_lexserver_testdb"
+	dbName := "wikispeech_lexserver_testdb"
 	lexRef := lex.NewLexRef(dbName, "sv")
 	dbPath := filepath.Join(*dbLocation, dbName) // +".db")
 

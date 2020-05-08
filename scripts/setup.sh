@@ -93,7 +93,7 @@ echo "[$CMD] db engine: $DBENGINE" >&2
 echo "[$CMD] db location: $DBLOCATION" >&2
 echo "[$CMD] go binaries: $GOBINARIES" >&2
 
-LEXDB=speechoid_lexserver_demo
+LEXDB=wikispeech_lexserver_demo
 SS_FILES="$APPDIR/symbol_sets"
 DEMOFILES=$PRONLEXPATH/lexserver/demo_files
 CMDDIR="$PRONLEXPATH/cmd/lexio"
@@ -104,7 +104,7 @@ initial_setup() {
 	echo "[$CMD] Application folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
-    if [ -f $APPDIR/speechoid_lexserver_testdb.db ] ; then
+    if [ -f $APPDIR/wikispeech_lexserver_testdb.db ] ; then
 	echo "[$CMD] Application folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
