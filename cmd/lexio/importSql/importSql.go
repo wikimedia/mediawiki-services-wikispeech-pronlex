@@ -129,6 +129,34 @@ func getFileReader(fName string) io.Reader {
 	return nil
 }
 
+type dsn struct {
+	host     string
+	user     string
+	port     string
+	protocol string
+}
+
+var dsnRE = regexp.MustCompile("^([a-z_]+):@([a-z]+)\\(([0-9a-z.]+):([0-9]+)\\)$")
+
+func parseMariaDBDSN(dbLocation string) (dsn, error) {
+	m := dsnRE.FindAllStringSubmatch(dbLocation, 1)
+	if m == nil || len(m) != 1 {
+		log.Printf("%#v", m[0])
+		log.Printf("%#v", len(m))
+		return dsn{}, fmt.Errorf("Couldn't parse DSN %s", dbLocation)
+	}
+	user := m[0][1]
+	protocol := m[0][2]
+	host := m[0][3]
+	port := m[0][4]
+	return dsn{
+		port:     port,
+		host:     host,
+		user:     user,
+		protocol: protocol,
+	}, nil
+}
+
 func printStats(stats dbapi.LexStats, validate bool) error {
 	var fstr = "%-16s %6d\n"
 	println("\nLEXICON STATISTICS")
@@ -159,11 +187,7 @@ func main() {
 	var cmdName = "importSql"
 
 	var engineFlag = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
-	var sqliteFolder = flag.String("sqlite_folder", "", "")
-	var mariaDBUser = flag.String("mariadb_user", "speechoid", "")
-	var mariaDBHost = flag.String("mariadb_host", "localhost", "")
-	var mariaDBPort = flag.String("mariadb_port", "3306", "")
-	var mariaDBProtocol = flag.String("mariadb_protocol", "tcp", "")
+	var dbLocation = flag.String("db_location", "", "db location (folder for sqlite; address for mariadb)")
 	var dbName = flag.String("db_name", "", "db name")
 
 	var fatalError = false
@@ -181,7 +205,7 @@ func main() {
       <SQL DUMP FILE> - sql dump of a lexicon database (.sql or .sql.gz)
      
      SAMPLE INVOCATION:
-       importSql go run . -db_engine mariadb -mariadb_user speechoid -mariadb_host 127.0.0.1 -db_name testfest swe030224NST.pron-ws.utf8.mariadb.sql.gz
+       importSql go run . -db_engine mariadb -db_location 'speechoid:@tcp(127.0.0.1:3306)' -db_name sv_db swe030224NST.pron-ws.utf8.mariadb.sql.gz
 
 `)
 		flag.PrintDefaults()
@@ -206,22 +230,17 @@ func main() {
 	var sqlDumpFile = flag.Args()[0]
 
 	var dbm *dbapi.DBManager
-	var dbLocation string
 	if *engineFlag == "mariadb" {
 		dbm = dbapi.NewMariaDBManager()
-		dieIfEmptyFlag("mariadb_user", mariaDBUser)
-		dieIfEmptyFlag("mariadb_host", mariaDBHost)
-		dieIfEmptyFlag("mariadb_port", mariaDBPort)
-		dieIfEmptyFlag("mariadb_protocol", mariaDBProtocol)
-		dbLocation = fmt.Sprintf("%s:@%s(%s:%s)", *mariaDBUser, *mariaDBProtocol, *mariaDBHost, *mariaDBPort) // "speechoid:@tcp(127.0.0.1:3306)
 	} else if *engineFlag == "sqlite" {
 		dbm = dbapi.NewSqliteDBManager()
-		dieIfEmptyFlag("sqlite_folder", sqliteFolder)
-		dbLocation = *sqliteFolder
 	} else {
 		fmt.Fprintf(os.Stderr, "invalid db engine : %s\n", *engineFlag)
 		os.Exit(1)
 	}
+
+	dieIfEmptyFlag("db_engine", engineFlag)
+	dieIfEmptyFlag("db_location", dbLocation)
 	if fatalError {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
 		os.Exit(1)
@@ -230,7 +249,7 @@ func main() {
 	log.Printf("Input file: %s\n", sqlDumpFile)
 	log.Printf("Output db: %s\n", *dbName)
 
-	dbExists, err := dbm.DBExists(dbLocation, lex.DBRef(*dbName))
+	dbExists, err := dbm.DBExists(*dbLocation, lex.DBRef(*dbName))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] %v", cmdName, err))
 		os.Exit(1)
@@ -250,7 +269,7 @@ func main() {
 
 	if dbm.Engine() == dbapi.Sqlite {
 		execPath := sqlitePath
-		dbFile := path.Join(dbLocation, *dbName+".db")
+		dbFile := path.Join(*dbLocation, *dbName+".db")
 		/* #nosec G204 */
 		cmd := exec.Command(execPath, dbFile)
 		stdin := sqlDumpFile
@@ -267,10 +286,15 @@ func main() {
 		}
 
 	} else if dbm.Engine() == dbapi.MariaDB {
+		dsnParsed, err := parseMariaDBDSN(*dbLocation)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Parsed MariaDB DSN: %v", dsnParsed)
 		// - LOAD:  gunzip -c <dumpFile> | mysql -u speechoid -h <dbHost> <dbName>
 		execPath := mariaDBPath
 		/* #nosec G204 */
-		cmd := exec.Command(execPath, "-u", *mariaDBUser, "-h", *mariaDBHost, "--port", *mariaDBPort, "--protocol", *mariaDBProtocol, "--database", *dbName)
+		cmd := exec.Command(execPath, "-u", dsnParsed.user, "-h", dsnParsed.host, "--port", dsnParsed.port, "--protocol", dsnParsed.protocol, "--database", *dbName)
 		stdin := sqlDumpFile
 		cmd.Stdin = getFileReader(stdin)
 		var cmdOut bytes.Buffer
@@ -286,5 +310,5 @@ func main() {
 	}
 	log.Printf("Imported %s into db %s\n", sqlDumpFile, *dbName)
 
-	runPostTests(dbm, dbLocation, lex.DBRef(*dbName), sqlDumpFile)
+	runPostTests(dbm, *dbLocation, lex.DBRef(*dbName), sqlDumpFile)
 }
