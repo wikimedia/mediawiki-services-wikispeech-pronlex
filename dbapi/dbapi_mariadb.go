@@ -2499,7 +2499,7 @@ func (mdb mariaDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, error
 		if err != nil {
 			return res, fmt.Errorf("scanning row failed : %v", err)
 		}
-		if db != "information_schema" && !strings.HasPrefix(db, "speechoid_pronlex_test") {
+		if db != "information_schema" && !strings.HasPrefix(db, "wikispeech_pronlex_test") {
 			dbsTmp = append(dbsTmp, db)
 		}
 	}

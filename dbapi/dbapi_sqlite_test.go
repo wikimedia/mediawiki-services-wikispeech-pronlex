@@ -48,7 +48,7 @@ func execSchemaSqlite(db *sql.DB) (sql.Result, error) {
 
 func TestSqliteinsertEntries(t *testing.T) {
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test1")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -591,7 +591,7 @@ func TestSqliteImportLexiconFile(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test2")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test2")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -693,7 +693,7 @@ func TestSqliteImportLexiconFileWithDupLines(t *testing.T) {
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test3")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test3")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -795,7 +795,7 @@ func TestSqliteImportLexiconFileInvalid(t *testing.T) {
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test4")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test4")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -846,7 +846,7 @@ func TestSqliteImportLexiconFileGz(t *testing.T) {
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test5")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test5")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -941,7 +941,7 @@ func TestSqliteImportLexiconBigFileGz(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_sv_nst")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -1034,7 +1034,7 @@ func TestSqliteImportLexiconBigFileGzPostTest(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_sv_nst")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -1123,7 +1123,7 @@ func TestSqliteUpdateComments(t *testing.T) {
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test6")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test6")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -1220,7 +1220,7 @@ func TestSqliteValidationRuleLike(t *testing.T) {
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	ff("Failed to exec PRAGMA call %v", err)
 
-	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test7")
+	// db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test7")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }

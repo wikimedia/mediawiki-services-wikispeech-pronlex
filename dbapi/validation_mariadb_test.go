@@ -90,7 +90,7 @@ func createValidatorMariadbTest() validation.Validator {
 
 func vInsertEntriesMariadb(t *testing.T, lexName string) (*sql.DB, string) {
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test13")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test13")
 	if err != nil {
 		log.Fatal(err)
 	}
