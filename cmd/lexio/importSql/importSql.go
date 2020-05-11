@@ -3,21 +3,20 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
-	"path"
-	//	"database/sql"
 	"flag"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/stts-se/pronlex/dbapi"
-	"github.com/stts-se/pronlex/lex"
 	"io"
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
-	//"strconv"
 	"strings"
+
+	"github.com/stts-se/pronlex/dbapi"
+	"github.com/stts-se/pronlex/lex"
 )
 
 // SQLITE
@@ -107,26 +106,25 @@ func runPostTests(dbm *dbapi.DBManager, dbLocation string, dbRef lex.DBRef, sqlD
 
 }
 
-func getFileReader(fName string) io.Reader {
+func getFileReader(fName string) (io.Reader, error) {
 	fs, err := os.Open(filepath.Clean(fName))
 	if err != nil {
 		log.Fatalf("Couldn't open file %s for reading : %v\n", fName, err)
 	}
 
 	if strings.HasSuffix(fName, ".sql") {
-		return io.Reader(fs)
+		return io.Reader(fs), nil
 	} else if strings.HasSuffix(fName, ".sql.gz") {
 		if strings.HasSuffix(fName, ".gz") {
 			gz, err := gzip.NewReader(fs)
 			if err != nil {
-				log.Fatalf("Couldn't to open gz reader : %v", err)
+				return nil, fmt.Errorf("couldn't to open gz reader : %v", err)
 			}
-			return io.Reader(gz)
+			return io.Reader(gz), nil
 		}
 
 	}
-	log.Fatalf("Unknown file type: %s. Expected .sql or .sql.gz", fName)
-	return nil
+	return nil, fmt.Errorf("unknown file type: %s. Expected .sql or .sql.gz", fName)
 }
 
 type dsn struct {
@@ -273,7 +271,10 @@ func main() {
 		/* #nosec G204 */
 		cmd := exec.Command(execPath, dbFile)
 		stdin := sqlDumpFile
-		cmd.Stdin = getFileReader(stdin)
+		cmd.Stdin, err = getFileReader(stdin)
+		if err != nil {
+			log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, *dbName, err)
+		}
 		var cmdOut bytes.Buffer
 		cmd.Stdout = &cmdOut
 		cmd.Stderr = os.Stderr
@@ -296,7 +297,10 @@ func main() {
 		/* #nosec G204 */
 		cmd := exec.Command(execPath, "-u", dsnParsed.user, "-h", dsnParsed.host, "--port", dsnParsed.port, "--protocol", dsnParsed.protocol, "--database", *dbName)
 		stdin := sqlDumpFile
-		cmd.Stdin = getFileReader(stdin)
+		cmd.Stdin, err = getFileReader(stdin)
+		if err != nil {
+			log.Fatalf("Couldn't load sql dump %s into db %s : %v\n", sqlDumpFile, *dbName, err)
+		}
 		var cmdOut bytes.Buffer
 		cmd.Stdout = &cmdOut
 		cmd.Stderr = os.Stderr
