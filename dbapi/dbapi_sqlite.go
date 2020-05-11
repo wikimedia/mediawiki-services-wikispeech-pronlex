@@ -2592,7 +2592,6 @@ func (sdb sqliteDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, erro
 		var extension = filepath.Ext(dbName)
 		dbName = dbName[0 : len(dbName)-len(extension)]
 		dbRef := lex.DBRef(dbName)
-		//err := dbm.OpenDB(dbRef, dbPath)
 		res = append(res, dbRef)
 
 		if err != nil {
