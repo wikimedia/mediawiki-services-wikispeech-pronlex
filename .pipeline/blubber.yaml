@@ -1,0 +1,38 @@
+version: v4
+
+base: docker-registry.wikimedia.org/wikimedia-buster
+
+runs:
+  insecurely: true
+
+lives:
+  in: /srv
+
+variants:
+  build:
+    apt:
+      packages: [ gcc, build-essential, sqlite3, git ]
+    copies:
+      - from: local
+        source: ./blubber/appdir
+        destination: ./appdir
+      - from: local
+        source: ./blubber/go
+        destination: ./go
+      - from: local
+        source: ./blubber/goProjects
+        destination: ./goProjects
+      - from: local
+        source: ./blubber/lexdata
+        destination: ./lexdata
+      - from: local
+        source: ./blubber/pronlex
+        destination: ./pronlex
+  production:
+    includes: [ build ]
+    entrypoint: [ "./pronlex/blubber-entrypoint.sh" ]
+  test:
+    includes: [ build ]
+    apt:
+      packages: [ wget ]
+    entrypoint: [ "./pronlex/blubber-entrypoint-test.sh" ]
