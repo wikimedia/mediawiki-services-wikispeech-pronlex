@@ -93,7 +93,7 @@ echo "[$CMD] db engine: $DBENGINE" >&2
 echo "[$CMD] db location: $DBLOCATION" >&2
 echo "[$CMD] go binaries: $GOBINARIES" >&2
 
-LEXDB=speechoid_lexserver_demo
+LEXDB=wikispeech_lexserver_demo
 SS_FILES="$APPDIR/symbol_sets"
 DEMOFILES=$PRONLEXPATH/lexserver/demo_files
 CMDDIR="$PRONLEXPATH/cmd/lexio"
@@ -104,7 +104,7 @@ initial_setup() {
 	echo "[$CMD] Application folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
-    if [ -f $APPDIR/speechoid_lexserver_testdb.db ] ; then
+    if [ -f $APPDIR/wikispeech_lexserver_testdb.db ] ; then
 	echo "[$CMD] Application folder $APPDIR is already configured. No setup needed." >&2
 	exit 0
     fi
@@ -157,15 +157,41 @@ initial_setup
 # scripts/.. is the root folder
 cd $SCRIPTDIR/..
 
+function parse_MariaDB_DSN() {
+    ## 'USER:@PROTOCOL(HOST:PORT)
+    dsn=$1;
+    dsnre="^([a-z_]+):@[a-z]*\(([0-9a-z.]+):([0-9]+)\)$";
+    if [[ $dsn =~ $dnsre ]]; then
+	MARIADB_USER=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\1/'`
+	MARIADB_PROTOCOL=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\2/'`
+	MARIADB_HOST=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\3/'`
+	MARIADB_PORT=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\4/'`
+
+	if [ -z $MARIADB_USER ] ||[ -z $MARIADB_PROTOCOL ] || [ -z $MARIADB_HOST ] || [ -z $MARIADB_PORT ]; then
+	    echo "[$CMD] Couldn't parse MariaDB DSN: $dsn" >&2
+	    exit 1
+	fi
+	
+	if [ $MARIADB_HOST == "127.0.0.1" ]; then
+	    MARIADB_HOST="localhost"
+	fi
+
+	echo "MariaDB DSN $dsn parsed to user: $MARIADB_USER; host: $MARIADB_HOST" >&2
+    else
+	echo "[$CMD] Invalid DSN for MariaDB: $dsn" >&2
+	exit 1
+    fi
+}
 
 DEFAULT_MARIADB_LOCATION="speechoid:@tcp(127.0.0.1:3306)"
 if [ $DBENGINE == "mariadb" ]; then
-    if [ $DBLOCATION != $DEFAULT_MARIADB_LOCATION ]; then
-	echo "[$CMD] Not not implemented for $DBENGINE location '$DBLOCATION'. Please use '$DEFAULT_MARIADB_LOCATION' or contact a developer to update this script." >&2
-	exit 1
-    fi
-    sudo mysql -u root < $SCRIPTDIR/mariadb_setup.sql
-    sudo mysql -u root -e "create database $LEXDB ; GRANT ALL PRIVILEGES ON $LEXDB.* TO 'speechoid'@'localhost' "
+    parse_MariaDB_DSN $DBLOCATION
+    # if [ $DBLOCATION != $DEFAULT_MARIADB_LOCATION ]; then
+    # 	echo "[$CMD] Not not implemented for $DBENGINE location '$DBLOCATION'. Please use '$DEFAULT_MARIADB_LOCATION' or contact a developer to update this script." >&2
+    # 	exit 1
+    # fi
+    sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT < $SCRIPTDIR/mariadb_setup.sql
+    sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $LEXDB ; GRANT ALL PRIVILEGES ON $LEXDB.* TO '$MARIADB_USER'@'localhost' "
 fi
 if run_go_command createEmptyDB -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB ; then
     echo "[$CMD] Created empty db $LEXDB @ $DBLOCATION for $DBENGINE" >&2

@@ -29,7 +29,7 @@ import (
 var lexiconUpdateEntryURL = `/updateentry?entry={
     "id": 9,
     "lexRef": {
-        "DBRef": "speechoid_lexserver_testdb",
+        "DBRef": "wikispeech_lexserver_testdb",
         "LexName": "sv"
     },
     "strn": "dom",
@@ -180,7 +180,7 @@ var lexiconListCurrentEntryStatuses = urlHandler{
 	name:     "list_current_entry_statuses",
 	url:      "/list_current_entry_statuses/{lexicon_name}",
 	help:     "List current entry statuses. Optional param freq set to true will include frequencies for each status.",
-	examples: []string{"/list_current_entry_statuses/speechoid_lexserver_testdb:sv"},
+	examples: []string{"/list_current_entry_statuses/wikispeech_lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -223,7 +223,7 @@ var lexiconListCommentLabels = urlHandler{
 	name:     "list_comment_labels",
 	url:      "/list_comment_labels/{lexicon_name}",
 	help:     "List comment labels.",
-	examples: []string{"/list_current_entry_statuses/speechoid_lexserver_testdb:sv"},
+	examples: []string{"/list_current_entry_statuses/wikispeech_lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -251,7 +251,7 @@ var lexiconListCurrentEntryUsers = urlHandler{
 	name:     "list_current_entry_users",
 	url:      "/list_current_entry_users/{lexicon_name}",
 	help:     "List current entry users. Optional param freq set to true will include frequencies for each user.",
-	examples: []string{"/list_current_entry_users/speechoid_lexserver_testdb:sv?freq=true"},
+	examples: []string{"/list_current_entry_users/wikispeech_lexserver_testdb:sv?freq=true"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -295,7 +295,7 @@ var lexiconListAllEntryStatuses = urlHandler{
 	name:     "list_all_entry_statuses",
 	url:      "/list_all_entry_statuses/{lexicon_name}",
 	help:     "List all entry statuses.",
-	examples: []string{"/list_all_entry_statuses/speechoid_lexserver_testdb:sv"},
+	examples: []string{"/list_all_entry_statuses/wikispeech_lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -329,7 +329,7 @@ var lexiconInfo = urlHandler{
 	name:     "info",
 	url:      "/info/{lexicon_name}",
 	help:     "Get some basic lexicon info.",
-	examples: []string{"/info/speechoid_lexserver_testdb:sv"},
+	examples: []string{"/info/wikispeech_lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -358,7 +358,7 @@ var lexiconStats = urlHandler{
 	name:     "stats",
 	url:      "/stats/{lexicon_name}",
 	help:     "Lists lexicon stats.",
-	examples: []string{"/stats/speechoid_lexserver_testdb:sv"},
+	examples: []string{"/stats/wikispeech_lexserver_testdb:sv"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 		lexRef, err := getLexRefParam(r)
 		if err != nil {
@@ -444,7 +444,7 @@ var lexiconEntriesExist = urlHandler{
 	name:     "entries_exist",
 	url:      "/entries_exist",
 	help:     "Lookup orthographies in the db and see if they exist as entries.",
-	examples: []string{"/entries_exist?lexicons=speechoid_lexserver_testdb:sv&words=hund,h%C3%A4st,hunnd"},
+	examples: []string{"/entries_exist?lexicons=wikispeech_lexserver_testdb:sv&words=hund,h%C3%A4st,hunnd"},
 	handler: func(w http.ResponseWriter, r *http.Request) {
 
 		var err error
@@ -505,7 +505,7 @@ var lexiconEntriesExist = urlHandler{
 	},
 }
 
-var lexiconAddEntryURL = `/addentry?lexicon_name=speechoid_lexserver_testdb:sv&entry={
+var lexiconAddEntryURL = `/addentry?lexicon_name=wikispeech_lexserver_testdb:sv&entry={
     "strn": "flesk",
     "language": "sv-se",
     "partOfSpeech": "NN",

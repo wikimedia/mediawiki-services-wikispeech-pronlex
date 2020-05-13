@@ -33,7 +33,7 @@ func TestEntryTag1Mariadb(t *testing.T) {
 	// 	t.Errorf("Failed to exec PRAGMA call %v", err)
 	// }
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test11")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test11")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -163,7 +163,7 @@ func TestEntryTag1Mariadb(t *testing.T) {
 
 func TestEntryTag2Mariadb(t *testing.T) {
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test12")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test12")
 	if err != nil {
 		log.Fatal(err)
 	}

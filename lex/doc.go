@@ -64,7 +64,7 @@ A few JSON examples:
    {
    id: 6,
    lexRef: {
-      DBRef: "speechoid_lexserver_testdb",
+      DBRef: "wikispeech_lexserver_testdb",
       LexName: "sv"
    },
       strn: "hästar",

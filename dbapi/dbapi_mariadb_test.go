@@ -53,7 +53,7 @@ func execSchemaMariadb(db *sql.DB) (sql.Result, error) {
 
 func Test_insertEntries(t *testing.T) {
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test1")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test1")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -575,7 +575,7 @@ func TestMariadbImportLexiconFile(t *testing.T) {
 	// 	log.Fatal(err)
 	// }
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test2")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test2")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -677,7 +677,7 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test3")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test3")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -779,7 +779,7 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test4")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test4")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -830,7 +830,7 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test5")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test5")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -925,7 +925,7 @@ func Test_ImportLexiconBigFileGz(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_sv_nst")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1018,7 +1018,7 @@ func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_sv_nst")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_sv_nst")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1107,7 +1107,7 @@ func Test_UpdateComments(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test6")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test6")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1204,7 +1204,7 @@ func Test_ValidationRuleLike(t *testing.T) {
 	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test7")
+	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test7")
 	if err != nil {
 		log.Fatal(err)
 	}

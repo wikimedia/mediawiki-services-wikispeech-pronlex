@@ -31,7 +31,7 @@ func Test_DBManagerMariadb(t *testing.T) {
 	// 	}
 	// }
 
-	db1, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test8")
+	db1, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test8")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func Test_DBManagerMariadb(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	db2, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/speechoid_pronlex_test9")
+	db2, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test9")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
