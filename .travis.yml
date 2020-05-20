@@ -39,4 +39,3 @@ script:
  - sleep $SLEEP
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
- - docker build . -t pronlex 
