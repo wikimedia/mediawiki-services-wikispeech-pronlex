@@ -12,13 +12,14 @@ env:
  - RELEASE=master SLEEP=60
  - RELEASE=master SLEEP=60 DO_IMPORT=1
 
-addons:
-  mariadb: '10.1'
+#addons:
+#  mariadb: '10.1'
 
 services: mysql
 
 script:
  - set -e
+ - sudo apt-get install mariadb-client-10.1 mariadb-server-10.1
  - cat go.mod
  - sudo mysql -u root < scripts/mariadb_setup.sql
  - go test -v ./... 
