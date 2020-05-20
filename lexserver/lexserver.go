@@ -699,7 +699,12 @@ Default ports:
 		if err != nil {
 			log.Fatalf("Couldn't create logger: %v", err)
 		}
-		defer f.Close()
+		defer func() {
+			err = f.Close()
+			if err != nil {
+				log.Fatalf("Couldn't close logger: %v", err)
+			}
+		}()
 		log.SetOutput(f)
 	}
 	log.Println("server: created logger for " + *logger)
