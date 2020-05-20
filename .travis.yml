@@ -13,7 +13,7 @@ env:
  - RELEASE=master SLEEP=60 DO_IMPORT=1
 
 addons:
-  mariadb: '10.0'
+  mariadb: '10.1.44'
 
 services: mysql
 
