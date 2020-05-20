@@ -2488,6 +2488,7 @@ func (mdb mariaDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, error
 	defer db.Close()
 
 	dbRows, err := db.Query("show databases")
+	//lint:ignore SA5001 we cannot resolve the error anyway
 	defer dbRows.Close()
 	dbsTmp := []string{}
 	if err != nil {
@@ -2512,6 +2513,7 @@ func (mdb mariaDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, error
 			return res, fmt.Errorf("failed to use database %s : %v", dbName, err)
 		}
 		tbRows, err := db.Query("show tables")
+		//lint:ignore SA5001 we cannot resolve the error anyway
 		defer tbRows.Close()
 		if err != nil {
 			return res, fmt.Errorf("failed to show tables : %v", err)
@@ -2619,6 +2621,7 @@ func (mdb mariaDBIF) dbExists(dbLocation string, dbRef lex.DBRef) (bool, error) 
 	defer db.Close()
 
 	rows, err := db.Query("show databases")
+	//lint:ignore SA5001 we cannot resolve the error anyway
 	defer rows.Close()
 	if err != nil {
 		return false, fmt.Errorf("failed to list databases : %v", err)
@@ -2646,6 +2649,7 @@ func (mdb mariaDBIF) dbExists(dbLocation string, dbRef lex.DBRef) (bool, error) 
 		return false, fmt.Errorf("failed to use database %s : %v", dbName, err)
 	}
 	tbRows, err := db.Query("show tables")
+	//lint:ignore SA5001 we cannot resolve the error anyway
 	defer tbRows.Close()
 	if err != nil {
 		return false, fmt.Errorf("failed to list tables : %v", err)
