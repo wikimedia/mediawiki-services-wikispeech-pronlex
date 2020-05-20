@@ -707,7 +707,7 @@ Default ports:
 		}()
 		log.SetOutput(f)
 	}
-	log.Println("server: created logger for " + *logger)
+	log.Println("lexserver: created logger for " + *logger)
 
 	//symbolSetFileArea = *ssFiles
 	//dbLocation = *dbFiles
