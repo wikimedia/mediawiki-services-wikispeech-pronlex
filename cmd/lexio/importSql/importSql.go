@@ -134,14 +134,14 @@ type dsn struct {
 	protocol string
 }
 
-var dsnRE = regexp.MustCompile("^([a-z_]+):@([a-z]+)\\(([0-9a-z.]+):([0-9]+)\\)$")
+var dsnRE = regexp.MustCompile(`^([a-z_]+):@([a-z]+)\(([0-9a-z.]+):([0-9]+)\)$`)
 
 func parseMariaDBDSN(dbLocation string) (dsn, error) {
 	m := dsnRE.FindAllStringSubmatch(dbLocation, 1)
 	if m == nil || len(m) != 1 {
 		log.Printf("%#v", m[0])
 		log.Printf("%#v", len(m))
-		return dsn{}, fmt.Errorf("Couldn't parse DSN %s", dbLocation)
+		return dsn{}, fmt.Errorf("couldn't parse DSN %s", dbLocation)
 	}
 	user := m[0][1]
 	protocol := m[0][2]
