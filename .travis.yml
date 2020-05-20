@@ -19,7 +19,8 @@ services: mysql
 
 script:
  - set -e
- - sudo apt-get install mariadb-client-10.1 mariadb-server-10.1
+# - sudo apt-get install mariadb-client-10.1 mariadb-server-10.1
+ - sudo apt-cache search mariadb|egrep "^mariadb"
  - cat go.mod
  - sudo mysql -u root < scripts/mariadb_setup.sql
  - go test -v ./... 
@@ -34,7 +35,7 @@ script:
      bash scripts/import.sh lexdata /tmp/appdir master
    fi
 
- - bash scripts/start_server.sh -a /tmp/appdir &
+ - bash scripts/start_server.sh -a /tmp/appdir -e sqlite &
  - export pid=$!
  - echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
