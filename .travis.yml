@@ -19,8 +19,7 @@ services: mysql
 
 script:
  - set -e
-# - sudo apt-get install mariadb-client-10.1 mariadb-server-10.1
- - sudo apt-cache search mariadb|egrep "^mariadb"
+ - sudo apt-get install mariadb-client mariadb-server
  - cat go.mod
  - sudo mysql -u root < scripts/mariadb_setup.sql
  - go test -v ./... 
