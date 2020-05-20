@@ -108,11 +108,11 @@ func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 
 type sqliteDBIF struct{}
 
-func (mdb sqliteDBIF) name() string {
+func (sdb sqliteDBIF) name() string {
 	return "sqlite"
 }
 
-func (mdb sqliteDBIF) engine() DBEngine {
+func (sdb sqliteDBIF) engine() DBEngine {
 	return Sqlite
 }
 

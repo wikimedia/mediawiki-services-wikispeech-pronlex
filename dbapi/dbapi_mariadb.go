@@ -2574,7 +2574,7 @@ func (mdb mariaDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error)
 	return db, nil
 }
 
-func (mbd mariaDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
+func (mdb mariaDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
 	dbPath := filepath.Join(dbLocation, string(dbRef))
 
 	db, err := sql.Open("mysql", dbPath)
@@ -2590,7 +2590,7 @@ func (mbd mariaDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
 	}
 	defer db.Close()
 
-	db, err = mbd.openDB(dbLocation, dbRef)
+	db, err = mdb.openDB(dbLocation, dbRef)
 	if err != nil {
 		return err
 	}
