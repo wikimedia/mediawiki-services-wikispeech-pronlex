@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log/syslog"
 	//"database/sql"
 	"encoding/json"
 	"flag"
@@ -627,6 +628,7 @@ func main() {
 	var test = flag.Bool("test", false, "run server tests")
 	dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	dbLocation = flag.String("db_location", "", fmt.Sprintf("db location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteLocation, defaultMariaDBLocation))
+	var logger = flag.String("logger", "stderr", "System `logger` (stderr, syslog or filename)")
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var version = flag.Bool("version", false, "print version and exit")
 	var help = flag.Bool("help", false, "print usage/help and exit")
@@ -682,6 +684,25 @@ Default ports:
 	if !strings.HasPrefix(port, ":") {
 		port = ":" + port
 	}
+
+	if *logger == "stderr" {
+		// default logger
+	} else if *logger == "syslog" {
+		writer, err := syslog.New(syslog.LOG_INFO, "lexserver")
+		if err != nil {
+			log.Fatalf("Couldn't create logger: %v", err)
+		}
+		log.SetOutput(writer)
+		log.SetFlags(0) // no timestamps etc, since syslog already prints that
+	} else {
+		f, err := os.OpenFile(*logger, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatalf("Couldn't create logger: %v", err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
+	}
+	log.Println("server: created logger for " + *logger)
 
 	//symbolSetFileArea = *ssFiles
 	//dbLocation = *dbFiles
@@ -758,7 +779,6 @@ Default ports:
 		shutdown(s)
 	}
 	log.Println("lexserver: BYE!")
-	log.Println("")
 }
 
 func shutdown(s *http.Server) {
