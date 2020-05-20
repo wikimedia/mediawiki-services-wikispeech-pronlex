@@ -17,7 +17,10 @@ echo $basedir
 cd $basedir
 mkdir -p .build
 
-go test -v ./... 
+#go test -v ./... 
+
+#gosec ./...
+#staticcheck ./...
 
 mkdir -p .build/appdir
 
@@ -25,12 +28,11 @@ for proc in `ps --sort pid -Af|egrep pronlex| egrep -v  "grep .E"|sed 's/  */\t/
     kill $proc || echo "Couldn't kill $pid"
 done
 
-bash install/setup.sh .build/appdir
+bash scripts/setup.sh -a .build/appdir -e sqlite 
 
-bash install/start_server.sh -a .build/appdir &
+bash scripts/start_server.sh -a .build/appdir -e sqlite &
 export pid=$!
 echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shutting down"
 sleep $SLEEP
 sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
-docker build . --no-cache -t sttsse/pronlex:buildtest

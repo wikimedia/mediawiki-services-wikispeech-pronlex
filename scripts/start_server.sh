@@ -122,12 +122,14 @@ if [ "$DBENGINE" == "sqlite" ]; then
     DBLOCATION=`readlink -f $DBLOCATION`
 fi
 
+STATIC=`realpath $APPDIR/static`
 
 echo "[$CMD] OPTIONS:" >&2
 echo "[$CMD] application folder: $APPDIR" >&2
 echo "[$CMD] db engine: $DBENGINE" >&2
 echo "[$CMD] db location: $DBLOCATION" >&2
 echo "[$CMD] lexserver port: $PORT" >&2
+echo "[$CMD] static: $STATIC" >&2
 echo "[$CMD] logger: $LOGGER" >&2
 echo "[$CMD] go binaries: $GOBINARIES" >&2
 echo "[$CMD] test mode: $TESTMODE" >&2
@@ -142,7 +144,7 @@ function run_go_cmd {
     fi
 }
 
-switches="-logger $LOGGER -db_engine $DBENGINE -db_location $DBLOCATION -static $APPDIR/static "
+switches="-logger $LOGGER -db_engine $DBENGINE -db_location $DBLOCATION -static $STATIC"
 if [ $SERVERHELP -eq 1 ]; then
     switches="-help"
     echo "[$CMD] Calling lexserver help and exit" >&2
