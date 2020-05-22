@@ -1,5 +1,6 @@
 language: go
 
+os: linux
 dist: bionic
 
 go:
@@ -37,10 +38,10 @@ script:
    fi
 
  - bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p 8766 &
- - export pid=$!
- - echo "pronlex sqlite server started on pid $pid. wait for $SLEEP seconds before shutting down"
+ - export pida=$!
+ - echo "pronlex sqlite server started on pid $pida. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
- - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
+ - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pida
  
  - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
 
@@ -50,9 +51,9 @@ script:
    fi
 
  - bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p 8767
- - export pid=$!
- - echo "pronlex mariadb server started on pid $pid. wait for $SLEEP seconds before shutting down"
+ - export pidb=$!
+ - echo "pronlex mariadb server started on pid $pidb. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
- - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
+ - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pidb
  
  - go test -v ./... 
