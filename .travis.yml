@@ -12,8 +12,8 @@ notifications:
     on_failure: change
 
 env:
- - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite
- - RELEASE=master SLEEP=60 DO_IMPORT=1 engine=mariadb
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8787
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8787
 
 #addons:
 #  mariadb: '10.1'
@@ -38,13 +38,13 @@ script:
      if [ -v DO_IMPORT ]; then
          bash scripts/import.sh -e mariadb  -f lexdata -a /tmp/appdir/mariadb -r $RELEASE -l 'speechoid:@tcp(127.0.0.1:3306)'
      fi
-     bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p 8767
+     bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p $PORT
      export pid=$!
    else 
      if [ -v DO_IMPORT ]; then
          bash scripts/import.sh -e sqlite -f lexdata -a /tmp/appdir/sqlite -r $RELEASE
      fi
-     bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p 8766 &
+     bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p $PORT &
      export pid=$!
    fi
 
