@@ -34,15 +34,15 @@ script:
  - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
 
  - |
-   if [ $ENGINE == "mariadb"]; then
+   if [ $ENGINE == "mariadb" ]; then
      if [ -v DO_IMPORT ]; then
-         bash scripts/import.sh -f lexdata -a /tmp/appdir/mariadb -r $RELEASE -l 'speechoid:@tcp(127.0.0.1:3306)'
+         bash scripts/import.sh -e mariadb  -f lexdata -a /tmp/appdir/mariadb -r $RELEASE -l 'speechoid:@tcp(127.0.0.1:3306)'
      fi
      bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p 8767
      export pid=$!
    else 
      if [ -v DO_IMPORT ]; then
-         bash scripts/import.sh -f lexdata -a /tmp/appdir/sqlite -r $RELEASE
+         bash scripts/import.sh -e sqlite -f lexdata -a /tmp/appdir/sqlite -r $RELEASE
      fi
      bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p 8766 &
      export pid=$!
