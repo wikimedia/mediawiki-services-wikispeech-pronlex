@@ -12,8 +12,8 @@ notifications:
     on_failure: change
 
 env:
- - RELEASE=master SLEEP=60
- - RELEASE=master SLEEP=60 DO_IMPORT=1
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 engine=mariadb
 
 #addons:
 #  mariadb: '10.1'
@@ -31,29 +31,26 @@ script:
  - staticcheck ./...
 
  - bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite
-
- - | 
-   if [ -v DO_IMPORT ]; then
-     bash scripts/import.sh -f lexdata -a /tmp/appdir/sqlite -r $RELEASE
-   fi
-
- - bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p 8766 &
- - export pida=$!
- - echo "pronlex sqlite server started on pid $pida. wait for $SLEEP seconds before shutting down"
- 
  - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
 
- - | 
-   if [ -v DO_IMPORT ]; then
-     bash scripts/import.sh -f lexdata -a /tmp/appdir/mariadb -r $RELEASE -l 'speechoid:@tcp(127.0.0.1:3306)'
+ - |
+   if [ $ENGINE == "mariadb"]; then
+     if [ -v DO_IMPORT ]; then
+         bash scripts/import.sh -f lexdata -a /tmp/appdir/mariadb -r $RELEASE -l 'speechoid:@tcp(127.0.0.1:3306)'
+     fi
+     bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p 8767
+     export pid=$!
+   else 
+     if [ -v DO_IMPORT ]; then
+         bash scripts/import.sh -f lexdata -a /tmp/appdir/sqlite -r $RELEASE
+     fi
+     bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p 8766 &
+     export pid=$!
    fi
 
- - bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p 8767
- - export pidb=$!
- - echo "pronlex mariadb server started on pid $pidb. wait for $SLEEP seconds before shutting down"
+ - echo "pronlex $ENGINE server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
 
- - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pida
- - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pidb
+ - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
  - go test -v ./... 
