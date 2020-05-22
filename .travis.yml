@@ -24,6 +24,9 @@ script:
  - sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
  - sudo add-apt-repository 'deb [arch=amd64] http://ftp.nluug.nl/db/mariadb/repo/10.4/debian buster main'
  - sudo apt update
+ - sudo apt upgrade
+ - wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_armhf.deb
+ - dpkg -i libssl1.0.0_1.0.1t-1+deb8u12_armhf.deb
  - sudo apt install mariadb-client-10.4 mariadb-server-10.4 mariadb-client-core-10.4 libc6 libssl1.1 galera-4 mariadb-server-core-10.4 
  - cat go.mod
  - sudo mysql -u root < scripts/mariadb_setup.sql
