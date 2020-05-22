@@ -23,8 +23,7 @@ script:
  - set -e
  - sudo apt-get install mariadb-client mariadb-server
  - cat go.mod
-# - sudo mysql -u root < scripts/mariadb_setup.sql
- - go test -v ./... 
+ #- sudo mysql -u root < scripts/mariadb_setup.sql
  - go get github.com/securego/gosec/cmd/gosec
  - gosec ./...
  - go get honnef.co/go/tools/cmd/staticcheck
@@ -56,3 +55,4 @@ script:
  - sleep $SLEEP
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
+ - go test -v ./... 
