@@ -23,7 +23,7 @@ script:
  - set -e
  - sudo apt-get install mariadb-client mariadb-server
  - cat go.mod
- - sudo mysql -u root < scripts/mariadb_setup.sql
+# - sudo mysql -u root < scripts/mariadb_setup.sql
  - go test -v ./... 
  - go get github.com/securego/gosec/cmd/gosec
  - gosec ./...
