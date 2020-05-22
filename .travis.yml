@@ -21,7 +21,7 @@ env:
 
 script:
  - set -e
-#- sudo apt-get install mariadb-client mariadb-server
+ - sudo apt-get install mariadb-client mariadb-server
  # - sudo apt-get install software-properties-common dirmngr gnupg-curl
  # - sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
  # - sudo add-apt-repository 'deb [arch=amd64] http://ftp.nluug.nl/db/mariadb/repo/10.4/debian buster main'
