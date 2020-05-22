@@ -32,16 +32,30 @@ script:
  - gosec ./...
  - go get honnef.co/go/tools/cmd/staticcheck
  - staticcheck ./...
- - bash scripts/setup.sh /tmp/appdir
+
+ - bash scripts/setup.sh /tmp/appdir/sqlite
 
  - | 
    if [ -v DO_IMPORT ]; then
-     bash scripts/import.sh lexdata /tmp/appdir $RELEASE
+     bash scripts/import.sh lexdata /tmp/appdir/sqlite $RELEASE
    fi
 
- - bash scripts/start_server.sh -a /tmp/appdir -e sqlite &
+ - bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite &
  - export pid=$!
- - echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shutting down"
+ - echo "pronlex sqlite server started on pid $pid. wait for $SLEEP seconds before shutting down"
+ - sleep $SLEEP
+ - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
+ 
+ - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+
+ - | 
+   if [ -v DO_IMPORT ]; then
+     bash scripts/import.sh lexdata /tmp/appdir/mariadb $RELEASE
+   fi
+
+ - bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+ - export pid=$!
+ - echo "pronlex mariadb server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
