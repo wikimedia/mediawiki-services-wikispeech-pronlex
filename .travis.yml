@@ -36,7 +36,7 @@ script:
      bash scripts/import.sh lexdata /tmp/appdir/sqlite $RELEASE
    fi
 
- - bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite &
+ - bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p 8766 &
  - export pid=$!
  - echo "pronlex sqlite server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
@@ -49,7 +49,7 @@ script:
      bash scripts/import.sh lexdata /tmp/appdir/mariadb $RELEASE
    fi
 
- - bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+ - bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p 8767
  - export pid=$!
  - echo "pronlex mariadb server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
