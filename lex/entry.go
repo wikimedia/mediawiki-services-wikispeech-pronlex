@@ -173,23 +173,23 @@ type Lemma struct {
 // othograpy. Two different lex.Entries cannot have identical
 // lex.Entry.Tags (the database should not allow this).
 type Entry struct {
-	ID               int64             `json:"id,omitempty"`
-	LexRef           LexRef            `json:"lexRef,omitempty"`
+	ID               int64             `json:"id"`
+	LexRef           LexRef            `json:"lexRef"`
 	Strn             string            `json:"strn"`
-	Language         string            `json:"language,omitempty"`
-	PartOfSpeech     string            `json:"partOfSpeech,omitempty"`
-	Morphology       string            `json:"morphology,omitempty"`
-	WordParts        string            `json:"wordParts,omitempty"`
-	Lemma            Lemma             `json:"lemma,omitempty"`
+	Language         string            `json:"language"`
+	PartOfSpeech     string            `json:"partOfSpeech"`
+	Morphology       string            `json:"morphology"`
+	WordParts        string            `json:"wordParts"`
+	Lemma            Lemma             `json:"lemma"`
 	Transcriptions   []Transcription   `json:"transcriptions"`
-	EntryStatus      EntryStatus       `json:"status,omitempty"` // TODO Probably should be a slice of statuses?
-	EntryValidations []EntryValidation `json:"entryValidations,omitempty"`
+	EntryStatus      EntryStatus       `json:"status"` // TODO Probably should be a slice of statuses?
+	EntryValidations []EntryValidation `json:"entryValidations"`
 
 	// Preferred flag: 1=true, 0=false; schema triggers only one preferred per orthographic word
 	//Preferred        int64             `json:"preferred"`
-	Preferred bool           `json:"preferred,omitempty"`
-	Tag       string         `json:"tag,omitempty"`
-	Comments  []EntryComment `json:"comments,omitempty"`
+	Preferred bool           `json:"preferred"`
+	Tag       string         `json:"tag"`
+	Comments  []EntryComment `json:"comments"`
 }
 
 // EntryWriter is an interface defining things to which one can write an Entry.
