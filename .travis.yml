@@ -12,8 +12,8 @@ notifications:
     on_failure: change
 
 env:
-# - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir LOC="'speechoid:@tcp(127.0.0.1:3306)'"
- - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir LOC=/tmp/appdir
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir/sqlite LOC=/tmp/appdir/sqlite
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir/mariadb LOC="'speechoid:@tcp(127.0.0.1:3306)'"
 
 #addons:
 #  mariadb: '10.1'
@@ -30,7 +30,9 @@ script:
  - go get honnef.co/go/tools/cmd/staticcheck
  - staticcheck ./...
 
- - bash scripts/setup.sh -a $APPDIR -e $ENGINE -l $LOC
+ # need mariadb for unit tests below to work properly
+ - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+ - bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite -l /tmp/appdir/sqlite
 
  - go test -v ./... 
 
