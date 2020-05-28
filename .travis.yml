@@ -30,21 +30,20 @@ script:
  - go get honnef.co/go/tools/cmd/staticcheck
  - staticcheck ./...
 
- - bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite
- - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
-
  - |
    if [ $ENGINE == "mariadb" ]; then
+     bash scripts/setup.sh -a /tmp/appdir/$ENGINE -e $ENGINE -l 'speechoid:@tcp(127.0.0.1:3306)'
      if [ -v DO_IMPORT ]; then
-         bash scripts/import.sh -e mariadb  -f lexdata -a /tmp/appdir/mariadb -r $RELEASE -l 'speechoid:@tcp(127.0.0.1:3306)'
+         bash scripts/import.sh -e /$ENGINE  -f lexdata -a /tmp/appdir/$ENGINE -r $RELEASE -l 'speechoid:@tcp(127.0.0.1:3306)'
      fi
-     bash scripts/start_server.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -p $PORT
+     bash scripts/start_server.sh -a /tmp/appdir/$ENGINE -e $ENGINE -l 'speechoid:@tcp(127.0.0.1:3306)' -p $PORT
      export pid=$!
    else 
+     bash scripts/setup.sh -a /tmp/appdir/$ENGINE -e $ENGINE
      if [ -v DO_IMPORT ]; then
-         bash scripts/import.sh -e sqlite -f lexdata -a /tmp/appdir/sqlite -r $RELEASE
+         bash scripts/import.sh -e $ENGINE -f lexdata -a /tmp/appdir/$ENGINE -r $RELEASE
      fi
-     bash scripts/start_server.sh -a /tmp/appdir/sqlite -e sqlite -p $PORT &
+     bash scripts/start_server.sh -a /tmp/appdir/$ENGINE -e $ENGINE -p $PORT &
      export pid=$!
    fi
 
