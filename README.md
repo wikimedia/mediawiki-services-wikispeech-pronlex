@@ -40,9 +40,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    `pronlex$ go test ./...`
 
 
-### II. Quick start: Create a lexicon database file and look up a word
+### II. Quick start: Create a lexicon database file and look up a word (for Sqlite configuration)
 
-1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
+1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sqlite.sql.gz`
 
 2) Pre-compile binaries (for faster execution times)
 
@@ -50,11 +50,11 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 2) Create a database file (this takes a while):
 
-    `pronlex$ importSql swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
+    `pronlex$ importSql -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name sv_db swe030224NST.pron-ws.utf8.sqlite.sql.gz`
        
 3) Test looking up a word:
        
-   `pronlex$ lexlookup swe_lex.db åsna`
+   `pronlex$ lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name sv_db -lexicon swe_lex åsna`
 
 
 ### III: Server setup

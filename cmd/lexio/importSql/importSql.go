@@ -202,8 +202,9 @@ func main() {
 
       <SQL DUMP FILE> - sql dump of a lexicon database (.sql or .sql.gz)
      
-     SAMPLE INVOCATION:
+     SAMPLE INVOCATIONS:
        importSql go run . -db_engine mariadb -db_location 'speechoid:@tcp(127.0.0.1:3306)' -db_name sv_db swe030224NST.pron-ws.utf8.mariadb.sql.gz
+       importSql go run . -db_engine sqlite -db_location ~/wikispeech -db_name sv_db swe030224NST.pron-ws.utf8.mariadb.sql.gz
 
 `)
 		flag.PrintDefaults()
@@ -214,6 +215,7 @@ func main() {
 	flag.Parse()
 
 	if len(flag.Args()) != 1 {
+		fmt.Println("?", flag.Args())
 		flag.Usage()
 		os.Exit(1)
 	}
