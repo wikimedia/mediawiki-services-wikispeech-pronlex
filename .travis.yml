@@ -15,11 +15,6 @@ env:
  - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir/sqlite LOC=/tmp/appdir/sqlite
  - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir/mariadb LOC='speechoid:@tcp(127.0.0.1:3306)'
 
-#addons:
-#  mariadb: '10.1'
-
-#services: mysql
-
 script:
  - set -e
  - sudo apt-get install mariadb-client mariadb-server
@@ -41,7 +36,7 @@ script:
          bash scripts/import.sh -e $ENGINE -f lexdata -a $APPDIR -r $RELEASE -l $LOC
      fi
 
- - bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT
+ - bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
  - export pid=$!
 
  - echo "pronlex $ENGINE server started on pid $pid. wait for $SLEEP seconds before shutting down"
