@@ -73,6 +73,22 @@ func buildRegexpRule(ss symbolset.SymbolSet, rType string, rName string, fs []st
 			}
 			return r, nil
 		}
+	case "RequiredTagRe":
+		{
+			r, err := rs.NewRequiredTagRe(ss, rName, level, re, msg, acc, rej)
+			if err != nil {
+				return nilRes, err
+			}
+			return r, nil
+		}
+	case "IllegalTagRe":
+		{
+			r, err := rs.NewIllegalTagRe(ss, rName, level, re, msg, acc, rej)
+			if err != nil {
+				return nilRes, err
+			}
+			return r, nil
+		}
 	}
 	return nilRes, fmt.Errorf("invalid rule type %s for input: %s", rType, strings.Join(fs, "\t"))
 
