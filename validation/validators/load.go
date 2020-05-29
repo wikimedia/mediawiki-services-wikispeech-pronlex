@@ -101,20 +101,21 @@ func parseEntry(testType string, rName string, fs []string) (string, lex.Entry, 
 		return "", lex.Entry{}, fmt.Errorf("invalid line input for %s test: %s", testType, strings.Join(fs, "\t"))
 	}
 	orth := fs[2]
+	tag := fs[3]
 
-	e := lex.Entry{Strn: orth}
-	for _, ts := range strings.Split(fs[3], "#") {
+	e := lex.Entry{Strn: orth, Tag: tag}
+	for _, ts := range strings.Split(fs[4], "#") {
 		ts = strings.TrimSpace(ts)
 		if len(ts) > 0 {
 			t := lex.Transcription{Strn: ts}
 			e.Transcriptions = append(e.Transcriptions, t)
 		}
 	}
-	if len(fs) > 4 {
-		e.Language = fs[4]
-	}
 	if len(fs) > 5 {
-		e.PartOfSpeech = fs[5]
+		e.Language = fs[5]
+	}
+	if len(fs) > 6 {
+		e.PartOfSpeech = fs[6]
 	}
 
 	return rName, e, nil

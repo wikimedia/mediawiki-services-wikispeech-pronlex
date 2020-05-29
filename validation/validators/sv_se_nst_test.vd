@@ -9,5 +9,5 @@ IllegalTransRe	repeated_phonemes	Fatal	Repeated phonemes cannot be used within t
 IllegalOrthRe	bw:VocalisedOrth	Warning	The bw orthography must be vocalised (it contains >3 consonant chars)	[AbtvjHxd*rzs$SDTZEgfqklmnhwyp'><&}|{`Y~]{4}
 IllegalOrthRe	bw:OrthLengthPlacement	Fatal	Length symbol (~) is only allowed after (most) consonants"	[^btvjHxd*rzs$SDTZEgfqklmnhwyp>}|{`Y]~
 
-ACCEPT	primary_stress	hEst	\" h E s t
-REJECT	MustHaveTrans	hEst	
+ACCEPT	primary_stress	hEst		\" h E s t
+REJECT	MustHaveTrans	hEst		
