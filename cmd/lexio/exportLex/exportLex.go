@@ -85,9 +85,10 @@ func main() {
 	}
 
 	dieIfEmptyFlag("lex_name", lexName)
-	dieIfEmptyFlag("out_file", lexName)
+	dieIfEmptyFlag("out_file", outFile)
 	if fatalError {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
+		flag.Usage()
 		os.Exit(1)
 	}
 
