@@ -61,7 +61,8 @@ func main() {
 	//var replace = flag.Bool("replace", false, "if the lexicon already exists, delete it before importing the new input data (default: false)")
 	var quiet = flag.Bool("quiet", false, "mute information logging (default: false)")
 	var help = flag.Bool("help", false, "print help message")
-	var createDb = flag.Bool("createdb", false, "create db if it doesn't exist")
+	var createDb = flag.Bool("createdb", false, "create db if it doesn't exist (default: false)")
+	var createLex = flag.Bool("createlex", false, "create lexicon if it doesn't exist (default: false)")
 
 	var engineFlag = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	var dbLocation = flag.String("db_location", "", "db location (folder for sqlite; address for mariadb)")
@@ -208,28 +209,19 @@ SAMPLE INVOCATION:
 	if err != nil {
 		log.Fatalf("Couldn't check if lexicon %s exists: %v", lexRef, err)
 	}
-	if lexExists {
-		// if *replace {
-		// 	log.Printf("Running SuperDelete on lexicon %s. This may take some time. Please do not abort during deletion.\n", lexRef)
-		// 	err := dbm.SuperDeleteLexicon(lexRef)
-		// 	if err != nil {
-		// 		log.Fatalf("Couldn't super delete lexicon %s : %v", lexRef, err)
-		// 		return
-		// 	}
-		// 	log.Printf("Deleted lexicon %s\n", lexRef)
-
-		// } else {
-		//log.Fatalf("Nothing will be added. Lexicon already exists in database: %s. Use the -replace switch if you want to replace the old lexicon.", lexRef)
-		//return
-		log.Fatalf("Nothing will be added. Lexicon already exists in database: %s.", lexRef)
+	if lexExists && *createLex {
+		log.Fatalf("Cannot create lexicon (lexicon already exists): %s.", lexRef)
 		return
-		// }
+	} else if !lexExists && !*createLex {
+		log.Fatalf("Lexicon does not exist (and createlex switch is off): %s.", lexRef)
+		return
 	}
-
-	err = dbm.DefineLexicon(lexRef, symbolSetName, *locale)
-	if err != nil {
-		log.Fatal(err)
-		return
+	if !lexExists {
+		err = dbm.DefineLexicon(lexRef, symbolSetName, *locale)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
 	}
 
 	var logger dbapi.Logger
