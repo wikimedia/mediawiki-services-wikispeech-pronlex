@@ -2465,6 +2465,9 @@ func (sdb sqliteDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error)
 	// log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
 
 	valStats, err := sdb.validationStatsTx(tx, lexiconID)
+	if err != nil {
+		return res, err
+	}
 	res.ValStats = valStats
 
 	latestUpdates, err := sdb.latestUpdatesPerSourceTx(tx, lexiconID)
