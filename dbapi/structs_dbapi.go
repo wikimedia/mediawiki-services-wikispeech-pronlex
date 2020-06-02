@@ -201,7 +201,8 @@ type LexStats struct {
 
 	StatusFrequencies []StatusFreq `json:"statusFrequencies"`
 
-	ValStats ValStats
+	ValStats               ValStats
+	LatestUpdatesPerSource LatestUpdatesPerSource
 }
 
 // QueryStats holds the result of a call to the dbapi.LexiconStats function.
@@ -209,6 +210,11 @@ type LexStats struct {
 type QueryStats struct {
 	Query   Query `json:"query"`
 	Entries int64 `json:"entries"`
+}
+
+// LatestUpdatesPerSource holds the latest status timestamp per source
+type LatestUpdatesPerSource struct {
+	Sources map[string]string `json:"sources"` // source name => timestamp
 }
 
 // ValStats is used to incrementally give statistics during a validation process, or to just represent a final validation statistics.
