@@ -440,6 +440,13 @@ var lexiconLookup = urlHandler{
 	},
 }
 
+type MiniEntry struct {
+	Orth   string `json:"orth"`
+	Tag    string `json:"tag"`
+	Status string `json:"status"`
+	Pref   bool   `json:"pref"`
+}
+
 var lexiconEntriesExist = urlHandler{
 	name:     "entries_exist",
 	url:      "/entries_exist",
@@ -476,7 +483,7 @@ var lexiconEntriesExist = urlHandler{
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 			return
 		}
-		var res = make(map[string]bool)
+		var res = make(map[string][]MiniEntry)
 		writer := lex.EntrySliceWriter{}
 		err = dbm.LookUp(q, &writer)
 		if err != nil {
@@ -486,11 +493,12 @@ var lexiconEntriesExist = urlHandler{
 		}
 		for _, e := range writer.Entries {
 			orth := e.Strn
-			res[orth] = true
+			me := MiniEntry{Orth: orth, Tag: e.Tag, Status: e.EntryStatus.Name, Pref: e.Preferred}
+			res[orth] = append(res[orth], me)
 		}
 		for _, orth := range q.Query.Words {
 			if _, ok := res[orth]; !ok {
-				res[orth] = false
+				res[orth] = []MiniEntry{}
 			}
 		}
 		jsn, err := marshal(res, r)
