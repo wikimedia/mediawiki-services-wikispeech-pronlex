@@ -57,7 +57,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    `pronlex$ lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name sv_db -lexicon swe_lex åsna`
 
 
-### III: Server setup
+### III. Server setup
 
 1. Setup the pronlex server:
 
