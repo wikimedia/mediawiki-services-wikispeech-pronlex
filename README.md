@@ -69,6 +69,10 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
    Sets up the pronlex server using the specified database engine and specified location, and a set of test data. The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
 
+   If, for some reason, you are not using the above setup script to configure your pronlex installation, you need to configure mariadb using the mariadb setup script (as root):
+
+   `sudo mysql -u root < scripts/mariadb_setup.sql`
+
 
 2. Import lexicon data (optional)
 
