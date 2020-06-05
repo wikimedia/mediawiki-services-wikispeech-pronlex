@@ -710,7 +710,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 		}
 
 		if e.Tag != "" {
-			err = mdb.insertEntryTagTx(tx, e.ID, e.Tag)
+			err = mdb.insertEntryTagTx(tx, e.ID, e.Tag, e.Strn)
 			if err != nil {
 				msg := fmt.Sprintf("failed to insert entry tag '%s' for '%s': %v", e.Tag, e.Strn, err)
 				err2 := tx.Rollback()
@@ -787,7 +787,7 @@ var insertEntryTagMDB = "INSERT INTO EntryTag (entryId, tag, wordForm) values (?
 //TODO Add db look-up to see if db uniqueness constraints are
 //violated, to return more gentle error (or no error) instead of
 //failing and rolling back.
-func (mdb mariaDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
+func (mdb mariaDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string, wordForm string) error {
 
 	tag = strings.TrimSpace(strings.ToLower(tag))
 
@@ -797,14 +797,14 @@ func (mdb mariaDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) err
 	}
 
 	var eId int64
-	var eTag, wordForm string
+	var eTag, wordForm2 string
 	// Check if it is already there, then silently do nuttin'
-	chkResErr := tx.QueryRow("SELECT entryId, tag, wordForm FROM EntryTag WHERE entryId = ?", entryID).Scan(&eId, &eTag, &wordForm)
+	chkResErr := tx.QueryRow("SELECT entryId, tag, wordForm FROM EntryTag WHERE entryId = ?", entryID).Scan(&eId, &eTag, &wordForm2)
 	_ = chkResErr
 	//sdkjjks :=
 
 	// Entry already has wanted tag, silently accept the fact
-	if eId == entryID && eTag == tag {
+	if eId == entryID && eTag == tag && wordForm == wordForm2 {
 		return nil
 	}
 
@@ -1016,9 +1016,8 @@ func (mdb mariaDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out l
 
 	sqlStmt := selectEntriesSQL(lexNames, q)
 
-	//log.Printf("SQL %v\n\n", sqlStmt)
-
-	//log.Printf("VALUES %v\n\n", values)
+	// log.Printf("SQL %v\n\n", sqlStmt)
+	// log.Printf("VALUES %v\n\n", sqlStmt.values)
 
 	err := mdb.validateInputLexicons(tx, lexNames, q)
 	if err != nil {

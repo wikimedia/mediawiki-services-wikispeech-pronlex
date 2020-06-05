@@ -1132,10 +1132,6 @@ func (sdb sqliteDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out 
 
 	sqlStmt := selectEntriesSQL(lexNames, q)
 
-	//log.Printf("SQL %v\n\n", sqlStmt)
-
-	//log.Printf("VALUES %v\n\n", values)
-
 	err := sdb.validateInputLexicons(tx, lexNames, q)
 	if err != nil {
 		return err

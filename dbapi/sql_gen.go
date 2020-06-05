@@ -267,7 +267,7 @@ func entryTag(q Query) (string, []interface{}) {
 
 	if q.MultipleTags {
 		res += " Entry.strn in (select distinct Entry.strn from EntryTag, Entry where EntryTag.entryId = Entry.id group by EntryTag.wordForm having count(EntryTag.wordForm)> 1)"
-		resv = append(resv, q.MultipleTags)
+		//resv = append(resv, q.MultipleTags)
 	}
 
 	if q.TagLike != "" {
