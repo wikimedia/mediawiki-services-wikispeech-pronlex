@@ -205,6 +205,18 @@ func lemmas(q Query) (string, []interface{}) {
 	return res, resv
 }
 
+func multipleTags(q Query) string {
+	var reses []string
+
+	if q.MultipleTags {
+		reses = append(reses, "Entry.strn in (select distinct Entry.strn from EntryTag, Entry where EntryTag.entryId = Entry.id  group by EntryTag.wordForm having count(EntryTag.wordForm)> 1)")
+	}
+
+	res := strings.Join(reses, " AND ")
+	return res
+
+}
+
 func transcriptions(q Query) (string, []interface{}) {
 
 	var reses []string
@@ -363,6 +375,8 @@ type sqlStmt struct {
 }
 
 func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interface{}) {
+	//log.Printf("DEBUG QUERY %#v", q)
+
 	var args []interface{}
 
 	// Query.Lexicons
@@ -396,6 +410,9 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	vl, vlv := validations(q)
 	args = append(args, vlv...)
 
+	mtl := multipleTags(q)
+	args = append(args, mtl)
+
 	// HasEntryValidation doesn't take any argument
 	ev := ""
 	if q.HasEntryValidation {
@@ -403,10 +420,11 @@ func appendQuery(sql string, lexNames []lex.LexName, q Query) (string, []interfa
 	}
 
 	// puts together pieces of sql created above with " and " in between
-	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, us, tl, cl, vl, ev}), " AND "))
+	qRes := strings.TrimSpace(strings.Join(RemoveEmptyStrings([]string{l, w, le, t, es, us, tl, cl, vl, mtl, ev}), " AND "))
 	if qRes != "" {
 		sql += " AND " + qRes
 	}
+	//log.Printf("DEBUG QUERY RESULT %s", sql)
 	return sql, args
 }
 

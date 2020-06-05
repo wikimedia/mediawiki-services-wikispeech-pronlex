@@ -357,6 +357,7 @@ var knownParams = map[string]int{
 	"commentlabellike":    1,
 	"commentsourcelike":   1,
 	"commentlike":         1,
+	"multipletags":        1,
 	"page":                1,
 	"pagelength":          1,
 	"pp":                  1,
@@ -414,6 +415,10 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	hasEntryValidation := false
 	if strings.ToLower(getParam("hasentryvalidation", r)) == "true" {
 		hasEntryValidation = true
+	}
+	multipleTags := false
+	if strings.ToLower(getParam("multipletags", r)) == "true" {
+		multipleTags = true
 	}
 	validationRuleLike := strings.TrimSpace(getParam("validationrulelike", r))
 	validationLevelLike := strings.TrimSpace(getParam("validationlevellike", r))
@@ -478,6 +483,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		Page:                page,
 		PageLength:          pageLength,
 		HasEntryValidation:  hasEntryValidation,
+		MultipleTags:        multipleTags,
 		ValidationRuleLike:  validationRuleLike,
 		ValidationLevelLike: validationLevelLike,
 		Users:               users,

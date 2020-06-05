@@ -1063,7 +1063,7 @@ func (sdb sqliteDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) (
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
 func (sdb sqliteDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
-	//log.Printf("dbapi lookUp QUWRY %#v\n\n", q)
+	//log.Printf("dbapi lookUp QUWRY %#v\tempty?%v\n\n", q, q.Empty())
 
 	if q.Empty() {
 		return nil

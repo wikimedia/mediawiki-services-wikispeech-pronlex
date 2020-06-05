@@ -75,6 +75,8 @@ type Query struct {
 	ValidationRuleLike  string `json:"validationRuleLike"`
 	ValidationLevelLike string `json:"validationLevelLike"`
 
+	MultipleTags bool `json:"multipleTags"`
+
 	// // Search for Entries with EntryValidations with the listed
 	// // validation rule names (such as 'Decomp2Orth', etc)
 	// EntryValidations []string `json:"entryValidations"`
@@ -146,6 +148,8 @@ func (q Query) Empty() bool {
 	case len(q.Users) > 0:
 		return false
 	case q.HasEntryValidation:
+		return false
+	case q.MultipleTags:
 		return false
 
 	}
