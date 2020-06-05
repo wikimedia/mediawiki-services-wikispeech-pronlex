@@ -343,7 +343,7 @@ func TestMultipleTags1Sqlite(t *testing.T) {
 		t.Errorf("Failed to create lexicon db: %v", err)
 	}
 
-	l := lexicon{name: "entrytag_test", symbolSetName: "ZZ", locale: "ll"}
+	l := lexicon{name: "multipletags_test", symbolSetName: "ZZ", locale: "ll"}
 	l, err = sqliteDBIF{}.defineLexicon(db, l)
 	if err != nil {
 		t.Errorf("failed defineLexicon : %v", err)
@@ -393,7 +393,17 @@ func TestMultipleTags1Sqlite(t *testing.T) {
 		Transcriptions: []lex.Transcription{t1b, t2b},
 		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
 
-	_, err = sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1, e2})
+	e3 := lex.Entry{Strn: "apan",
+		PartOfSpeech:   "NN",
+		Morphology:     "NEU UTR",
+		WordParts:      "apan",
+		Language:       "XYZZ",
+		Preferred:      true,
+		Tag:            "entrytag_3",
+		Transcriptions: []lex.Transcription{t1b, t2b},
+		EntryStatus:    lex.EntryStatus{Name: "old1", Source: "tst"}}
+
+	_, err = sqliteDBIF{}.insertEntries(db, l, []lex.Entry{e1, e2, e3})
 	if err != nil {
 		t.Errorf("failed to insert entries : %v", err)
 	}
