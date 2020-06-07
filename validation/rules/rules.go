@@ -201,7 +201,7 @@ func (r IllegalTagRe) Validate(e lex.Entry) (validation.Result, error) {
 		}
 		messages = append(
 			messages,
-			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Strn))
+			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Tag))
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
@@ -245,7 +245,7 @@ func (r RequiredTagRe) Validate(e lex.Entry) (validation.Result, error) {
 		}
 		messages = append(
 			messages,
-			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Strn))
+			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Tag))
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
