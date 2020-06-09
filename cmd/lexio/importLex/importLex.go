@@ -115,10 +115,11 @@ SAMPLE INVOCATION:
 	dieIfEmptyFlag("db_location", dbLocation)
 	dieIfEmptyFlag("db_name", dbName)
 	dieIfEmptyFlag("lex_name", lexName)
-	dieIfEmptyFlag("lex_file", lexName)
+	dieIfEmptyFlag("lex_file", lexFile)
 	dieIfEmptyFlag("locale", locale)
 	dieIfEmptyFlag("symbolset", ssFile)
 	if fatalError {
+		printUsage()
 		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
 		os.Exit(1)
 	}
