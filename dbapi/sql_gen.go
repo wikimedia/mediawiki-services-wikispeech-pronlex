@@ -262,20 +262,20 @@ func users(q Query) (string, []interface{}) {
 
 func entryTag(q Query) (string, []interface{}) {
 
-	var res string
+	var res []string
 	var resv []interface{}
 
 	if q.MultipleTags {
-		res += " Entry.strn in (select distinct Entry.strn from EntryTag, Entry where EntryTag.entryId = Entry.id group by EntryTag.wordForm having count(EntryTag.wordForm)> 1)"
+		res = append(res, " Entry.strn in (select distinct Entry.strn from EntryTag, Entry where EntryTag.entryId = Entry.id group by EntryTag.wordForm having count(EntryTag.wordForm)> 1)")
 		//resv = append(resv, q.MultipleTags)
 	}
 
 	if q.TagLike != "" {
-		res += " Entry.id = EntryTag.entryId AND EntryTag.tag like ? "
+		res = append(res, " Entry.id = EntryTag.entryId AND EntryTag.tag like ? ")
 		resv = append(resv, q.TagLike)
 	}
 
-	return res, resv
+	return strings.Join(res, " AND "), resv
 }
 
 func comments(q Query) (string, []interface{}) {
