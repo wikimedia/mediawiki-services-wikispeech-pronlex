@@ -1,5 +1,8 @@
 language: go
 
+os: linux
+dist: bionic
+
 go:
   - 1.13.x
 
@@ -9,34 +12,35 @@ notifications:
     on_failure: change
 
 env:
- - RELEASE=master SLEEP=60
- - RELEASE=master SLEEP=60 DO_IMPORT=1
-
-addons:
-  mariadb: '10.0'
-
-services: mysql
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir/sqlite LOC=/tmp/appdir/sqlite
+ - RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir/mariadb LOC='speechoid:@tcp(127.0.0.1:3306)'
 
 script:
  - set -e
+ - sudo apt-get install mariadb-client mariadb-server
  - cat go.mod
- - sudo mysql -u root < scripts/mariadb_setup.sql
- - go test -v ./... 
+ #- sudo mysql -u root < scripts/mariadb_setup.sql
  - go get github.com/securego/gosec/cmd/gosec
  - gosec ./...
  - go get honnef.co/go/tools/cmd/staticcheck
  - staticcheck ./...
- - bash scripts/setup.sh /tmp/appdir
 
- - | 
-   if [ -v DO_IMPORT ]; then
-     bash scripts/import.sh lexdata /tmp/appdir master
-   fi
+ # need mariadb for unit tests below to work properly
+ - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+ - bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite -l /tmp/appdir/sqlite
 
- - bash scripts/start_server.sh -a /tmp/appdir &
+ - go test -v ./... 
+
+ - |
+     if [ -v DO_IMPORT ]; then
+         bash scripts/import.sh -e $ENGINE -f lexdata -a $APPDIR -r $RELEASE -l $LOC
+     fi
+
+ - bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
  - export pid=$!
- - echo "pronlex server started on pid $pid. wait for $SLEEP seconds before shutting down"
+
+ - echo "pronlex $ENGINE server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
+
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  
- - docker build . -t pronlex 

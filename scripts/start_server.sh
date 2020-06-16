@@ -11,6 +11,7 @@ PORT="8787"
 PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
 GOBINARIES=0
 SERVERHELP=0
+LOGGER="stderr"
 
 # Test mode:
 TESTON="on"
@@ -30,6 +31,7 @@ Options:
   -l db location (required for mariadb; for sqlite default is application folder)
   -p lexserver port (default: $PORT)
   -b use go binaries (optional, as opposed to 'go run' with source code)
+  -o system logger (stderr, syslog or filename)
   -t test mode (default: $TESTMODE)
      $TESTOFF: no tests
      $TESTON: test before starting lexserver, exit on error
@@ -41,7 +43,7 @@ EXAMPLE INVOCATIONS:
 " >&2
 }
 
-while getopts "hHbt:p:l:e:a:" opt; do
+while getopts "hHbt:p:l:e:a:o:" opt; do
     case $opt in
 	h)
 	    print_help
@@ -66,6 +68,9 @@ while getopts "hHbt:p:l:e:a:" opt; do
 	    ;;
 	p)
 	    PORT=$OPTARG
+	    ;;
+	o)
+	    LOGGER=$OPTARG
 	    ;;
 	b)
 	    GOBINARIES=1
@@ -117,12 +122,15 @@ if [ "$DBENGINE" == "sqlite" ]; then
     DBLOCATION=`readlink -f $DBLOCATION`
 fi
 
+STATIC=`realpath $APPDIR/static`
 
 echo "[$CMD] OPTIONS:" >&2
 echo "[$CMD] application folder: $APPDIR" >&2
 echo "[$CMD] db engine: $DBENGINE" >&2
 echo "[$CMD] db location: $DBLOCATION" >&2
 echo "[$CMD] lexserver port: $PORT" >&2
+echo "[$CMD] static: $STATIC" >&2
+echo "[$CMD] logger: $LOGGER" >&2
 echo "[$CMD] go binaries: $GOBINARIES" >&2
 echo "[$CMD] test mode: $TESTMODE" >&2
 
@@ -136,7 +144,7 @@ function run_go_cmd {
     fi
 }
 
-switches="-db_engine $DBENGINE -db_location $DBLOCATION -static $APPDIR/static "
+switches="-logger $LOGGER -db_engine $DBENGINE -db_location $DBLOCATION -static $STATIC"
 if [ $SERVERHELP -eq 1 ]; then
     switches="-help"
     echo "[$CMD] Calling lexserver help and exit" >&2

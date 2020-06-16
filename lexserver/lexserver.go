@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log/syslog"
 	//"database/sql"
 	"encoding/json"
 	"flag"
@@ -356,6 +357,7 @@ var knownParams = map[string]int{
 	"commentlabellike":    1,
 	"commentsourcelike":   1,
 	"commentlike":         1,
+	"multipletags":        1,
 	"page":                1,
 	"pagelength":          1,
 	"pp":                  1,
@@ -413,6 +415,10 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 	hasEntryValidation := false
 	if strings.ToLower(getParam("hasentryvalidation", r)) == "true" {
 		hasEntryValidation = true
+	}
+	multipleTags := false
+	if strings.ToLower(getParam("multipletags", r)) == "true" {
+		multipleTags = true
 	}
 	validationRuleLike := strings.TrimSpace(getParam("validationrulelike", r))
 	validationLevelLike := strings.TrimSpace(getParam("validationlevellike", r))
@@ -477,6 +483,7 @@ func queryFromParams(r *http.Request) (dbapi.DBMQuery, error) {
 		Page:                page,
 		PageLength:          pageLength,
 		HasEntryValidation:  hasEntryValidation,
+		MultipleTags:        multipleTags,
 		ValidationRuleLike:  validationRuleLike,
 		ValidationLevelLike: validationLevelLike,
 		Users:               users,
@@ -627,6 +634,7 @@ func main() {
 	var test = flag.Bool("test", false, "run server tests")
 	dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	dbLocation = flag.String("db_location", "", fmt.Sprintf("db location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteLocation, defaultMariaDBLocation))
+	var logger = flag.String("logger", "stderr", "System `logger` (stderr, syslog or filename)")
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var version = flag.Bool("version", false, "print version and exit")
 	var help = flag.Bool("help", false, "print usage/help and exit")
@@ -682,6 +690,30 @@ Default ports:
 	if !strings.HasPrefix(port, ":") {
 		port = ":" + port
 	}
+
+	if *logger == "stderr" {
+		// default logger
+	} else if *logger == "syslog" {
+		writer, err := syslog.New(syslog.LOG_INFO, "lexserver")
+		if err != nil {
+			log.Fatalf("Couldn't create logger: %v", err)
+		}
+		log.SetOutput(writer)
+		log.SetFlags(0) // no timestamps etc, since syslog already prints that
+	} else {
+		f, err := os.OpenFile(*logger, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			log.Fatalf("Couldn't create logger: %v", err)
+		}
+		defer func() {
+			err = f.Close()
+			if err != nil {
+				log.Fatalf("Couldn't close logger: %v", err)
+			}
+		}()
+		log.SetOutput(f)
+	}
+	log.Println("lexserver: created logger for " + *logger)
 
 	//symbolSetFileArea = *ssFiles
 	//dbLocation = *dbFiles
@@ -758,7 +790,6 @@ Default ports:
 		shutdown(s)
 	}
 	log.Println("lexserver: BYE!")
-	log.Println("")
 }
 
 func shutdown(s *http.Server) {

@@ -7,7 +7,9 @@
      
      FLAGS:
        -createdb
-         	create db if it doesn't exist
+         	create db if it doesn't exist (default: false)
+       -createlex
+         	create lexicon if it doesn't exist (default: false)
        -db_engine string
          	db engine (sqlite or mariadb) (default "sqlite")
        -db_location string

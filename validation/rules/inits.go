@@ -65,3 +65,33 @@ func NewIllegalOrthRe(ss symbolset.SymbolSet, name string, level string, re stri
 		Reject:   reject,
 	}, nil
 }
+
+func NewRequiredTagRe(ss symbolset.SymbolSet, name string, level string, re string, msg string, accept []lex.Entry, reject []lex.Entry) (validation.Rule, error) {
+	rex, err := ProcessRe(re)
+	if err != nil {
+		return RequiredTagRe{}, err
+	}
+	return RequiredTagRe{
+		NameStr:  name,
+		LevelStr: level,
+		Message:  msg,
+		Re:       rex,
+		Accept:   accept,
+		Reject:   reject,
+	}, nil
+}
+
+func NewIllegalTagRe(ss symbolset.SymbolSet, name string, level string, re string, msg string, accept []lex.Entry, reject []lex.Entry) (validation.Rule, error) {
+	rex, err := ProcessRe(re)
+	if err != nil {
+		return IllegalTagRe{}, err
+	}
+	return IllegalTagRe{
+		NameStr:  name,
+		LevelStr: level,
+		Message:  msg,
+		Re:       rex,
+		Accept:   accept,
+		Reject:   reject,
+	}, nil
+}

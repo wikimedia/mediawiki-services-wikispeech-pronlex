@@ -139,10 +139,10 @@ func main() {
 
 	verb := true
 
-	deleteFlag := flag.Bool("delete", false, "Delete entry. Required flags: -id <int> -db_ref <string> -lex_name <string>")
+	deleteFlag := flag.Bool("delete", false, "Delete entry. Required flags: -id <int> -db_engine <string> -db_location <string> -db_name <string> -lex_name <string>")
 	idFlag := flag.Int("id", 0, "DB entry id")
 
-	printMissingFlag := flag.Bool("missing", false, "Print the words not found in the lexicon. Required flags: -id <int> -db_ref <string> -lex_name <string>")
+	printMissingFlag := flag.Bool("missing", false, "Print the words not found in the lexicon. Required flags: -db_engine <string> -db_location <string> -db_name <string> -lex_name <string>")
 
 	engineFlag := flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	dbLocation := flag.String("db_location", "", "DB location (folder for sqlite; address for mariadb)")

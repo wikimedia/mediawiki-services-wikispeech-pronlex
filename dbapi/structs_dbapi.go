@@ -75,6 +75,8 @@ type Query struct {
 	ValidationRuleLike  string `json:"validationRuleLike"`
 	ValidationLevelLike string `json:"validationLevelLike"`
 
+	MultipleTags bool `json:"multipleTags"`
+
 	// // Search for Entries with EntryValidations with the listed
 	// // validation rule names (such as 'Decomp2Orth', etc)
 	// EntryValidations []string `json:"entryValidations"`
@@ -147,6 +149,8 @@ func (q Query) Empty() bool {
 		return false
 	case q.HasEntryValidation:
 		return false
+	case q.MultipleTags:
+		return false
 
 	}
 
@@ -201,7 +205,8 @@ type LexStats struct {
 
 	StatusFrequencies []StatusFreq `json:"statusFrequencies"`
 
-	ValStats ValStats
+	ValStats               ValStats
+	LatestUpdatesPerSource LatestUpdatesPerSource
 }
 
 // QueryStats holds the result of a call to the dbapi.LexiconStats function.
@@ -209,6 +214,11 @@ type LexStats struct {
 type QueryStats struct {
 	Query   Query `json:"query"`
 	Entries int64 `json:"entries"`
+}
+
+// LatestUpdatesPerSource holds the latest status timestamp per source
+type LatestUpdatesPerSource struct {
+	Sources map[string]string `json:"sources"` // source name => timestamp
 }
 
 // ValStats is used to incrementally give statistics during a validation process, or to just represent a final validation statistics.

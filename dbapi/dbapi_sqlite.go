@@ -108,11 +108,11 @@ func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 
 type sqliteDBIF struct{}
 
-func (mdb sqliteDBIF) name() string {
+func (sdb sqliteDBIF) name() string {
 	return "sqlite"
 }
 
-func (mdb sqliteDBIF) engine() DBEngine {
+func (sdb sqliteDBIF) engine() DBEngine {
 	return Sqlite
 }
 
@@ -1063,7 +1063,7 @@ func (sdb sqliteDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) (
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
 //lex.EntryWriter.
 func (sdb sqliteDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
-	//log.Printf("dbapi lookUp QUWRY %#v\n\n", q)
+	//log.Printf("dbapi lookUp QUWRY %#v\tempty?%v\n\n", q, q.Empty())
 
 	if q.Empty() {
 		return nil
@@ -1131,10 +1131,6 @@ func (sdb sqliteDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out 
 	//log.Printf("dbapi lookUpTx QUWRY %#v\n\n", q)
 
 	sqlStmt := selectEntriesSQL(lexNames, q)
-
-	//log.Printf("SQL %v\n\n", sqlStmt)
-
-	//log.Printf("VALUES %v\n\n", values)
 
 	err := sdb.validateInputLexicons(tx, lexNames, q)
 	if err != nil {
@@ -2465,7 +2461,13 @@ func (sdb sqliteDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error)
 	// log.Printf("dbapi.LexiconStats COUNT PER STATUS TOOK %v\n", t3.Sub(t2))
 
 	valStats, err := sdb.validationStatsTx(tx, lexiconID)
+	if err != nil {
+		return res, err
+	}
 	res.ValStats = valStats
+
+	latestUpdates, err := sdb.latestUpdatesPerSourceTx(tx, lexiconID)
+	res.LatestUpdatesPerSource = latestUpdates
 
 	// t4 := time.Now()
 	// log.Printf("dbapi.LexiconStats VAL STATS TOOK %v\n", t4.Sub(t3))
@@ -2476,6 +2478,36 @@ func (sdb sqliteDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error)
 
 	return res, err
 
+}
+
+func (sdb sqliteDBIF) latestUpdatesPerSourceTx(tx *sql.Tx, lexiconID int64) (LatestUpdatesPerSource, error) {
+	var query = `select t.source, t.Timestamp
+from EntryStatus t
+inner join (
+    select source, id, max(Timestamp) as MaxDate
+    from EntryStatus
+    group by source
+) tm on t.source = tm.source and t.Timestamp = tm.MaxDate and t.id = tm.id`
+
+	res := LatestUpdatesPerSource{Sources: make(map[string]string)}
+
+	rows, err := tx.Query(query)
+	if err != nil {
+		return res, fmt.Errorf("db query failed : %v", err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var source string
+		var timestamp string
+		err = rows.Scan(&source, &timestamp)
+		if err != nil {
+			return res, fmt.Errorf("scanning row failed : %v", err)
+		}
+
+		res.Sources[strings.ToLower(source)] = timestamp
+	}
+	return res, nil
 }
 
 func (sdb sqliteDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {

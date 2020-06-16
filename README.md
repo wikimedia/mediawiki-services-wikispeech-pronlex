@@ -27,9 +27,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
    [Sqlite3](https://www.sqlite.org/): On Linux systems with `apt`, run `sudo apt install sqlite3`
 
-   [MariaDB](https://mariadb.org/): On Linux systems with `apt`, run `sudo apt install mariadb-server` or similar
+   [MariaDB](https://mariadb.org/): On Linux systems with `apt`, run `sudo apt install mariadb-server` or similar (it should be version 10.1.3 or higher)
 
-
+   Please note that you need to install both databases if you intend to run unit tests or other automated tests
 4. Clone the source code
 
    `$ git clone https://github.com/stts-se/pronlex.git`  
@@ -40,9 +40,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    `pronlex$ go test ./...`
 
 
-### II. Quick start: Create a lexicon database file and look up a word
+### II. Quick start: Create a lexicon database file and look up a word (for Sqlite configuration)
 
-1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sql.gz`
+1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sqlite.sql.gz`
 
 2) Pre-compile binaries (for faster execution times)
 
@@ -50,14 +50,14 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 2) Create a database file (this takes a while):
 
-    `pronlex$ importSql swe030224NST.pron-ws.utf8.sql.gz swe_lex.db`
+    `pronlex$ importSql -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name sv_db swe030224NST.pron-ws.utf8.sqlite.sql.gz`
        
 3) Test looking up a word:
        
-   `pronlex$ lexlookup swe_lex.db åsna`
+   `pronlex$ lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name sv_db -lexicon swe_lex åsna`
 
 
-### III: Server setup
+### III. Server setup
 
 1. Setup the pronlex server:
 
@@ -68,6 +68,10 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    `pronlex$ bash scripts/setup.sh -h`
 
    Sets up the pronlex server using the specified database engine and specified location, and a set of test data. The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
+
+   If, for some reason, you are not using the above setup script to configure your pronlex installation, you need to configure mariadb using the mariadb setup script (as root):
+
+   `sudo mysql -u root < scripts/mariadb_setup.sql`
 
 
 2. Import lexicon data (optional)

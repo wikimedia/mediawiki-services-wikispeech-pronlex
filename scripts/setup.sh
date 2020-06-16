@@ -207,7 +207,7 @@ fi
 echo "" >&2
 echo "IMPORT: $LEXDB:sv" >&2
 
-if run_go_command importLex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name sv -locale sv_SE -lex_file $DEMOFILES/swe030224NST.pron-ws.utf8.for_testing -symbolset $SS_FILES/sv-se_ws-sampa.sym ; then
+if run_go_command importLex -createlex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name sv -locale sv_SE -lex_file $DEMOFILES/swe030224NST.pron-ws.utf8.for_testing -symbolset $SS_FILES/sv-se_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:sv FAILED" >&2
@@ -215,7 +215,7 @@ else
 fi
 
 echo "" >&2
-if run_go_command importLex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name nb -locale nb_NO -lex_file $DEMOFILES/nor030224NST.pron-ws.utf8.for_testing -symbolset $SS_FILES/nb-no_ws-sampa.sym ; then
+if run_go_command importLex -createlex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name nb -locale nb_NO -lex_file $DEMOFILES/nor030224NST.pron-ws.utf8.for_testing -symbolset $SS_FILES/nb-no_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:nb FAILED" >&2
@@ -224,7 +224,7 @@ fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2
-if run_go_command importLex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name enu -locale en_US -lex_file $DEMOFILES/cmudict-0.7b-ws.utf8.for_testing -symbolset $SS_FILES/en-us_ws-sampa.sym ; then
+if run_go_command importLex -createlex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name enu -locale en_US -lex_file $DEMOFILES/cmudict-0.7b-ws.utf8.for_testing -symbolset $SS_FILES/en-us_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:enu FAILED" >&2
@@ -233,7 +233,7 @@ else
 
 echo "" >&2
 echo "IMPORT: $LEXDB:ar" >&2
-if  run_go_command importLex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name ar -locale ar_AR -lex_file $DEMOFILES/ar_TEST.pron-ws.utf8.for_testing -symbolset $SS_FILES/ar_ws-sampa.sym ; then
+if  run_go_command importLex -createlex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name ar -locale ar_AR -lex_file $DEMOFILES/ar_TEST.pron-ws.utf8.for_testing -symbolset $SS_FILES/ar_ws-sampa.sym ; then
     echo -n ""
 else
     echo "$LEXDB:ar FAILED" >&2

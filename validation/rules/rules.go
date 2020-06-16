@@ -113,7 +113,7 @@ func (r IllegalOrthRe) Validate(e lex.Entry) (validation.Result, error) {
 		}
 		messages = append(
 			messages,
-			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Strn))
+			fmt.Sprintf("%s. Found: \"%s\"", r.Message, e.Strn))
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }
@@ -157,7 +157,95 @@ func (r RequiredOrthRe) Validate(e lex.Entry) (validation.Result, error) {
 		}
 		messages = append(
 			messages,
-			fmt.Sprintf("%s. Found: '%s'", r.Message, e.Strn))
+			fmt.Sprintf("%s. Found: \"%s\"", r.Message, e.Strn))
+	}
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
+}
+
+// IllegalTagRe is a general rule type to check for illegal tag by regexp
+type IllegalTagRe struct {
+	NameStr  string
+	LevelStr string
+	Message  string
+	Re       *regexp2.Regexp
+	Accept   []lex.Entry
+	Reject   []lex.Entry
+}
+
+// ShouldAccept returns a slice of entries that the rule should accept
+func (r IllegalTagRe) ShouldAccept() []lex.Entry {
+	return r.Accept
+}
+
+// ShouldReject returns a slice of entries that the rule should reject
+func (r IllegalTagRe) ShouldReject() []lex.Entry {
+	return r.Reject
+}
+
+// Name is the name of this rule
+func (r IllegalTagRe) Name() string {
+	return r.NameStr
+}
+
+// Level is the rule level (typically format, fatal, warning, info)
+func (r IllegalTagRe) Level() string {
+	return r.LevelStr
+}
+
+// Validate a lex.Entry
+func (r IllegalTagRe) Validate(e lex.Entry) (validation.Result, error) {
+	var messages = make([]string, 0)
+	if m, err := r.Re.MatchString(strings.TrimSpace(e.Tag)); m {
+		if err != nil {
+			return validation.Result{RuleName: r.Name(), Level: r.Level()}, err
+		}
+		messages = append(
+			messages,
+			fmt.Sprintf("%s. Found: \"%s\"", r.Message, e.Tag))
+	}
+	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
+}
+
+// RequiredTagRe is a general rule type used to defined basic tag requirements using regexps
+type RequiredTagRe struct {
+	NameStr  string
+	LevelStr string
+	Message  string
+	Re       *regexp2.Regexp
+	Accept   []lex.Entry
+	Reject   []lex.Entry
+}
+
+// ShouldAccept returns a slice of entries that the rule should accept
+func (r RequiredTagRe) ShouldAccept() []lex.Entry {
+	return r.Accept
+}
+
+// ShouldReject returns a slice of entries that the rule should reject
+func (r RequiredTagRe) ShouldReject() []lex.Entry {
+	return r.Reject
+}
+
+// Name is the name of this rule
+func (r RequiredTagRe) Name() string {
+	return r.NameStr
+}
+
+// Level is the rule level (typically format, fatal, warning, info)
+func (r RequiredTagRe) Level() string {
+	return r.LevelStr
+}
+
+// Validate a lex.Entry
+func (r RequiredTagRe) Validate(e lex.Entry) (validation.Result, error) {
+	var messages = make([]string, 0)
+	if m, err := r.Re.MatchString(strings.TrimSpace(e.Tag)); !m {
+		if err != nil {
+			return validation.Result{RuleName: r.Name(), Level: r.Level()}, err
+		}
+		messages = append(
+			messages,
+			fmt.Sprintf("%s. Found: \"%s\"", r.Message, e.Tag))
 	}
 	return validation.Result{RuleName: r.Name(), Level: r.Level(), Messages: messages}, nil
 }

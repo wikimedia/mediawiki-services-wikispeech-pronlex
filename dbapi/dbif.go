@@ -24,7 +24,7 @@ type DBIF interface {
 	getLexiconTx(tx *sql.Tx, name string) (lexicon, error)
 	insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int64, error)
 	insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.EntryComment) error
-	insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error
+	//insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error // different signature for mariadb/sqlite
 	insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []lex.EntryValidation) error
 	insertLemma(tx *sql.Tx, l lex.Lemma) (lex.Lemma, error)
 	lexiconStats(db *sql.DB, lexName string) (LexStats, error)

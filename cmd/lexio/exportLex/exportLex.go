@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/mattn/go-sqlite3"
+
 	"github.com/stts-se/pronlex/dbapi"
 	"github.com/stts-se/pronlex/lex"
 	"github.com/stts-se/pronlex/line"
@@ -49,6 +51,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
 		os.Exit(1)
 	}
+	dbapi.Sqlite3WithRegex()
 
 	var dbm *dbapi.DBManager
 	if *engineFlag == "mariadb" {
@@ -82,9 +85,10 @@ func main() {
 	}
 
 	dieIfEmptyFlag("lex_name", lexName)
-	dieIfEmptyFlag("out_file", lexName)
+	dieIfEmptyFlag("out_file", outFile)
 	if fatalError {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
+		flag.Usage()
 		os.Exit(1)
 	}
 
