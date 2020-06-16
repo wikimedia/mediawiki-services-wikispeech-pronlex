@@ -758,6 +758,21 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 		if e.Preferred {
 			pref = 1
 		}
+
+		//TODO: Trigger doesn't work properly in Sqlite as of 2020-06-16. Must set previous preferred to false manually
+		if e.Preferred {
+			var setPreferredFalse = "UPDATE Entry SET preferred = 0 WHERE Entry.strn = ?"
+			_, err := tx.Exec(setPreferredFalse, e.Strn)
+			if err != nil {
+				msg := fmt.Sprintf("failed preferred update of previous entries : %v", err)
+				err2 := tx.Rollback()
+				if err2 != nil {
+					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+				}
+				return ids, fmt.Errorf(msg)
+			}
+		}
+
 		res, err := tx.Stmt(stmt1).Exec(
 			l.id,
 			strings.ToLower(e.Strn),
@@ -1698,6 +1713,20 @@ func (sdb sqliteDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 	if e.Preferred {
 		pref = 1
 	}
+	//TODO: Trigger doesn't work in Sqlite as of 2020-06-16. Must set previous preferred to false manually
+	if e.Preferred {
+		var setPreferredFalse = "UPDATE Entry SET preferred = 0 WHERE Entry.strn = ?"
+		_, err := tx.Exec(setPreferredFalse, e.Strn)
+		if err != nil {
+			msg := fmt.Sprintf("failed preferred update of previous entries : %v", err)
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
+			return false, fmt.Errorf(msg)
+		}
+	}
+
 	_, err := tx.Exec("update entry set preferred = ? where entry.id = ?", pref, e.ID)
 	if err != nil {
 		msg := fmt.Sprintf("failed preferred update : %v", err)
