@@ -70,7 +70,7 @@ func TestPreferred1Sqlite(t *testing.T) {
 		Language:       "",
 		Preferred:      true,
 		Tag:            t1,
-		Transcriptions: []lex.Transcription{lex.Transcription{Strn: "\" r u m", Language: ""}},
+		Transcriptions: []lex.Transcription{{Strn: "\" r u m", Language: ""}},
 		EntryStatus:    lex.EntryStatus{Name: "unchecked", Source: "imported"}}
 
 	e2 := lex.Entry{Strn: "rom",
@@ -79,7 +79,7 @@ func TestPreferred1Sqlite(t *testing.T) {
 		Language:       "",
 		Preferred:      false,
 		Tag:            t2,
-		Transcriptions: []lex.Transcription{lex.Transcription{Strn: "\" r o m", Language: ""}},
+		Transcriptions: []lex.Transcription{{Strn: "\" r o m", Language: ""}},
 		EntryStatus:    lex.EntryStatus{Name: "unchecked", Source: "imported"}}
 
 	// Insert entries
