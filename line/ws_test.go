@@ -2,6 +2,7 @@ package line
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/stts-se/pronlex/lex"
@@ -16,6 +17,53 @@ func Test_NewWS(t *testing.T) {
 		t.Errorf("My heart bleeds: %v", err)
 	}
 	_ = nws // Hooray!
+}
+
+func TestParseComments(t *testing.T) {
+	var cmtString string
+	var got, expect []lex.EntryComment
+	var nws WS
+	var err error
+
+	nws, err = NewWS()
+	if err != nil {
+		t.Errorf("My heart bleeds: %v", err)
+	}
+
+	//
+	cmtString = "[other: ] (nisse) §§§ [spelling: this is a typo] (kalle)"
+	got, err = nws.parseComments(cmtString)
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+
+	expect = []lex.EntryComment{
+		{Label: "other", Comment: "", Source: "nisse"},
+		{Label: "spelling", Comment: "this is a typo", Source: "kalle"},
+	}
+
+	if !reflect.DeepEqual(got, expect) {
+		t.Errorf("Expected %#v, found %#v", expect, got)
+	}
+
+	//
+	cmtString = "[other: ] (nisse) §§§ [spelling: this is a typo] (kalle)"
+	got, err = nws.parseComments(cmtString)
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+
+	expect = []lex.EntryComment{
+		{Label: "other", Comment: "", Source: "nisse"},
+		{Label: "spelling", Comment: "this is a typo", Source: "kalle"},
+	}
+
+	if !reflect.DeepEqual(got, expect) {
+		t.Errorf("Expected %#v, found %#v", expect, got)
+	}
+
 }
 
 func Test_WSParse_01(t *testing.T) {

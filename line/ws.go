@@ -31,7 +31,7 @@ const newline = "<br>"
 // EntryComment.String() : return fmt.Sprintf("[%s: %s] (%s)", c.Label, c.Comment, c.Source)
 
 //lint:ignore S1007 this regexp works so we don't want to change it now
-var commentRe = regexp.MustCompile("^\\[([^)]+): ([^\\]]+)\\] \\(([a-zåäö0-9_-]+)\\)$")
+var commentRe = regexp.MustCompile(`^\[([^)]+): ([^\]]*)\] \(([a-zåäö0-9_-]+)\)$`)
 
 func (ws WS) joinComments(comments []lex.EntryComment) (string, error) {
 	var res = []string{}
@@ -54,6 +54,9 @@ func (ws WS) parseComments(cmts string) ([]lex.EntryComment, error) {
 	}
 	for _, cmt := range strings.Split(cmts, commentDelim) {
 		m := commentRe.FindStringSubmatch(cmt)
+		if len(m) != 4 {
+			return res, fmt.Errorf("Couldn't parse input comment: %s", cmt)
+		}
 		label := m[1]
 		text := strings.Replace(m[2], newline, "\n", -1)
 		source := m[3]
