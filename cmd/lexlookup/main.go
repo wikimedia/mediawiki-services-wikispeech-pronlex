@@ -185,10 +185,10 @@ Flags:
 		os.Exit(0)
 	}
 	flag.Parse()
-	if len(flag.Args()) < 1 {
-		printUsage()
-		os.Exit(0)
-	}
+	// if len(flag.Args()) < 1 {
+	// 	printUsage()
+	// 	os.Exit(0)
+	// }
 
 	dieIfEmptyFlag("db_engine", engineFlag)
 	dieIfEmptyFlag("db_location", dbLocation)
