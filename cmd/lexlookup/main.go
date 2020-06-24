@@ -158,7 +158,7 @@ func main() {
 	}
 
 	var printUsage = func() {
-		fmt.Fprintf(os.Stderr, `USAGE: lexlookup (<words...> | <stdin>)
+		fmt.Fprintln(os.Stderr, `USAGE: lexlookup (<words...> | <stdin>)
 
 If a single word is supplied, it may contain the characters '%%' and '_' for LIKE string search.
 
@@ -175,7 +175,6 @@ Deleting a DB entry:
 lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name wikispeech_lexserver_demo -delete -id <int> -db_ref <string> -lex_name <string>
 
 Flags:
-
 `)
 		flag.PrintDefaults()
 	}
