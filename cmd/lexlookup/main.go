@@ -174,8 +174,7 @@ lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name wikispeec
 Deleting a DB entry:
 lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name wikispeech_lexserver_demo -delete -id <int> -db_ref <string> -lex_name <string>
 
-Flags:
-`)
+Flags:`)
 		flag.PrintDefaults()
 	}
 
