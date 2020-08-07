@@ -1,0 +1,8 @@
+pipelines:
+  test:
+    blubberfile: blubber.yaml
+    stages:
+      - name: run-test
+      - build: test
+      - run: true
+
