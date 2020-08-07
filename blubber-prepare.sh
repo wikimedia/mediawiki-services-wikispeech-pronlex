@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-DIR=`pwd`
+#
+# This script is executed from within the docker image during Blubber build.
+#
+
+mkdir pronlex
+mv * pronlex
 
 m_error() {
   echo $1
@@ -8,56 +13,40 @@ m_error() {
 }
 
 install_go() {
-  cd ${DIR}/blubber
+  cd /srv
   if [ ! -f /tmp/go1.13.linux-amd64.tar.gz ]; then
    if ! wget https://dl.google.com/go/go1.13.linux-amd64.tar.gz -O /tmp/go1.13.linux-amd64.tar.gz; then
      m_error "Unable to download Go lang 1.13 from Google!"
    fi
   fi
-  if [ ! -d ${DIR}/blubber/go ]; then
-    tar xvfz /tmp/go1.13.linux-amd64.tar.gz
-  fi
+  tar xvfz /tmp/go1.13.linux-amd64.tar.gz
   echo "Go installed"
 }
 
 install_pronlex() {
-  cd ${DIR}/blubber/pronlex
+  cd /srv/pronlex
 
   if ! go build ./...; then
     m_error "Failed to build Pronlex!"
   fi
 
-  # todo consider download testdata and test pronlex
-
-  if [ -d ${DIR}/blubber/appdir ]; then
-    rm -rf ${DIR}/blubber/appdir
-  fi
-
   echo "Setting up Pronlex"
-  cd ${DIR}/blubber/pronlex
-  /bin/bash scripts/setup.sh -a ${DIR}/blubber/appdir -e sqlite
+  cd /srv/pronlex
+  /bin/bash scripts/setup.sh -a /srv/appdir -e sqlite
 
 
-  echo "Setting up Lexdata"
-  if [ -d ${DIR}/blubber/lexdata ]; then
-    cd ${DIR}/blubber/lexdata
-    if ! git pull; then
-      m_error "Unable to update Lexdata from Git repo"
-    fi
-  else
-    cd ${DIR}/blubber
-    if ! git clone https://github.com/stts-se/lexdata.git; then
-      m_error "Unable to close Lexdata from Git repo"
-    fi
+  echo "Cloning Lexdata"
+  cd /srv
+  if ! git clone https://github.com/stts-se/lexdata.git; then
+    m_error "Unable to clone Lexdata from Git repo"
   fi
 
   echo "Importing Lexdata"
-  cd ${DIR}/blubber/pronlex
-
-  /bin/bash scripts/import.sh -a ${DIR}/blubber/appdir -e sqlite -f ${DIR}/blubber/lexdata
+  cd /srv/pronlex
+  /bin/bash scripts/import.sh -a /srv/appdir -e sqlite -f /srv/lexdata
 
   echo "Starting Pronlex server. Will wait a minute for it to start up and download any dependencies, and then kill it."
-  /bin/bash scripts/start_server.sh -a ${DIR}/blubber/appdir -p 8080 -e sqlite &
+  /bin/bash scripts/start_server.sh -a /srv/appdir -p 8080 -e sqlite &
   PRONLEX_PID=$!
   for i in $(seq 1 6); do
     if ! kill -0 ${PRONLEX_PID}; then
@@ -70,21 +59,12 @@ install_pronlex() {
   kill ${PRONLEX_PID}
 }
 
-if [ ! -d blubber ]; then
-  cp -r . /tmp/pronlex_tmp
-  mkdir blubber
-  cd blubber
-  mv /tmp/pronlex_tmp pronlex
-fi
+install_go
 
-if [ ! -d ${DIR}/blubber/go ]; then
-  install_go
-fi
-
-export GOROOT=${DIR}/blubber/go
-export GOPATH=${DIR}/blubber/goProjects
+export GOROOT=/srv/go
+export GOPATH=/srv/goProjects
 export PATH=${GOPATH}/bin:${GOROOT}/bin:${PATH}
 
 install_pronlex
 
-echo "Successfully prepared Pronlex! Now run ./blubber-build.sh"
+echo "Successfully prepared Pronlex!"
