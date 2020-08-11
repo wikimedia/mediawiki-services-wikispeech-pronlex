@@ -3,6 +3,6 @@ pipelines:
     blubberfile: blubber.yaml
     stages:
       - name: run-test
-      - build: test
-      - run: true
+        build: test
+        run: true
 
