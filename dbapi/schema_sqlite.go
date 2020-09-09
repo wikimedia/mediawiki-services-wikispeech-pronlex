@@ -205,14 +205,14 @@ CREATE UNIQUE INDEX idx46cf073d on Lemma2Entry (entryId);
 -- Triggers to ensure only one preferred = 1 per orthographic word
 -- When a new entry is added, where preferred is not 0, all other entries for 
 -- the same orthographic word (entry.strn), will have the preferred field set to 0.
-CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
-  BEGIN
-    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
-  END;
-CREATE TRIGGER updatePref BEFORE UPDATE ON ENTRY
-  BEGIN
-    UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
-  END;
+-- CREATE TRIGGER insertPref BEFORE INSERT ON ENTRY
+--   BEGIN
+--     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
+--   END;
+-- CREATE TRIGGER updatePref BEFORE UPDATE ON ENTRY
+--   BEGIN
+--     UPDATE entry SET preferred = 0 WHERE strn = NEW.strn AND NEW.preferred <> 0 AND lexiconid = NEW.lexiconid;
+--   END;
 
 -- Triggers to ensure that there are only one entry status per entry
 CREATE TRIGGER insertEntryStatus BEFORE INSERT ON ENTRYSTATUS

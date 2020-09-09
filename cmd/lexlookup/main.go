@@ -146,7 +146,7 @@ func main() {
 
 	engineFlag := flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	dbLocation := flag.String("db_location", "", "DB location (folder for sqlite; address for mariadb)")
-	dbName := flag.String("db_name", "", "DB reference name")
+	dbName := flag.String("db_name", "", "DB reference name (for sqlite, it should be without the .db suffix")
 	lexName := flag.String("lexicon", "", "Lexicon name")
 
 	var fatalError = false
@@ -158,20 +158,23 @@ func main() {
 	}
 
 	var printUsage = func() {
-		fmt.Fprintf(os.Stderr, `USAGE: lexlookup (<words...> | <stdin>)
+		fmt.Fprintln(os.Stderr, `USAGE: lexlookup (<words...> | <stdin>)
 
 If a single word is supplied, it may contain the characters '%%' and '_' for LIKE string search.
 
+Lookup (list all words starting with 'k'):
+lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name wikispeech_lexserver_demo 'k%'
+
+Lookup (specific words):
+lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name wikispeech_lexserver_demo 'hunden'
 
 Print missing words: 
-lexlookup -missing <words>
+lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name wikispeech_lexserver_demo -missing <words>
 
 Deleting a DB entry:
-lexlookup -delete -id <int> -db_ref <string> -lex_name <string>
+lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name wikispeech_lexserver_demo -delete -id <int> -db_ref <string> -lex_name <string>
 
-Flags:
-
-`)
+Flags:`)
 		flag.PrintDefaults()
 	}
 
@@ -180,15 +183,17 @@ Flags:
 		os.Exit(0)
 	}
 	flag.Parse()
-	if len(flag.Args()) < 1 {
-		printUsage()
-		os.Exit(0)
-	}
+	// if len(flag.Args()) < 1 {
+	// 	printUsage()
+	// 	os.Exit(0)
+	// }
 
 	dieIfEmptyFlag("db_engine", engineFlag)
 	dieIfEmptyFlag("db_location", dbLocation)
 	dieIfEmptyFlag("db_name", dbName)
-	dieIfEmptyFlag("lexicon", lexName)
+	if *deleteFlag {
+		dieIfEmptyFlag("lexicon", lexName)
+	}
 	if fatalError {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("[%s] exit from unrecoverable errors", cmdName))
 		os.Exit(1)
