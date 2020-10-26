@@ -6,3 +6,10 @@ pipelines:
         build: test
         run: true
 
+  publish:
+    blubberfile: blubber.yaml
+    stages:
+      - name: production
+        build: production
+        publish:
+          image: true
