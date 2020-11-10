@@ -811,6 +811,7 @@ func shutdown(s *http.Server) {
 		}
 		log.Printf("lexserver: closed database %s", string(dbName))
 	}
+	log.Println("lexserver: shutdown completed")
 }
 
 func createServer(port string) (*http.Server, error) {

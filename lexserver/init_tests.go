@@ -17,7 +17,7 @@ func runInitTests(s *http.Server, port string) error {
 
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
-			log.Fatal(fmt.Errorf("init_tests: couldn't start test server on port %s : %v", port, err))
+			//log.Fatal(fmt.Errorf("init_tests: couldn't start test server on port %s : %v", port, err))
 		}
 	}()
 
