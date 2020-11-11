@@ -1,6 +1,7 @@
 package main
 
 import (
+	//"time"
 	//"database/sql"
 	"encoding/json"
 	"fmt"
@@ -477,3 +478,30 @@ var adminMoveNewEntries = urlHandler{
 		fmt.Fprintf(w, "number of entries moved from '%s' to '%s': %d", fromLexName, toLexName, moveRes.N)
 	},
 }
+
+// var adminShutdown = urlHandler{
+// 	name: "shutdown",
+// 	url:  "/shutdown",
+// 	help: "Shutdown server",
+// 	//examples: []string{"/shutdown"},
+// 	handler: func(w http.ResponseWriter, r *http.Request) {
+// 		log.Printf("lexserver: shutdown called from Rest API")
+// 		pass := getParam("pass", r)
+// 		if *adminPass != "" && pass != *adminPass {
+// 			if pass == "" {
+// 				fmt.Fprint(w, "Shutdown password must be provided with param 'pass'")
+// 			} else {
+// 				fmt.Fprint(w, "Invalid shutdown password")
+// 			}
+// 			log.Printf("lexserver: invalid shutdown password")
+// 			return
+// 		}
+// 		fmt.Fprintf(w, "Server will shutdown in %v seconds", 3)
+// 		var shutdownFunc = func() {
+// 			time.Sleep(3 * time.Second)
+// 			shutdown()
+// 			os.Exit(0)
+// 		}
+// 		go shutdownFunc()
+// 	},
+// }
