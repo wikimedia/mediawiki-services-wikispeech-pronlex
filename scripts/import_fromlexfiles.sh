@@ -20,15 +20,15 @@ Options:
   -r lexdata release tag (default: master)
   -b use go binaries (optional, as opposed to 'go run' with source code)
 
-Imports lexicon data for Swedish, Norwegian, US English, and a small set of test data for Arabic from the lexdata repository.
+Imports lexicon data for Swedish, Norwegian, US English, and a small set of test data for Arabic from the wikispeech-lexdata repository.
 Imports from sql dump files (file extension .sql.gz).
-If the lexdata folder doesn't exist, it will be downloaded from github: https://github.com/stts-se/lexdata 
+If the lexdata folder doesn't exist, it will be downloaded from github: https://github.com/stts-se/wikispeech-lexdata 
 
 If you don't know what release tag you should use, you should probably use master.
 
 EXAMPLE INVOCATIONS:
- bash $0 -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/lexdata
- bash $0 -a ~/wikispeech/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -f ~/git_repos/lexdata
+ bash $0 -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/wikispeech-lexdata
+ bash $0 -a ~/wikispeech/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)' -f ~/git_repos/wikispeech-lexdata
 " >&2
 }
 
@@ -126,7 +126,7 @@ fi
 if [ -d $LEXDATA ]; then
     cd $LEXDATA && git pull && git checkout $RELEASETAG && cd - || exit 1
 else
-    git clone https://github.com/stts-se/lexdata.git $LEXDATA
+    git clone https://github.com/stts-se/wikispeech-lexdata.git $LEXDATA
     cd $LEXDATA
     git checkout $RELEASETAG
     cd -
