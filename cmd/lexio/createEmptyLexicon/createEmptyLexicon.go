@@ -95,7 +95,7 @@ func main() {
 
 	var printUsage = func() {
 		fmt.Fprintf(os.Stderr, `Usage:
-     $ createEmptyLexicon [flags] <SYMBOL SET NAME> <LOCALE>
+     $ createEmptyLexicon [flags]
 
 Flags: 
 `)
