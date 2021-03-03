@@ -86,7 +86,7 @@ func (h urlHandler) helpHTML(root string) string {
 		//s = s + `<p>Example invocation:`
 		for _, x := range h.examples {
 			urlPretty := root + x
-			url := root + urlEnc(x)
+			url := prefix + root + urlEnc(x)
 			s = s + `<pre><a href="` + url + `">` + urlPretty + `</a></pre>`
 		}
 		//s = s + "</p>"
@@ -302,11 +302,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	html := `<h1>Lexserver</h1>`
 
 	for _, subRouter := range subRouters {
-		html = html + `<p><a href="` + subRouter.root + `"><b>` + removeInitialSlash(subRouter.root) + `</b></a>`
+		html = html + `<p><a href="` + prefix + subRouter.root + "/" + `"><b>` + removeInitialSlash(subRouter.root) + `</b></a>`
 		html = html + " | " + subRouter.desc + "</p>\n\n"
-
 	}
-	html = html + "<p/><hr/><a href='/version'>About Pronlex</a>"
+	html = html + `<p/><hr/><a href="` + prefix + `/version">About Pronlex</a>`
 	fmt.Fprint(w, html)
 }
 
@@ -621,6 +620,8 @@ func isStaticPage(url string) bool {
 	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt" || url == "/ping" || url == "/version"
 }
 
+var prefix string
+
 func main() {
 
 	port := ":8787"
@@ -635,6 +636,7 @@ func main() {
 	dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
 	dbLocation = flag.String("db_location", "", fmt.Sprintf("db location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteLocation, defaultMariaDBLocation))
 	var logger = flag.String("logger", "stderr", "System `logger` (stderr, syslog or filename)")
+	var prefixFlag = flag.String("prefix", "", "Explicit server prefix (e.g. /lexserver)")
 	var static = flag.String("static", filepath.Join(".", "static"), "location for static html files")
 	var version = flag.Bool("version", false, "print version and exit")
 	var help = flag.Bool("help", false, "print usage/help and exit")
@@ -714,6 +716,16 @@ Default ports:
 		log.SetOutput(f)
 	}
 	log.Println("lexserver: created logger for " + *logger)
+
+	prefix = *prefixFlag
+	if prefix != "" {
+		if !strings.HasPrefix(prefix, "/") {
+			prefix = "/" + prefix
+		}
+		// if !strings.HasSuffix(prefix, "/") {
+		// 	prefix = prefix + "/"
+		// }
+	}
 
 	//symbolSetFileArea = *ssFiles
 	//dbLocation = *dbFiles
@@ -811,6 +823,7 @@ func shutdown(s *http.Server) {
 		}
 		log.Printf("lexserver: closed database %s", string(dbName))
 	}
+	log.Println("lexserver: shutdown completed")
 }
 
 func createServer(port string) (*http.Server, error) {
@@ -820,7 +833,7 @@ func createServer(port string) (*http.Server, error) {
 	if !strings.HasPrefix(port, ":") {
 		port = ":" + port
 	}
-	rout := mux.NewRouter().StrictSlash(true)
+	rout := mux.NewRouter().StrictSlash(false)
 
 	var err error // återanvänds för alla fel
 

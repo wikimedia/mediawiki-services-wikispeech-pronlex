@@ -42,7 +42,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 ### II. Quick start: Create a lexicon database file and look up a word (for Sqlite configuration)
 
-1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sqlite.sql.gz`
+1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/wikispeech-lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sqlite.sql.gz`
 
 2) Pre-compile binaries (for faster execution times)
 
@@ -78,9 +78,9 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
    `pronlex$ bash scripts/import.sh -a <application folder> -e <db engine> -l <db location>* -f <lexdata git> `    
    Example:      
-   `pronlex$ bash scripts/import.sh -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/lexdata`   
+   `pronlex$ bash scripts/import.sh -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/wikispeech-lexdata`   
 
-   Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [lexdata repository](https://github.com/stts-se/lexdata).
+   Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [wikispeech-lexdata](https://github.com/stts-se/wikispeech-lexdata) repository.
 If the `<lexdata git>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
 The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
 
@@ -91,7 +91,7 @@ The db location folder is not required for sqlite (if it's not specified, the ap
    * Import database sql dumps files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
 
 
-You can create your own lexicon files, or you can use existing data in the [lexdata repository](https://github.com/stts-se/lexdata). The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
+You can create your own lexicon files, or you can use existing data in the [wikispeech-lexdata](https://github.com/stts-se/wikispeech-lexdata) repository. The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
 
 
 ### IV. Start the lexicon server

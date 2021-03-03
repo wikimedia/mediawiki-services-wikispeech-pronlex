@@ -960,7 +960,7 @@ func TestSqliteImportLexiconBigFileGz(t *testing.T) {
 	}
 
 	// actual tests start here
-	err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
+	err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/wikispeech-lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
 	if err != nil {
 		t.Errorf(fs, nil, err)
 	}
@@ -1053,7 +1053,7 @@ func TestSqliteImportLexiconBigFileGzPostTest(t *testing.T) {
 	// }
 
 	// // actual tests start here
-	// err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
+	// err = ImportSqliteLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/wikispeech-lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
 	// if err != nil {
 	// 	t.Errorf(fs, nil, err)
 	// }

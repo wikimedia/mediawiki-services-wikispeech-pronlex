@@ -107,7 +107,7 @@ There are stand-alone commands for managing the lexicon database. These are loca
   - etc
 * lexicon format definitions
   - default Wikispeech lexicon format
-  - data conversion (for more information, see the [lexdata](https://github.com/stts-se/lexdata)) repository
+  - data conversion (for more information, see the [wikispeech-lexdata](https://github.com/stts-se/wikispeech-lexdata)) repository
     - CMU2WS - CMU US English
     - csCzPhword2WS - Czech dictionary
     - nbNoNST2WS - NST Norwegian bokmål

@@ -33,7 +33,7 @@ script:
 
  - |
      if [ -v DO_IMPORT ]; then
-         bash scripts/import.sh -e $ENGINE -f lexdata -a $APPDIR -r $RELEASE -l $LOC
+         bash scripts/import.sh -e $ENGINE -f wikispeech-lexdata -a $APPDIR -r $RELEASE -l $LOC
      fi
 
  - bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
