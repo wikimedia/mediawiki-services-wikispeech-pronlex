@@ -7,6 +7,7 @@ SCRIPTDIR=`dirname $0`
 PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
 GOBINARIES=0
 
+DBENGINE="sqlite"
 
 print_help() {
     echo "
@@ -14,7 +15,7 @@ USAGE: bash $CMD [options]
 
 Options:
   -h print help/options and exit
-  -e db engine (required)
+  -e db engine (optional, default: sqlite)
   -a application folder (required)
   -l db location (required for mariadb; for sqlite default is application folder)
   -b use go binaries (optional, as opposed to 'go run' with source code)

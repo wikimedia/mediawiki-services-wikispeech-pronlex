@@ -14,6 +14,8 @@ GOBINARIES=0
 SERVERHELP=0
 LOGGER="stderr"
 
+DBENGINE="sqlite"
+
 # Test mode:
 TESTON="on"
 TESTOFF="off"
@@ -27,7 +29,7 @@ USAGE bash $CMD [options]
 Options:
   -h print help/options and exit
   -H call $GOCMD help and exit
-  -e db engine (required)
+  -e db engine (optional, default: sqlite)
   -r explicit server prefix (default: empty)
   -a application folder (required)
   -l db location (required for mariadb; for sqlite default is application folder)
