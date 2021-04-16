@@ -119,3 +119,6 @@ Wikimedia's installation instructions for Wikispeech: https://www.mediawiki.org/
 -->
 
 
+---
+
+_This work was supported by the Swedish Post and Telecom Authority (PTS) through the grant "Wikispeech – en användargenererad talsyntes på Wikipedia" (2016–2017)._
