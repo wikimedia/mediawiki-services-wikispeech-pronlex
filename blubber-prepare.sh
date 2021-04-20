@@ -37,7 +37,7 @@ install_pronlex() {
 
   echo "Cloning Lexdata"
   cd /srv
-  if ! git clone https://github.com/stts-se/lexdata.git; then
+  if ! git clone https://github.com/stts-se/wikispeech-lexdata.git lexdata; then
     m_error "Unable to clone Lexdata from Git repo"
   fi
 
