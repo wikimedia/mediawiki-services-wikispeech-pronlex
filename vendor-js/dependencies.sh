@@ -6,7 +6,7 @@ cmd=`basename $0`
 
 echo $gitroot
 
-cd $gitroot && git grep "\<script.*javascript.*\.js" | egrep -v "\<.-- "| sed 's/<script.*src="//' | sed 's/">.*//' >| $outdir/$outfile && echo "[$cmd] Javascript dependencies written to $outdir/$outfile"
+cd $gitroot && git grep "\<script.*javascript.*\.js" | egrep -v "\<.-- "| sed 's/<script.*src="//' | sed 's/">.*//' | egrep -v vendor-js | egrep http >| $outdir/$outfile && echo "[$cmd] Javascript dependencies written to $outdir/$outfile"
 
 cd $outdir
 cat $outfile | egrep http | sed 's/.*\b\(http\)/\1/' | sort -u | xargs wget -c

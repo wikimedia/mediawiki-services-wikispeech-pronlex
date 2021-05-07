@@ -1,44 +1,46 @@
 <html>
-  <head>
-    <title>Import lexicon</title>    
-  </head>
+    <head>
+	<title>Import lexicon</title>    
+    </head>
 
-  <body>
+    <body>
 
-    <h1>Import lexicon</h1>
+	<h1>Import lexicon</h1>
 
-    <p>
-      <span>
+	<p>This page has been disabled.</p>
+	
+	<!-- <p>
+	     <span>
 
-	<form data-bind="submit: $root.importLexiconFile">
-	  <table>
-	    <tr><td>Lexicon DB: </td><td><select data-bind="options: $root.lexiconDBs, optionsCaption: 'Select lexicon db', value: $root.lexiconDB"></select></td></tr>
+	     <form data-bind="submit: $root.importLexiconFile">
+	     <table>
+	     <tr><td>Lexicon DB: </td><td><select data-bind="options: $root.lexiconDBs, optionsCaption: 'Select lexicon db', value: $root.lexiconDB"></select></td></tr>
 
-	    <tr><td>Lexicon name:</td><td> <input data-bind="value: $root.lexiconName"/></td></tr>
-	    <tr><td>Locale: </td><td><input data-bind="value: $root.locale"/></td></tr>
+	     <tr><td>Lexicon name:</td><td> <input data-bind="value: $root.lexiconName"/></td></tr>
+	     <tr><td>Locale: </td><td><input data-bind="value: $root.locale"/></td></tr>
 
-	    <tr><td>Symbol set: </td><td><select data-bind="options: $root.symbolSetNames, optionsCaption: 'Select symbol set', value: $root.symbolSetName"></select></td></tr>
+	     <tr><td>Symbol set: </td><td><select data-bind="options: $root.symbolSetNames, optionsCaption: 'Select symbol set', value: $root.symbolSetName"></select></td></tr>
 
-	    <tr><td>Lexicon file: </td><td><input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/></td></tr>
-	    <tr><td>Validate after import: </td><td><input type="checkbox" data-bind="checked: $root.validate, enable: $root.hasValidator"/></td></tr>
-	    <tr><td colspan="2"><button data-bind="enable: $root.validForm" type="submit">Submit</button></td></tr>
-	  </table>
-	</form>
+	     <tr><td>Lexicon file: </td><td><input type="file" data-bind="event: { change: function() { $root.setSelectedFile($element.files[0]) } }"/></td></tr>
+	     <tr><td>Validate after import: </td><td><input type="checkbox" data-bind="checked: $root.validate, enable: $root.hasValidator"/></td></tr>
+	     <tr><td colspan="2"><button data-bind="enable: $root.validForm" type="submit">Submit</button></td></tr>
+	     </table>
+	     </form>
 
-      </span>
-    </p>
+	     </span>
+	     </p>
 
-    <p>
-      <span data-bind="text: $root.message()"></span>
-    </p>
-    
-    
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
-    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
-    
-    <script type="text/javascript" src="/static/admin/lex_import_page.js"></script>
-    
-
+	     <p>
+	     <span data-bind="text: $root.message()"></span>
+	     </p>
+	     
+	     
+	     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+	     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"></script>
+	     
+	     <script type="text/javascript" src="/static/admin/lex_import_page.js"></script>
+	     
+	-->
   </body>
 </html>
