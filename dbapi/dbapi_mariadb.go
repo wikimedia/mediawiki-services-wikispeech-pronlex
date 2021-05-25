@@ -954,16 +954,27 @@ func (mdb mariaDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex
 	}
 
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		msg := fmt.Sprintf("failed to initialize transaction : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		if tx != nil {
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
 		}
 		return fmt.Errorf(msg)
 	}
-	return mdb.lookUpTx(tx, lexNames, q, out)
+	// defer func() {
+	// 	if tx != nil {
+	// 		tx.Commit()
+	// 	}
+	// }()
+	err = mdb.lookUpTx(tx, lexNames, q, out)
+	if err != nil {
+		return tx.Rollback()
+	} else {
+		return tx.Commit()
+	}
 }
 
 func (mdb mariaDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q Query) error {
