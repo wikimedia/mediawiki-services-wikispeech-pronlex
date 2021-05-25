@@ -138,7 +138,7 @@ func validate(dbif DBIF, db *sql.DB, lexNames []lex.LexName, logger Logger, vd v
 			if err != nil {
 				return stats, fmt.Errorf("couldn't marshal validation stats : %s", err)
 			}
-			msg := fmt.Sprintf("%s", js)
+			msg := string(js)
 			logger.Write(msg)
 		}
 	}
