@@ -2709,7 +2709,7 @@ func (sdb sqliteDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error
 		}
 		return db, fmt.Errorf(msg)
 	}
-	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+	//db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
 
 	// TODO This looks odd, with error handling inside the error handling
 	_, err = db.Exec("PRAGMA foreign_keys = ON")
