@@ -15,8 +15,9 @@ import (
 // DBManager is used by external services (i.e., lexserver) to cache sql database instances along with their names
 type DBManager struct {
 	sync.RWMutex
-	dbs  map[lex.DBRef]*sql.DB
-	dbif DBIF
+	dbs          map[lex.DBRef]*sql.DB
+	dbif         DBIF
+	MaxOpenConns int
 }
 
 func (dbm DBManager) Engine() DBEngine {
@@ -141,6 +142,10 @@ func (dbm *DBManager) OpenDB(dbLocation string, dbRef lex.DBRef) error {
 
 	if err != nil {
 		return fmt.Errorf("DBManager.OpenDB: couldn't open db : %v", err)
+	}
+
+	if dbm.MaxOpenConns > 0 {
+		db.SetMaxOpenConns(dbm.MaxOpenConns)
 	}
 
 	dbm.dbs[dbRef] = db

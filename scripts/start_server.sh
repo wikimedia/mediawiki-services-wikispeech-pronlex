@@ -9,6 +9,7 @@ CMD=`basename $0`
 GOCMD="lexserver"
 PORT="8787"
 PREFIX=""
+MAXOPENCONNS=""
 PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
 GOBINARIES=0
 SERVERHELP=0
@@ -31,6 +32,7 @@ Options:
   -H call $GOCMD help and exit
   -e db engine (optional, default: sqlite)
   -r explicit server prefix (default: empty)
+  -c max open db conns (default: empty)
   -a application folder (required)
   -l db location (required for mariadb; for sqlite default is application folder)
   -p lexserver port (default: $PORT)
@@ -47,7 +49,7 @@ EXAMPLE INVOCATIONS:
 " >&2
 }
 
-while getopts "hHbt:p:l:e:a:o:r:" opt; do
+while getopts "hHbt:p:l:e:a:o:r:c:" opt; do
     case $opt in
 	h)
 	    print_help
@@ -81,6 +83,9 @@ while getopts "hHbt:p:l:e:a:o:r:" opt; do
 	    ;;
 	b)
 	    GOBINARIES=1
+	    ;;
+	c)
+	    MAXOPENCONNS=$OPTARG
 	    ;;
 	t)
 	    TESTMODE=$OPTARG
@@ -139,6 +144,9 @@ echo "[$CMD] lexserver port: $PORT" >&2
 if [ "<$PREFIX>" != "<>" ]; then
    echo "[$CMD] lexserver prefix: $PREFIX" >&2
 fi
+if [ "<$MAXOPENCONNS>" != "<>" ]; then
+   echo "[$CMD] db max open conns: $MAXOPENCONNS" >&2
+fi
 echo "[$CMD] static: $STATIC" >&2
 echo "[$CMD] logger: $LOGGER" >&2
 echo "[$CMD] go binaries: $GOBINARIES" >&2
@@ -157,6 +165,9 @@ function run_go_cmd {
 switches="-logger $LOGGER -db_engine $DBENGINE -db_location $DBLOCATION -static $STATIC"
 if [ "<$PREFIX>" != "<>" ]; then
     switches="$switches -prefix $PREFIX"
+fi
+if [ "<$MAXOPENCONNS>" != "<>" ]; then
+    switches="$switches -max_open_conns $MAXOPENCONNS"
 fi
 if [ $SERVERHELP -eq 1 ]; then
     switches="-help"

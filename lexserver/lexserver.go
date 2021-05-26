@@ -634,6 +634,7 @@ func main() {
 
 	var test = flag.Bool("test", false, "run server tests")
 	dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
+	var maxOpenConns = flag.Int("max_open_conns", 0, "max open connections to one db")
 	dbLocation = flag.String("db_location", "", fmt.Sprintf("db location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteLocation, defaultMariaDBLocation))
 	var logger = flag.String("logger", "stderr", "System `logger` (stderr, syslog or filename)")
 	var prefixFlag = flag.String("prefix", "", "Explicit server prefix (e.g. /lexserver)")
@@ -758,6 +759,7 @@ Default ports:
 		log.Fatal(fmt.Errorf("lexserver: couldn't initialize db manager : %v", err))
 		os.Exit(1)
 	}
+	dbm.MaxOpenConns = *maxOpenConns
 	if engine == dbapi.Sqlite {
 		dbapi.Sqlite3WithRegex()
 	}
