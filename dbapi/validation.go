@@ -19,15 +19,17 @@ func processChunk(dbif DBIF, db *sql.DB, chunk []int64, vd validation.Validator,
 	var w lex.EntrySliceWriter
 
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		msg := fmt.Sprintf("failed to initialize transaction : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+		if tx != nil {
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
+			}
 		}
 		return stats, fmt.Errorf(msg)
 	}
+	defer tx.Commit()
 
 	err = dbif.lookUp(db, []lex.LexName{}, q, &w)
 	if err != nil {
