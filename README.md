@@ -86,7 +86,6 @@ The db location folder is not required for sqlite (if it's not specified, the ap
 
    If you want to import other lexicon data, or just a subset of the data above, you can use one of the following methods:
    
-   * Import lexicon files using the lexserver web API (http://localhost:8787/admin/lex_import_page if you have a running lexicon server on localhost)
    * Import lexicon files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
    * Import database sql dumps files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
 
