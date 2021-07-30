@@ -8,8 +8,8 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/mattn/go-sqlite3 v1.14.8
-	github.com/stts-se/rbg2p v0.0.0-20200806104429-03a0f71aa3db
-	github.com/stts-se/symbolset v0.0.0-20210419124834-2911b700d179
-	golang.org/x/net v0.0.0-20210415231046-e915ea6b2b7d
+	github.com/stts-se/rbg2p v1.0.1
+	github.com/stts-se/symbolset v0.0.0-20210722170237-fd268e11d90d
+	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985
 	golang.org/x/text v0.3.6
 )
