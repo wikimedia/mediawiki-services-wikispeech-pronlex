@@ -887,23 +887,6 @@ func createServer(port string) (*http.Server, error) {
 	rout.HandleFunc("/version", versionHandler)
 	rout.Handle("/websockreg", websocket.Handler(webSockRegHandler))
 
-	// typescript experiments
-	// demo := newSubRouter(rout, "/demo", "Search demo for testing (using typesscript)")
-	// var searchDemoHandler = urlHandler{
-	// 	name:     "search demo page",
-	// 	url:      "/search",
-	// 	help:     "Typescript search demo.",
-	// 	examples: []string{"/search"},
-	// 	handler: func(w http.ResponseWriter, r *http.Request) {
-	// 		http.ServeFile(w, r, filepath.Join(staticFolder, "search_demo.html"))
-	// 	},
-	// }
-
-	// search demo / typescript test
-	//demo.addHandler(searchDemoHandler)
-	//rout.PathPrefix("/lexsearch/externals/").Handler(http.StripPrefix("/lexsearch/externals/", http.FileServer(http.Dir("../web/lexsearch/externals"))))
-	//rout.PathPrefix("/lexsearch/built/").Handler(http.StripPrefix("/lexsearch/built/", http.FileServer(http.Dir("../web/lexsearch/built"))))
-
 	// static
 	rout.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(staticFolder, "favicon.ico"))
