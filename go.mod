@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/dlclark/regexp2 v1.4.0
-	github.com/go-errors/errors v1.1.1
+	github.com/go-errors/errors v1.4.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.7.4
 	github.com/mattn/go-sqlite3 v1.14.8
