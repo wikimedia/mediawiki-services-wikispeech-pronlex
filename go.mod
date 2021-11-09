@@ -9,7 +9,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/mattn/go-sqlite3 v1.14.9
 	github.com/stts-se/rbg2p v1.0.1
-	github.com/stts-se/symbolset v0.0.0-20210722170237-fd268e11d90d
-	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985
+	github.com/stts-se/symbolset v0.0.0-20210730194000-527cefa8ba3f
+	golang.org/x/net v0.0.0-20211108170745-6635138e15ea
 	golang.org/x/text v0.3.7
 )
