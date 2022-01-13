@@ -10,6 +10,6 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/stts-se/rbg2p v1.0.1
 	github.com/stts-se/symbolset v0.0.0-20210730194000-527cefa8ba3f
-	golang.org/x/net v0.0.0-20211108170745-6635138e15ea
+	golang.org/x/net v0.0.0-20220111093109-d55c255bac03
 	golang.org/x/text v0.3.7
 )
