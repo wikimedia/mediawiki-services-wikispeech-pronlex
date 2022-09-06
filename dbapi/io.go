@@ -211,7 +211,7 @@ func ValidateLexiconFile(logger Logger, lexiconFileName string, validator *valid
 	start := time.Now()
 
 	var wg sync.WaitGroup
-	log.Println(fmt.Sprintf("lexiconFileName: %v", lexiconFileName))
+	log.Printf("lexiconFileName: %v\n", lexiconFileName)
 
 	if _, err := os.Stat(lexiconFileName); os.IsNotExist(err) {
 		var msg = fmt.Sprintf("ValidateLexiconFile failed to open file : %v", err)
