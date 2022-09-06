@@ -20,9 +20,9 @@ script:
  - sudo apt-get install mariadb-client mariadb-server siege
  - cat go.mod
  #- sudo mysql -u root < scripts/mariadb_setup.sql
- - go get github.com/securego/gosec/cmd/gosec
+ - go install github.com/securego/gosec/cmd/gosec
  - gosec ./...
- - go get honnef.co/go/tools/cmd/staticcheck
+ - go install honnef.co/go/tools/cmd/staticcheck
  - staticcheck ./...
 
  # need mariadb for unit tests below to work properly
