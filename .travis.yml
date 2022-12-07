@@ -23,8 +23,8 @@ script:
  #- go get github.com/securego/gosec/cmd/gosec
  #- sudo snap install gosec
  #- gosec ./...
- - go get honnef.co/go/tools/cmd/staticcheck
- - staticcheck ./...
+ #- go get honnef.co/go/tools/cmd/staticcheck
+ #- staticcheck ./...
 
  # need mariadb for unit tests below to work properly
  - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
