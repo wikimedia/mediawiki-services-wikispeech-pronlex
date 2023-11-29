@@ -6,7 +6,7 @@ require (
 	github.com/dlclark/regexp2 v1.10.0
 	github.com/go-errors/errors v1.4.2
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	//github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mattn/go-sqlite3 v1.14.18
 	github.com/stts-se/rbg2p v1.0.1
