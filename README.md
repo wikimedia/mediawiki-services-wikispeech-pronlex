@@ -2,7 +2,7 @@
 pronlex is a pronunciation lexicon database with a server behind a simple HTTP API.
 
 [![GoDoc](https://godoc.org/github.com/stts-se/pronlex?status.svg)](https://godoc.org/github.com/stts-se/pronlex)
-[![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex) [![Build Status](https://travis-ci.org/stts-se/pronlex.svg?branch=master)](https://travis-ci.org/stts-se/pronlex)
+[![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/pronlex)](https://goreportcard.com/report/github.com/stts-se/pronlex) [![Build Status](https://travis-ci.com/stts-se/pronlex.svg?branch=master)](https://app.travis-ci.com/stts-se/pronlex)
 
 
 
@@ -86,7 +86,6 @@ The db location folder is not required for sqlite (if it's not specified, the ap
 
    If you want to import other lexicon data, or just a subset of the data above, you can use one of the following methods:
    
-   * Import lexicon files using the lexserver web API (http://localhost:8787/admin/lex_import_page if you have a running lexicon server on localhost)
    * Import lexicon files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
    * Import database sql dumps files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
 
@@ -119,3 +118,6 @@ Wikimedia's installation instructions for Wikispeech: https://www.mediawiki.org/
 -->
 
 
+---
+
+_This work was supported by the Swedish Post and Telecom Authority (PTS) through the grant "Wikispeech – en användargenererad talsyntes på Wikipedia" (2016–2017)._

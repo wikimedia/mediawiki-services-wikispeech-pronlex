@@ -319,10 +319,10 @@ func lexiconFromIDTx(tx *sql.Tx, id int64) (lexicon, error) {
 func (sdb sqliteDBIF) deleteLexicon(db *sql.DB, lexName string) error {
 	log.Printf("deleteLexicon called with lexicon name %s\n", lexName)
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		return err
 	}
+	defer tx.Commit()
 	return sdb.deleteLexiconTx(tx, lexName)
 }
 
@@ -728,10 +728,10 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 	var ids []int64
 	// Transaction -->
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		return ids, fmt.Errorf("begin transaction failed : %v", err)
 	}
+	defer tx.Commit()
 
 	stmt1, err := tx.Prepare(entrySTMTSqlite)
 	if err != nil {
@@ -1013,16 +1013,10 @@ func (sdb sqliteDBIF) associateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry)
 // LookUpIds takes a Query struct, searches the lexicon db, and writes the result to a slice of ids
 func (sdb sqliteDBIF) lookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
-		msg := fmt.Sprintf("failed to initialize transaction : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
-
-		return nil, fmt.Errorf(msg)
+		return nil, fmt.Errorf("failed to initialize transaction : %v", err)
 	}
+	defer tx.Commit()
 	return sdb.lookUpIdsTx(tx, lexNames, q)
 }
 
@@ -1085,15 +1079,10 @@ func (sdb sqliteDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out le
 	}
 
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
-		msg := fmt.Sprintf("failed to initialize transaction : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
-		return fmt.Errorf(msg)
+		return fmt.Errorf("failed to initialize transaction : %v", err)
 	}
+	defer tx.Commit()
 	return sdb.lookUpTx(tx, lexNames, q, out)
 }
 
@@ -1462,16 +1451,18 @@ func getEntriesFromIDs(db *sql.DB, ids []int64, out lex.EntryWriter) error {
 // TODO Full name of DB as input param?
 func (sdb sqliteDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		msg := fmt.Sprintf("failed starting transaction for updating entry : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		if tx != nil {
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
 		}
 
 		return res, updated, fmt.Errorf(msg)
 	}
+	defer tx.Commit()
 
 	updated, err = sdb.updateEntryTx(tx, e)
 	if err != nil {
@@ -2022,15 +2013,17 @@ func (sdb sqliteDBIF) insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []l
 
 func (sdb sqliteDBIF) updateValidation(db *sql.DB, entries []lex.Entry) error {
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		msg := fmt.Sprintf("failed starting transaction for updating validation : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		if tx != nil {
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
 		}
 		return fmt.Errorf(msg)
 	}
+	defer tx.Commit()
 
 	err = sdb.updateValidationTx(tx, entries)
 	if err != nil {
@@ -2162,11 +2155,10 @@ func uniqIDs(ss []Symbol) []int64 {
 */
 func (sdb sqliteDBIF) entryCount(db *sql.DB, lexiconName string) (int64, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
-
 	if err != nil {
 		return -1, fmt.Errorf("dbapi.EntryCount failed opening db transaction : %v", err)
 	}
+	defer tx.Commit()
 
 	// number of entries in a lexicon
 	var entries int64
@@ -2179,11 +2171,10 @@ func (sdb sqliteDBIF) entryCount(db *sql.DB, lexiconName string) (int64, error) 
 
 func (sdb sqliteDBIF) locale(db *sql.DB, lexiconName string) (string, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
-
 	if err != nil {
 		return "", fmt.Errorf("dbapi.EntryCount failed opening db transaction : %v", err)
 	}
+	defer tx.Commit()
 
 	var locale string
 	err = tx.QueryRow("SELECT locale FROM lexicon WHERE lexicon.name = ?", lexiconName).Scan(&locale)
@@ -2541,11 +2532,11 @@ inner join (
 
 func (sdb sqliteDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
-
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
 	}
+	defer tx.Commit()
+
 	lex, err := sdb.getLexiconTx(tx, lexName)
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)
@@ -2709,7 +2700,8 @@ func (sdb sqliteDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error
 		}
 		return db, fmt.Errorf(msg)
 	}
-	db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+	//db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
+	//db.SetMaxOpenConns(251)
 
 	// TODO This looks odd, with error handling inside the error handling
 	_, err = db.Exec("PRAGMA foreign_keys = ON")

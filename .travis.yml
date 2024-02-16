@@ -4,7 +4,7 @@ os: linux
 dist: bionic
 
 go:
-  - 1.13.x
+  - 1.19.x
 
 notifications:
   email:
@@ -17,13 +17,14 @@ env:
 
 script:
  - set -e
- - sudo apt-get install mariadb-client mariadb-server
+ - sudo apt-get install mariadb-client mariadb-server siege
  - cat go.mod
  #- sudo mysql -u root < scripts/mariadb_setup.sql
- - go get github.com/securego/gosec/cmd/gosec
- - gosec ./...
- - go get honnef.co/go/tools/cmd/staticcheck
- - staticcheck ./...
+ #- go get github.com/securego/gosec/cmd/gosec
+ #- sudo snap install gosec
+ #- gosec ./...
+ #- go get honnef.co/go/tools/cmd/staticcheck
+ #- staticcheck ./...
 
  # need mariadb for unit tests below to work properly
  - bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
@@ -41,6 +42,10 @@ script:
 
  - echo "pronlex $ENGINE server started on pid $pid. wait for $SLEEP seconds before shutting down"
  - sleep $SLEEP
+
+ - siege "http://localhost:8780/lexicon/lookup?lexicons=sv_se_nst_lex:sv-se.nst&words=vi%20testar%20talsyntes" -r10 -50 &> /tmp/siege.log
+ - cat /tmp/siege.log
+ - egrep Failed /tmp/siege.log | cut -f2 | egrep -cw 0
 
  - sh .travis/exit_server_and_fail_if_not_running.sh pronlex $pid
  

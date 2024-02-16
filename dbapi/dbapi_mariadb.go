@@ -184,10 +184,10 @@ func (mdb mariaDBIF) getLexiconTx(tx *sql.Tx, name string) (lexicon, error) {
 func (mdb mariaDBIF) deleteLexicon(db *sql.DB, lexName string) error {
 	log.Printf("deleteLexicon called with lexicon name %s\n", lexName)
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		return err
 	}
+	defer tx.Commit()
 	return deleteLexiconTx(tx, lexName)
 }
 
@@ -591,10 +591,10 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 	var ids []int64
 	// Transaction -->
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		return ids, fmt.Errorf("begin transaction failed : %v", err)
 	}
+	defer tx.Commit()
 
 	stmt1, err := tx.Prepare(entrySTMTMDB)
 	if err != nil {
@@ -882,16 +882,10 @@ func (mdb mariaDBIF) associateLemma2Entry(db *sql.Tx, l lex.Lemma, e lex.Entry) 
 // LookUpIds takes a Query struct, searches the lexicon db, and writes the result to a slice of ids
 func (mdb mariaDBIF) lookUpIds(db *sql.DB, lexNames []lex.LexName, q Query) ([]int64, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
-		msg := fmt.Sprintf("failed to initialize transaction : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
-
-		return nil, fmt.Errorf(msg)
+		return nil, fmt.Errorf("failed to initialize transaction : %v", err)
 	}
+	defer tx.Commit()
 	return mdb.lookUpIdsTx(tx, lexNames, q)
 }
 
@@ -948,21 +942,15 @@ func (mdb mariaDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([
 //lex.EntryWriter.
 func (mdb mariaDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
 	//log.Printf("dbapi lookUp QUWRY %#v\n\n", q)
-
 	if q.Empty() {
 		return nil
 	}
 
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
-		msg := fmt.Sprintf("failed to initialize transaction : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
-		}
-		return fmt.Errorf(msg)
+		return fmt.Errorf("failed to initialize transaction : %v", err)
 	}
+	defer tx.Commit()
 	return mdb.lookUpTx(tx, lexNames, q, out)
 }
 
@@ -1318,16 +1306,17 @@ func (mdb mariaDBIF) getEntryFromID(db *sql.DB, id int64) (lex.Entry, error) {
 // TODO Full name of DB as input param?
 func (mdb mariaDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updated bool, err error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		msg := fmt.Sprintf("failed starting transaction for updating entry : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		if tx != nil {
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
 		}
-
 		return res, updated, fmt.Errorf(msg)
 	}
+	defer tx.Commit()
 
 	updated, err = mdb.updateEntryTx(tx, e)
 	if err != nil {
@@ -1881,15 +1870,17 @@ func (mdb mariaDBIF) insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []le
 
 func (mdb mariaDBIF) updateValidation(db *sql.DB, entries []lex.Entry) error {
 	tx, err := db.Begin()
-	defer tx.Commit()
 	if err != nil {
 		msg := fmt.Sprintf("failed starting transaction for updating validation : %v", err)
-		err2 := tx.Rollback()
-		if err2 != nil {
-			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+		if tx != nil {
+			err2 := tx.Rollback()
+			if err2 != nil {
+				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
+			}
 		}
 		return fmt.Errorf(msg)
 	}
+	defer tx.Commit()
 
 	err = mdb.updateValidationTx(tx, entries)
 	if err != nil {
@@ -2010,11 +2001,10 @@ func unique(ns []int64) []int64 {
 
 func (mdb mariaDBIF) entryCount(db *sql.DB, lexiconName string) (int64, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
-
 	if err != nil {
 		return -1, fmt.Errorf("dbapi.EntryCount failed opening db transaction : %v", err)
 	}
+	defer tx.Commit()
 
 	// number of entries in a lexicon
 	var entries int64
@@ -2027,11 +2017,10 @@ func (mdb mariaDBIF) entryCount(db *sql.DB, lexiconName string) (int64, error) {
 
 func (mdb mariaDBIF) locale(db *sql.DB, lexiconName string) (string, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
-
 	if err != nil {
 		return "", fmt.Errorf("dbapi.EntryCount failed opening db transaction : %v", err)
 	}
+	defer tx.Commit()
 
 	var locale string
 	err = tx.QueryRow("SELECT locale FROM Lexicon WHERE Lexicon.name = ?", lexiconName).Scan(&locale)
@@ -2335,11 +2324,11 @@ func (mdb mariaDBIF) lexiconStats(db *sql.DB, lexName string) (LexStats, error) 
 
 func (mdb mariaDBIF) validationStats(db *sql.DB, lexName string) (ValStats, error) {
 	tx, err := db.Begin()
-	defer tx.Commit()
-
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.ValidationStats failed opening db transaction : %v", err)
 	}
+	defer tx.Commit()
+
 	lex, err := mdb.getLexiconTx(tx, lexName)
 	if err != nil {
 		return ValStats{}, fmt.Errorf("dbapi.LexiconStats failed getting lexicon id : %v", err)

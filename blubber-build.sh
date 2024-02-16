@@ -8,6 +8,5 @@ docker rm wikispeech-pronlex
 docker rmi --force wikispeech-pronlex
 
 # build docker
-blubber .pipeline/blubber.yaml test | docker build --tag wikispeech-pronlex-test --file - .
-blubber .pipeline/blubber.yaml production | docker build --tag wikispeech-pronlex --file - .
-
+docker build --tag wikispeech-pronlex-test --file .pipeline/blubber.yaml --target test .
+docker build --tag wikispeech-pronlex --file .pipeline/blubber.yaml --target production .

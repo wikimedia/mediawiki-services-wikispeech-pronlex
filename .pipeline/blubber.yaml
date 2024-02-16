@@ -1,6 +1,8 @@
+# syntax=docker-registry.wikimedia.org/repos/releng/blubber/buildkit:v0.21.1
+
 version: v4
 
-base: docker-registry.wikimedia.org/wikimedia-buster
+base: docker-registry.wikimedia.org/golang1.21
 
 runs:
   insecurely: true
@@ -11,7 +13,7 @@ lives:
 variants:
   build:
     apt:
-      packages: [ gcc, build-essential, sqlite3, git, wget, ca-certificates ]
+      packages: [ gcc, sqlite3, git, wget ]
     builder:
       command: [ ./blubber-prepare.sh ]
       requirements: [ . ]

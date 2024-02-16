@@ -7,13 +7,15 @@ PRONLEXPATH=`readlink -f $0 | xargs dirname | xargs dirname`
 GOBINARIES=0
 RELEASETAG="master"
 
+DBENGINE="sqlite"
+
 print_help(){
 	    echo "
 USAGE bash $CMD [options]
 
 Options:
   -h print help/options and exit
-  -e db engine (required)
+  -e db engine (optional, default: sqlite)
   -a application folder (required)
   -l db location (required for mariadb; for sqlite default is application folder)
   -f lexdata folder (required)

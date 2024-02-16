@@ -4,10 +4,6 @@ echo "Starting Pronlex..."
 
 DIR=`pwd`
 
-export GOROOT=${DIR}/go
-export GOPATH=${DIR}/goProjects
-export PATH=${GOPATH}/bin:${GOROOT}/bin:${PATH}
-
 cd pronlex
 
 if [[ -z "${PRONLEX_MARIADB_URI}" ]]; then

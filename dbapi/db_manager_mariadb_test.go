@@ -74,11 +74,11 @@ func Test_DBManagerMariadb(t *testing.T) {
 
 	_, err = execSchemaMariadb(db1) // Creates new lexicon database
 	if err != nil {
-		log.Fatalf("NO! creating db1 failed %v", err)
+		log.Fatalf("NO! creating db1 for mariadb failed: %v", err)
 	}
 	_, err = execSchemaMariadb(db2) // Creates new lexicon database
 	if err != nil {
-		log.Fatalf("NO! %v", err)
+		log.Fatalf("NO! creating db2 for mariadb failed: %v", err)
 	}
 
 	dbm := NewMariaDBManager()

@@ -634,6 +634,7 @@ func main() {
 
 	var test = flag.Bool("test", false, "run server tests")
 	dbEngine = flag.String("db_engine", "sqlite", "db engine (sqlite or mariadb)")
+	var maxOpenConns = flag.Int("max_open_conns", 0, "max open connections to one db")
 	dbLocation = flag.String("db_location", "", fmt.Sprintf("db location (default \"%s\" for sqlite; \"%s\" for mariadb)", defaultSqliteLocation, defaultMariaDBLocation))
 	var logger = flag.String("logger", "stderr", "System `logger` (stderr, syslog or filename)")
 	var prefixFlag = flag.String("prefix", "", "Explicit server prefix (e.g. /lexserver)")
@@ -758,6 +759,7 @@ Default ports:
 		log.Fatal(fmt.Errorf("lexserver: couldn't initialize db manager : %v", err))
 		os.Exit(1)
 	}
+	dbm.MaxOpenConns = *maxOpenConns
 	if engine == dbapi.Sqlite {
 		dbapi.Sqlite3WithRegex()
 	}
@@ -884,23 +886,6 @@ func createServer(port string) (*http.Server, error) {
 	rout.HandleFunc("/ping", pingHandler)
 	rout.HandleFunc("/version", versionHandler)
 	rout.Handle("/websockreg", websocket.Handler(webSockRegHandler))
-
-	// typescript experiments
-	demo := newSubRouter(rout, "/demo", "Search demo for testing (using typesscript)")
-	var searchDemoHandler = urlHandler{
-		name:     "search demo page",
-		url:      "/search",
-		help:     "Typescript search demo.",
-		examples: []string{"/search"},
-		handler: func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, filepath.Join(staticFolder, "search_demo.html"))
-		},
-	}
-
-	// search demo / typescript test
-	demo.addHandler(searchDemoHandler)
-	rout.PathPrefix("/lexsearch/externals/").Handler(http.StripPrefix("/lexsearch/externals/", http.FileServer(http.Dir("../web/lexsearch/externals"))))
-	rout.PathPrefix("/lexsearch/built/").Handler(http.StripPrefix("/lexsearch/built/", http.FileServer(http.Dir("../web/lexsearch/built"))))
 
 	// static
 	rout.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {

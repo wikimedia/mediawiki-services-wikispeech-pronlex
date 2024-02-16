@@ -14,13 +14,28 @@ import (
 
 // DBManager is used by external services (i.e., lexserver) to cache sql database instances along with their names
 type DBManager struct {
-	sync.RWMutex
-	dbs  map[lex.DBRef]*sql.DB
-	dbif DBIF
+	mutex        *sync.RWMutex
+	dbs          map[lex.DBRef]*sql.DB
+	dbif         DBIF
+	MaxOpenConns int
 }
 
 func (dbm DBManager) Engine() DBEngine {
 	return dbm.dbif.engine()
+}
+
+func (dbm DBManager) Lock() {
+	dbm.mutex.Lock()
+}
+func (dbm DBManager) Unlock() {
+	dbm.mutex.Unlock()
+}
+func (dbm DBManager) RLock() {
+	dbm.mutex.RLock()
+}
+
+func (dbm DBManager) RUnlock() {
+	dbm.mutex.RUnlock()
 }
 
 // NewDBManager creates a new DBManager instance with empty cache
@@ -36,12 +51,12 @@ func NewDBManager(engine DBEngine) (*DBManager, error) {
 
 // NewSqliteDBManager creates a new DBManager instance with empty cache
 func NewSqliteDBManager() *DBManager {
-	return &DBManager{dbs: make(map[lex.DBRef]*sql.DB), dbif: sqliteDBIF{}}
+	return &DBManager{mutex: &sync.RWMutex{}, dbs: make(map[lex.DBRef]*sql.DB), dbif: sqliteDBIF{}}
 }
 
 // NewMariaDBManager creates a new DBManager instance with empty cache
 func NewMariaDBManager() *DBManager {
-	return &DBManager{dbs: make(map[lex.DBRef]*sql.DB), dbif: mariaDBIF{}}
+	return &DBManager{mutex: &sync.RWMutex{}, dbs: make(map[lex.DBRef]*sql.DB), dbif: mariaDBIF{}}
 }
 
 // CloseDB is used to close the specified database
@@ -141,6 +156,10 @@ func (dbm *DBManager) OpenDB(dbLocation string, dbRef lex.DBRef) error {
 
 	if err != nil {
 		return fmt.Errorf("DBManager.OpenDB: couldn't open db : %v", err)
+	}
+
+	if dbm.MaxOpenConns > 0 {
+		db.SetMaxOpenConns(dbm.MaxOpenConns)
 	}
 
 	dbm.dbs[dbRef] = db
