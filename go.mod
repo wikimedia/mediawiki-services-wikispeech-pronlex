@@ -1,6 +1,6 @@
 module github.com/stts-se/pronlex
 
-go 1.19
+go 1.26.0
 
 require (
 	github.com/dlclark/regexp2 v1.10.0
@@ -11,6 +11,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/stts-se/rbg2p v1.0.1
 	github.com/stts-se/symbolset v0.0.0-20210730194000-527cefa8ba3f
-	golang.org/x/net v0.21.0
-	golang.org/x/text v0.14.0
+	golang.org/x/net v0.59.0
+	golang.org/x/text v0.42.0
 )
